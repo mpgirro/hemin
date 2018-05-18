@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<databaseChangeLog
+    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <include file="changelog/1_init_sequence.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/2_create_podcast.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/3_create_episode.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/4_create_feed.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/5_create_chapter.xml" relativeToChangelogFile="true"/>
+
+</databaseChangeLog>

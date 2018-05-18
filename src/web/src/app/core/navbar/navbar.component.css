@@ -1,0 +1,29 @@
+
+input[type=text] {
+  width: 30px;
+
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+
+  background-image: url('/assets/img/searchicon.png');
+  background-size: 14px;
+  background-position: right 7px top 7px;
+  background-repeat: no-repeat;
+
+  -webkit-transition: width 0.4s ease-in-out;
+  -moz-transition:width 0.4s ease-in-out;
+  -o-transition: width 0.4s ease-in-out;
+  transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+  width: 100%;
+
+  box-sizing: border-box;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background-color: white;
+
+}

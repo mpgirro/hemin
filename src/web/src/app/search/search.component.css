@@ -1,0 +1,23 @@
+.search-result {
+
+}
+
+.media-body > h5.mt-0 {
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+img.result-thumb {
+  width: 64px;
+  height: 64px;
+}
+
+#search-box {
+  border-radius: 0;
+}
+
+.result-title {
+  font-size: 1rem;
+  font-weight: bold;
+  color:black;
+}

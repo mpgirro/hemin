@@ -1,0 +1,73 @@
+<div class="col-xl-4 offset-xl-4 col-lg-6 offset-lg-3 col-md-8 offset-md-2 col-sm-10 offset-sm-1 col-12-x px-0">
+
+  <!-- Nav tabs -->
+  <nav class="navbar navbar-expand px-0 mt-5">
+    <span class="navbar-text"><h1 class="h5">Podcast Directory</h1></span>
+    <ul class="nav nav-pills ml-auto" id="episodesTab" role="tablist">
+      <li class="nav-item">
+        <a class="nav-link active" role="tab"
+           id="directory-matrix-tab" href="#directory-matrix"
+           data-toggle="tab" aria-controls="directory-matrix" aria-selected="false">
+          <span class="oi oi-grid-three-up"></span>
+        </a>
+      </li>
+
+      <li class="nav-item">
+        <a class="nav-link" role="tab"
+           id="directory-richlist-tab" href="#directory-richlist"
+           data-toggle="tab" aria-controls="directory-richlist" aria-selected="true">
+          <span class="oi oi-list-rich"></span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+</div>
+
+<!-- Tab panes -->
+<div class="tab-content" id="directoryTabContent">
+
+  <div class="tab-pane fade show active" role="tabpanel"
+       id="directory-matrix" aria-labelledby="directory-matrix-tab">
+
+    <app-podcast-matrix [podcasts]="podcasts"></app-podcast-matrix>
+
+  </div>
+
+  <div class="tab-pane fade col-4 offset-4" role="tabpanel"
+       id="directory-richlist" aria-labelledby="directory-richlist-tab">
+
+    <app-podcast-richlist [podcasts]="podcasts"></app-podcast-richlist>
+
+  </div>
+</div>
+
+
+
+<div *ngIf="podcasts.length > 0">
+  <nav aria-label="Podcasts page navigation" class="mt-3">
+    <ul class="pagination pagination-sm justify-content-center">
+
+      <li class="page-item" [ngClass]="{'disabled':!(currPage > 1)}">
+        <a class="page-link"
+           [routerLink]="['/directory', {p: currPage-1, s: currSize}]"
+           aria-label="Previous">
+          <span aria-hidden="true"><i class="fa fa-angle-left"></i> Prev</span>
+          <span class="sr-only">Previous</span>
+        </a>
+      </li>
+
+      <li class="page-item" [ngClass]="{'disabled':!(podcasts.length == currSize)}">
+        <a class="page-link"
+           [routerLink]="['/directory', {p: currPage+1, s: currSize}]"
+           aria-label="Next">
+          <span aria-hidden="true">Next <i class="fa fa-angle-right"></i></span>
+          <span class="sr-only">Next</span>
+        </a>
+      </li>
+
+    </ul>
+  </nav>
+</div>
+<div *ngIf="podcasts && podcasts.length === 0">
+  <div class="alert alert-warning" role="alert">No podcasts found</div>
+</div>
