@@ -6,7 +6,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
-import exo.engine.domain.dto.ResultWrapperDTO
+import exo.engine.domain.dto.{ResultWrapper}
 import exo.engine.index.IndexProtocol.{IndexResultsFound, SearchIndex}
 
 import scala.concurrent.duration._
@@ -53,7 +53,7 @@ class ExoEngine {
         bus() ! ProposeNewFeed(url)
     }
 
-    def search(query: String, page: Int, size: Int): Future[ResultWrapperDTO] = {
+    def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
         (bus() ? SearchIndex(query, page, size)).map {
             case IndexResultsFound(_, results) => results
         }

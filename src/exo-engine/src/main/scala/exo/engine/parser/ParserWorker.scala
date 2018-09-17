@@ -10,8 +10,8 @@ import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogBroker
 import exo.engine.catalog.CatalogProtocol._
 import exo.engine.domain.FeedStatus
+import exo.engine.domain.dto.Episode
 import exo.engine.index.IndexProtocol.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
-import exo.engine.domain.dto.EpisodeDTO
 import exo.engine.exception.FeedParsingException
 import exo.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
 import exo.engine.parse.api.FyydAPI
@@ -118,7 +118,7 @@ class ParserWorker extends Actor with ActorLogging {
         case ParseFyydEpisodes(podcastExo, json) =>
             log.debug("Received ParseFyydEpisodes({},_)", podcastExo)
 
-            val episodes: List[EpisodeDTO] = fyydAPI.getEpisodes(json).asScala.toList
+            val episodes: List[Episode] = fyydAPI.getEpisodes(json).asScala.toList
             log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastExo)
             for(episode <- episodes){
                 registerEpisode(podcastExo, episode)
@@ -182,13 +182,13 @@ class ParserWorker extends Actor with ActorLogging {
                         for(e <- es.asScala){
                             registerEpisode(podcastExo, e)
                         }
-                    case None => log.warning("Parsing generated a NULL-List[EpisodeDTO] for feed: {}", feedUrl)
+                    case None => log.warning("Parsing generated a NULL-List[Episode] for feed: {}", feedUrl)
                 }
             case None => log.warning("Parsing generated a NULL-PodcastDocument for feed: {}", feedUrl)
         }
     }
 
-    private def registerEpisode(podcastExo: String, episode: EpisodeDTO): Unit = {
+    private def registerEpisode(podcastExo: String, episode: Episode): Unit = {
 
         val e = episodeMapper.toModifiable(episode)
 

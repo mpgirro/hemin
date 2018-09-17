@@ -18,9 +18,9 @@ import javax.annotation.Nullable;
         create     = "new",             // generates public no args constructor
         build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableChapterDTO.class)
-@JsonDeserialize(as = ImmutableChapterDTO.class)
-public interface ChapterDTO {
+@JsonSerialize(as = ImmutableChapter.class)
+@JsonDeserialize(as = ImmutableChapter.class)
+public interface Chapter {
 
     @Nullable
     Long getId();

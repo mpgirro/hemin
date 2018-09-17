@@ -1,9 +1,9 @@
 package exo.engine.index;
 
 
-import exo.engine.domain.dto.EpisodeDTO;
-import exo.engine.domain.dto.IndexDocDTO;
-import exo.engine.domain.dto.PodcastDTO;
+import exo.engine.domain.dto.Episode;
+import exo.engine.domain.dto.IndexDoc;
+import exo.engine.domain.dto.Podcast;
 import exo.engine.mapper.IndexMapper;
 
 /**
@@ -15,23 +15,23 @@ import exo.engine.mapper.IndexMapper;
  */
 public interface IndexCommitter {
 
-    void add(IndexDocDTO doc);
+    void add(IndexDoc doc);
 
-    default void add(PodcastDTO podcast) {
+    default void add(Podcast podcast) {
         add(IndexMapper.INSTANCE.toModifiable(podcast));
     }
 
-    default void add(EpisodeDTO episode) {
+    default void add(Episode episode) {
         add(IndexMapper.INSTANCE.toModifiable(episode));
     }
 
-    void update(IndexDocDTO doc);
+    void update(IndexDoc doc);
 
-    default void update(PodcastDTO podcast) {
+    default void update(Podcast podcast) {
         update(IndexMapper.INSTANCE.toModifiable(podcast));
     }
 
-    default void update(EpisodeDTO episode) {
+    default void update(Episode episode) {
         update(IndexMapper.INSTANCE.toModifiable(episode));
     }
 

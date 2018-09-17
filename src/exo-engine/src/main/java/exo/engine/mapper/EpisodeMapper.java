@@ -1,9 +1,9 @@
 package exo.engine.mapper;
 
 import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.EpisodeDTO;
-import exo.engine.domain.dto.ImmutableEpisodeDTO;
-import exo.engine.domain.dto.ModifiableEpisodeDTO;
+import exo.engine.domain.dto.Episode;
+import exo.engine.domain.dto.ImmutableEpisode;
+import exo.engine.domain.dto.ModifiableEpisode;
 import exo.engine.domain.entity.EpisodeEntity;
 import exo.engine.domain.entity.PodcastEntity;
 import org.mapstruct.Mapper;
@@ -27,79 +27,79 @@ public interface EpisodeMapper {
 
     @Mapping(source = "podcastId", target = "podcast")
     @Mapping(target = "chapters", ignore = true) // TODO this make DB persist calls fail
-    EpisodeEntity toEntity(EpisodeDTO episode);
+    EpisodeEntity toEntity(Episode episode);
 
     @Mapping(source = "podcast.id", target = "podcastId")
     @Mapping(source = "podcast.exo", target = "podcastExo")
     @Mapping(source = "podcast.title", target = "podcastTitle")
     @Mapping(target = "chapters", ignore = true) // TODO this make DB persist calls fail
-    ModifiableEpisodeDTO toModifiable(EpisodeEntity episode);
+    ModifiableEpisode toModifiable(EpisodeEntity episode);
 
-    default ImmutableEpisodeDTO toImmutable(EpisodeEntity episode) {
+    default ImmutableEpisode toImmutable(EpisodeEntity episode) {
         return Optional
             .ofNullable(episode)
             .map(this::toModifiable)
-            .map(ModifiableEpisodeDTO::toImmutable)
+            .map(ModifiableEpisode::toImmutable)
             .orElse(null);
     }
 
-    default ModifiableEpisodeDTO toModifiable(EpisodeDTO episode) {
+    default ModifiableEpisode toModifiable(Episode episode) {
         return Optional
             .ofNullable(episode)
             .map(e -> {
-                if (e instanceof ModifiableEpisodeDTO) {
-                    return (ModifiableEpisodeDTO) e;
+                if (e instanceof ModifiableEpisode) {
+                    return (ModifiableEpisode) e;
                 } else {
-                    return new ModifiableEpisodeDTO().from(e);
+                    return new ModifiableEpisode().from(e);
                 }})
             .orElse(null);
     }
 
-    default ImmutableEpisodeDTO toImmutable(EpisodeDTO episode) {
+    default ImmutableEpisode toImmutable(Episode episode) {
         return Optional
             .ofNullable(episode)
             .map(e -> {
-                if (e instanceof ImmutableEpisodeDTO) {
-                    return (ImmutableEpisodeDTO) e;
+                if (e instanceof ImmutableEpisode) {
+                    return (ImmutableEpisode) e;
                 } else {
-                    return ((ModifiableEpisodeDTO) e).toImmutable();
+                    return ((ModifiableEpisode) e).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableEpisodeDTO update(EpisodeDTO src, @MappingTarget ModifiableEpisodeDTO target);
+    ModifiableEpisode update(Episode src, @MappingTarget ModifiableEpisode target);
 
-    default ModifiableEpisodeDTO update(EpisodeDTO src, @MappingTarget EpisodeDTO target) {
+    default ModifiableEpisode update(Episode src, @MappingTarget Episode target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableEpisodeDTO) {
-                    return (ModifiableEpisodeDTO) t;
+                if (t instanceof ModifiableEpisode) {
+                    return (ModifiableEpisode) t;
                 } else {
-                    return new ModifiableEpisodeDTO().from(t);
+                    return new ModifiableEpisode().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableEpisodeDTO updateImmutable(EpisodeDTO src, @MappingTarget EpisodeDTO target) {
+    default ImmutableEpisode updateImmutable(Episode src, @MappingTarget Episode target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableEpisodeDTO) {
-                    return (ModifiableEpisodeDTO) t;
+                if (t instanceof ModifiableEpisode) {
+                    return (ModifiableEpisode) t;
                 } else {
-                    return new ModifiableEpisodeDTO().from(t);
+                    return new ModifiableEpisode().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableEpisodeDTO::toImmutable)
+            .map(ModifiableEpisode::toImmutable)
             .orElse(null);
     }
 
-    default ImmutableEpisodeDTO toImmutable(org.apache.lucene.document.Document doc) {
+    default ImmutableEpisode toImmutable(org.apache.lucene.document.Document doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutableEpisodeDTO.builder()
+            .map(d -> ImmutableEpisode.builder()
                 .setExo(d.get(IndexField.EXO))
                 .setTitle(d.get(IndexField.TITLE))
                 .setLink(d.get(IndexField.LINK))

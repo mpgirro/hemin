@@ -1,10 +1,9 @@
 package exo.engine.catalog.service
 
 import javax.persistence.EntityManager
-
 import akka.event.LoggingAdapter
 import exo.engine.catalog.repository.{FeedRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.FeedDTO
+import exo.engine.domain.dto.{Feed}
 import exo.engine.mapper.FeedMapper
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
@@ -32,7 +31,7 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def save(feedDTO: FeedDTO): Option[FeedDTO] = {
+    def save(feedDTO: Feed): Option[Feed] = {
         log.debug("Request to save Feed : {}", feedDTO)
         Option(feedDTO)
           .map(f => feedMapper.toEntity(f))
@@ -41,7 +40,7 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOne(dbId: Long): Option[FeedDTO] = {
+    def findOne(dbId: Long): Option[Feed] = {
         log.debug("Request to get Feed (ID) : {}", dbId)
         Option(dbId)
           .map(id => feedRepository.findOne(id))
@@ -49,7 +48,7 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOneByExo(feedExo: String): Option[FeedDTO] = {
+    def findOneByExo(feedExo: String): Option[Feed] = {
         log.debug("Request to get Feed (EXO) : {}", feedExo)
         Option(feedExo)
           .map(exo => feedRepository.findOneByExo(exo))
@@ -57,7 +56,7 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAll(page: Int, size: Int): List[FeedDTO] = {
+    def findAll(page: Int, size: Int): List[Feed] = {
         log.debug("Request to get all Feeds by page : {} and size : {}", page, size)
         val pageable = new PageRequest(page, size)
         feedRepository.findAll(pageable)
@@ -67,7 +66,7 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAllByUrl(url: String): List[FeedDTO] = {
+    def findAllByUrl(url: String): List[Feed] = {
         log.debug("Request to get all Feeds by URL : {}", url)
         feedRepository.findAllByUrl(url)
             .asScala
@@ -76,14 +75,14 @@ class FeedCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOneByUrlAndPodcastExo(url: String, podcastExo: String): Option[FeedDTO] = {
+    def findOneByUrlAndPodcastExo(url: String, podcastExo: String): Option[Feed] = {
         log.debug("Request to get all Feeds by URL : {} and Podcast (EXO) : {}", url, podcastExo)
         val result = feedRepository.findOneByUrlAndPodcastExo(url, podcastExo)
         Option(feedMapper.toImmutable(result))
     }
 
     @Transactional
-    def findAllByPodcast(podcastExo: String): List[FeedDTO] = {
+    def findAllByPodcast(podcastExo: String): List[Feed] = {
         log.debug("Request to get all Feeds by Podcast (EXO) : {}", podcastExo)
         feedRepository.findAllByPodcast(podcastExo)
             .asScala

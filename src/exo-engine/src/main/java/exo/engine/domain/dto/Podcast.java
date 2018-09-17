@@ -34,9 +34,9 @@ import java.util.Set;
         create     = "new",             // generates public no args constructor
         build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutablePodcastDTO.class)
-@JsonDeserialize(as = ImmutablePodcastDTO.class)
-public interface PodcastDTO {
+@JsonSerialize(as = ImmutablePodcast.class)
+@JsonDeserialize(as = ImmutablePodcast.class)
+public interface Podcast {
 
     @Nullable
     Long getId();

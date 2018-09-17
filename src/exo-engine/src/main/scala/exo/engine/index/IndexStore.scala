@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.index.IndexProtocol._
 import exo.engine.index.IndexStoreSearchHandler.RefreshIndexSearcher
-import exo.engine.domain.dto.{ImmutableIndexDocDTO, IndexDocDTO, ResultWrapperDTO}
+import exo.engine.domain.dto._
 import exo.engine.exception.SearchException
 
 import scala.collection.JavaConverters._
@@ -46,7 +46,7 @@ class IndexStore (indexPath: String,
     private val indexSearcher: IndexSearcher = new LuceneSearcher(indexCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
 
     private var indexChanged = false
-    private val cache: mutable.Queue[IndexDocDTO] = new mutable.Queue
+    private val cache: mutable.Queue[IndexDoc] = new mutable.Queue
     private val updateWebsiteQueue: mutable.Queue[(String,String)] = new mutable.Queue
     private val updateImageQueue: mutable.Queue[(String,String)] = new mutable.Queue
     private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
@@ -75,7 +75,7 @@ class IndexStore (indexPath: String,
                 log.error("Error trying to search the index; reason: {}", e.getMessage)
             case e: Exception =>
                 log.error("Unhandled Exception : {}", e.getMessage, e)
-                sender ! IndexProtocol.IndexResultsFound("UNKNOWN", ResultWrapperDTO.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+                sender ! IndexProtocol.IndexResultsFound("UNKNOWN", ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
                 //currQuery = ""
         }
         super.postRestart(cause)
@@ -178,7 +178,7 @@ class IndexStore (indexPath: String,
     private def processWebsiteQueue(queue: mutable.Queue[(String,String)]): Unit = {
         if (queue.nonEmpty) {
             val (exo,html) = queue.dequeue()
-            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDocDTO])
+            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
             entry match {
                 case Some(doc) => indexCommitter.update(doc.withWebsiteData(html))
                 case None      => log.error("Could not retrieve from index for update website (EXO) : {}", exo)
@@ -191,7 +191,7 @@ class IndexStore (indexPath: String,
     private def processImageQueue(queue: mutable.Queue[(String,String)]): Unit = {
         if (queue.nonEmpty) {
             val (exo,image) = queue.dequeue()
-            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDocDTO])
+            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
             entry match {
                 case Some(doc) => indexCommitter.update(doc.withImage(image))
                 case None      => log.error("Could not retrieve from index for update image (EXO) : {}", exo)
@@ -204,7 +204,7 @@ class IndexStore (indexPath: String,
     private def processLinkQueue(queue: mutable.Queue[(String,String)]): Unit = {
         if (queue.nonEmpty) {
             val (exo,link) = queue.dequeue()
-            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDocDTO])
+            val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
             entry match {
                 case Some(doc) => indexCommitter.update(doc.withLink(link))
                 case None      => log.error("Could not retrieve from index for update link (EXO) : {}", exo)

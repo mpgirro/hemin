@@ -1,7 +1,7 @@
 package exo.engine.index;
 
 import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.IndexDocDTO;
+import exo.engine.domain.dto.IndexDoc;
 import exo.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -55,7 +55,7 @@ public class LuceneCommitter implements exo.engine.index.IndexCommitter {
     }
 
     @Override
-    public void add(IndexDocDTO indexDoc) {
+    public void add(IndexDoc indexDoc) {
         log.debug("Appending document to index : {}", indexDoc);
 
         final Document luceneDoc = indexMapper.toLucene(indexDoc);
@@ -67,7 +67,7 @@ public class LuceneCommitter implements exo.engine.index.IndexCommitter {
     }
 
     @Override
-    public void update(IndexDocDTO indexDoc) {
+    public void update(IndexDoc indexDoc) {
         log.debug("Updating document in index : {}", indexDoc);
 
         final Document luceneDoc = indexMapper.toLucene(indexDoc);

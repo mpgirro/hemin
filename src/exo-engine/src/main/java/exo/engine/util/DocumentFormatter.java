@@ -1,6 +1,6 @@
 package exo.engine.util;
 
-import exo.engine.domain.dto.IndexDocDTO;
+import exo.engine.domain.dto.IndexDoc;
 import org.jsoup.Jsoup;
 
 /**
@@ -10,7 +10,7 @@ public class DocumentFormatter {
 
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    public static String cliFormat(IndexDocDTO doc){
+    public static String cliFormat(IndexDoc doc){
         final StringBuilder builder = new StringBuilder();
         switch (doc.getDocType()) {
             case "podcast":

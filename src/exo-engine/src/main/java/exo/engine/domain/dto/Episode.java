@@ -20,9 +20,9 @@ import java.util.List;
         create     = "new",             // generates public no args constructor
         build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableEpisodeDTO.class)
-@JsonDeserialize(as = ImmutableEpisodeDTO.class)
-public interface EpisodeDTO {
+@JsonSerialize(as = ImmutableEpisode.class)
+@JsonDeserialize(as = ImmutableEpisode.class)
+public interface Episode {
 
     @Nullable
     Long getId();
@@ -97,6 +97,6 @@ public interface EpisodeDTO {
     LocalDateTime getRegistrationTimestamp();
 
     @Nullable
-    List<ChapterDTO> getChapters();
+    List<Chapter> getChapters();
 
 }

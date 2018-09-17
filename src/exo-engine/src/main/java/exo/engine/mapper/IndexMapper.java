@@ -30,65 +30,65 @@ public interface IndexMapper {
     @Mapping(target = "contentEncoded", ignore = true)
     @Mapping(target = "transcript", ignore = true)
     @Mapping(target = "websiteData", ignore = true)
-    ModifiableIndexDocDTO toModifiable(PodcastDTO podcast);
+    ModifiableIndexDoc toModifiable(Podcast podcast);
 
     @Mapping(target = "docType", constant = "episode")
     @Mapping(source = "chapters", target = "chapterMarks")
     @Mapping(target = "itunesSummary", ignore = true)
     @Mapping(target = "transcript", ignore = true)
     @Mapping(target = "websiteData", ignore = true)
-    ModifiableIndexDocDTO toModifiable(EpisodeDTO episodeDTO);
+    ModifiableIndexDoc toModifiable(Episode episode);
 
-    default ImmutableIndexDocDTO toImmutable(PodcastDTO podcast) {
+    default ImmutableIndexDoc toImmutable(Podcast podcast) {
         return Optional
             .ofNullable(podcast)
             .map(this::toModifiable)
-            .map(ModifiableIndexDocDTO::toImmutable)
+            .map(ModifiableIndexDoc::toImmutable)
             .orElse(null);
     }
 
-    default ImmutableIndexDocDTO toImmutable(EpisodeDTO episode) {
+    default ImmutableIndexDoc toImmutable(Episode episode) {
         return Optional
             .ofNullable(episode)
             .map(this::toModifiable)
-            .map(ModifiableIndexDocDTO::toImmutable)
+            .map(ModifiableIndexDoc::toImmutable)
             .orElse(null);
     }
 
-    default String map(List<ChapterDTO> chapters){
+    default String map(List<Chapter> chapters){
         return Optional
             .ofNullable(chapters)
             .map(cs -> String.join("\n", cs.stream()
-                .map(ChapterDTO::getTitle)
+                .map(Chapter::getTitle)
                 .collect(Collectors.toList())))
             .orElse(null);
     }
 
-    default ModifiableIndexDocDTO toModifiable(IndexDocDTO doc) {
+    default ModifiableIndexDoc toModifiable(IndexDoc doc) {
         return Optional
             .ofNullable(doc)
             .map(d -> {
-                if (doc instanceof ModifiableIndexDocDTO) {
-                    return (ModifiableIndexDocDTO) d;
+                if (doc instanceof ModifiableIndexDoc) {
+                    return (ModifiableIndexDoc) d;
                 } else {
-                    return new ModifiableIndexDocDTO().from(d);
+                    return new ModifiableIndexDoc().from(d);
                 }})
             .orElse(null);
     }
 
-    default ImmutableIndexDocDTO toImmutable(IndexDocDTO doc) {
+    default ImmutableIndexDoc toImmutable(IndexDoc doc) {
         return Optional
             .ofNullable(doc)
             .map(d -> {
-                if (d instanceof ImmutableIndexDocDTO) {
-                    return (ImmutableIndexDocDTO) d;
+                if (d instanceof ImmutableIndexDoc) {
+                    return (ImmutableIndexDoc) d;
                 } else {
-                    return ((ModifiableIndexDocDTO) d).toImmutable();
+                    return ((ModifiableIndexDoc) d).toImmutable();
                 }})
             .orElse(null);
     }
 
-    default ImmutableIndexDocDTO toImmutable(Document doc) {
+    default ImmutableIndexDoc toImmutable(Document doc) {
 
         if (doc == null) return null;
 
@@ -99,7 +99,7 @@ public interface IndexMapper {
         }
     }
 
-    default Document toLucene(IndexDocDTO doc) {
+    default Document toLucene(IndexDoc doc) {
 
         if (doc == null) return null;
 

@@ -38,7 +38,7 @@ object EngineProtocol {
     case class BenchmarkSearchRequest(query: String, page: Option[Int], size: Option[Int])
 
     // Searcher -> User
-    case class SearchResults(results: ResultWrapperDTO)
+    case class SearchResults(results: ResultWrapper)
 
     // These messages are sent to propagate actorRefs to other actors, to overcome circular dependencies
     trait ActorRefInfo

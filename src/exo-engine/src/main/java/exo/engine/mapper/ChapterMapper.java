@@ -1,8 +1,8 @@
 package exo.engine.mapper;
 
-import exo.engine.domain.dto.ImmutableChapterDTO;
-import exo.engine.domain.dto.ModifiableChapterDTO;
-import exo.engine.domain.dto.ChapterDTO;
+import exo.engine.domain.dto.ImmutableChapter;
+import exo.engine.domain.dto.ModifiableChapter;
+import exo.engine.domain.dto.Chapter;
 import exo.engine.domain.entity.ChapterEntity;
 import exo.engine.domain.entity.EpisodeEntity;
 import org.mapstruct.Mapper;
@@ -23,62 +23,62 @@ public interface ChapterMapper {
     ChapterMapper INSTANCE = Mappers.getMapper( ChapterMapper.class );
 
     @Mapping(source = "episodeId", target = "episode")
-    ChapterEntity toEntity(ChapterDTO chapter);
+    ChapterEntity toEntity(Chapter chapter);
 
     @Mapping(source = "episode.id", target = "episodeId")
     @Mapping(source = "episode.exo", target = "episodeExo")
-    ModifiableChapterDTO toModifiable(ChapterEntity chapter);
+    ModifiableChapter toModifiable(ChapterEntity chapter);
 
-    default ModifiableChapterDTO toModifiable(ChapterDTO chapter) {
+    default ModifiableChapter toModifiable(Chapter chapter) {
         return Optional
             .ofNullable(chapter)
             .map(c -> {
-                if (c instanceof ModifiableChapterDTO) {
-                    return (ModifiableChapterDTO) c;
+                if (c instanceof ModifiableChapter) {
+                    return (ModifiableChapter) c;
                 } else {
-                    return new ModifiableChapterDTO().from(c);
+                    return new ModifiableChapter().from(c);
                 }})
             .orElse(null);
     }
 
-    default ImmutableChapterDTO toImmutable(ChapterDTO chapter) {
+    default ImmutableChapter toImmutable(Chapter chapter) {
         return Optional
             .ofNullable(chapter)
             .map(c -> {
-                if (c instanceof ImmutableChapterDTO) {
-                    return (ImmutableChapterDTO) c;
+                if (c instanceof ImmutableChapter) {
+                    return (ImmutableChapter) c;
                 } else {
-                    return ((ModifiableChapterDTO) c).toImmutable();
+                    return ((ModifiableChapter) c).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableChapterDTO update(ChapterDTO src, @MappingTarget ModifiableChapterDTO target);
+    ModifiableChapter update(Chapter src, @MappingTarget ModifiableChapter target);
 
-    default ModifiableChapterDTO update(ChapterDTO src, @MappingTarget ChapterDTO target) {
+    default ModifiableChapter update(Chapter src, @MappingTarget Chapter target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableChapterDTO) {
-                    return (ModifiableChapterDTO) t;
+                if (t instanceof ModifiableChapter) {
+                    return (ModifiableChapter) t;
                 } else {
-                    return new ModifiableChapterDTO().from(t);
+                    return new ModifiableChapter().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableChapterDTO updateImmutable(ChapterDTO src, @MappingTarget ChapterDTO target) {
+    default ImmutableChapter updateImmutable(Chapter src, @MappingTarget Chapter target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableChapterDTO) {
-                    return (ModifiableChapterDTO) t;
+                if (t instanceof ModifiableChapter) {
+                    return (ModifiableChapter) t;
                 } else {
-                    return new ModifiableChapterDTO().from(t);
+                    return new ModifiableChapter().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableChapterDTO::toImmutable)
+            .map(ModifiableChapter::toImmutable)
             .orElse(null);
     }
 

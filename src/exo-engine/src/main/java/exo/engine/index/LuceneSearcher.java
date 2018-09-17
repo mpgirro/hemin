@@ -1,9 +1,9 @@
 package exo.engine.index;
 
 import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.ImmutableResultWrapperDTO;
-import exo.engine.domain.dto.IndexDocDTO;
-import exo.engine.domain.dto.ResultWrapperDTO;
+import exo.engine.domain.dto.ImmutableResultWrapper;
+import exo.engine.domain.dto.IndexDoc;
+import exo.engine.domain.dto.ResultWrapper;
 import exo.engine.exception.SearchException;
 import exo.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
@@ -76,7 +76,7 @@ public class LuceneSearcher implements exo.engine.index.IndexSearcher {
      *                         documents, or if it exceeds the size of the found documents
      */
     @Override
-    public synchronized ResultWrapperDTO search(String q, int p, int s) throws SearchException {
+    public synchronized ResultWrapper search(String q, int p, int s) throws SearchException {
 
         if ( p < 1 ) {
             throw new SearchException("Requested page number (p) required to be >1, got: " + p);
@@ -96,7 +96,7 @@ public class LuceneSearcher implements exo.engine.index.IndexSearcher {
             throw new SearchException("Request search range (p x s) exceeds maximum search window s of " + MAX_RESULT_COUNT);
         }
 
-        final ImmutableResultWrapperDTO.Builder resultWrapper = ImmutableResultWrapperDTO.builder();
+        final ImmutableResultWrapper.Builder resultWrapper = ImmutableResultWrapper.builder();
 
         // set some sane values, we'll overwrite these if all goes well
         resultWrapper.setCurrPage(0);
@@ -144,7 +144,7 @@ public class LuceneSearcher implements exo.engine.index.IndexSearcher {
             }
 
             int windowSize = Math.max(0, windowEnd - windowStart);
-            final IndexDocDTO[] results = new IndexDocDTO[windowSize];
+            final IndexDoc[] results = new IndexDoc[windowSize];
 
             int j = 0;
             for (int i = windowStart; i < windowEnd; i++) {
@@ -170,7 +170,7 @@ public class LuceneSearcher implements exo.engine.index.IndexSearcher {
     }
 
     @Override
-    public synchronized Optional<IndexDocDTO> findByExo(String exo) throws SearchException {
+    public synchronized Optional<IndexDoc> findByExo(String exo) throws SearchException {
         IndexSearcher indexSearcher = null;
         try {
 

@@ -1,10 +1,9 @@
 package exo.engine.catalog.service
 
 import javax.persistence.EntityManager
-
 import akka.event.LoggingAdapter
 import exo.engine.catalog.repository.{EpisodeRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.{EpisodeDTO, PodcastDTO}
+import exo.engine.domain.dto.{Episode, Podcast}
 import exo.engine.mapper.{EpisodeMapper, PodcastMapper, TeaserMapper}
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository
@@ -33,7 +32,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def save(episodeDTO: EpisodeDTO): Option[EpisodeDTO] = {
+    def save(episodeDTO: Episode): Option[Episode] = {
         log.debug("Request to save Episode : {}", episodeDTO)
         Option(episodeDTO)
           .map(e => episodeMapper.toEntity(e))
@@ -42,7 +41,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findOne(dbId: Long): Option[EpisodeDTO] = {
+    def findOne(dbId: Long): Option[Episode] = {
         log.debug("Request to get Episode (ID) : {}", dbId)
         Option(dbId)
             .map(id => episodeRepository.findOne(id))
@@ -50,7 +49,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findOneByExo(episodeExo: String): Option[EpisodeDTO] = {
+    def findOneByExo(episodeExo: String): Option[Episode] = {
         log.debug("Request to get Episode (EXO) : {}", episodeExo)
         Option(episodeExo)
           .map(exo => episodeRepository.findOneByExo(exo))
@@ -58,7 +57,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findAll(): List[EpisodeDTO] = {
+    def findAll(): List[Episode] = {
         log.debug("Request to get all Episodes")
         episodeRepository.findAll
             .asScala
@@ -67,7 +66,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findAllByPodcast(podcastDTO: PodcastDTO): List[EpisodeDTO] = {
+    def findAllByPodcast(podcastDTO: Podcast): List[Episode] = {
         log.debug("Request to get all Episodes by Podcast : {}", podcastDTO)
         val podcast = podcastMapper.toEntity(podcastDTO)
         episodeRepository.findAllByPodcast(podcast)
@@ -77,7 +76,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findAllByPodcast(podcastExo: String): List[EpisodeDTO] = {
+    def findAllByPodcast(podcastExo: String): List[Episode] = {
         log.debug("Request to get all Episodes by Podcast (EXO) : {}", podcastExo)
         episodeRepository.findAllByPodcastExo(podcastExo)
             .asScala
@@ -86,7 +85,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findAllByPodcastAsTeaser(podcastExo: String): List[EpisodeDTO] = {
+    def findAllByPodcastAsTeaser(podcastExo: String): List[Episode] = {
         log.debug("Request to get all Episodes by Podcast (EXO) as teaser : {}", podcastExo)
         episodeRepository.findAllByPodcastExo(podcastExo)
             .asScala
@@ -95,7 +94,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findAllByPodcastAndGuid(podcastExo: String, guid: String): List[EpisodeDTO] = {
+    def findAllByPodcastAndGuid(podcastExo: String, guid: String): List[Episode] = {
         log.debug("Request to get all Episodes by Podcast (EXO) : {} and GUID : {}", podcastExo, guid)
         episodeRepository.findAllByPodcastAndGuid(podcastExo, guid)
             .asScala
@@ -104,7 +103,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     }
 
     @Transactional(readOnly = true)
-    def findOneByEnclosure(enclosureUrl: String, enclosureLength: Long, enclosureType: String): Option[EpisodeDTO] = {
+    def findOneByEnclosure(enclosureUrl: String, enclosureLength: Long, enclosureType: String): Option[Episode] = {
         log.debug("Request to get Episode by enclosureUrl : '{}' and enclosureLength : {} and enclosureType : {}", enclosureUrl, enclosureLength, enclosureType)
         val result = episodeRepository.findOneByEnlosure(enclosureUrl, enclosureLength, enclosureType)
         Option(episodeMapper.toImmutable(result))

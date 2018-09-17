@@ -2,9 +2,9 @@ package exo.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import exo.engine.EngineProtocol._
+import exo.engine.domain.dto.ResultWrapper
 import exo.engine.index.IndexProtocol.{IndexResultsFound, SearchIndex}
 import exo.engine.index.IndexStoreSearchHandler.RefreshIndexSearcher
-import exo.engine.domain.dto.ResultWrapperDTO
 import exo.engine.exception.SearchException
 
 import scala.concurrent.blocking
@@ -40,7 +40,7 @@ class IndexStoreSearchHandler(indexSearcher: IndexSearcher) extends Actor with A
                 log.error("Error trying to search the index; reason: {}", e.getMessage)
             case e: Exception =>
                 log.error("Unhandled Exception : {}", e.getMessage, e)
-                sender ! IndexProtocol.IndexResultsFound(currQuery, ResultWrapperDTO.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+                sender ! IndexProtocol.IndexResultsFound(currQuery, ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
                 currQuery = ""
         }
         super.postRestart(cause)
@@ -68,7 +68,7 @@ class IndexStoreSearchHandler(indexSearcher: IndexSearcher) extends Actor with A
             log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
 
             currQuery = query // make a copy in case of an exception
-            var results: ResultWrapperDTO = null
+            var results: ResultWrapper = null
             blocking {
                 results = indexSearcher.search(query, page, size)
             }
@@ -78,7 +78,7 @@ class IndexStoreSearchHandler(indexSearcher: IndexSearcher) extends Actor with A
             } else {
                 log.warning("No Podcast matching query: '{}' found in the index", query)
                 //sender ! NoIndexResultsFound(query)
-                sender ! IndexResultsFound(query,ResultWrapperDTO.empty())
+                sender ! IndexResultsFound(query,ResultWrapper.empty())
             }
 
             currQuery = "" // wipe the copy

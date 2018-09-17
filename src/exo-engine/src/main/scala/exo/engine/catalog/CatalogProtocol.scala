@@ -3,7 +3,7 @@ package exo.engine.catalog
 import java.time.LocalDateTime
 
 import exo.engine.domain.FeedStatus
-import exo.engine.domain.dto.{ChapterDTO, EpisodeDTO, FeedDTO, PodcastDTO}
+import exo.engine.domain.dto._
 
 /**
   * @author Maximilian Irro
@@ -15,24 +15,24 @@ object CatalogProtocol {
     trait CatalogCommand extends CatalogMessage
 
     case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
-    case class RegisterEpisodeIfNew(podcastExo: String, episode: EpisodeDTO) extends CatalogCommand // Questions: Parser -> CatalogStore
+    case class RegisterEpisodeIfNew(podcastExo: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
 
 
     trait CatalogEvent extends CatalogMessage
 
-    case class AddPodcastAndFeedIfUnknown(podcast: PodcastDTO, feed: FeedDTO) extends CatalogEvent
+    case class AddPodcastAndFeedIfUnknown(podcast: Podcast, feed: Feed) extends CatalogEvent
 
     // Crawler -> CatalogStore
     case class FeedStatusUpdate(podcastExo: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
     case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
     case class UpdateLinkByExo(exo: String, newUrl: String) extends CatalogEvent
 
-    case class SaveChapter(chapter: ChapterDTO) extends CatalogEvent
+    case class SaveChapter(chapter: Chapter) extends CatalogEvent
 
     // Parser -> CatalogStore
-    case class UpdatePodcast(podcastExo: String, feedUrl: String, podcast: PodcastDTO) extends CatalogEvent
-    case class UpdateEpisode(podcastExo: String, episode: EpisodeDTO) extends CatalogEvent
-    case class UpdateEpisodeWithChapters(podcastExo: String, episode: EpisodeDTO, chapter: List[ChapterDTO]) extends CatalogEvent
+    case class UpdatePodcast(podcastExo: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
+    case class UpdateEpisode(podcastExo: String, episode: Episode) extends CatalogEvent
+    case class UpdateEpisodeWithChapters(podcastExo: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
 
 
     trait CatalogQuery extends CatalogMessage
@@ -57,13 +57,13 @@ object CatalogProtocol {
     trait CatalogQueryResult extends CatalogMessage
 
     // CatalogStore -> Gateway
-    case class PodcastResult(podcast: PodcastDTO) extends CatalogQueryResult
-    case class AllPodcastsResult(results: List[PodcastDTO]) extends CatalogQueryResult
-    case class AllFeedsResult(results: List[FeedDTO]) extends CatalogQueryResult
-    case class EpisodeResult(episode: EpisodeDTO) extends CatalogQueryResult
-    case class EpisodesByPodcastResult(episodes: List[EpisodeDTO]) extends CatalogQueryResult
-    case class FeedsByPodcastResult(feeds: List[FeedDTO]) extends CatalogQueryResult
-    case class ChaptersByEpisodeResult(chapters: List[ChapterDTO]) extends CatalogQueryResult
+    case class PodcastResult(podcast: Podcast) extends CatalogQueryResult
+    case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
+    case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
+    case class EpisodeResult(episode: Episode) extends CatalogQueryResult
+    case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
+    case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
+    case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
     case class NothingFound(exo: String) extends CatalogQueryResult
 
     // some stuff for statistics

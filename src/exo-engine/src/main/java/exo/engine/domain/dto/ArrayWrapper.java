@@ -18,9 +18,9 @@ import java.util.List;
     defaults   = @Value.Immutable(builder = false),  // We may also disable builder
     build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableArrayWrapperDTO.class)
-@JsonDeserialize(as = ImmutableArrayWrapperDTO.class)
-public interface ArrayWrapperDTO<T> {
+@JsonSerialize(as = ImmutableArrayWrapper.class)
+@JsonDeserialize(as = ImmutableArrayWrapper.class)
+public interface ArrayWrapper<T> {
 
     @Value.Parameter
     List<T> getResults();

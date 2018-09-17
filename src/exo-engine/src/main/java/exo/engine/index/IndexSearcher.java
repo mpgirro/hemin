@@ -1,7 +1,7 @@
 package exo.engine.index;
 
-import exo.engine.domain.dto.IndexDocDTO;
-import exo.engine.domain.dto.ResultWrapperDTO;
+import exo.engine.domain.dto.IndexDoc;
+import exo.engine.domain.dto.ResultWrapper;
 import exo.engine.exception.SearchException;
 
 import java.util.Optional;
@@ -11,9 +11,9 @@ import java.util.Optional;
  */
 public interface IndexSearcher {
 
-    ResultWrapperDTO search(String query, int page, int size) throws SearchException;
+    ResultWrapper search(String query, int page, int size) throws SearchException;
 
-    Optional<IndexDocDTO> findByExo(String id) throws SearchException;
+    Optional<IndexDoc> findByExo(String id) throws SearchException;
 
     void refresh();
 

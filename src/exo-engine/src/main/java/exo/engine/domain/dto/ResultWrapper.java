@@ -20,9 +20,9 @@ import java.util.List;
     create     = "new",             // generates public no args constructor
     build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableResultWrapperDTO.class)
-@JsonDeserialize(as = ImmutableResultWrapperDTO.class)
-public interface ResultWrapperDTO {
+@JsonSerialize(as = ImmutableResultWrapper.class)
+@JsonDeserialize(as = ImmutableResultWrapper.class)
+public interface ResultWrapper {
 
     @Nullable
     Integer getCurrPage();
@@ -34,10 +34,10 @@ public interface ResultWrapperDTO {
     Integer getTotalHits();
 
     @Nullable
-    List<IndexDocDTO> getResults();
+    List<IndexDoc> getResults();
 
-    static ResultWrapperDTO empty() {
-        return ImmutableResultWrapperDTO.builder()
+    static ResultWrapper empty() {
+        return ImmutableResultWrapper.builder()
             .setCurrPage(0)
             .setMaxPage(0)
             .setTotalHits(0)

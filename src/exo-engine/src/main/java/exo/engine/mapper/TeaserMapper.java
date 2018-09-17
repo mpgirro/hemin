@@ -1,9 +1,9 @@
 package exo.engine.mapper;
 
-import exo.engine.domain.dto.EpisodeDTO;
-import exo.engine.domain.dto.ImmutableEpisodeDTO;
-import exo.engine.domain.dto.ImmutablePodcastDTO;
-import exo.engine.domain.dto.PodcastDTO;
+import exo.engine.domain.dto.Episode;
+import exo.engine.domain.dto.ImmutableEpisode;
+import exo.engine.domain.dto.ImmutablePodcast;
+import exo.engine.domain.dto.Podcast;
 import exo.engine.domain.entity.EpisodeEntity;
 import exo.engine.domain.entity.PodcastEntity;
 import org.mapstruct.Mapper;
@@ -23,10 +23,10 @@ public interface TeaserMapper {
 
     TeaserMapper INSTANCE = Mappers.getMapper( TeaserMapper.class );
 
-    default PodcastDTO asTeaser(PodcastDTO podcast) {
+    default Podcast asTeaser(Podcast podcast) {
         return Optional
             .ofNullable(podcast)
-            .map(p -> ImmutablePodcastDTO.builder()
+            .map(p -> ImmutablePodcast.builder()
                 .setExo(p.getExo())
                 .setTitle(p.getTitle())
                 .setImage(p.getImage())
@@ -43,10 +43,10 @@ public interface TeaserMapper {
             .orElse(null);
     }
 
-    default PodcastDTO asTeaser(PodcastEntity podcast) {
+    default Podcast asTeaser(PodcastEntity podcast) {
         return Optional
             .ofNullable(podcast)
-            .map(p -> ImmutablePodcastDTO.builder()
+            .map(p -> ImmutablePodcast.builder()
                 .setExo(p.getExo())
                 .setTitle(p.getTitle())
                 .setImage(p.getImage())
@@ -63,10 +63,10 @@ public interface TeaserMapper {
             .orElse(null);
     }
 
-    default EpisodeDTO asTeaser(EpisodeDTO episode) {
+    default Episode asTeaser(Episode episode) {
         return Optional
             .ofNullable(episode)
-            .map(e -> ImmutableEpisodeDTO.builder()
+            .map(e -> ImmutableEpisode.builder()
                 .setExo(e.getExo())
                 .setTitle(e.getTitle())
                 .setPubDate(e.getPubDate())
@@ -77,10 +77,10 @@ public interface TeaserMapper {
             .orElse(null);
     }
 
-    default EpisodeDTO asTeaser(EpisodeEntity episode) {
+    default Episode asTeaser(EpisodeEntity episode) {
         return Optional
             .ofNullable(episode)
-            .map(e -> ImmutableEpisodeDTO.builder()
+            .map(e -> ImmutableEpisode.builder()
                 .setExo(e.getExo())
                 .setTitle(e.getTitle())
                 .setPubDate(DateMapper.INSTANCE.asLocalDateTime(e.getPubDate()))

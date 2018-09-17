@@ -1,10 +1,9 @@
 package exo.engine.catalog.service
 
 import javax.persistence.EntityManager
-
 import akka.event.LoggingAdapter
 import exo.engine.catalog.repository.{PodcastRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.PodcastDTO
+import exo.engine.domain.dto.{Podcast}
 import exo.engine.mapper.{PodcastMapper, TeaserMapper}
 import org.springframework.data.domain.{PageRequest, Sort}
 import org.springframework.data.domain.Sort.Direction
@@ -34,7 +33,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def save(podcastDTO: PodcastDTO): Option[PodcastDTO] = {
+    def save(podcastDTO: Podcast): Option[Podcast] = {
         log.debug("Request to save Podcast : {}", podcastDTO)
         Option(podcastDTO)
           .map(p => podcastMapper.toEntity(p))
@@ -43,7 +42,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOne(dbId: Long): Option[PodcastDTO] = {
+    def findOne(dbId: Long): Option[Podcast] = {
         log.debug("Request to get Podcast (ID) : {}", dbId)
         Option(dbId)
           .map(id => podcastRepository.findOne(id))
@@ -51,7 +50,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOneByExo(podcastExo: String): Option[PodcastDTO] = {
+    def findOneByExo(podcastExo: String): Option[Podcast] = {
         log.debug("Request to get Podcast (EXO) : {}", podcastExo)
         Option(podcastExo)
           .map(exo => podcastRepository.findOneByExo(exo))
@@ -59,7 +58,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findOneByFeed(feedExo: String): Option[PodcastDTO] = {
+    def findOneByFeed(feedExo: String): Option[Podcast] = {
         log.debug("Request to get Podcast by feed (EXO) : {}", feedExo)
         Option(feedExo)
           .map(exo => podcastRepository.findOneByFeed(exo))
@@ -67,7 +66,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAll(page: Int, size: Int): List[PodcastDTO] = {
+    def findAll(page: Int, size: Int): List[Podcast] = {
         log.debug("Request to get all Podcasts by page : {} and size : {}", page, size)
         val sort = new Sort(new Sort.Order(Direction.ASC, "title"))
         val pageable = new PageRequest(page, size, sort)
@@ -78,7 +77,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAllAsTeaser(): List[PodcastDTO] = {
+    def findAllAsTeaser(): List[Podcast] = {
         log.debug("Request to get all Podcasts as teaser")
         podcastRepository.findAll()
             .asScala
@@ -87,7 +86,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAllRegistrationComplete(page: Int, size: Int): List[PodcastDTO] = {
+    def findAllRegistrationComplete(page: Int, size: Int): List[Podcast] = {
         log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
         val sort = new Sort(new Sort.Order(Direction.ASC, "title"))
         val pageable = new PageRequest(page, size, sort)
@@ -98,7 +97,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     }
 
     @Transactional
-    def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): List[PodcastDTO] = {
+    def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): List[Podcast] = {
         log.debug("Request to get all Podcasts as teaser where registration is complete by page : {} and size : {}", page, size)
         val sort = new Sort(new Sort.Order(Direction.ASC, "title"))
         val pageable = new PageRequest(page, size, sort)

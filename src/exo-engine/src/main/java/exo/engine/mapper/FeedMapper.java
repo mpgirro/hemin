@@ -1,8 +1,8 @@
 package exo.engine.mapper;
 
-import exo.engine.domain.dto.FeedDTO;
-import exo.engine.domain.dto.ImmutableFeedDTO;
-import exo.engine.domain.dto.ModifiableFeedDTO;
+import exo.engine.domain.dto.Feed;
+import exo.engine.domain.dto.ImmutableFeed;
+import exo.engine.domain.dto.ModifiableFeed;
 import exo.engine.domain.entity.FeedEntity;
 import exo.engine.domain.entity.PodcastEntity;
 import org.mapstruct.Mapper;
@@ -23,70 +23,70 @@ public interface FeedMapper {
     FeedMapper INSTANCE = Mappers.getMapper( FeedMapper.class );
 
     @Mapping(source = "podcastId", target = "podcast")
-    FeedEntity toEntity(FeedDTO feed);
+    FeedEntity toEntity(Feed feed);
 
     @Mapping(source = "podcast.id", target = "podcastId")
     @Mapping(source = "podcast.exo", target = "podcastExo")
-    ModifiableFeedDTO toModifiable(FeedEntity feed);
+    ModifiableFeed toModifiable(FeedEntity feed);
 
-    default ImmutableFeedDTO toImmutable(FeedEntity feed) {
+    default ImmutableFeed toImmutable(FeedEntity feed) {
         return Optional
             .ofNullable(feed)
             .map(this::toModifiable)
-            .map(ModifiableFeedDTO::toImmutable)
+            .map(ModifiableFeed::toImmutable)
             .orElse(null);
     }
 
-    default ModifiableFeedDTO toModifiable(FeedDTO feed) {
+    default ModifiableFeed toModifiable(Feed feed) {
         return Optional
             .ofNullable(feed)
             .map(f -> {
-                if (f instanceof ModifiableFeedDTO) {
-                    return (ModifiableFeedDTO) f;
+                if (f instanceof ModifiableFeed) {
+                    return (ModifiableFeed) f;
                 } else {
-                    return new ModifiableFeedDTO().from(f);
+                    return new ModifiableFeed().from(f);
                 }})
             .orElse(null);
     }
 
-    default ImmutableFeedDTO toImmutable(FeedDTO feed) {
+    default ImmutableFeed toImmutable(Feed feed) {
         return Optional
             .ofNullable(feed)
             .map(f -> {
-                if (f instanceof ImmutableFeedDTO) {
-                    return (ImmutableFeedDTO) f;
+                if (f instanceof ImmutableFeed) {
+                    return (ImmutableFeed) f;
                 } else {
-                    return ((ModifiableFeedDTO) f).toImmutable();
+                    return ((ModifiableFeed) f).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableFeedDTO update(FeedDTO src, @MappingTarget ModifiableFeedDTO target);
+    ModifiableFeed update(Feed src, @MappingTarget ModifiableFeed target);
 
-    default ModifiableFeedDTO update(FeedDTO src, @MappingTarget FeedDTO target) {
+    default ModifiableFeed update(Feed src, @MappingTarget Feed target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableFeedDTO) {
-                    return (ModifiableFeedDTO) t;
+                if (t instanceof ModifiableFeed) {
+                    return (ModifiableFeed) t;
                 } else {
-                    return new ModifiableFeedDTO().from(t);
+                    return new ModifiableFeed().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableFeedDTO updateImmutable(FeedDTO src, @MappingTarget FeedDTO target) {
+    default ImmutableFeed updateImmutable(Feed src, @MappingTarget Feed target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableFeedDTO) {
-                    return (ModifiableFeedDTO) t;
+                if (t instanceof ModifiableFeed) {
+                    return (ModifiableFeed) t;
                 } else {
-                    return new ModifiableFeedDTO().from(t);
+                    return new ModifiableFeed().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableFeedDTO::toImmutable)
+            .map(ModifiableFeed::toImmutable)
             .orElse(null);
     }
 

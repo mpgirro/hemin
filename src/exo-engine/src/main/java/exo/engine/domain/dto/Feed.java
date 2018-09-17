@@ -2,6 +2,7 @@ package exo.engine.domain.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import exo.engine.domain.FeedStatus;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -19,50 +20,32 @@ import java.time.LocalDateTime;
         create     = "new",             // generates public no args constructor
         build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableIndexDocDTO.class)
-@JsonDeserialize(as = ImmutableIndexDocDTO.class)
-public interface IndexDocDTO {
+@JsonSerialize(as = ImmutableFeed.class)
+@JsonDeserialize(as = ImmutableFeed.class)
+public interface Feed {
 
     @Nullable
-    String getDocType();
+    Long getId();
+
+    @Nullable
+    Long getPodcastId();
 
     @Nullable
     String getExo();
 
     @Nullable
-    String getTitle();
+    String getPodcastExo();
 
     @Nullable
-    String getLink();
+    String getUrl();
 
     @Nullable
-    String getDescription();
+    LocalDateTime getLastChecked();
 
     @Nullable
-    LocalDateTime getPubDate();
+    FeedStatus getLastStatus();
 
     @Nullable
-    String getImage();
-
-    @Nullable
-    String getItunesAuthor();
-
-    @Nullable
-    String getItunesSummary();
-
-    @Nullable
-    String getPodcastTitle(); // will be the same as the title if marshalled from a PodcastDTO
-
-    @Nullable
-    String getChapterMarks();
-
-    @Nullable
-    String getContentEncoded();
-
-    @Nullable
-    String getTranscript();
-
-    @Nullable
-    String getWebsiteData();
+    LocalDateTime getRegistrationTimestamp();
 
 }

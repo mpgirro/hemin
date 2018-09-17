@@ -1,7 +1,7 @@
 package exo.engine.parse.rss;
 
-import exo.engine.domain.dto.EpisodeDTO;
-import exo.engine.domain.dto.PodcastDTO;
+import exo.engine.domain.dto.Episode;
+import exo.engine.domain.dto.Podcast;
 
 import java.util.List;
 
@@ -15,8 +15,8 @@ public interface FeedParser {
     String NAMESPACE_ATOM = "http://www.w3.org/2005/Atom";
     String NAMESPACE_PSC = "http://podlove.org/simple-chapters";
 
-    PodcastDTO getPodcast();
+    Podcast getPodcast();
 
-    List<EpisodeDTO> getEpisodes();
+    List<Episode> getEpisodes();
 
 }

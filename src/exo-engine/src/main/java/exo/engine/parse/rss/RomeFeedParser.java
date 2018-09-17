@@ -39,8 +39,8 @@ public class RomeFeedParser implements FeedParser {
 
     private static final Logger log = LoggerFactory.getLogger(RomeFeedParser.class);
 
-    private final PodcastDTO thePodcast;
-    private final List<EpisodeDTO> theEpisodes;
+    private final Podcast thePodcast;
+    private final List<Episode> theEpisodes;
 
     private RomeFeedParser(String xmlData) throws FeedParsingException {
         try {
@@ -60,17 +60,17 @@ public class RomeFeedParser implements FeedParser {
     }
 
     @Override
-    public PodcastDTO getPodcast() {
+    public Podcast getPodcast() {
         return this.thePodcast;
     }
 
     @Override
-    public List<EpisodeDTO> getEpisodes() {
+    public List<Episode> getEpisodes() {
         return this.theEpisodes;
     }
 
-    private PodcastDTO parseFeed(SyndFeed feed) {
-        final ImmutablePodcastDTO.Builder builder = ImmutablePodcastDTO.builder();
+    private Podcast parseFeed(SyndFeed feed) {
+        final ImmutablePodcast.Builder builder = ImmutablePodcast.builder();
         String link = UrlUtil.sanitize(feed.getLink());
 
         builder
@@ -173,10 +173,10 @@ public class RomeFeedParser implements FeedParser {
         return builder.create();
     }
 
-    private List<EpisodeDTO> extractEpisodes(SyndFeed feed) {
-        final List<EpisodeDTO> results = new LinkedList<>();
+    private List<Episode> extractEpisodes(SyndFeed feed) {
+        final List<Episode> results = new LinkedList<>();
         for (SyndEntry e : feed.getEntries()) {
-            final ImmutableEpisodeDTO.Builder builder = ImmutableEpisodeDTO.builder();
+            final ImmutableEpisode.Builder builder = ImmutableEpisode.builder();
 
             builder
                 .setTitle(e.getTitle())
@@ -245,7 +245,7 @@ public class RomeFeedParser implements FeedParser {
                 if (simpleChapters.getChapters() != null && simpleChapters.getChapters().size() > 0) {
                     builder.setChapters(
                         simpleChapters.getChapters().stream()
-                            .map(sc -> ImmutableChapterDTO.builder()
+                            .map(sc -> ImmutableChapter.builder()
                                 .setStart(sc.getStart())
                                 .setTitle(sc.getTitle())
                                 .setHref(sc.getHref())

@@ -211,7 +211,7 @@ class CatalogStoreHandler(workerIndex: Int,
                 // TODO for now we always create a podcast for an unknown feed, but we will have to check if the feed is an alternate to a known podcast
 
                 val podcastExo = exoGenerator.getNewExo
-                var podcast = ImmutablePodcastDTO.builder()
+                var podcast = ImmutablePodcast.builder()
                     .setExo(podcastExo)
                     .setTitle(podcastExo)
                     .setDescription(url)
@@ -222,7 +222,7 @@ class CatalogStoreHandler(workerIndex: Int,
                 podcastService.save(podcast).map(p => {
 
                     val feedExo = exoGenerator.getNewExo
-                    val feed = ImmutableFeedDTO.builder()
+                    val feed = ImmutableFeed.builder()
                         .setExo(feedExo)
                         .setUrl(url)
                         .setLastChecked(LocalDateTime.now())
@@ -262,7 +262,7 @@ class CatalogStoreHandler(workerIndex: Int,
         doInTransaction(task, List(feedService))
     }
 
-    private def onSaveChapter(chapter: ChapterDTO): Unit = {
+    private def onSaveChapter(chapter: Chapter): Unit = {
         log.debug("Received SaveChapter('{}') for episode : ", chapter.getTitle, chapter.getEpisodeExo)
 
         def task = () => {
@@ -277,17 +277,17 @@ class CatalogStoreHandler(workerIndex: Int,
         doInTransaction(task, List(episodeService, chapterService))
     }
 
-    private def onAddPodcastAndFeedIfUnknown(podcast: PodcastDTO, feed: FeedDTO): Unit = {
+    private def onAddPodcastAndFeedIfUnknown(podcast: Podcast, feed: Feed): Unit = {
         log.debug("Received AddPodcastAndFeedIfUnknown({},{})", podcast.getExo, feed.getExo)
         def task = () => {
-            val podcastUpdate: ModifiablePodcastDTO = podcastService.findOneByExo(podcast.getExo).map(p => {
+            val podcastUpdate: ModifiablePodcast = podcastService.findOneByExo(podcast.getExo).map(p => {
                 podcastMapper.toModifiable(p)
             }).getOrElse({
                 log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.getExo)
                 podcastMapper.toModifiable(podcast)
             })
             podcastService.save(podcastUpdate).map(p => {
-                val feedUpdate: ModifiableFeedDTO = feedService.findOneByExo(feed.getExo).map(f => {
+                val feedUpdate: ModifiableFeed = feedService.findOneByExo(feed.getExo).map(f => {
                     feedMapper.toModifiable(f)
                 }).getOrElse({
                     log.debug("Feed to update is not yet in database, therefore it will be added : {}", feed.getExo)
@@ -304,7 +304,7 @@ class CatalogStoreHandler(workerIndex: Int,
     }
 
     @Deprecated
-    private def onUpdatePodcast(podcastExo: String, feedUrl: String, podcast: PodcastDTO): Unit = {
+    private def onUpdatePodcast(podcastExo: String, feedUrl: String, podcast: Podcast): Unit = {
         log.debug("Received UpdatePodcast({},{},{})", podcastExo, feedUrl, podcast.getExo)
 
         /* TODO
@@ -313,7 +313,7 @@ class CatalogStoreHandler(workerIndex: Int,
          * jenen feed den ich immer benutze um updates zu laden
          */
         def task = () => {
-            val update: ModifiablePodcastDTO = podcastService.findOneByExo(podcastExo).map(p => {
+            val update: ModifiablePodcast = podcastService.findOneByExo(podcastExo).map(p => {
                 podcastMapper.update(podcast, p)
             }).getOrElse({
                 log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.getExo)
@@ -328,11 +328,11 @@ class CatalogStoreHandler(workerIndex: Int,
         doInTransaction(task, List(podcastService))
     }
 
-    private def onUpdateEpisode(podcastExo: String, episode: EpisodeDTO): Unit = {
+    private def onUpdateEpisode(podcastExo: String, episode: Episode): Unit = {
         log.debug("Received UpdateEpisode({},{})", podcastExo, episode.getExo)
         def task = () => {
             podcastService.findOneByExo(podcastExo).map(p => {
-                val update: ModifiableEpisodeDTO = episodeService.findOneByExo(episode.getExo).map(e => {
+                val update: ModifiableEpisode = episodeService.findOneByExo(episode.getExo).map(e => {
                     episodeMapper.update(episode, e)
                 }).getOrElse({
                     log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.getExo)
@@ -415,7 +415,7 @@ class CatalogStoreHandler(workerIndex: Int,
             })
         }
         doInTransaction(task, List(podcastService))
-            .asInstanceOf[Option[PodcastDTO]]
+            .asInstanceOf[Option[Podcast]]
             .map(p => {
                 sender ! PodcastResult(idMapper.clearImmutable(p))
             }).getOrElse({
@@ -429,7 +429,7 @@ class CatalogStoreHandler(workerIndex: Int,
             //val podcasts = podcastService.findAllWhereFeedStatusIsNot(FeedStatus.NEVER_CHECKED) // TODO broken
             podcastService.findAll(page, size)
         }
-        val podcasts = doInTransaction(task, List(podcastService)).asInstanceOf[List[PodcastDTO]]
+        val podcasts = doInTransaction(task, List(podcastService)).asInstanceOf[List[Podcast]]
         sender ! AllPodcastsResult(podcasts.map(p => idMapper.clearImmutable(p)))
     }
 
@@ -438,7 +438,7 @@ class CatalogStoreHandler(workerIndex: Int,
         def task = () => {
             podcastService.findAllRegistrationCompleteAsTeaser(page, size)
         }
-        val podcasts = doInTransaction(task, List(podcastService)).asInstanceOf[List[PodcastDTO]]
+        val podcasts = doInTransaction(task, List(podcastService)).asInstanceOf[List[Podcast]]
         sender ! AllPodcastsResult(podcasts.map(p => idMapper.clearImmutable(p)))
     }
 
@@ -447,7 +447,7 @@ class CatalogStoreHandler(workerIndex: Int,
         def task = () => {
             feedService.findAll(page, size)
         }
-        val feeds = doInTransaction(task, List(feedService)).asInstanceOf[List[FeedDTO]]
+        val feeds = doInTransaction(task, List(feedService)).asInstanceOf[List[Feed]]
         sender ! AllFeedsResult(feeds.map(f => idMapper.clearImmutable(f)))
     }
 
@@ -462,7 +462,7 @@ class CatalogStoreHandler(workerIndex: Int,
             })
         }
         doInTransaction(task, List(episodeService))
-            .asInstanceOf[Option[EpisodeDTO]]
+            .asInstanceOf[Option[Episode]]
             .map(e => {
                 sender ! EpisodeResult(idMapper.clearImmutable(e))
             }).getOrElse({
@@ -476,7 +476,7 @@ class CatalogStoreHandler(workerIndex: Int,
         def task = () => {
             episodeService.findAllByPodcastAsTeaser(podcastId)
         }
-        val episodes = doInTransaction(task, List(episodeService)).asInstanceOf[List[EpisodeDTO]]
+        val episodes = doInTransaction(task, List(episodeService)).asInstanceOf[List[Episode]]
         sender ! EpisodesByPodcastResult(episodes.map(e => idMapper.clearImmutable(e)))
     }
 
@@ -485,7 +485,7 @@ class CatalogStoreHandler(workerIndex: Int,
         def task = () => {
             feedService.findAllByPodcast(podcastId)
         }
-        val feeds = doInTransaction(task, List(feedService)).asInstanceOf[List[FeedDTO]]
+        val feeds = doInTransaction(task, List(feedService)).asInstanceOf[List[Feed]]
         sender ! FeedsByPodcastResult(feeds.map(f => idMapper.clearImmutable(f)))
     }
 
@@ -495,7 +495,7 @@ class CatalogStoreHandler(workerIndex: Int,
         def task = () => {
             chapterService.findAllByEpisode(episodeId)
         }
-        val chapters = doInTransaction(task, List(chapterService)).asInstanceOf[List[ChapterDTO]]
+        val chapters = doInTransaction(task, List(chapterService)).asInstanceOf[List[Chapter]]
         sender ! ChaptersByEpisodeResult(chapters.map(c => idMapper.clearImmutable(c)))
     }
 
@@ -564,10 +564,10 @@ class CatalogStoreHandler(workerIndex: Int,
         doInTransaction(task, List(podcastService, feedService))
     }
 
-    private def onRegisterEpisodeIfNew(podcastExo: String, episode: EpisodeDTO): Unit = {
+    private def onRegisterEpisodeIfNew(podcastExo: String, episode: Episode): Unit = {
         log.debug("Received RegisterEpisodeIfNew({}, '{}')", podcastExo, episode.getTitle)
 
-        def task: () => Option[EpisodeDTO] = () => {
+        def task: () => Option[Episode] = () => {
             Option(episode.getGuid).map(guid => {
                 episodeService.findAllByPodcastAndGuid(podcastExo, guid).headOption
             }).getOrElse({
@@ -611,7 +611,7 @@ class CatalogStoreHandler(workerIndex: Int,
             }
         }
 
-        val registeredEpisode: Option[EpisodeDTO] = doInTransaction(task, List(episodeService, podcastService, chapterService)).asInstanceOf[Option[EpisodeDTO]]
+        val registeredEpisode: Option[Episode] = doInTransaction(task, List(episodeService, podcastService, chapterService)).asInstanceOf[Option[Episode]]
 
         // in case the episode was registered, we initiate some post processing
         registeredEpisode match {
