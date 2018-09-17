@@ -31,7 +31,7 @@ group 'at.irro.dipl'
 version '1.0-SNAPSHOT'
 description = ''
 
-mainClassName = 'exo.engine.App'
+mainClassName = 'exo.engine.ExoApp'
 
 compileJava {
     options.compilerArgs = [
