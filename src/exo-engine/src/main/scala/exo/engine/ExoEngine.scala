@@ -5,8 +5,8 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import exo.engine.catalog.CatalogStore.ProposeNewFeed
-import exo.engine.domain.dto.ResultWrapper
+import exo.engine.catalog.CatalogStore._
+import exo.engine.domain.dto._
 import exo.engine.index.IndexStore.{SearchIndex, SearchResults}
 
 import scala.concurrent.duration._
@@ -56,6 +56,47 @@ class ExoEngine {
     def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
         (bus ? SearchIndex(query, page, size)).map {
             case SearchResults(_, results) => results
+        }
+    }
+
+    def findEpisode(exo: String): Future[Option[Episode]] = {
+        (bus ? GetEpisode(exo)).map {
+            case EpisodeResult(episode) => Some(episode)
+            case NothingFound(unknown)  => None
+        }
+    }
+
+    def findChaptersByEpisode(exo: String): Future[List[Chapter]] = {
+        (bus ? GetChaptersByEpisode(exo)).map {
+            case ChaptersByEpisodeResult(chapters) => chapters
+        }
+    }
+
+    def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
+        val p: Int = page.map(p => p-1).getOrElse(DEFAULT_PAGE)
+        val s: Int = size.getOrElse(DEFAULT_SIZE)
+
+        (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
+            case AllPodcastsResult(podcasts) => podcasts
+        }
+    }
+
+    def findPodcast(exo: String): Future[Option[Podcast]] = {
+        (bus ? GetPodcast(exo)).map {
+            case PodcastResult(podcast) => Some(podcast)
+            case NothingFound(unknown)  => None
+        }
+    }
+
+    def findEpisodesByPodcast(exo: String): Future[List[Episode]] = {
+        (bus ? GetEpisodesByPodcast(exo)).map {
+            case EpisodesByPodcastResult(episodes) => episodes
+        }
+    }
+
+    def findFeedsByPodcast(exo: String): Future[List[Feed]] = {
+        (bus ? GetFeedsByPodcast(exo)).map {
+            case FeedsByPodcastResult(feeds) => feeds
         }
     }
 

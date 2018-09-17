@@ -20,6 +20,7 @@ import java.util.List;
 )
 @JsonSerialize(as = ImmutableArrayWrapper.class)
 @JsonDeserialize(as = ImmutableArrayWrapper.class)
+@Deprecated
 public interface ArrayWrapper<T> {
 
     @Value.Parameter
