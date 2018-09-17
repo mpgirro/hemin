@@ -34,7 +34,6 @@ class Crawler extends Actor with ActorLogging {
 
     private var parser: ActorRef = _
     private var catalog: ActorRef = _
-    private var benchmarkMonitor: ActorRef = _
 
     private var router: Router = {
         val routees = Vector.fill(WORKER_COUNT) {

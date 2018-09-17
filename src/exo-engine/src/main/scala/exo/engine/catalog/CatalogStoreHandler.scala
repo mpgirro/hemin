@@ -49,7 +49,6 @@ class CatalogStoreHandler(workerIndex: Int,
 
     private var crawler: ActorRef = _
     private var updater: ActorRef = _
-    private var benchmarkMonitor: ActorRef = _
     private var supervisor: ActorRef = _
 
     private var repositoryFactoryBuilder = new RepositoryFactoryBuilder(databaseUrl)

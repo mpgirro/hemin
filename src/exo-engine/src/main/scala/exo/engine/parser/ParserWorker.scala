@@ -45,7 +45,6 @@ class ParserWorker extends Actor with ActorLogging {
 
     //private var directoryStore: ActorRef = _
     private var crawler: ActorRef = _
-    private var benchmarkMonitor: ActorRef = _
     private var supervisor: ActorRef = _
 
     private val fyydAPI: FyydAPI = new FyydAPI()

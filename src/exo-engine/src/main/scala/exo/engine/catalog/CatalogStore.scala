@@ -35,7 +35,6 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
 
     private var crawler: ActorRef = _
     private var updater: ActorRef = _
-    private var benchmarkMonitor: ActorRef = _
     private var supervisor: ActorRef = _
 
     private var router: Router = {
@@ -70,11 +69,6 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
-
-        case msg @ ActorRefBenchmarkMonitor(ref) =>
-            log.debug("Received ActorRefBenchmarkMonitor(_)")
-            benchmarkMonitor = ref
-            router.routees.foreach(r => r.send(msg, sender()))
 
         case Terminated(corpse) =>
             log.error(s"A ${self.path} worker died : {}", corpse.path.name)

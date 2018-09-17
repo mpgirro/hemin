@@ -46,12 +46,8 @@ object EngineProtocol {
     case class ActorRefCatalogStoreActor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefCrawlerActor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefParserActor(ref: ActorRef) extends ActorRefInfo
-    case class ActorRefFeedStoreActor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefIndexStoreActor(ref: ActorRef) extends ActorRefInfo
-    case class ActorRefSearcherActor(ref: ActorRef) extends ActorRefInfo
-    case class ActorRefGatewayActor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefUpdaterActor(ref: ActorRef) extends ActorRefInfo
-    case class ActorRefBenchmarkMonitor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefSupervisor(ref: ActorRef) extends ActorRefInfo
 
     // These are maintenance methods, I use during development

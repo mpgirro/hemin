@@ -33,7 +33,6 @@ class CatalogBroker extends Actor with ActorLogging {
     mediator ! Put(self) // register to the path
 
     private var crawler: ActorRef = _
-    private var benchmarkMonitor: ActorRef = _
 
     /*
      * We define two separate routings, based on the Command–query separation principle

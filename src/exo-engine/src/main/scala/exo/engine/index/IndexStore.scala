@@ -90,11 +90,6 @@ class IndexStore (indexPath: String,
 
     override def receive: Receive = {
 
-        case msg @ ActorRefBenchmarkMonitor(ref) =>
-            log.debug("Received ActorRefBenchmarkMonitor(_)")
-            benchmarkMonitor = ref
-            router.routees.foreach(r => r.send(msg, sender()))
-
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
