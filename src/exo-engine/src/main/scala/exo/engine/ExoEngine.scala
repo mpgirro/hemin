@@ -5,6 +5,7 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
+import exo.engine.EngineProtocol.ShutdownSystem
 import exo.engine.catalog.CatalogStore._
 import exo.engine.domain.dto._
 import exo.engine.index.IndexStore.{SearchIndex, SearchResults}
@@ -45,6 +46,10 @@ class ExoEngine {
         val config = ConfigFactory.load
         val system = ActorSystem("exo", config)
         master = system.actorOf(Props(new NodeMaster), NodeMaster.name)
+    }
+
+    def shutdown(): Unit = {
+        master ! ShutdownSystem
     }
 
     def bus(): ActorRef = master

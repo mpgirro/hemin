@@ -123,6 +123,7 @@ class IndexStore (indexPath: String,
 
             var currQuery = query // make a copy in case of an exception
             val origSender = sender()
+
             Future {
                 var results: ResultWrapper = null
                 blocking {
