@@ -7,7 +7,9 @@ import exo.engine.domain.dto.{IndexDocDTO, ResultWrapperDTO}
   */
 object IndexProtocol {
 
-    trait IndexEvent
+    trait IndexMessage
+
+    trait IndexEvent extends IndexMessage
 
     // Crawler/Parser/CatalogStore -> IndexStore
     case class AddDocIndexEvent(doc: IndexDocDTO) extends IndexEvent
@@ -16,22 +18,21 @@ object IndexProtocol {
     case class UpdateDocLinkIndexEvent(exo: String, newLink: String) extends IndexEvent
 
 
-    trait IndexCommand
+    trait IndexCommand extends IndexMessage
 
     // IndexStore -> IndexStore
     case class CommitIndex() extends IndexCommand
 
 
-    trait IndexQuery
+    trait IndexQuery extends IndexMessage
 
     // Searcher -> IndexStore
     case class SearchIndex(query: String, page: Int, size: Int) extends IndexQuery
 
 
-    trait IndexQueryResult
+    trait IndexQueryResult extends IndexMessage
 
     // IndexStore -> Searcher
     case class IndexResultsFound(query: String, results: ResultWrapperDTO) extends IndexQueryResult
-    case class NoIndexResultsFound(query: String) extends IndexQueryResult
 
 }

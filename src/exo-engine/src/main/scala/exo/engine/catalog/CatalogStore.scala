@@ -114,7 +114,7 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
             val database: Database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(new JdbcConnection(conn))
             //database.setDefaultSchemaName("echo")
 
-            val liquibase: Liquibase = new Liquibase("db/liquibase/master.xml", new ClassLoaderResourceAccessor(), database)
+            val liquibase: Liquibase = new Liquibase("liquibase/master.xml", new ClassLoaderResourceAccessor(), database)
 
             val isDropFirst = true // TODO set this as a parameter
             if (isDropFirst) {

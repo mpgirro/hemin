@@ -9,7 +9,7 @@ import exo.engine.EngineProtocol.SearchResults
 import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
 import exo.engine.domain.dto.ResultWrapperDTO
-import exo.engine.index.IndexProtocol.{IndexResultsFound, NoIndexResultsFound, SearchIndex}
+import exo.engine.index.IndexProtocol.{IndexResultsFound, SearchIndex}
 
 import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
@@ -50,6 +50,8 @@ class ExoEngine {
         master = system.actorOf(Props(new NodeMaster), NodeMaster.name)
     }
 
+    def bus(): ActorRef = master
+
     def catalogBroker(): ActorRef = {
         val future = master ? GetCatalogBroker
         val catalog = Await.result(future, INTERNAL_TIMEOUT.duration).asInstanceOf[ActorRef]
@@ -76,7 +78,6 @@ class ExoEngine {
             (index ? SearchIndex(query, page, size)).onComplete{
                 case Success(result) => result match {
                     case IndexResultsFound(_,r) => p success r
-                    case NoIndexResultsFound(_) => p success ResultWrapperDTO.empty()
                 }
                 case fail @ Failure (_) => fail
                     /*
@@ -86,6 +87,14 @@ class ExoEngine {
             }
         }
         p.future // immediatelly return the promise's future as a placeholder
+    }
+
+    def search2(query: String, page: Int, size: Int): Future[ResultWrapperDTO] = {
+        (indexBroker() ? SearchIndex(query, page, size)).map(m => {
+            m match {
+                case IndexResultsFound(_,results) => results
+            }
+        })
     }
 
     private def breakerOpen(name: String): Unit = {

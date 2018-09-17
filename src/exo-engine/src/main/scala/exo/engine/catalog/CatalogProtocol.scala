@@ -10,13 +10,15 @@ import exo.engine.domain.dto.{ChapterDTO, EpisodeDTO, FeedDTO, PodcastDTO}
   */
 object CatalogProtocol {
 
-    trait CatalogCommand
+    trait CatalogMessage
+
+    trait CatalogCommand extends CatalogMessage
 
     case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
     case class RegisterEpisodeIfNew(podcastExo: String, episode: EpisodeDTO) extends CatalogCommand // Questions: Parser -> CatalogStore
 
 
-    trait CatalogEvent
+    trait CatalogEvent extends CatalogMessage
 
     case class AddPodcastAndFeedIfUnknown(podcast: PodcastDTO, feed: FeedDTO) extends CatalogEvent
 
@@ -33,7 +35,7 @@ object CatalogProtocol {
     case class UpdateEpisodeWithChapters(podcastExo: String, episode: EpisodeDTO, chapter: List[ChapterDTO]) extends CatalogEvent
 
 
-    trait CatalogQuery
+    trait CatalogQuery extends CatalogMessage
 
     // Gateway -> CatalogStore
     case class GetPodcast(podcastExo: String) extends CatalogQuery
@@ -52,7 +54,7 @@ object CatalogProtocol {
     case class CheckAllFeeds() extends CatalogQuery
 
 
-    trait CatalogQueryResult
+    trait CatalogQueryResult extends CatalogMessage
 
     // CatalogStore -> Gateway
     case class PodcastResult(podcast: PodcastDTO) extends CatalogQueryResult

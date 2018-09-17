@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.index.IndexProtocol._
 import exo.engine.index.IndexStoreSearchHandler.RefreshIndexSearcher
-import exo.engine.domain.dto.{ImmutableIndexDocDTO, IndexDocDTO}
+import exo.engine.domain.dto.{ImmutableIndexDocDTO, IndexDocDTO, ResultWrapperDTO}
 import exo.engine.exception.SearchException
 
 import scala.collection.JavaConverters._
@@ -75,7 +75,7 @@ class IndexStore (indexPath: String,
                 log.error("Error trying to search the index; reason: {}", e.getMessage)
             case e: Exception =>
                 log.error("Unhandled Exception : {}", e.getMessage, e)
-                sender ! NoIndexResultsFound("UNKNOWN") // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+                sender ! IndexProtocol.IndexResultsFound("UNKNOWN", ResultWrapperDTO.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
                 //currQuery = ""
         }
         super.postRestart(cause)

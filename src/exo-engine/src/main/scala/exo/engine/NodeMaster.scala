@@ -1,13 +1,16 @@
 package exo.engine
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
+import akka.pattern.{CircuitBreaker, ask}
 import akka.cluster.Cluster
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import exo.engine.catalog.CatalogBroker
+import exo.engine.catalog.CatalogProtocol.CatalogMessage
 import exo.engine.crawler.Crawler
 import exo.engine.index.IndexBroker
+import exo.engine.index.IndexProtocol.IndexMessage
 import exo.engine.parser.Parser
 import exo.engine.updater.Updater
 
@@ -87,6 +90,12 @@ class NodeMaster extends Actor with ActorLogging {
         case GetIndexBroker => sender ! index
 
         case GetUpdater => sender ! updater
+
+        case msg: CatalogMessage => catalog.tell(msg, sender())
+        case msg: CrawlerMessage => crawler.tell(msg, sender())
+        case msg: IndexMessage   => index.tell(msg, sender())
+        case msg: ParserMessage  => parser.tell(msg, sender())
+        case msg: UpdaterMessage => updater.tell(msg, sender())
 
         case Terminated(corpse) => onTerminated(corpse)
 

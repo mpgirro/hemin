@@ -75,6 +75,7 @@ dependencies {
     compile group: 'org.scala-lang.modules', name: "scala-java8-compat_${scala_major_version}", version: '0.8.0'
 
     compile group: 'com.typesafe.scala-logging', name: "scala-logging_${scala_major_version}", version: '3.8.0'
+    compile "ch.qos.logback:logback-classic:${logback_version}"
 
     compileOnly "org.immutables:value:${immutables_version}:annotations" // compilation-only annotations artifact
     apt         "org.immutables:value:${immutables_version}"             // for annotation processing only
