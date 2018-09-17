@@ -2,20 +2,16 @@ package exo.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
-import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
-import exo.engine.index.IndexStoreSearchHandler.RefreshIndexSearcher
 import exo.engine.domain.dto._
 import exo.engine.exception.SearchException
-import exo.engine.index.IndexBroker._
 import exo.engine.index.IndexStore._
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.compat.java8.OptionConverters._
-import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future, blocking}
 import scala.language.postfixOps
 
 /**
@@ -71,20 +67,10 @@ class IndexStore (indexPath: String,
 
     private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
 
-    private var benchmarkMonitor: ActorRef = _
     private var supervisor: ActorRef = _
 
     // kickoff the committing play
     context.system.scheduler.schedule(COMMIT_INTERVAL, COMMIT_INTERVAL, self, CommitIndex)
-
-    private var router: Router = {
-        val routees = Vector.fill(WORKER_COUNT) {
-            val handler = createSearchHandler()
-            context watch handler
-            ActorRefRoutee(handler)
-        }
-        Router(RoundRobinRoutingLogic(), routees)
-    }
 
     override def postRestart(cause: Throwable): Unit = {
         log.info("{} has been restarted or resumed", self.path.name)
@@ -134,7 +120,25 @@ class IndexStore (indexPath: String,
 
         case SearchIndex(query, page, size) =>
             log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
-            router.route(SearchIndex(query, page, size), sender())
+
+            var currQuery = query // make a copy in case of an exception
+            val origSender = sender()
+            Future {
+                var results: ResultWrapper = null
+                blocking {
+                    results = indexSearcher.search(query, page, size)
+                }
+
+                if (results.getTotalHits > 0){
+                    origSender ! SearchResults(query,results)
+                } else {
+                    log.warning("No Podcast matching query: '{}' found in the index", query)
+                    //sender ! NoIndexResultsFound(query)
+                    origSender ! SearchResults(query,ResultWrapper.empty())
+                }
+
+                currQuery = "" // wipe the copy
+            }
 
     }
 
@@ -183,7 +187,6 @@ class IndexStore (indexPath: String,
         }
 
         if (committed) {
-            router.routees.foreach(r => r.send(RefreshIndexSearcher, self))
             indexSearcher.refresh()
         }
     }
@@ -225,16 +228,6 @@ class IndexStore (indexPath: String,
 
             processLinkQueue(queue)
         }
-    }
-
-    private def createSearchHandler(): ActorRef = {
-        handlerIndex += 1
-        val newIndexSearcher: IndexSearcher = new LuceneSearcher(indexCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
-        val handler = context.actorOf(IndexStoreSearchHandler.props(newIndexSearcher), IndexStoreSearchHandler.name(handlerIndex))
-
-        handler ! ActorRefSupervisor(self)
-
-        handler
     }
 
 }

@@ -14,7 +14,7 @@ import exo.engine.crawler.Crawler._
 import exo.engine.domain.FeedStatus
 import exo.engine.exception.EchoException
 import exo.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
-import exo.engine.parse.api.{FyydAPI, FyydDirectoryAPI}
+import exo.engine.parse.api.FyydDirectoryAPI
 import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 import scala.compat.java8.OptionConverters._
