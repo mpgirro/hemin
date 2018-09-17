@@ -1,0 +1,190 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        jcenter()
+        maven { url 'https://plugins.gradle.org/m2/' }
+    }
+    dependencies {
+//    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath 'net.ltgt.gradle:gradle-apt-plugin:0.13'
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+    }
+}
+
+defaultTasks 'clean build publishToMavenLocal'
+
+apply plugin: 'java'
+apply plugin: 'scala'
+apply plugin: 'idea'
+apply plugin: 'application'
+//apply plugin: 'com.github.johnrengelman.shadow' // to build fat jars with gradle
+apply plugin: 'maven-publish'
+apply plugin: 'net.ltgt.apt' // required by mapstruct
+apply plugin: 'net.ltgt.apt-idea'
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+assert System.properties['java.specification.version'] == '1.8'
+
+group 'at.irro.dipl'
+version '1.0-SNAPSHOT'
+description = ''
+
+mainClassName = 'exo.engine.App'
+
+compileJava {
+    options.compilerArgs = [
+            '-Amapstruct.suppressGeneratorTimestamp=true',
+            '-Amapstruct.suppressGeneratorVersionInfoComment=true',
+            '-Xlint:deprecation'
+    ]
+}
+
+ext {
+    scala_major_version = '2.12'
+    scala_minor_version = '4'
+//    log4j_version = '2.9.1'
+    akka_version = '2.5.11'
+    akka_http_version = '10.0.11'
+    slf4j_version = '1.7.25'
+    logback_version = '1.2.3'
+    lucene_version = '7.2.0'
+    jackson_version = '2.9.4'
+    immutables_version = '2.5.6'
+    guava_version = '24.1-jre'
+    junit_vintage_version = '4.12'
+    junit_jupiter_version = '5.1.0'
+    junit_platform_version = '1.1.0'
+    spring_data_jpa_version = '1.11.10.RELEASE'
+    h2_version = '1.4.196'
+    liquibase_version = '3.5.3'
+    liquibase_slf4j_version = '2.0.0'
+}
+
+repositories {
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+
+    compile group: 'org.scala-lang', name: 'scala-compiler', version: "${scala_major_version}.${scala_minor_version}"
+    compile group: 'org.scala-lang', name: 'scala-library', version: "${scala_major_version}.${scala_minor_version}"
+
+    compile group: 'org.scala-lang.modules', name: "scala-java8-compat_${scala_major_version}", version: '0.8.0'
+
+    compile group: 'com.typesafe.scala-logging', name: "scala-logging_${scala_major_version}", version: '3.8.0'
+
+    compileOnly "org.immutables:value:${immutables_version}:annotations" // compilation-only annotations artifact
+    apt         "org.immutables:value:${immutables_version}"             // for annotation processing only
+
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-json-org', version: jackson_version
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jackson_version
+    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-guava', version: jackson_version
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jackson_version
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson_version
+
+    compile     'org.mapstruct:mapstruct-jdk8:1.2.0.Final'
+    testCompile 'org.testng:testng:6.10', 'org.easytesting:fest-assert:1.4'
+    apt         'org.mapstruct:mapstruct-processor:1.2.0.Final'
+
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.3.0.Final'
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
+
+    compile "org.apache.lucene:lucene-core:${lucene_version}"
+    compile "org.apache.lucene:lucene-queryparser:${lucene_version}"
+    compile "org.apache.lucene:lucene-analyzers-common:${lucene_version}"
+
+    compile 'org.jsoup:jsoup:1.11.2'                    // HTTP parser
+    compile 'com.google.code.gson:gson:2.8.2'           // gson parser
+    compile "com.google.guava:guava:${guava_version}"
+    compile 'com.rometools:rome:1.9.0'
+    compile 'com.rometools:rome-modules:1.9.0'
+
+    compile 'org.hashids:hashids:1.0.3'
+
+    compile group: 'com.typesafe.akka', name: "akka-actor_${scala_major_version}", version: akka_version
+    compile "com.typesafe.akka:akka-slf4j_${scala_major_version}:${akka_version}"
+    compile "com.typesafe.akka:akka-stream_${scala_major_version}:${akka_version}"
+    compile "com.typesafe.akka:akka-http_${scala_major_version}:${akka_http_version}"
+    compile "com.typesafe.akka:akka-http-spray-json_${scala_major_version}:${akka_http_version}"
+    compile "com.typesafe.akka:akka-cluster_${scala_major_version}:${akka_version}"
+    compile "com.typesafe.akka:akka-cluster-tools_${scala_major_version}:${akka_version}"
+
+    compile group: 'javax.inject', name: 'javax.inject', version: '1'
+    compile group: 'org.springframework', name: 'spring-context', version: '4.3.14.RELEASE'
+    compile group: 'org.springframework.data', name: 'spring-data-jpa', version: "${spring_data_jpa_version}"
+    compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.3.0.Final'
+    compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
+    compile group: 'com.h2database', name: 'h2', version: "${h2_version}"
+    compile group: 'org.liquibase', name: 'liquibase-core', version: "${liquibase_version}"
+    runtime group: 'com.mattbertolini', name: 'liquibase-slf4j', version: "${liquibase_slf4j_version}"
+
+    compile group: 'com.softwaremill.sttp', name: "core_${scala_major_version}", version: '1.1.10'
+    compile group: 'com.softwaremill.sttp', name: "akka-http-backend_${scala_major_version}", version: '1.1.10'
+
+    // JUnit Jupiter API and TestEngine implementation
+    //test.useJUnitPlatform()
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junit_jupiter_version}"
+    testRuntimeOnly    "org.junit.jupiter:junit-jupiter-engine:${junit_jupiter_version}"
+    //testCompile("junit:junit:4.12")
+    //testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0") //Support JUnit 3 and JUnit 4 tests
+    testCompile "org.junit.platform:junit-platform-runner:${junit_platform_version}" // Enable use of the JUnitPlatform Runner within the IDE
+
+}
+
+jar {
+    doLast {
+        exclude("**/resources/logback.xml")
+//        exclude("**/logback.xml")
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+// Generating gradle wrapper so people don't have to have the Gradle version preinstalled
+task wrapper(type: Wrapper) {
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '4.6'
+    distributionType = Wrapper.DistributionType.ALL
+}
+
+run {
+    standardInput = System.in
+}
+
+run.doFirst {
+    // Environment variables go here.
+}
+
+test {
+    /*
+    useJUnitPlatform {
+        excludeTags 'slow'
+        includeEngines 'junit-jupiter', 'junit-vintage'
+    }
+
+    failFast = true
+    */
+
+    // Always run tests, even when nothing changed.
+    dependsOn 'cleanTest'
+
+    // Show test results.
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+junitPlatform {
+    details 'tree'
+}
+
+

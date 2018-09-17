@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" scanPeriod="60 seconds">
+
+    <!-- The FILE and ASYNC appenders are here as examples for a production configuration -->
+    <!--
+        <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+                <fileNamePattern>echo-actors.%d{yyyy-MM-dd}.log</fileNamePattern>
+                <maxHistory>90</maxHistory>
+            </rollingPolicy>
+            <encoder>
+                <charset>utf-8</charset>
+                <Pattern>[%level] [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%logger{36}] [%X{sourceThread}] [%X{akkaSource}] - %msg%n</Pattern>
+            </encoder>
+        </appender>
+
+        <appender name="ASYNC" class="ch.qos.logback.classic.AsyncAppender">
+            <queueSize>512</queueSize>
+            <appender-ref ref="FILE"/>
+        </appender>
+    -->
+
+    <!-- Console output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder defaults to ch.qos.logback.classic.encoder.PatternLayoutEncoder -->
+        <encoder>
+            <!--<pattern>%highlight([%-5level]) %gray([%d{yyyy-MM-dd HH:mm:ss.SSS}]) %cyan([%X{akkaSource}]) - %msg%n</pattern>-->
+            <pattern>%gray(%d{yyyy-MM-dd HH:mm:ss.SSS}) %highlight(%-5level) %cyan(%X{akkaSource}) - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- async console output -->
+    <!--
+    <appender name="ASYNC_STDOUT" class="ch.qos.logback.classic.AsyncAppender">
+        <queueSize>3</queueSize>
+        <appender-ref ref="STDOUT" />
+    </appender>
+    -->
+
+    <!-- for further appenders see http://logback.qos.ch/manual/appenders.html -->q
+
+    <logger name="exo.engine" level="DEBUG" />
+    <!--<logger name="echo.core.benchmark" level="DEBUG" />-->
+    <logger name="ch.qos.logback" level="WARN"/>
+    <logger name="liquibase" level="WARN"/>
+    <logger name="org.hibernate" level="WARN"/>
+    <logger name="org.springframework.jdbc" level="WARN"/>
+    <logger name="org.springframework.orm" level="WARN"/>
+    <logger name="com.rometools.modules.mediarss.io" level="ERROR"/>
+    <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <!-- appender-ref ref="FILE"/ -->
+    </root>
+
+    <!--
+        Log levels and their ordering: TRACE < DEBUG < INFO < WARN < ERROR
+        Additional values for "level" in the configuration:
+        * ALL, OFF
+        * INHERITED or NULL (not for root)
+    -->
+
+</configuration>
