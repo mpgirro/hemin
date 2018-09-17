@@ -1,20 +1,17 @@
 package exo.engine
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.pattern.{CircuitBreaker, ask}
+import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import exo.engine.EngineProtocol.SearchResults
-import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
 import exo.engine.domain.dto.ResultWrapperDTO
 import exo.engine.index.IndexProtocol.{IndexResultsFound, SearchIndex}
 
-import scala.concurrent.{Await, ExecutionContext, Future, Promise}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
-import scala.util.{Failure, Success, Try}
 
 /**
   * @author max
@@ -52,49 +49,14 @@ class ExoEngine {
 
     def bus(): ActorRef = master
 
-    def catalogBroker(): ActorRef = {
-        val future = master ? GetCatalogBroker
-        val catalog = Await.result(future, INTERNAL_TIMEOUT.duration).asInstanceOf[ActorRef]
-        catalog
-    }
-
-    def indexBroker(): ActorRef = {
-        val future = master ? GetIndexBroker
-        val index = Await.result(future, INTERNAL_TIMEOUT.duration).asInstanceOf[ActorRef]
-        index
-    }
-
     def propose(url: String): Unit = {
-        val future = master ? GetUpdater
-        val updater = Await.result(future, INTERNAL_TIMEOUT.duration).asInstanceOf[ActorRef]
-        updater ! ProposeNewFeed(url)
+        bus() ! ProposeNewFeed(url)
     }
 
     def search(query: String, page: Int, size: Int): Future[ResultWrapperDTO] = {
-        val p = Promise[ResultWrapperDTO]()
-        val f = p.future
-        Future {
-            val index = indexBroker() // TODO hier nich textra die lookup methode aufrufen!
-            (index ? SearchIndex(query, page, size)).onComplete{
-                case Success(result) => result match {
-                    case IndexResultsFound(_,r) => p success r
-                }
-                case fail @ Failure (_) => fail
-                    /*
-                    log.error(s"Search for '$query' failed ; reason : ${reason.getMessage}")
-                    p success ResultWrapperDTO.empty()
-                    */
-            }
+        (bus() ? SearchIndex(query, page, size)).map {
+            case IndexResultsFound(_, results) => results
         }
-        p.future // immediatelly return the promise's future as a placeholder
-    }
-
-    def search2(query: String, page: Int, size: Int): Future[ResultWrapperDTO] = {
-        (indexBroker() ? SearchIndex(query, page, size)).map(m => {
-            m match {
-                case IndexResultsFound(_,results) => results
-            }
-        })
     }
 
     private def breakerOpen(name: String): Unit = {
