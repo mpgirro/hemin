@@ -9,7 +9,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
-object App {
+object ExoApp {
 
     private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
@@ -29,14 +29,15 @@ object App {
         Thread.sleep(10000)
 
         println("Starting search...")
-        val f = engine.search("hukl", 1, 20)
-        f onComplete {
-            case Success(results) =>
-                println("Search results:")
-                for (r <- results.getResults.asScala)
-                    println(r.getTitle+"\n")
-            case Failure(reason)  => println("ERROR: " + reason.getMessage)
-        }
+        engine
+            .search("hukl", 1, 20)
+            .onComplete {
+                case Success(results) =>
+                    println("Search results:")
+                    for (r <- results.getResults.asScala)
+                        println(r.getTitle+"\n")
+                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+            }
 
     }
 

@@ -5,10 +5,11 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
-import exo.engine.index.IndexProtocol._
 import exo.engine.index.IndexStoreSearchHandler.RefreshIndexSearcher
 import exo.engine.domain.dto._
 import exo.engine.exception.SearchException
+import exo.engine.index.IndexBroker._
+import exo.engine.index.IndexStore._
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -25,6 +26,23 @@ object IndexStore {
     def props(indexPath: String, createIndex: Boolean): Props = {
         Props(new IndexStore(indexPath, createIndex)).withDispatcher("echo.index.dispatcher")
     }
+
+    trait IndexMessage
+    trait IndexEvent extends IndexMessage
+    trait IndexCommand extends IndexMessage
+    trait IndexQuery extends IndexMessage
+    trait IndexQueryResult extends IndexMessage
+    // IndexEvents
+    case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
+    case class UpdateDocWebsiteDataIndexEvent(exo: String, html: String) extends IndexEvent
+    case class UpdateDocImageIndexEvent(exo: String, image: String) extends IndexEvent
+    case class UpdateDocLinkIndexEvent(exo: String, newLink: String) extends IndexEvent
+    // IndexCommands
+    case class CommitIndex() extends IndexCommand
+    // IndexQueries
+    case class SearchIndex(query: String, page: Int, size: Int) extends IndexQuery
+    // IndexQueryResults
+    case class SearchResults(query: String, results: ResultWrapper) extends IndexQueryResult
 }
 
 class IndexStore (indexPath: String,
@@ -75,7 +93,7 @@ class IndexStore (indexPath: String,
                 log.error("Error trying to search the index; reason: {}", e.getMessage)
             case e: Exception =>
                 log.error("Unhandled Exception : {}", e.getMessage, e)
-                sender ! IndexProtocol.IndexResultsFound("UNKNOWN", ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+                sender ! SearchResults("UNKNOWN", ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
                 //currQuery = ""
         }
         super.postRestart(cause)

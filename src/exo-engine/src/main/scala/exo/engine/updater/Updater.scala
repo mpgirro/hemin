@@ -2,7 +2,9 @@ package exo.engine.updater
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
+import exo.engine.catalog.CatalogStore.ProposeNewFeed
+import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
+import exo.engine.updater.Updater.ProcessFeed
 
 /**
   * @author Maximilian Irro
@@ -11,6 +13,9 @@ import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
 object Updater {
     final val name = "updater"
     def props(): Props = Props(new Updater()).withDispatcher("echo.updater.dispatcher")
+
+    trait UpdaterMessage
+    case class ProcessFeed(exo: String, url: String, job: FetchJob) extends UpdaterMessage
 }
 
 class Updater extends Actor with ActorLogging {

@@ -9,11 +9,13 @@ import akka.stream._
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogBroker
-import exo.engine.catalog.CatalogProtocol._
+import exo.engine.catalog.CatalogStore._
+import exo.engine.crawler.Crawler._
 import exo.engine.domain.FeedStatus
-import exo.engine.index.IndexProtocol.{IndexEvent, UpdateDocLinkIndexEvent}
 import exo.engine.exception.EchoException
+import exo.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
 import exo.engine.parse.api.FyydAPI
+import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}

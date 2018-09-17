@@ -17,6 +17,12 @@ import scala.concurrent.duration._
 object Parser {
     def name(nodeIndex: Int): String = "parser-" + nodeIndex
     def props(): Props = Props(new Parser())
+
+    trait ParserMessage
+    case class ParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String) extends ParserMessage
+    case class ParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String) extends ParserMessage
+    case class ParseWebsiteData(exo: String, html: String) extends ParserMessage
+    case class ParseFyydEpisodes(podcastExo: String, episodesData: String) extends ParserMessage
 }
 
 class Parser extends Actor with ActorLogging {

@@ -8,13 +8,15 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogProtocol._
+import exo.engine.catalog.CatalogStore._
 import exo.engine.catalog.repository.RepositoryFactoryBuilder
 import exo.engine.catalog.service._
+import exo.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import exo.engine.domain.FeedStatus
-import exo.engine.index.IndexProtocol.{AddDocIndexEvent, IndexEvent}
 import exo.engine.domain.dto._
+import exo.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent}
 import exo.engine.mapper._
+import exo.engine.updater.Updater.ProcessFeed
 import exo.engine.util.ExoGenerator
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronizationManager
@@ -97,100 +99,64 @@ class CatalogStoreHandler(workerIndex: Int,
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
 
-        case ProposeNewFeed(feedUrl) =>
-            proposeFeed(feedUrl)
+        case ProposeNewFeed(feedUrl) => proposeFeed(feedUrl)
 
-        case CheckPodcast(exo) =>
-            onCheckPodcast(exo)
+        case CheckPodcast(exo) => onCheckPodcast(exo)
 
-        case CheckFeed(exo) =>
-            onCheckFeed(exo)
+        case CheckFeed(exo) => onCheckFeed(exo)
 
-        case CheckAllPodcasts =>
-            onCheckAllPodcasts(0, MAX_PAGE_SIZE)
+        case CheckAllPodcasts => onCheckAllPodcasts(0, MAX_PAGE_SIZE)
 
-        case CheckAllFeeds =>
-            onCheckAllFeeds(0, MAX_PAGE_SIZE)
+        case CheckAllFeeds => onCheckAllFeeds(0, MAX_PAGE_SIZE)
 
-        case FeedStatusUpdate(podcastExo, feedUrl, timestamp, status) =>
-            onFeedStatusUpdate(podcastExo, feedUrl, timestamp, status)
+        case FeedStatusUpdate(podcastExo, feedUrl, timestamp, status) => onFeedStatusUpdate(podcastExo, feedUrl, timestamp, status)
 
-        case SaveChapter(chapter) =>
-            onSaveChapter(chapter)
+        case SaveChapter(chapter) => onSaveChapter(chapter)
 
-        case AddPodcastAndFeedIfUnknown(podcast, feed) =>
-            onAddPodcastAndFeedIfUnknown(podcast, feed)
+        case AddPodcastAndFeedIfUnknown(podcast, feed) => onAddPodcastAndFeedIfUnknown(podcast, feed)
 
-        case UpdatePodcast(exo, url, podcast) =>
-            onUpdatePodcast(exo, url, podcast)
+        case UpdatePodcast(exo, url, podcast) => onUpdatePodcast(exo, url, podcast)
 
-        case UpdateEpisode(podcastExo, episode) =>
-            onUpdateEpisode(podcastExo, episode)
+        case UpdateEpisode(podcastExo, episode) => onUpdateEpisode(podcastExo, episode)
 
         // TODO
         //case UpdateFeed(podcastExo, feed) =>  ...
         //case UpdateChapter(episodeExo, chapter) =>  ...
 
-        case UpdateFeedUrl(oldUrl, newUrl) =>
-            onUpdateFeedMetadataUrl(oldUrl, newUrl)
+        case UpdateFeedUrl(oldUrl, newUrl) => onUpdateFeedMetadataUrl(oldUrl, newUrl)
 
-        case UpdateLinkByExo(exo, newUrl) =>
-            onUpdateLinkByExo(exo, newUrl)
+        case UpdateLinkByExo(exo, newUrl) => onUpdateLinkByExo(exo, newUrl)
 
-        case GetPodcast(podcastExo) =>
-            onGetPodcast(podcastExo)
+        case GetPodcast(podcastExo) => onGetPodcast(podcastExo)
 
-        case GetAllPodcasts(page, size) =>
-            onGetAllPodcasts(page, size)
+        case GetAllPodcasts(page, size) => onGetAllPodcasts(page, size)
 
-        case GetAllPodcastsRegistrationComplete(page, size) =>
-            onGetAllPodcastsRegistrationComplete(page, size)
+        case GetAllPodcastsRegistrationComplete(page, size) => onGetAllPodcastsRegistrationComplete(page, size)
 
-        case GetAllFeeds(page, size) =>
-            onGetAllFeeds(page, size)
+        case GetAllFeeds(page, size) => onGetAllFeeds(page, size)
 
-        case GetEpisode(podcastExo) =>
-            onGetEpisode(podcastExo)
+        case GetEpisode(podcastExo) => onGetEpisode(podcastExo)
 
-        case GetEpisodesByPodcast(podcastExo) =>
-            onGetEpisodesByPodcast(podcastExo)
+        case GetEpisodesByPodcast(podcastExo) => onGetEpisodesByPodcast(podcastExo)
 
-        case GetFeedsByPodcast(podcastExo) =>
-            onGetFeedsByPodcast(podcastExo)
+        case GetFeedsByPodcast(podcastExo) => onGetFeedsByPodcast(podcastExo)
 
-        case GetChaptersByEpisode(episodeExo) =>
-            onGetChaptersByEpisode(episodeExo)
+        case GetChaptersByEpisode(episodeExo) => onGetChaptersByEpisode(episodeExo)
 
-        case RegisterEpisodeIfNew(podcastExo, episode) =>
-            onRegisterEpisodeIfNew(podcastExo, episode)
+        case RegisterEpisodeIfNew(podcastExo, episode) => onRegisterEpisodeIfNew(podcastExo, episode)
 
-        case DebugPrintAllPodcasts =>
-            debugPrintAllPodcasts()
+        case DebugPrintAllPodcasts => debugPrintAllPodcasts()
 
-        case DebugPrintAllEpisodes =>
-            debugPrintAllEpisodes()
+        case DebugPrintAllEpisodes => debugPrintAllEpisodes()
 
-        case DebugPrintAllFeeds =>
-            debugPrintAllFeeds()
+        case DebugPrintAllFeeds => debugPrintAllFeeds()
 
-        case DebugPrintCountAllPodcasts =>
-            debugPrintCountAllPodcasts()
+        case DebugPrintCountAllPodcasts => debugPrintCountAllPodcasts()
 
-        case DebugPrintCountAllEpisodes =>
-            debugPrintCountAllEpisodes()
+        case DebugPrintCountAllEpisodes => debugPrintCountAllEpisodes()
 
-        case DebugPrintCountAllFeeds =>
-            debugPrintCountAllFeeds()
+        case DebugPrintCountAllFeeds => debugPrintCountAllFeeds()
 
-        case GetMeanEpisodeCountPerPodcast =>
-            log.debug("Request to get mean episode count per podcast")
-            def task = () => {
-                val ps = podcastService.findAllAsTeaser()
-                val es = episodeService.findAll()
-                val mean = es.size / ps.size
-                sender ! MeanEpisodeCountPerPodcast(ps.size, es.size, mean)
-            }
-            doInTransaction(task, List(podcastService, episodeService))
     }
 
     private def emitCatalogEvent(event: CatalogEvent): Unit = {

@@ -4,6 +4,7 @@ import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
 import exo.engine.EngineProtocol._
+import exo.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 /**
   * @author Maximilian Irro

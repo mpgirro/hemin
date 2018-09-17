@@ -6,7 +6,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeA
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogProtocol.{CatalogCommand, CatalogEvent, CatalogQuery}
+import exo.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
 
 import scala.collection.JavaConverters._
 

@@ -3,8 +3,8 @@ package exo.engine.catalog
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import exo.engine.catalog.CatalogProtocol._
 import exo.engine.EngineProtocol._
+import exo.engine.catalog.CatalogStore._
 
 /**
   * @author Maximilian Irro

@@ -10,35 +10,8 @@ import exo.engine.domain.dto._
   */
 object EngineProtocol {
 
-    trait CrawlerMessage
-    trait ParserMessage
-    trait UpdaterMessage
-
-    // Job variants for Crawler
-    trait FetchJob extends CrawlerMessage
-    case class NewPodcastFetchJob() extends FetchJob
-    case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
-    case class WebsiteFetchJob() extends FetchJob
-
-    // Msg: Catalog -> Updater
-    case class ProcessFeed(exo: String, url: String, job: FetchJob) extends UpdaterMessage
-
-    // Msg: Updater -> Crawler
-    case class DownloadWithHeadCheck(exo: String, url: String, job: FetchJob) extends CrawlerMessage
-    case class DownloadContent(exo: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
-
-    // Crawler -> Parser
-    case class ParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String) extends ParserMessage
-    case class ParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String) extends ParserMessage
-    case class ParseWebsiteData(exo: String, html: String) extends ParserMessage
-    case class ParseFyydEpisodes(podcastExo: String, episodesData: String) extends ParserMessage
-
     // Gateway(= Web) -> Searcher; CLI -> Gateway (Benchmark)
     case class SearchRequest(query: String, page: Option[Int], size: Option[Int])
-    case class BenchmarkSearchRequest(query: String, page: Option[Int], size: Option[Int])
-
-    // Searcher -> User
-    case class SearchResults(results: ResultWrapper)
 
     // These messages are sent to propagate actorRefs to other actors, to overcome circular dependencies
     trait ActorRefInfo

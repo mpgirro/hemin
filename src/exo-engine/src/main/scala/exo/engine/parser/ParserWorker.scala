@@ -8,14 +8,16 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Send}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogBroker
-import exo.engine.catalog.CatalogProtocol._
+import exo.engine.catalog.CatalogStore._
+import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
 import exo.engine.domain.FeedStatus
 import exo.engine.domain.dto.Episode
-import exo.engine.index.IndexProtocol.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
 import exo.engine.exception.FeedParsingException
+import exo.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
 import exo.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
 import exo.engine.parse.api.FyydAPI
 import exo.engine.parse.rss.RomeFeedParser
+import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 

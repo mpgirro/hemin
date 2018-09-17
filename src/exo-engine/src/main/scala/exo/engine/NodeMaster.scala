@@ -7,12 +7,15 @@ import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import exo.engine.catalog.CatalogBroker
-import exo.engine.catalog.CatalogProtocol.CatalogMessage
+import exo.engine.catalog.CatalogStore.CatalogMessage
 import exo.engine.crawler.Crawler
+import exo.engine.crawler.Crawler.CrawlerMessage
 import exo.engine.index.IndexBroker
-import exo.engine.index.IndexProtocol.IndexMessage
+import exo.engine.index.IndexStore.IndexMessage
 import exo.engine.parser.Parser
+import exo.engine.parser.Parser.ParserMessage
 import exo.engine.updater.Updater
+import exo.engine.updater.Updater.UpdaterMessage
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
@@ -48,7 +51,6 @@ class NodeMaster extends Actor with ActorLogging {
     private var crawler: ActorRef = _
     private var catalog: ActorRef = _
     private var updater: ActorRef = _
-    private var cli: ActorRef = _
 
     override def preStart(): Unit = {
 
@@ -111,7 +113,6 @@ class NodeMaster extends Actor with ActorLogging {
         log.info("initiating shutdown sequence")
 
         // it is important to shutdown all actor(supervisor) befor shutting down the actor system
-        context.system.stop(cli)
         context.system.stop(crawler)    // these have a too full inbox usually to let them finish processing
         context.system.stop(catalog)
         context.system.stop(index)

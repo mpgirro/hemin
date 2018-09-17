@@ -22,6 +22,14 @@ import scala.concurrent.duration._
 object Crawler {
     def name(nodeIndex: Int): String = "crawler-" + nodeIndex
     def props(): Props = Props(new Crawler())
+
+    trait CrawlerMessage
+    trait FetchJob extends CrawlerMessage
+    case class NewPodcastFetchJob() extends FetchJob
+    case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
+    case class WebsiteFetchJob() extends FetchJob
+    case class DownloadWithHeadCheck(exo: String, url: String, job: FetchJob) extends CrawlerMessage
+    case class DownloadContent(exo: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
 }
 
 class Crawler extends Actor with ActorLogging {

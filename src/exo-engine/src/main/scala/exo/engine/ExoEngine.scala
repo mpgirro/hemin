@@ -5,9 +5,9 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import exo.engine.catalog.CatalogProtocol.ProposeNewFeed
-import exo.engine.domain.dto.{ResultWrapper}
-import exo.engine.index.IndexProtocol.{IndexResultsFound, SearchIndex}
+import exo.engine.catalog.CatalogStore.ProposeNewFeed
+import exo.engine.domain.dto.ResultWrapper
+import exo.engine.index.IndexStore.{SearchIndex, SearchResults}
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, Future}
@@ -50,12 +50,12 @@ class ExoEngine {
     def bus(): ActorRef = master
 
     def propose(url: String): Unit = {
-        bus() ! ProposeNewFeed(url)
+        bus ! ProposeNewFeed(url)
     }
 
     def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
-        (bus() ? SearchIndex(query, page, size)).map {
-            case IndexResultsFound(_, results) => results
+        (bus ? SearchIndex(query, page, size)).map {
+            case SearchResults(_, results) => results
         }
     }
 
