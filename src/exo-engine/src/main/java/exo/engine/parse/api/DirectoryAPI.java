@@ -13,7 +13,7 @@ import java.util.Scanner;
 /**
  * @author Maximilian Irro
  */
-public abstract class API {
+public abstract class DirectoryAPI {
 
     protected Gson gson = new Gson();
 

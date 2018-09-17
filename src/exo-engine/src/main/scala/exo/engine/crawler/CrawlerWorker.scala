@@ -14,7 +14,7 @@ import exo.engine.crawler.Crawler._
 import exo.engine.domain.FeedStatus
 import exo.engine.exception.EchoException
 import exo.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
-import exo.engine.parse.api.FyydAPI
+import exo.engine.parse.api.{FyydAPI, FyydDirectoryAPI}
 import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 import scala.compat.java8.OptionConverters._
@@ -56,7 +56,7 @@ class CrawlerWorker extends Actor with ActorLogging {
     private var parser: ActorRef = _
     private var supervisor: ActorRef = _
 
-    private val fyydAPI: FyydAPI = new FyydAPI()
+    private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
     private var httpClient: HttpClient = new HttpClient(DOWNLOAD_TIMEOUT, DOWNLOAD_MAXBYTES)
 
     private var currUrl: String = _

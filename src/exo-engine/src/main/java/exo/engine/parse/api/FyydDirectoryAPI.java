@@ -14,16 +14,16 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Minimalistic(!) wrapper around the fyyd.de API
+ * Minimalistic(!) wrapper around the fyyd.de DirectoryAPI
  *
  *
- * For API documentation, see https://github.com/eazyliving/fyyd-api
+ * For DirectoryAPI documentation, see https://github.com/eazyliving/fyyd-api
  *
  * @author Maximilian Irro
  */
-public class FyydAPI extends API {
+public class FyydDirectoryAPI extends DirectoryAPI {
 
-    private static final Logger log = LoggerFactory.getLogger(FyydAPI.class);
+    private static final Logger log = LoggerFactory.getLogger(FyydDirectoryAPI.class);
 
     private static String API_URL = "https://api.fyyd.de/0.2";
 
@@ -55,7 +55,7 @@ public class FyydAPI extends API {
     }
 
     public String getPodcastJSON(String id) throws IOException {
-        return get(API_URL+"/podcast/?podcast_id="+id); // TODO schaut die API wirklich so aus?
+        return get(API_URL+"/podcast/?podcast_id="+id); // TODO schaut die DirectoryAPI wirklich so aus?
     }
 
     public String getEpisodesByPodcastIdJSON(Long id) throws IOException {

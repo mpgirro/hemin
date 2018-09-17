@@ -15,7 +15,7 @@ import exo.engine.domain.dto.Episode
 import exo.engine.exception.FeedParsingException
 import exo.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
 import exo.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
-import exo.engine.parse.api.FyydAPI
+import exo.engine.parse.api.FyydDirectoryAPI
 import exo.engine.parse.rss.RomeFeedParser
 import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 import org.jsoup.Jsoup
@@ -49,7 +49,7 @@ class ParserWorker extends Actor with ActorLogging {
     private var crawler: ActorRef = _
     private var supervisor: ActorRef = _
 
-    private val fyydAPI: FyydAPI = new FyydAPI()
+    private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
 
     private var currFeedUrl = ""
     private var currPodcastExo = ""
@@ -86,45 +86,57 @@ class ParserWorker extends Actor with ActorLogging {
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
 
-        case ParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String) =>
-            log.debug("Received ParseNewPodcastData for feed: " + feedUrl)
+        case ParseNewPodcastData(feedUrl, podcastExo, feedData) => onParseNewPodcastData(feedUrl, podcastExo, feedData)
 
-            currFeedUrl = feedUrl
-            currPodcastExo = podcastExo
+        case ParseUpdateEpisodeData(feedUrl, podcastExo, episodeFeedData) => onParseUpdateEpisodeData(feedUrl, podcastExo, episodeFeedData)
 
-            parse(podcastExo, feedUrl, feedData, isNewPodcast = true)
+        case ParseWebsiteData(exo, html) => onParseWebsiteData(exo, html)
 
-            currFeedUrl = ""
-            currPodcastExo = ""
+        case ParseFyydEpisodes(podcastExo, json) => onParseFyydEpisodes(podcastExo, json)
 
-        case ParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String) =>
-            log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastExo)
+    }
 
-            currFeedUrl = feedUrl
-            currPodcastExo = podcastExo
+    private def onParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String): Unit = {
+        log.debug("Received ParseNewPodcastData for feed: " + feedUrl)
 
-            parse(podcastExo, feedUrl, episodeFeedData, isNewPodcast = false)
+        currFeedUrl = feedUrl
+        currPodcastExo = podcastExo
 
-            currFeedUrl = ""
-            currPodcastExo = ""
+        parse(podcastExo, feedUrl, feedData, isNewPodcast = true)
 
-        case ParseWebsiteData(exo: String, html: String) =>
-            log.debug("Received ParseWebsiteData({},_)", exo)
+        currFeedUrl = ""
+        currPodcastExo = ""
+    }
 
-            val readableText = Jsoup.parse(html).text()
+    private def onParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String): Unit = {
+        log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastExo)
 
-            val indexEvent = UpdateDocWebsiteDataIndexEvent(exo, readableText)
-            mediator ! Publish(indexEventStream, indexEvent)
+        currFeedUrl = feedUrl
+        currPodcastExo = podcastExo
 
-        case ParseFyydEpisodes(podcastExo, json) =>
-            log.debug("Received ParseFyydEpisodes({},_)", podcastExo)
+        parse(podcastExo, feedUrl, episodeFeedData, isNewPodcast = false)
 
-            val episodes: List[Episode] = fyydAPI.getEpisodes(json).asScala.toList
-            log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastExo)
-            for(episode <- episodes){
-                registerEpisode(podcastExo, episode)
-            }
+        currFeedUrl = ""
+        currPodcastExo = ""
+    }
 
+    private def onParseWebsiteData(exo: String, html: String): Unit = {
+        log.debug("Received ParseWebsiteData({},_)", exo)
+
+        val readableText = Jsoup.parse(html).text()
+
+        val indexEvent = UpdateDocWebsiteDataIndexEvent(exo, readableText)
+        mediator ! Publish(indexEventStream, indexEvent)
+    }
+
+    private def onParseFyydEpisodes(podcastExo: String, json: String): Unit = {
+        log.debug("Received ParseFyydEpisodes({},_)", podcastExo)
+
+        val episodes: List[Episode] = fyydAPI.getEpisodes(json).asScala.toList
+        log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastExo)
+        for(episode <- episodes){
+            registerEpisode(podcastExo, episode)
+        }
     }
 
     private def sendCatalogCommand(command: CatalogCommand): Unit = {
