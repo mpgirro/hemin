@@ -6,12 +6,12 @@ import akka.cluster.Cluster
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
-import exo.engine.catalog.CatalogBroker
+import exo.engine.catalog.{CatalogBroker, CatalogStore}
 import exo.engine.catalog.CatalogStore.CatalogMessage
 import exo.engine.config.ExoConfig
 import exo.engine.crawler.Crawler
 import exo.engine.crawler.Crawler.CrawlerMessage
-import exo.engine.index.IndexBroker
+import exo.engine.index.{IndexBroker, IndexStore}
 import exo.engine.index.IndexStore.IndexMessage
 import exo.engine.parser.Parser
 import exo.engine.parser.Parser.ParserMessage
@@ -42,7 +42,7 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
 
     private implicit val executionContext = context.system.dispatcher
 
-    private val cluster = Cluster(context.system)
+    //private val cluster = Cluster(context.system)
 
     private implicit val INTERNAL_TIMEOUT = config.internalTimeout
 
@@ -56,22 +56,26 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
 
         val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
 
-        index    = context.watch(context.actorOf(IndexBroker.props(),   IndexBroker.name))
-        parser   = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name(1)))
-        crawler  = context.watch(context.actorOf(Crawler.props(),       Crawler.name(1)))
-        catalog  = context.watch(context.actorOf(CatalogBroker.props(), CatalogBroker.name))
-        updater  = context.watch(context.actorOf(Updater.props(config.updaterConfig),       Updater.name))
+        index   = context.watch(context.actorOf(IndexStore.props(config.indexConfig),     IndexStore.name))
+        parser  = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
+        crawler = context.watch(context.actorOf(Crawler.props(config.crawlerConfig),      Crawler.name))
+        catalog = context.watch(context.actorOf(CatalogStore.props(config.catalogConfig), CatalogStore.name))
+        updater = context.watch(context.actorOf(Updater.props(config.updaterConfig),      Updater.name))
 
 
         // pass around references not provided by constructors due to circular dependencies
+        crawler ! ActorRefCatalogStoreActor(catalog)
+        crawler ! ActorRefIndexStoreActor(index)
         crawler ! ActorRefParserActor(parser)
         crawler ! ActorRefCatalogStoreActor(catalog)
 
         parser ! ActorRefCatalogStoreActor(catalog)
+        parser ! ActorRefIndexStoreActor(index)
         parser ! ActorRefCrawlerActor(crawler)
 
-        catalog ! ActorRefCrawlerActor(crawler)
         catalog ! ActorRefCatalogStoreActor(catalog)
+        catalog ! ActorRefIndexStoreActor(index)
+        catalog ! ActorRefCrawlerActor(crawler)
         catalog ! ActorRefUpdaterActor(updater)
 
         updater ! ActorRefCatalogStoreActor(catalog)
@@ -118,7 +122,7 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
         context.system.stop(index)
         context.system.stop(parser)
 
-        cluster.leave(cluster.selfAddress) // leave the cluster before shutdown
+        //cluster.leave(cluster.selfAddress) // leave the cluster before shutdown
 
         context.system.terminate().onComplete(_ => log.info("system.terminate() finished"))
         //context.stop(self)  // master

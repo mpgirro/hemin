@@ -7,6 +7,7 @@ import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLog
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
+import exo.engine.config.CatalogConfig
 
 import scala.collection.JavaConverters._
 
@@ -16,10 +17,11 @@ import scala.collection.JavaConverters._
 
 object CatalogBroker {
     final val name = "catalog"
-    def props(): Props = Props(new CatalogBroker())
+    def props(config: CatalogConfig): Props = Props(new CatalogBroker(config))
 }
 
-class CatalogBroker extends Actor with ActorLogging {
+@Deprecated
+class CatalogBroker (config: CatalogConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
@@ -91,8 +93,8 @@ class CatalogBroker extends Actor with ActorLogging {
     }
 
     private def createCatalogStore(storeIndex: Int, databaseUrl: String): ActorRef = {
-        val catalogStore = context.actorOf(CatalogStore.props(databaseUrl),
-            name = CatalogStore.name(storeIndex))
+        val catalogStore = context.actorOf(CatalogStore.props(config),
+            name = CatalogStore.name)
 
         // forward the actor refs to the worker, but only if those references haven't died
         Option(crawler).foreach(c => catalogStore ! ActorRefCrawlerActor(c) )

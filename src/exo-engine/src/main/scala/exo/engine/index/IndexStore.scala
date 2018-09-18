@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
+import exo.engine.config.IndexConfig
 import exo.engine.domain.dto._
 import exo.engine.exception.SearchException
 import exo.engine.index.IndexStore._
@@ -18,9 +19,10 @@ import scala.language.postfixOps
   * @author Maximilian Irro
   */
 object IndexStore {
-    def name(storeIndex: Int): String = "store-" + storeIndex
-    def props(indexPath: String, createIndex: Boolean): Props = {
-        Props(new IndexStore(indexPath, createIndex)).withDispatcher("echo.index.dispatcher")
+    //def name(storeIndex: Int): String = "store-" + storeIndex
+    final val name = "index"
+    def props(config: IndexConfig): Props = {
+        Props(new IndexStore(config)).withDispatcher("echo.index.dispatcher")
     }
 
     trait IndexMessage
@@ -41,22 +43,20 @@ object IndexStore {
     case class SearchResults(query: String, results: ResultWrapper) extends IndexQueryResult
 }
 
-class IndexStore (indexPath: String,
-                  createIndex: Boolean) extends Actor with ActorLogging {
+class IndexStore (config: IndexConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val COMMIT_INTERVAL: FiniteDuration = Option(CONFIG.getInt("echo.index.commit-interval")).getOrElse(3).seconds
-    /*
-    private val INDEX_PATH: String = Option(CONFIG.getString("echo.index.lucene-path")).getOrElse("index")
-    */
     private val WORKER_COUNT: Int = Option(CONFIG.getInt("echo.index.handler-count")).getOrElse(5)
-    private var handlerIndex = 0
+    */
+    //private var handlerIndex = 0
 
-    private val mediator = DistributedPubSub(context.system).mediator
+    //private val mediator = DistributedPubSub(context.system).mediator
 
-    private val indexCommitter: IndexCommitter = new LuceneCommitter(indexPath, createIndex) // TODO do not alway re-create the index
+    private val indexCommitter: IndexCommitter = new LuceneCommitter(config.indexPath, config.createIndex) // TODO do not alway re-create the index
     private val indexSearcher: IndexSearcher = new LuceneSearcher(indexCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
 
     private var indexChanged = false
@@ -70,7 +70,7 @@ class IndexStore (indexPath: String,
     private var supervisor: ActorRef = _
 
     // kickoff the committing play
-    context.system.scheduler.schedule(COMMIT_INTERVAL, COMMIT_INTERVAL, self, CommitIndex)
+    context.system.scheduler.schedule(config.commitInterval, config.commitInterval, self, CommitIndex)
 
     override def postRestart(cause: Throwable): Unit = {
         log.info("{} has been restarted or resumed", self.path.name)
@@ -127,15 +127,15 @@ class IndexStore (indexPath: String,
             Future {
                 var results: ResultWrapper = null
                 blocking {
-                    results = indexSearcher.search(query, page, size)
+                    results = indexSearcher.search(currQuery, page, size)
                 }
 
                 if (results.getTotalHits > 0){
-                    origSender ! SearchResults(query,results)
+                    origSender ! SearchResults(currQuery,results)
                 } else {
                     log.warning("No Podcast matching query: '{}' found in the index", query)
                     //sender ! NoIndexResultsFound(query)
-                    origSender ! SearchResults(query,ResultWrapper.empty())
+                    origSender ! SearchResults(currQuery,ResultWrapper.empty())
                 }
 
                 currQuery = "" // wipe the copy

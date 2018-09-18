@@ -16,7 +16,8 @@ import scala.concurrent.duration._
   */
 
 object Parser {
-    def name(nodeIndex: Int): String = "parser-" + nodeIndex
+    //def name(nodeIndex: Int): String = "parser-" + nodeIndex
+    final val name = "parser"
     def props(config: ParserConfig): Props = Props(new Parser(config))
 
     trait ParserMessage
@@ -37,7 +38,8 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
 
     private var workerIndex = 0
 
-    private var catalogStore: ActorRef = _
+    private var catalog: ActorRef = _
+    private var index: ActorRef = _
     private var crawler: ActorRef = _
 
     private var router: Router = {
@@ -63,7 +65,12 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
 
         case msg @ ActorRefCatalogStoreActor(ref) =>
             log.debug("Received ActorRefCatalogStoreActor(_)")
-            catalogStore = ref
+            catalog = ref
+            router.routees.foreach(r => r.send(msg, sender()))
+
+        case msg @ ActorRefIndexStoreActor(ref) =>
+            log.debug("Received ActorRefIndexStoreActor(_)")
+            index = ref
             router.routees.foreach(r => r.send(msg, sender()))
 
         case msg @ ActorRefCrawlerActor(ref) =>
@@ -85,7 +92,7 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
         val worker = context.actorOf(ParserWorker.props(config), ParserWorker.name(workerIndex))
 
         // forward the actor refs to the worker, but only if those references haven't died
-        Option(catalogStore).foreach(d => worker ! ActorRefCatalogStoreActor(d))
+        Option(catalog).foreach(d => worker ! ActorRefCatalogStoreActor(d))
         Option(crawler).foreach(c => worker ! ActorRefCrawlerActor(c))
         worker ! ActorRefSupervisor(self)
 

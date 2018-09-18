@@ -11,6 +11,7 @@ import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore._
 import exo.engine.catalog.repository.RepositoryFactoryBuilder
 import exo.engine.catalog.service._
+import exo.engine.config.CatalogConfig
 import exo.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import exo.engine.domain.FeedStatus
 import exo.engine.domain.dto._
@@ -30,30 +31,36 @@ import scala.concurrent.blocking
 
 object CatalogStoreHandler {
     def name(workerIndex: Int): String = "handler-" + workerIndex
-    def props(workerIndex: Int, databaseUrl: String): Props = {
-        Props(new CatalogStoreHandler(workerIndex, databaseUrl)).withDispatcher("echo.catalog.dispatcher")
+    def props(workerIndex: Int, config: CatalogConfig): Props = {
+        Props(new CatalogStoreHandler(workerIndex, config)).withDispatcher("echo.catalog.dispatcher")
     }
 }
 
 class CatalogStoreHandler(workerIndex: Int,
-                          databaseUrl: String) extends Actor with ActorLogging {
+                          config: CatalogConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val MAX_PAGE_SIZE: Int = Option(CONFIG.getInt("echo.catalog.max-page-size")).getOrElse(10000)
+    */
 
+    /*
     private val catalogEventStream = CONFIG.getString("echo.catalog.event-stream")
     private val indexEventStream = CONFIG.getString("echo.index.event-stream")
     private val mediator = DistributedPubSub(context.system).mediator
+    */
 
     private val exoGenerator: ExoGenerator = new ExoGenerator(workerIndex)
 
+    private var catalogStore: ActorRef = _
+    private var indexStore: ActorRef = _
     private var crawler: ActorRef = _
     private var updater: ActorRef = _
     private var supervisor: ActorRef = _
 
-    private var repositoryFactoryBuilder = new RepositoryFactoryBuilder(databaseUrl)
+    private var repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
     private var emf: EntityManagerFactory = repositoryFactoryBuilder.getEntityManagerFactory
 
     private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder)
@@ -71,7 +78,7 @@ class CatalogStoreHandler(workerIndex: Int,
     override def postRestart(cause: Throwable): Unit = {
         log.info("{} has been restarted or resumed", self.path.name)
 
-        repositoryFactoryBuilder = new RepositoryFactoryBuilder(databaseUrl)
+        repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
         emf = repositoryFactoryBuilder.getEntityManagerFactory
 
         super.postRestart(cause)
@@ -86,6 +93,14 @@ class CatalogStoreHandler(workerIndex: Int,
     }
 
     override def receive: Receive = {
+
+        case ActorRefCatalogStoreActor(ref) =>
+            log.debug("Received ActorRefCatalogStoreActor(_)")
+            catalogStore = ref
+
+        case ActorRefIndexStoreActor(ref) =>
+            log.debug("Received ActorRefIndexStoreActor(_)")
+            indexStore = ref
 
         case ActorRefCrawlerActor(ref) =>
             log.debug("Received ActorRefCrawlerActor(_)")
@@ -105,9 +120,9 @@ class CatalogStoreHandler(workerIndex: Int,
 
         case CheckFeed(exo) => onCheckFeed(exo)
 
-        case CheckAllPodcasts => onCheckAllPodcasts(0, MAX_PAGE_SIZE)
+        case CheckAllPodcasts => onCheckAllPodcasts(0, config.maxPageSize)
 
-        case CheckAllFeeds => onCheckAllFeeds(0, MAX_PAGE_SIZE)
+        case CheckAllFeeds => onCheckAllFeeds(0, config.maxPageSize)
 
         case FeedStatusUpdate(podcastExo, feedUrl, timestamp, status) => onFeedStatusUpdate(podcastExo, feedUrl, timestamp, status)
 
@@ -159,6 +174,7 @@ class CatalogStoreHandler(workerIndex: Int,
 
     }
 
+    /*
     private def emitCatalogEvent(event: CatalogEvent): Unit = {
         mediator ! Publish(catalogEventStream, event)
     }
@@ -166,6 +182,7 @@ class CatalogStoreHandler(workerIndex: Int,
     private def emitIndexEvent(event: IndexEvent): Unit = {
         mediator ! Publish(indexEventStream, event)
     }
+    */
 
     private def proposeFeed(url: String): Unit = {
         log.debug("Received msg proposing a new feed: " + url)
@@ -200,7 +217,8 @@ class CatalogStoreHandler(workerIndex: Int,
                         val catalogEvent = AddPodcastAndFeedIfUnknown(
                             idMapper.clearImmutable(p),
                             idMapper.clearImmutable(f))
-                        emitCatalogEvent(catalogEvent)
+                        //emitCatalogEvent(catalogEvent)
+                        self ! catalogEvent
 
                         updater ! ProcessFeed(podcastExo, f.getUrl, NewPodcastFetchJob())
                     })
@@ -584,13 +602,15 @@ class CatalogStoreHandler(workerIndex: Int,
                 log.info("episode registered : '{}' [p:{},e:{}]", e.getTitle, podcastExo, e.getExo)
 
                 val indexEvent = AddDocIndexEvent(indexMapper.toImmutable(e))
-                emitIndexEvent(indexEvent)
+                //emitIndexEvent(indexEvent)
+                indexStore ! indexEvent
 
                 /* TODO send an update to all catalogs via the broker, so all other stores will have
                  * the data too (this will of course mean that I will update my own data, which is a
                  * bit pointless, by oh well... */
                 val catalogEvent = UpdateEpisode(podcastExo, idMapper.clearImmutable(e))
-                emitCatalogEvent(catalogEvent)
+                //emitCatalogEvent(catalogEvent)
+                self ! catalogEvent
 
                 // request that the website will get added to the episodes index entry as well
                 Option(e.getLink) match {
@@ -607,7 +627,7 @@ class CatalogStoreHandler(workerIndex: Int,
         log.debug("Received DebugPrintAllPodcasts")
         log.info("All Podcasts in database:")
         def task = () => {
-            podcastService.findAll(0, MAX_PAGE_SIZE).foreach(p => println(s"${p.getExo} : ${p.getTitle}"))
+            podcastService.findAll(0, config.maxPageSize).foreach(p => println(s"${p.getExo} : ${p.getTitle}"))
         }
         doInTransaction(task, List(podcastService))
     }
@@ -625,7 +645,7 @@ class CatalogStoreHandler(workerIndex: Int,
         log.debug("Received DebugPrintAllFeeds")
         log.info("All Feeds in database:")
         def task = () => {
-            feedService.findAll(0, MAX_PAGE_SIZE).foreach(f => println(s"${f.getExo} : ${f.getUrl}"))
+            feedService.findAll(0, config.maxPageSize).foreach(f => println(s"${f.getExo} : ${f.getUrl}"))
         }
         doInTransaction(task, List(feedService))
     }

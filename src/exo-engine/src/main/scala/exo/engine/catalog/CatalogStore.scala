@@ -7,6 +7,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
+import exo.engine.config.CatalogConfig
 import exo.engine.domain.FeedStatus
 import exo.engine.domain.dto.{Chapter, Episode, Feed, Podcast}
 import liquibase.{Contexts, LabelExpression, Liquibase}
@@ -21,9 +22,10 @@ import scala.collection.JavaConverters._
   */
 
 object CatalogStore {
-    def name(storeIndex: Int): String = "store-" + storeIndex
-    def props(databaseUrl: String): Props = {
-        Props(new CatalogStore(databaseUrl)).withDispatcher("echo.catalog.dispatcher")
+    //def name(storeIndex: Int): String = "store-" + storeIndex
+    final val name = "catalog"
+    def props(config: CatalogConfig): Props = {
+        Props(new CatalogStore(config)).withDispatcher("echo.catalog.dispatcher")
     }
 
     trait CatalogMessage
@@ -67,22 +69,26 @@ object CatalogStore {
     case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
-class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
+class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val WORKER_COUNT: Int = Option(CONFIG.getInt("echo.catalog.worker-count")).getOrElse(5)
+    */
 
     private var currentWorkerIndex = 0
 
+    private var catalogStore: ActorRef = _
+    private var indexStore: ActorRef = _
     private var crawler: ActorRef = _
     private var updater: ActorRef = _
     private var supervisor: ActorRef = _
 
     private var router: Router = {
-        val routees = Vector.fill(WORKER_COUNT) {
-            val catalogStore = createCatalogStoreWorkerActor(databaseUrl)
+        val routees = Vector.fill(config.workerCount) {
+            val catalogStore = createCatalogStoreWorkerActor(config.databaseUrl)
             context watch catalogStore
             ActorRefRoutee(catalogStore)
         }
@@ -98,6 +104,16 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
     }
 
     override def receive: Receive = {
+
+        case msg @ ActorRefCatalogStoreActor(ref) =>
+            log.debug("Received ActorRefCatalogStoreActor(_)")
+            catalogStore = ref
+            router.routees.foreach(r => r.send(msg, sender()))
+
+        case msg @ ActorRefIndexStoreActor(ref) =>
+            log.debug("Received ActorRefIndexStoreActor(_)")
+            indexStore = ref
+            router.routees.foreach(r => r.send(msg, sender()))
 
         case msg @ ActorRefCrawlerActor(ref) =>
             log.debug("Received ActorRefCrawlerActor(_)")
@@ -130,7 +146,7 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
     private def createCatalogStoreWorkerActor(databaseUrl: String): ActorRef = {
         currentWorkerIndex += 1
         val workerIndex = currentWorkerIndex
-        val catalogStore = context.actorOf(CatalogStoreHandler.props(workerIndex, databaseUrl), CatalogStoreHandler.name(workerIndex))
+        val catalogStore = context.actorOf(CatalogStoreHandler.props(workerIndex, config), CatalogStoreHandler.name(workerIndex))
 
         // forward the actor refs to the worker, but only if those references haven't died
         Option(crawler).foreach(c => catalogStore ! ActorRefCrawlerActor(c) )
@@ -144,7 +160,7 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
         try {
             Class.forName("org.h2.Driver")
             val conn: Connection = DriverManager.getConnection(
-                s"${databaseUrl};DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false",
+                s"${config.databaseUrl};DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false",
                 "sa",
                 "")
 
@@ -158,14 +174,13 @@ class CatalogStore(databaseUrl: String) extends Actor with ActorLogging {
                 liquibase.dropAll()
             }
 
-            if(liquibase.isSafeToRunUpdate){
+            if (liquibase.isSafeToRunUpdate) {
                 liquibase.update(new Contexts(), new LabelExpression())
             } else {
                 log.warning("Liquibase reports it is NOT safe to run the update")
             }
         } catch {
-            case e: Exception =>
-                log.error("Error on Liquibase update: {}", e)
+            case e: Exception => log.error("Error on Liquibase update: {}", e)
         } finally {
             val stopTime = System.currentTimeMillis
             val elapsedTime = stopTime - startTime

@@ -10,6 +10,7 @@ import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogBroker
 import exo.engine.catalog.CatalogStore._
+import exo.engine.config.CrawlerConfig
 import exo.engine.crawler.Crawler._
 import exo.engine.domain.FeedStatus
 import exo.engine.exception.EchoException
@@ -27,13 +28,14 @@ import scala.language.postfixOps
 
 object CrawlerWorker {
     def name(workerIndex: Int): String = "worker-" + workerIndex
-    def props(): Props = Props(new CrawlerWorker()).withDispatcher("echo.crawler.dispatcher")
+    def props(config: CrawlerConfig): Props = Props(new CrawlerWorker(config)).withDispatcher("echo.crawler.dispatcher")
 }
 
-class CrawlerWorker extends Actor with ActorLogging {
+class CrawlerWorker (config: CrawlerConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val WEBSITE_JOBS: Boolean = Option(CONFIG.getBoolean("echo.crawler.website-jobs")).getOrElse(false)
 
@@ -42,6 +44,7 @@ class CrawlerWorker extends Actor with ActorLogging {
 
     private val DOWNLOAD_TIMEOUT = 10 // TODO read from config
     private val DOWNLOAD_MAXBYTES = 5242880 // = 5  * 1024 * 1024 // TODO load from config file
+    */
 
     // important, or we will experience starvation on processing many feeds at once
     private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.crawler.dispatcher")
@@ -49,15 +52,21 @@ class CrawlerWorker extends Actor with ActorLogging {
     private implicit val actorSystem: ActorSystem = context.system
     private implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))
 
+    /*
+    // TODO remove config
+    private val CONFIG = ConfigFactory.load()
     private val catalogEventStream = CONFIG.getString("echo.catalog.event-stream")
     private val indexEventStream = CONFIG.getString("echo.index.event-stream")
     private val mediator = DistributedPubSub(context.system).mediator
+    */
 
+    private var catalog: ActorRef = _
+    private var index: ActorRef = _
     private var parser: ActorRef = _
     private var supervisor: ActorRef = _
 
     private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
-    private var httpClient: HttpClient = new HttpClient(DOWNLOAD_TIMEOUT, DOWNLOAD_MAXBYTES)
+    private var httpClient: HttpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
 
     private var currUrl: String = _
     private var currJob: FetchJob = _
@@ -89,6 +98,10 @@ class CrawlerWorker extends Actor with ActorLogging {
 
     override def receive: Receive = {
 
+        case ActorRefCatalogStoreActor(ref) =>
+            log.debug("Received ActorRefCatalogStoreActor(_)")
+            catalog = ref
+
         case ActorRefParserActor(ref) =>
             log.debug("Received ActorRefParserActor(_)")
             parser = ref
@@ -105,7 +118,7 @@ class CrawlerWorker extends Actor with ActorLogging {
 
             job match {
                 case WebsiteFetchJob() =>
-                    if (WEBSITE_JOBS) {
+                    if (config.fetchWebsites) {
                         log.info("Received DownloadWithHeadCheck({}, '{}', {})", exo, url, job.getClass.getSimpleName)
                         headCheck(exo, url, job)
                     }
@@ -131,6 +144,7 @@ class CrawlerWorker extends Actor with ActorLogging {
 
     }
 
+    /*
     private def sendCatalogCommand(command: CatalogCommand): Unit = {
         mediator ! Send("/user/node/"+CatalogBroker.name, command, localAffinity = true)
     }
@@ -138,6 +152,11 @@ class CrawlerWorker extends Actor with ActorLogging {
     private def emitCatalogEvent(event: CatalogEvent): Unit = {
         mediator ! Publish(catalogEventStream, event)
     }
+
+    private def emitIndexEvent(event: IndexEvent): Unit = {
+        mediator ! Publish(indexEventStream, event)
+    }
+    */
 
     private def onCrawlFyyd(count: Int) = {
         log.debug("Received CrawlFyyd({})", count)
@@ -150,7 +169,8 @@ class CrawlerWorker extends Actor with ActorLogging {
         val it = feeds.iterator()
         while (it.hasNext) {
             val catalogCommand = ProposeNewFeed(it.next())
-            sendCatalogCommand(catalogCommand)
+            //sendCatalogCommand(catalogCommand)
+            catalog ! catalogCommand
         }
     }
 
@@ -161,16 +181,13 @@ class CrawlerWorker extends Actor with ActorLogging {
         parser ! ParseFyydEpisodes(podcastId, json)
     }
 
-    private def emitIndexEvent(event: IndexEvent): Unit = {
-        mediator ! Publish(indexEventStream, event)
-    }
-
     private def sendErrorNotificationIfFeasable(exo: String, url: String, job: FetchJob): Unit = {
         job match {
             case WebsiteFetchJob() => // do nothing...
             case _ =>
                 val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_ERROR)
-                emitCatalogEvent(catalogEvent)
+                //emitCatalogEvent(catalogEvent)
+                catalog ! catalogEvent
         }
     }
 
@@ -196,10 +213,12 @@ class CrawlerWorker extends Actor with ActorLogging {
                             if (!url.equals(href)) {
                                 //directoryStore ! UpdateLinkByExo(exo, href)
                                 val catalogEvent = UpdateLinkByExo(exo, href)
-                                emitCatalogEvent(catalogEvent)
+                                //emitCatalogEvent(catalogEvent)
+                                catalog ! catalogEvent
 
                                 val indexEvent = UpdateDocLinkIndexEvent(exo, href)
-                                emitIndexEvent(indexEvent)
+                                //emitIndexEvent(indexEvent)
+                                index ! indexEvent
                             }
 
                             // we always download websites, because we only do it once anyway
@@ -211,7 +230,8 @@ class CrawlerWorker extends Actor with ActorLogging {
                             // it will use the new location starting with the next update cycle
                             if (!url.equals(href)) {
                                 val catalogEvent = UpdateFeedUrl(url, href)
-                                emitCatalogEvent(catalogEvent)
+                                //emitCatalogEvent(catalogEvent)
+                                catalog ! catalogEvent
                             }
 
                             /*
@@ -243,12 +263,14 @@ class CrawlerWorker extends Actor with ActorLogging {
                 case NewPodcastFetchJob() =>
                     parser ! ParseNewPodcastData(url, exo, data)
                     val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
-                    emitCatalogEvent(catalogEvent)
+                    //emitCatalogEvent(catalogEvent)
+                    catalog ! catalogEvent
 
                 case UpdateEpisodesFetchJob(etag, lastMod) =>
                     parser ! ParseUpdateEpisodeData(url, exo, data)
                     val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
-                    emitCatalogEvent(catalogEvent)
+                    //emitCatalogEvent(catalogEvent)
+                    catalog ! catalogEvent
 
                 case WebsiteFetchJob() =>
                     parser ! ParseWebsiteData(exo, data)

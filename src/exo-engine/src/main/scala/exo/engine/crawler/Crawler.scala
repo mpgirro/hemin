@@ -10,6 +10,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill,
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
+import exo.engine.config.CrawlerConfig
 import exo.engine.exception.EchoException
 
 import scala.collection.JavaConverters._
@@ -20,8 +21,9 @@ import scala.concurrent.duration._
   */
 
 object Crawler {
-    def name(nodeIndex: Int): String = "crawler-" + nodeIndex
-    def props(): Props = Props(new Crawler())
+    //def name(nodeIndex: Int): String = "crawler-" + nodeIndex
+    final val name = "crawler"
+    def props(config: CrawlerConfig): Props = Props(new Crawler(config))
 
     trait CrawlerMessage
     trait FetchJob extends CrawlerMessage
@@ -32,19 +34,22 @@ object Crawler {
     case class DownloadContent(exo: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
 }
 
-class Crawler extends Actor with ActorLogging {
+class Crawler (config: CrawlerConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val WORKER_COUNT: Int = Option(CONFIG.getInt("echo.crawler.worker-count")).getOrElse(5)
+    */
+
     private var workerIndex = 0
 
-    private var parser: ActorRef = _
     private var catalog: ActorRef = _
+    private var parser: ActorRef = _
 
     private var router: Router = {
-        val routees = Vector.fill(WORKER_COUNT) {
+        val routees = Vector.fill(config.workerCount) {
             val crawler = createWorker()
             context watch crawler
             ActorRefRoutee(crawler)
@@ -72,14 +77,15 @@ class Crawler extends Actor with ActorLogging {
     }
 
     override def receive: Receive = {
-        case msg @ ActorRefParserActor(ref) =>
-            log.debug("Received ActorRefIndexerActor(_)")
-            parser = ref
-            router.routees.foreach(r => r.send(msg, sender()))
 
         case msg @ ActorRefCatalogStoreActor(ref) =>
             log.debug("Received ActorRefCatalogStoreActor(_)")
             catalog = ref
+            router.routees.foreach(r => r.send(msg, sender()))
+
+        case msg @ ActorRefParserActor(ref) =>
+            log.debug("Received ActorRefIndexerActor(_)")
+            parser = ref
             router.routees.foreach(r => r.send(msg, sender()))
 
         case Terminated(corpse) =>
@@ -97,7 +103,7 @@ class Crawler extends Actor with ActorLogging {
 
     private def createWorker(): ActorRef = {
         workerIndex += 1
-        val worker = context.actorOf(CrawlerWorker.props(), CrawlerWorker.name(workerIndex))
+        val worker = context.actorOf(CrawlerWorker.props(config), CrawlerWorker.name(workerIndex))
 
         // forward the actor refs to the worker, but only if those references haven't died
         Option(parser).foreach(p => worker ! ActorRefParserActor(p) )

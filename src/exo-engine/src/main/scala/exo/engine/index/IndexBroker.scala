@@ -7,6 +7,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeA
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
+import exo.engine.config.IndexConfig
 import exo.engine.domain.dto.{IndexDoc, ResultWrapper}
 import exo.engine.exception.SearchException
 import exo.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
@@ -19,10 +20,11 @@ import scala.concurrent.duration._
   */
 object IndexBroker {
     final val name = "index"
-    def props(): Props = Props(new IndexBroker())
+    def props(config: IndexConfig): Props = Props(new IndexBroker(config))
 }
 
-class IndexBroker extends Actor with ActorLogging {
+@Deprecated
+class IndexBroker (config: IndexConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
@@ -93,7 +95,7 @@ class IndexBroker extends Actor with ActorLogging {
     }
 
     private def createIndexStore(storeIndex: Int, indexPath: String): ActorRef = {
-        val index = context.actorOf(IndexStore.props(indexPath, CREATE_INDEX), IndexStore.name(storeIndex))
+        val index = context.actorOf(IndexStore.props(config), IndexStore.name)
         context.watch(index)
 
         index ! ActorRefSupervisor(self)

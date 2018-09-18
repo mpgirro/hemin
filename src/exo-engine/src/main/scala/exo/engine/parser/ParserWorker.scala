@@ -37,17 +37,20 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-    private val CONFIG = ConfigFactory.load()
+    //private val CONFIG = ConfigFactory.load()
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE
     private val indexMapper = IndexMapper.INSTANCE
 
+    /*
     private val catalogEventStream = CONFIG.getString("echo.catalog.event-stream")
     private val indexEventStream = CONFIG.getString("echo.index.event-stream")
     private val mediator = DistributedPubSub(context.system).mediator
+    */
 
-    //private var directoryStore: ActorRef = _
+    private var catalog: ActorRef = _
+    private var index: ActorRef = _
     private var crawler: ActorRef = _
     private var supervisor: ActorRef = _
 
@@ -63,7 +66,8 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
                 log.error("FeedParsingException occured while processing feed : {}", currFeedUrl)
                 //directoryStore ! FeedStatusUpdate(currPodcastExo, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
                 val catalogEvent = FeedStatusUpdate(currPodcastExo, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
-                emitCatalogEvent(catalogEvent)
+                //emitCatalogEvent(catalogEvent)
+                catalog ! catalogEvent
                 currPodcastExo = ""
                 currFeedUrl = ""
             case e: java.lang.StackOverflowError =>
@@ -79,6 +83,14 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
     }
 
     override def receive: Receive = {
+
+        case ActorRefCatalogStoreActor(ref) =>
+            log.debug("Received ActorRefCatalogStoreActor(_)")
+            catalog = ref
+
+        case ActorRefIndexStoreActor(ref) =>
+            log.debug("Received ActorRefIndexStoreActor(_)")
+            index = ref
 
         case ActorRefCrawlerActor(ref) =>
             log.debug("Received ActorRefCrawlerActor(_)")
@@ -128,7 +140,8 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
         val readableText = Jsoup.parse(html).text()
 
         val indexEvent = UpdateDocWebsiteDataIndexEvent(exo, readableText)
-        mediator ! Publish(indexEventStream, indexEvent)
+        //mediator ! Publish(indexEventStream, indexEvent)
+        index ! indexEvent
     }
 
     private def onParseFyydEpisodes(podcastExo: String, json: String): Unit = {
@@ -141,6 +154,7 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
         }
     }
 
+    /*
     private def sendCatalogCommand(command: CatalogCommand): Unit = {
         mediator ! Send("/user/node/"+CatalogBroker.name, command, localAffinity = true)
     }
@@ -152,6 +166,7 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
     private def emitIndexEvent(event: IndexEvent): Unit = {
         mediator ! Publish(indexEventStream, event)
     }
+    */
 
     private def parse(podcastExo: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
@@ -177,7 +192,8 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
                     */
 
                     val indexEvent = AddDocIndexEvent(indexMapper.toImmutable(p))
-                    emitIndexEvent(indexEvent)
+                    //emitIndexEvent(indexEvent)
+                    index ! indexEvent
 
                     // request that the podcasts website will get added to the index as well, if possible
                     Option(p.getLink) match {
@@ -189,7 +205,8 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
 
                 // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
                 val catalogEvent = UpdatePodcast(podcastExo, feedUrl, p.toImmutable)
-                emitCatalogEvent(catalogEvent)
+                //emitCatalogEvent(catalogEvent)
+                catalog ! catalogEvent
 
                 // check for "new" episodes: because this is a new Podcast, all episodes will be new and registered
                 Option(parser.getEpisodes) match {
@@ -220,7 +237,8 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
         */
 
         val catalogCommand = RegisterEpisodeIfNew(podcastExo, e.toImmutable)
-        sendCatalogCommand(catalogCommand)
+        //sendCatalogCommand(catalogCommand)
+        catalog ! catalogCommand
     }
 
     /* TODO this code works but produces bad output and is super slow!

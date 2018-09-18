@@ -79,7 +79,7 @@ object ExoApp {
 
             case "search" :: Nil          => usage("search")
             case "search" :: query :: Nil => search(query)
-            case "search" :: query :: _   => usage("search")
+            //case "search" :: query :: _   => usage("search")
 
             case "get" :: "podcast" :: Nil        => usage("get podcast")
             case "get" :: "podcast" :: exo :: Nil => getPodcast(exo)
