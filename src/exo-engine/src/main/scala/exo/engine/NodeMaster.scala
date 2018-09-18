@@ -54,7 +54,7 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
 
     override def preStart(): Unit = {
 
-        val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
+        //val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
 
         index   = context.watch(context.actorOf(IndexStore.props(config.indexConfig),     IndexStore.name))
         parser  = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
@@ -92,9 +92,7 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
     override def receive: Receive = {
 
         case GetCatalogBroker => sender ! catalog
-
         case GetIndexBroker => sender ! index
-
         case GetUpdater => sender ! updater
 
         case msg: CatalogMessage => catalog.tell(msg, sender())
