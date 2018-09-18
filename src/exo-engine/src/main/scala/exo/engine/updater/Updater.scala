@@ -3,6 +3,7 @@ package exo.engine.updater
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore.ProposeNewFeed
+import exo.engine.config.UpdaterConfig
 import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
 import exo.engine.updater.Updater.ProcessFeed
 
@@ -12,13 +13,13 @@ import exo.engine.updater.Updater.ProcessFeed
 
 object Updater {
     final val name = "updater"
-    def props(): Props = Props(new Updater()).withDispatcher("echo.updater.dispatcher")
+    def props(config: UpdaterConfig): Props = Props(new Updater(config)).withDispatcher("echo.updater.dispatcher")
 
     trait UpdaterMessage
     case class ProcessFeed(exo: String, url: String, job: FetchJob) extends UpdaterMessage
 }
 
-class Updater extends Actor with ActorLogging {
+class Updater (config: UpdaterConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 

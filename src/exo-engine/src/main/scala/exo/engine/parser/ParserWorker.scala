@@ -9,6 +9,7 @@ import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogBroker
 import exo.engine.catalog.CatalogStore._
+import exo.engine.config.ParserConfig
 import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
 import exo.engine.domain.FeedStatus
 import exo.engine.domain.dto.Episode
@@ -28,10 +29,11 @@ import scala.collection.JavaConverters._
   */
 object ParserWorker {
     def name(workerIndex: Int): String = "worker-" + workerIndex
-    def props(): Props = Props(new ParserWorker()).withDispatcher("echo.parser.dispatcher")
+    def props(config: ParserConfig): Props =
+        Props(new ParserWorker(config)).withDispatcher("echo.parser.dispatcher")
 }
 
-class ParserWorker extends Actor with ActorLogging {
+class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 

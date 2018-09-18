@@ -8,6 +8,7 @@ import exo.engine.EngineProtocol._
 import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import exo.engine.catalog.CatalogBroker
 import exo.engine.catalog.CatalogStore.CatalogMessage
+import exo.engine.config.ExoConfig
 import exo.engine.crawler.Crawler
 import exo.engine.crawler.Crawler.CrawlerMessage
 import exo.engine.index.IndexBroker
@@ -26,14 +27,14 @@ import scala.language.postfixOps
 
 object NodeMaster {
     final val name = "node"
-    def props(): Props = Props(new NodeMaster())
+    def props(config: ExoConfig): Props = Props(new NodeMaster(config))
 
     case class GetCatalogBroker()
     case class GetIndexBroker()
     case class GetUpdater()
 }
 
-class NodeMaster extends Actor with ActorLogging {
+class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
@@ -43,8 +44,7 @@ class NodeMaster extends Actor with ActorLogging {
 
     private val cluster = Cluster(context.system)
 
-    private val CONFIG = ConfigFactory.load()
-    private implicit val INTERNAL_TIMEOUT = Option(CONFIG.getInt("echo.internal-timeout")).getOrElse(5).seconds
+    private implicit val INTERNAL_TIMEOUT = config.internalTimeout
 
     private var index: ActorRef = _
     private var parser: ActorRef = _
@@ -57,10 +57,10 @@ class NodeMaster extends Actor with ActorLogging {
         val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
 
         index    = context.watch(context.actorOf(IndexBroker.props(),   IndexBroker.name))
-        parser   = context.watch(context.actorOf(Parser.props(),        Parser.name(1)))
+        parser   = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name(1)))
         crawler  = context.watch(context.actorOf(Crawler.props(),       Crawler.name(1)))
         catalog  = context.watch(context.actorOf(CatalogBroker.props(), CatalogBroker.name))
-        updater  = context.watch(context.actorOf(Updater.props(),       Updater.name))
+        updater  = context.watch(context.actorOf(Updater.props(config.updaterConfig),       Updater.name))
 
 
         // pass around references not provided by constructors due to circular dependencies

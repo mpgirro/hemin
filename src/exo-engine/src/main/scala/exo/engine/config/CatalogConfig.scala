@@ -6,5 +6,7 @@ package exo.engine.config
 case class CatalogConfig (
     workerCount: Int,
     databaseUrl: String,
+    defaultPage: Int,
+    defaultSize: Int,
     maxPageSize: Int
 )

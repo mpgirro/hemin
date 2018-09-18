@@ -1,5 +1,6 @@
 package exo.engine.config
 
+import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.concurrent.duration._
@@ -10,7 +11,8 @@ case class ExoConfig (
     crawlerConfig: CrawlerConfig,
     indexConfig: IndexConfig,
     parserConfig: ParserConfig,
-    updaterConfig: UpdaterConfig
+    updaterConfig: UpdaterConfig,
+    internalTimeout: Timeout
 )
 
 object ExoConfig {
@@ -28,6 +30,8 @@ object ExoConfig {
             catalogConfig = CatalogConfig(
                 workerCount = Option(config.getInt("echo.catalog.worker-count")).getOrElse(5),
                 databaseUrl = Option(config.getString("echo.catalog.database-url")).getOrElse("jdbc:h2:mem:echo1"),
+                defaultPage = Option(config.getInt("echo.catalog.default-page")).getOrElse(1),
+                defaultSize = Option(config.getInt("echo.catalog.default-size")).getOrElse(20),
                 maxPageSize = Option(config.getInt("echo.catalog.max-page-size")).getOrElse(10000)
             ),
             crawlerConfig = CrawlerConfig(
@@ -45,6 +49,7 @@ object ExoConfig {
             parserConfig = ParserConfig(
                 workerCount = Option(config.getInt("echo.parser.worker-count")).getOrElse(2)
             ),
-            updaterConfig = UpdaterConfig()
+            updaterConfig = UpdaterConfig(),
+            internalTimeout = Option(config.getInt("echo.internal-timeout")).getOrElse(5).seconds
         )
 }

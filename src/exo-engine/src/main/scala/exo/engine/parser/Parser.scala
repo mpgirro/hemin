@@ -5,6 +5,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill,
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
+import exo.engine.config.ParserConfig
 import exo.engine.exception.FeedParsingException
 
 import scala.collection.JavaConverters._
@@ -16,7 +17,7 @@ import scala.concurrent.duration._
 
 object Parser {
     def name(nodeIndex: Int): String = "parser-" + nodeIndex
-    def props(): Props = Props(new Parser())
+    def props(config: ParserConfig): Props = Props(new Parser(config))
 
     trait ParserMessage
     case class ParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String) extends ParserMessage
@@ -25,12 +26,14 @@ object Parser {
     case class ParseFyydEpisodes(podcastExo: String, episodesData: String) extends ParserMessage
 }
 
-class Parser extends Actor with ActorLogging {
+class Parser (config: ParserConfig) extends Actor with ActorLogging {
 
     log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
+    /*
     private val CONFIG = ConfigFactory.load()
     private val WORKER_COUNT: Int = Option(CONFIG.getInt("echo.parser.worker-count")).getOrElse(2)
+    */
 
     private var workerIndex = 0
 
@@ -38,7 +41,7 @@ class Parser extends Actor with ActorLogging {
     private var crawler: ActorRef = _
 
     private var router: Router = {
-        val routees = Vector.fill(WORKER_COUNT) {
+        val routees = Vector.fill(config.workerCount) {
             val parser = createWorker()
             context watch parser
             ActorRefRoutee(parser)
@@ -79,7 +82,7 @@ class Parser extends Actor with ActorLogging {
 
     private def createWorker(): ActorRef = {
         workerIndex += 1
-        val worker = context.actorOf(ParserWorker.props(), ParserWorker.name(workerIndex))
+        val worker = context.actorOf(ParserWorker.props(config), ParserWorker.name(workerIndex))
 
         // forward the actor refs to the worker, but only if those references haven't died
         Option(catalogStore).foreach(d => worker ! ActorRefCatalogStoreActor(d))
