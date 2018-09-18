@@ -44,11 +44,11 @@ object ExoApp {
 
     def main(args: Array[String]): Unit = {
 
-
         println("Starting engine...")
         engine.start()
 
-        repl()
+
+        repl() // TODO distinguish between interactive and non-interactive mode
 
     }
 
@@ -77,47 +77,16 @@ object ExoApp {
             case "propose" :: Nil   => usage("propose")
             case "propose" :: feeds => feeds.foreach(f => engine.propose(f))
 
-            case "search" :: Nil    => usage("search")
-            case "search" :: query  =>
-                engine
-                    .search("hukl", 1, 20)
-                    .onComplete {
-                        case Success(results) =>
-                            println("Found "+results.getResults.size()+" results for query '" + query.mkString(" ") + "'")
-                            println("Results:")
-                            for (result <- results.getResults.asScala) {
-                                println(s"\n${DocumentFormatter.cliFormat(result)}\n")
-                            }
-                            println()
-                        case Failure(reason)  => println("ERROR: " + reason.getMessage)
-                    }
+            case "search" :: Nil          => usage("search")
+            case "search" :: query :: Nil => search(query)
+            case "search" :: query :: _   => usage("search")
 
             case "get" :: "podcast" :: Nil        => usage("get podcast")
-            case "get" :: "podcast" :: exo :: Nil =>
-                engine
-                    .findPodcast(exo)
-                    .onComplete {
-                        case Success(result) =>
-                            result match {
-                                case Some(p) => println(p.toString)
-                                case None    => println("Unknown EXO")
-                            }
-                        case Failure(reason)  => println("ERROR: " + reason.getMessage)
-                    }
+            case "get" :: "podcast" :: exo :: Nil => getPodcast(exo)
             case "get" :: "podcast" :: exo :: _   => usage("get podcast")
 
             case "get" :: "episode" :: Nil        => usage("get episode")
-            case "get" :: "episode" :: exo :: Nil =>
-                engine
-                    .findEpisode(exo)
-                    .onComplete {
-                        case Success(result) =>
-                            result match {
-                                case Some(e) => println(e.toString)
-                                case None    => println("Unknown EXO")
-                            }
-                        case Failure(reason)  => println("ERROR: " + reason.getMessage)
-                    }
+            case "get" :: "episode" :: exo :: Nil => getEpisode(exo)
             case "get" :: "episode" :: exo :: _   => usage("get episode")
 
             case _  => help()
@@ -144,6 +113,47 @@ object ExoApp {
             println(k + "\t" + v)
         }
         println("\nFeel free to play around!\n")
+    }
+
+    private def search(query: String): Unit = {
+        engine
+            .search("hukl", 1, 20)
+            .onComplete {
+                case Success(results) =>
+                    println("Found "+results.getResults.size()+" results for query '" + query.mkString(" ") + "'")
+                    println("Results:")
+                    for (result <- results.getResults.asScala) {
+                        println(s"\n${DocumentFormatter.cliFormat(result)}\n")
+                    }
+                    println()
+                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+            }
+    }
+
+    private def getPodcast(exo: String): Unit = {
+        engine
+            .findPodcast(exo)
+            .onComplete {
+                case Success(result) =>
+                    result match {
+                        case Some(p) => println(p.toString)
+                        case None    => println("Unknown EXO")
+                    }
+                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+            }
+    }
+
+    private def getEpisode(exo: String): Unit = {
+        engine
+            .findEpisode(exo)
+            .onComplete {
+                case Success(result) =>
+                    result match {
+                        case Some(e) => println(e.toString)
+                        case None    => println("Unknown EXO")
+                    }
+                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+            }
     }
 
 }
