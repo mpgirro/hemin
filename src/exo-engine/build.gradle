@@ -93,6 +93,9 @@ dependencies {
     compile group: 'org.hibernate', name: 'hibernate-entitymanager', version: '4.3.0.Final'
     compile group: 'org.hibernate.javax.persistence', name: 'hibernate-jpa-2.1-api', version: '1.0.2.Final'
 
+    compile group: 'com.typesafe.slick', name: "slick_${scala_major_version}", version: '3.2.3'
+    compile group: 'org.reactivemongo', name: "reactivemongo_${scala_major_version}", version: '0.16.0'
+
     compile "org.apache.lucene:lucene-core:${lucene_version}"
     compile "org.apache.lucene:lucene-queryparser:${lucene_version}"
     compile "org.apache.lucene:lucene-analyzers-common:${lucene_version}"

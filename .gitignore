@@ -1,0 +1,2 @@
+# Ignore data directories of docker containers
+/docker/data/mongo

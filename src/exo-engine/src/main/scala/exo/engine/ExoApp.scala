@@ -89,6 +89,10 @@ object ExoApp {
             case "get" :: "episode" :: exo :: Nil => getEpisode(exo)
             case "get" :: "episode" :: exo :: _   => usage("get episode")
 
+            case "get" :: "chapters" :: Nil        => usage("get chapters")
+            case "get" :: "chapters" :: exo :: Nil => getChapters(exo)
+            case "get" :: "chapters" :: exo :: _   => usage("get chapters")
+
             case _  => help()
         }
     }
@@ -152,6 +156,18 @@ object ExoApp {
                         case Some(e) => println(e.toString)
                         case None    => println("Unknown EXO")
                     }
+                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+            }
+    }
+
+    private def getChapters(exo: String): Unit = {
+        engine
+            .findChaptersByEpisode(exo)
+            .onComplete {
+                case Success(chapters) =>
+                    println("Chapters:")
+                    for (c <- chapters)
+                        println(c.getTitle)
                 case Failure(reason)  => println("ERROR: " + reason.getMessage)
             }
     }
