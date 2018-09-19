@@ -23,7 +23,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Transactional
 class FeedCatalogService(log: LoggingAdapter,
                          rfb: RepositoryFactoryBuilder,
-                         db: Future[DefaultDB])
+                         db: DefaultDB)
                         (implicit ec: ExecutionContext)
     extends CatalogService {
 

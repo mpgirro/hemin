@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 /**
   * @author max
   */
-class ChapterMongoRepository (db: Future[DefaultDB])
+class ChapterMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
     // TODO pass the actors EX
@@ -21,7 +21,7 @@ class ChapterMongoRepository (db: Future[DefaultDB])
 
     //private val collection: BSONCollection = db("chapters")
 
-    private def collection: Future[BSONCollection] = db.map(_.collection("chapters"))
+    private def collection: BSONCollection = db.collection("chapters")
     //private def collection: BSONCollection = db.collection("chapters")
 
     //private implicit def writer: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
@@ -86,11 +86,11 @@ class ChapterMongoRepository (db: Future[DefaultDB])
             .map(_ => {})
             */
 
-        collection.flatMap(_
+        collection
             .insert[Chapter](ordered = false)
             .one(chapter)
             .map(_ => {})
-        )
+
 
         /*
         val writeRes: Future[WriteResult] =
@@ -111,9 +111,8 @@ class ChapterMongoRepository (db: Future[DefaultDB])
         // run this query over the collection
         //collection.find(query).one[Chapter]
 
-        collection.flatMap(_
+        collection
             .find(query).one[Chapter]
-        )
 
         //collection.find(query).one[Chapter]
     }
@@ -126,11 +125,11 @@ class ChapterMongoRepository (db: Future[DefaultDB])
             Cursor.FailOnError[List[Chapter]]())
             */
 
-        collection.flatMap(_
+        collection
             .find(query)
             .cursor[Chapter]()
             .collect[List](-1, Cursor.FailOnError[List[Chapter]]())
-        )
+
 
         /*
         collection

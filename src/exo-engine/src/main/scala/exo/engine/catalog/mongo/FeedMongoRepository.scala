@@ -16,11 +16,11 @@ import scala.util.{Failure, Success}
 /**
   * @author max
   */
-class FeedMongoRepository (db: Future[DefaultDB])
+class FeedMongoRepository (db: DefaultDB)
                           (implicit ec: ExecutionContext) {
 
     //private def collection: BSONCollection = db.collection("feeds")
-    private def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
+    private def collection: BSONCollection = db.collection("feeds")
 
     private implicit object FeedReader extends BSONDocumentReader[Feed] {
         override def read(bson: BSONDocument): Feed = {
@@ -63,24 +63,22 @@ class FeedMongoRepository (db: Future[DefaultDB])
     }
 
     def save(feed: Feed): Future[Unit] = {
-
-        /*
         //println("Saving [MongoFeedService] : " + feed.toString)
-
         collection
             .insert[Feed](ordered = false)
             .one(feed)
             .map(_ => {})
-            */
-        val document = FeedWriter.write(feed)
+
         /*
         val writeRes: Future[WriteResult] =
             collection.insert[BSONDocument](ordered = false).one(document)
         */
 
-        val writeRes: Future[WriteResult] = collection.flatMap(_
+        /*
+        val document = FeedWriter.write(feed)
+        val writeRes: Future[WriteResult] = collection
                 .insert[BSONDocument](ordered = false)
-                .one(document))
+                .one(document)
 
         writeRes.onComplete { // Dummy callbacks
             case Failure(e) => e.printStackTrace()
@@ -89,6 +87,7 @@ class FeedMongoRepository (db: Future[DefaultDB])
         }
 
         writeRes.map(_ => {}) // in this example, do nothing with the success
+        */
     }
 
     def findByExo(exo: String): Future[Option[Feed]] = {
@@ -98,9 +97,9 @@ class FeedMongoRepository (db: Future[DefaultDB])
             .find(query)
             .one[Feed]
             */
-        collection.flatMap(_
+        collection
             .find(query)
-            .one[Feed])
+            .one[Feed]
     }
 
     def findAllByEpisodeExo(podcastExo: String): Future[List[Feed]] = {
@@ -111,10 +110,10 @@ class FeedMongoRepository (db: Future[DefaultDB])
             .cursor[Feed]()
             .collect[List](-1, Cursor.FailOnError[List[Feed]]()) // -1 to get all matches
             */
-        collection.flatMap(_
+        collection
             .find(query)
             .cursor[Feed]()
-            .collect[List](-1, Cursor.FailOnError[List[Feed]]())) // -1 to get all matches
+            .collect[List](-1, Cursor.FailOnError[List[Feed]]()) // -1 to get all matches
 
     }
 

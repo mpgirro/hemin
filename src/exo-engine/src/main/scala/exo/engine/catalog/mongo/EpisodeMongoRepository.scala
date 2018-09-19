@@ -13,11 +13,11 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * @author max
   */
-class EpisodeMongoRepository (db: Future[DefaultDB])
+class EpisodeMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
     //private def collection: BSONCollection = db.collection("episodes")
-    private def collection: Future[BSONCollection] = db.map(_.collection("episodes"))
+    private def collection: BSONCollection = db.collection("episodes")
 
     private implicit object ChapterReader extends BSONDocumentReader[Episode] {
         override def read(bson: BSONDocument): Episode = {
@@ -118,10 +118,10 @@ class EpisodeMongoRepository (db: Future[DefaultDB])
             .map(_ => {})
             */
 
-        collection.flatMap(_
+        collection
             .insert[Episode](ordered = false)
             .one(episode)
-            .map(_ => {}))
+            .map(_ => {})
     }
 
     def findByExo(exo: String): Future[Option[Episode]] = {
@@ -131,9 +131,9 @@ class EpisodeMongoRepository (db: Future[DefaultDB])
             .find(query)
             .one[Episode]
             */
-        collection.flatMap(_
+        collection
             .find(query)
-            .one[Episode])
+            .one[Episode]
     }
 
 }

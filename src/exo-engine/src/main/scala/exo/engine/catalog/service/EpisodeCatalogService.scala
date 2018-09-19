@@ -22,7 +22,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Transactional
 class EpisodeCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            db: Future[DefaultDB])
+                            db: DefaultDB)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 

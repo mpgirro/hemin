@@ -8,10 +8,10 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * @author max
   */
-class PodcastMongoRepository (db: Future[DefaultDB])
+class PodcastMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
     //private def collection: BSONCollection = db.collection("podcasts")
-    private def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
+    private def collection: BSONCollection = db.collection("podcasts")
 
 }

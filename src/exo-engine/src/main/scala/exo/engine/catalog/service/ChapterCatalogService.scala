@@ -21,7 +21,7 @@ import scala.util.{Failure, Success}
   */
 class ChapterCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            db: Future[DefaultDB])
+                            db: DefaultDB)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -66,17 +66,13 @@ class ChapterCatalogService(log: LoggingAdapter,
 
     @Transactional
     def save(chapterDTO: Chapter): Option[Chapter] = {
-        /*
         log.debug("Request to save Chapter : {}", chapterDTO)
+        mongoRepo.save(chapterDTO)
         Option(chapterDTO)
           .map(c => chapterMapper.toEntity(c))
           .map(c => chapterRepository.save(c))
           .map(c => chapterMapper.toModifiable(c))
           .map(_.toImmutable)
-          */
-        //println("Saving [ChapterCatalogService] : " + chapterDTO.toString)
-        mongoRepo.save(chapterDTO)
-        None // TODO for now, return nothing until we migrate to returning a future
     }
 
     @Transactional
