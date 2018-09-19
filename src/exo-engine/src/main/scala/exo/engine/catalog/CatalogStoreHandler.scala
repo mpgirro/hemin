@@ -100,7 +100,7 @@ class CatalogStoreHandler(workerIndex: Int,
 
 
 
-    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder)
+    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder,db)
     private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder,db)
     private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, db)
     private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder,db)

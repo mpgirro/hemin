@@ -19,7 +19,7 @@ class EpisodeMongoRepository (db: DefaultDB)
     //private def collection: BSONCollection = db.collection("episodes")
     private def collection: BSONCollection = db.collection("episodes")
 
-    private implicit object ChapterReader extends BSONDocumentReader[Episode] {
+    private implicit object EpisodeReader extends BSONDocumentReader[Episode] {
         override def read(bson: BSONDocument): Episode = {
             val builder = ImmutableEpisode.builder()
             val opt: Option[Episode] = for {
@@ -78,7 +78,7 @@ class EpisodeMongoRepository (db: DefaultDB)
         }
     }
 
-    private implicit object ChapterWriter extends BSONDocumentWriter[Episode] {
+    private implicit object EpisodeWriter extends BSONDocumentWriter[Episode] {
         override def write(episode: Episode): BSONDocument =
             BSONDocument(
                 "id" -> BSONLong(episode.getId), // TODO remove; no rel. DB

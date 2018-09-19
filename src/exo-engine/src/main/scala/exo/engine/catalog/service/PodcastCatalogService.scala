@@ -2,16 +2,19 @@ package exo.engine.catalog.service
 
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
+import exo.engine.catalog.mongo.PodcastMongoRepository
 import exo.engine.catalog.repository.{PodcastRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.{Podcast}
+import exo.engine.domain.dto.Podcast
 import exo.engine.mapper.{PodcastMapper, TeaserMapper}
 import org.springframework.data.domain.{PageRequest, Sort}
 import org.springframework.data.domain.Sort.Direction
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import reactivemongo.api.DefaultDB
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 
 /**
   * @author Maximilian Irro
@@ -19,13 +22,18 @@ import scala.collection.JavaConverters._
 @Repository
 @Transactional
 class PodcastCatalogService(log: LoggingAdapter,
-                            rfb: RepositoryFactoryBuilder) extends CatalogService {
+                            rfb: RepositoryFactoryBuilder,
+                            db: DefaultDB)
+                           (implicit ec: ExecutionContext)
+    extends CatalogService {
 
     private var repositoryFactory: JpaRepositoryFactory = _
     private var podcastRepository: PodcastRepository = _
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val teaserMapper = TeaserMapper.INSTANCE
+
+    private val mongoRepo = new PodcastMongoRepository(db)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -35,6 +43,7 @@ class PodcastCatalogService(log: LoggingAdapter,
     @Transactional
     def save(podcastDTO: Podcast): Option[Podcast] = {
         log.debug("Request to save Podcast : {}", podcastDTO)
+        mongoRepo.save(podcastDTO)
         Option(podcastDTO)
           .map(p => podcastMapper.toEntity(p))
           .map(p => podcastRepository.save(p))
