@@ -9,6 +9,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore._
+import exo.engine.catalog.mongo.ChapterMongoRepository
 import exo.engine.catalog.repository.RepositoryFactoryBuilder
 import exo.engine.catalog.service._
 import exo.engine.config.CatalogConfig
@@ -21,9 +22,11 @@ import exo.engine.updater.Updater.ProcessFeed
 import exo.engine.util.ExoGenerator
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronizationManager
+import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.blocking
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future, blocking}
 
 /**
   * @author Maximilian Irro
@@ -63,10 +66,43 @@ class CatalogStoreHandler(workerIndex: Int,
     private var repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
     private var emf: EntityManagerFactory = repositoryFactoryBuilder.getEntityManagerFactory
 
+
+
+    // TODO experimental
+    val dbName = "exodb"
+
+    // My settings (see available connection options)
+    val mongoUri = s"mongodb://localhost:27017/$dbName" // ?authMode=scram-sha1
+
+    // TODO pass the actors EX
+    import ExecutionContext.Implicits.global // use any appropriate context
+
+
+    // Connect to the database: Must be done only once per application
+    val driver = MongoDriver()
+    val parsedUri = MongoConnection.parseURI(mongoUri)
+    //val connection = parsedUri.map(driver.connection(_))
+    val connection: MongoConnection = driver.connection(List("localhost"))
+
+    /*
+    // Database and collections: Get references
+    val futureConnection: Future[MongoConnection] = Future.fromTry(connection)
+    //def db: Future[DefaultDB] = futureConnection.flatMap(_.database(dbName))
+    val mongoConnection: MongoConnection = Await.result(futureConnection, 10.seconds)
+    val db: DefaultDB = Await.result(mongoConnection.database(dbName), 10.seconds)
+    */
+    val db: Future[DefaultDB] = connection.database(dbName)
+
+    val mongoService = new ChapterMongoRepository(db)
+
+    // - - - - - - - - -
+
+
+
     private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder)
-    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder)
-    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder)
-    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder)
+    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder,db)
+    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, db)
+    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder,db)
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE

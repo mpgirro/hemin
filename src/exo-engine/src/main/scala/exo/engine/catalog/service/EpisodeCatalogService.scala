@@ -2,14 +2,18 @@ package exo.engine.catalog.service
 
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
+import exo.engine.catalog.mongo.EpisodeMongoRepository
 import exo.engine.catalog.repository.{EpisodeRepository, RepositoryFactoryBuilder}
 import exo.engine.domain.dto.{Episode, Podcast}
 import exo.engine.mapper.{EpisodeMapper, PodcastMapper, TeaserMapper}
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
+import reactivemongo.api.DefaultDB
 
 import scala.collection.JavaConverters._
+import scala.concurrent.duration._
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * @author Maximilian Irro
@@ -17,7 +21,10 @@ import scala.collection.JavaConverters._
 @Repository
 @Transactional
 class EpisodeCatalogService(log: LoggingAdapter,
-                            rfb: RepositoryFactoryBuilder) extends CatalogService {
+                            rfb: RepositoryFactoryBuilder,
+                            db: Future[DefaultDB])
+                           (implicit ec: ExecutionContext)
+    extends CatalogService {
 
     private var repositoryFactory: JpaRepositoryFactory = _
     private var episodeRepository: EpisodeRepository = _
@@ -25,6 +32,8 @@ class EpisodeCatalogService(log: LoggingAdapter,
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE
     private val teaserMapper = TeaserMapper.INSTANCE
+
+    private val mongoRepo = new EpisodeMongoRepository(db)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -34,6 +43,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     @Transactional
     def save(episodeDTO: Episode): Option[Episode] = {
         log.debug("Request to save Episode : {}", episodeDTO)
+        mongoRepo.save(episodeDTO)
         Option(episodeDTO)
           .map(e => episodeMapper.toEntity(e))
           .map(e => episodeRepository.save(e))
@@ -54,6 +64,11 @@ class EpisodeCatalogService(log: LoggingAdapter,
         Option(episodeExo)
           .map(exo => episodeRepository.findOneByExo(exo))
           .map(e => episodeMapper.toImmutable(e))
+
+        /*
+        val r = mongoService.findByExo(episodeExo)
+        Await.result(r, 10.seconds)
+        */
     }
 
     @Transactional(readOnly = true)

@@ -1,5 +1,7 @@
 package exo.engine.mapper;
 
+import reactivemongo.bson.BSONDateTime;
+
 import java.sql.Timestamp;
 import java.time.*;
 import java.time.format.DateTimeParseException;
@@ -12,10 +14,27 @@ import java.util.Optional;
 public class DateMapper {
 
     public static DateMapper INSTANCE = new DateMapper();
+    public static ZoneId ZONE = ZoneId.of("Europe/Vienna");
 
     public String asString(LocalDateTime localDateTime) {
         try {
             return (localDateTime == null ? null : localDateTime.toString());
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException( e );
+        }
+    }
+
+    public Long asMilliseconds(LocalDateTime localDateTime) {
+        try {
+            return (localDateTime == null ? null : asZonedDateTime(localDateTime)).toInstant().toEpochMilli();
+        } catch (DateTimeParseException e) {
+            throw new RuntimeException( e );
+        }
+    }
+
+    public LocalDateTime asLocalDateTime(long milliseconds) {
+        try {
+            return LocalDateTime.ofInstant(Instant.ofEpochMilli(milliseconds), ZONE);
         } catch (DateTimeParseException e) {
             throw new RuntimeException( e );
         }
@@ -63,7 +82,7 @@ public class DateMapper {
 
     public Date asDate(LocalDate source) {
         return Optional.ofNullable(source)
-            .map(d -> Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant()))
+            .map(d -> Date.from(d.atStartOfDay(ZONE).toInstant()))
             .orElse(null);
 
         /* TODO
@@ -82,19 +101,19 @@ public class DateMapper {
     }
 
     public Date asDate(LocalDateTime source) {
-        return source == null ? null : Date.from(source.atZone(ZoneId.systemDefault()).toInstant());
+        return source == null ? null : Date.from(source.atZone(ZONE).toInstant());
     }
 
     public LocalDate asLocaleDate(Date source) {
-        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault()).toLocalDate();
+        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZONE).toLocalDate();
     }
 
     public ZonedDateTime asZonedDateTime(Date source) {
-        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault());
+        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZONE);
     }
 
     public LocalDateTime asLocalDateTime(Date source) {
-        return source == null ? null : LocalDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault());
+        return source == null ? null : LocalDateTime.ofInstant(source.toInstant(), ZONE);
     }
 
     public java.sql.Date asSqlDate(LocalDate date) {
@@ -106,11 +125,11 @@ public class DateMapper {
     }
 
     public ZonedDateTime asZonedDateTime(LocalDateTime localDateTime) {
-        return ZonedDateTime.ofInstant(localDateTime, ZoneOffset.UTC, ZoneId.systemDefault());
+        return ZonedDateTime.ofInstant(localDateTime, ZoneOffset.UTC, ZONE);
     }
 
     public LocalDate asLocalDate(java.util.Date source) {
-        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZoneId.systemDefault()).toLocalDate();
+        return source == null ? null : ZonedDateTime.ofInstant(source.toInstant(), ZONE).toLocalDate();
     }
 
 }

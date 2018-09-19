@@ -85,13 +85,17 @@ object ExoApp {
             case "get" :: "podcast" :: exo :: Nil => getPodcast(exo)
             case "get" :: "podcast" :: exo :: _   => usage("get podcast")
 
+            case "get" :: "podcast-feeds" :: Nil        => usage("get podcast")
+            case "get" :: "podcast-feeds" :: exo :: Nil => getFeedsByPodcast(exo)
+            case "get" :: "podcast-feeds" :: exo :: _   => usage("get podcast")
+
             case "get" :: "episode" :: Nil        => usage("get episode")
             case "get" :: "episode" :: exo :: Nil => getEpisode(exo)
             case "get" :: "episode" :: exo :: _   => usage("get episode")
 
-            case "get" :: "chapters" :: Nil        => usage("get chapters")
-            case "get" :: "chapters" :: exo :: Nil => getChapters(exo)
-            case "get" :: "chapters" :: exo :: _   => usage("get chapters")
+            case "get" :: "episode-chapters" :: Nil        => usage("get chapters")
+            case "get" :: "episode-chapters" :: exo :: Nil => getChaptersByEpisode(exo)
+            case "get" :: "episode-chapters" :: exo :: _   => usage("get chapters")
 
             case _  => help()
         }
@@ -160,15 +164,29 @@ object ExoApp {
             }
     }
 
-    private def getChapters(exo: String): Unit = {
+    private def getChaptersByEpisode(exo: String): Unit = {
         engine
             .findChaptersByEpisode(exo)
             .onComplete {
-                case Success(chapters) =>
-                    println("Chapters:")
-                    for (c <- chapters)
-                        println(c.getTitle)
-                case Failure(reason)  => println("ERROR: " + reason.getMessage)
+                case Success(cs)     =>
+                    if (cs.isEmpty)
+                        println("No chapters found")
+                    else
+                        for (c <- cs) println(c.getTitle)
+                case Failure(reason) => println("ERROR: " + reason.getMessage)
+            }
+    }
+
+    private def getFeedsByPodcast(exo: String): Unit = {
+        engine
+            .findFeedsByPodcast(exo)
+            .onComplete {
+                case Success(fs)     =>
+                    if (fs.isEmpty)
+                        println("No feeds found")
+                    else
+                        for (f <- fs) println(f.getUrl)
+                case Failure(reason) => println("ERROR: " + reason.getMessage)
             }
     }
 

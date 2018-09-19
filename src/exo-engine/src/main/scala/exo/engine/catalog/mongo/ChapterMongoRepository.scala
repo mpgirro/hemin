@@ -13,14 +13,16 @@ import scala.util.{Failure, Success}
 /**
   * @author max
   */
-class MongoChapterService (db: Future[DefaultDB]) {
+class ChapterMongoRepository (db: Future[DefaultDB])
+                             (implicit ec: ExecutionContext) {
 
     // TODO pass the actors EX
-    import ExecutionContext.Implicits.global // use any appropriate context
+    //import ExecutionContext.Implicits.global // use any appropriate context
 
     //private val collection: BSONCollection = db("chapters")
 
     private def collection: Future[BSONCollection] = db.map(_.collection("chapters"))
+    //private def collection: BSONCollection = db.collection("chapters")
 
     //private implicit def writer: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
     // or provide a custom one
@@ -69,11 +71,26 @@ class MongoChapterService (db: Future[DefaultDB]) {
     // TODO this writes, but does not OVERWRITE existing chapter with same EXO!!
     def save(chapter: Chapter): Future[Unit] = {
 
-        println("Saving [MongoChapterService] : " + chapter.toString)
+        //println("Saving [MongoChapterService] : " + chapter.toString)
 
+        /*
         collection.flatMap(_
             .insert[Chapter](ordered = false).one(chapter)
         ).map(_ => {})
+        */
+
+        /*
+        collection
+            .insert[Chapter](ordered = false)
+            .one(chapter)
+            .map(_ => {})
+            */
+
+        collection.flatMap(_
+            .insert[Chapter](ordered = false)
+            .one(chapter)
+            .map(_ => {})
+        )
 
         /*
         val writeRes: Future[WriteResult] =
@@ -93,9 +110,12 @@ class MongoChapterService (db: Future[DefaultDB]) {
         val query = BSONDocument("exo" -> exo)
         // run this query over the collection
         //collection.find(query).one[Chapter]
+
         collection.flatMap(_
             .find(query).one[Chapter]
         )
+
+        //collection.find(query).one[Chapter]
     }
 
     def findAllByEpisodeExo(episodeExo: String): Future[List[Chapter]] = {
@@ -105,12 +125,18 @@ class MongoChapterService (db: Future[DefaultDB]) {
             .collect[List](-1, // -1 to get all matches
             Cursor.FailOnError[List[Chapter]]())
             */
+
         collection.flatMap(_
-            .find(query).cursor[Chapter]()
-                .collect[List](-1, // -1 to get all matches
-                Cursor.FailOnError[List[Chapter]]())
-            //Cursor.FailOnError(new EchoException("Error on finding Chapters for Episode : "+episodeExo))
+            .find(query)
+            .cursor[Chapter]()
+            .collect[List](-1, Cursor.FailOnError[List[Chapter]]())
         )
+
+        /*
+        collection
+            .find(query).cursor[Chapter]()
+            .collect[List](-1, Cursor.FailOnError[List[Chapter]]()) // -1 to get all matches
+        */
     }
 
 }

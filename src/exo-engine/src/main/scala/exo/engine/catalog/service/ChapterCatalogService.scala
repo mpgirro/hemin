@@ -3,7 +3,7 @@ package exo.engine.catalog.service
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
 import akka.util.Timeout
-import exo.engine.catalog.mongo.MongoChapterService
+import exo.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository}
 import exo.engine.catalog.repository.{ChapterRepository, RepositoryFactoryBuilder}
 import exo.engine.domain.dto.{Chapter, ModifiableChapter}
 import exo.engine.mapper.ChapterMapper
@@ -20,18 +20,24 @@ import scala.util.{Failure, Success}
   * @author Maximilian Irro
   */
 class ChapterCatalogService(log: LoggingAdapter,
-                            rfb: RepositoryFactoryBuilder) extends CatalogService {
+                            rfb: RepositoryFactoryBuilder,
+                            db: Future[DefaultDB])
+                           (implicit ec: ExecutionContext)
+    extends CatalogService {
 
     private var repositoryFactory: JpaRepositoryFactory = _
     private var chapterRepository: ChapterRepository = _
 
     private val chapterMapper = ChapterMapper.INSTANCE
 
+    private val mongoRepo = new ChapterMongoRepository(db)
+
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
         chapterRepository = repositoryFactory.getRepository(classOf[ChapterRepository])
     }
 
+    /*
     // TODO experimental
     val dbName = "exodb"
 
@@ -48,12 +54,15 @@ class ChapterCatalogService(log: LoggingAdapter,
     val connection = parsedUri.map(driver.connection(_))
 
     // Database and collections: Get references
-    val futureConnection = Future.fromTry(connection)
-    def db: Future[DefaultDB] = futureConnection.flatMap(_.database(dbName))
+    val futureConnection: Future[MongoConnection] = Future.fromTry(connection)
+    //def db: Future[DefaultDB] = futureConnection.flatMap(_.database(dbName))
+    val mongoConnection: MongoConnection = Await.result(futureConnection, 10.seconds)
+    val db: DefaultDB = Await.result(mongoConnection.database(dbName), 10.seconds)
 
     val mongoService = new MongoChapterService(db)
 
     // - - - - - - - - -
+    */
 
     @Transactional
     def save(chapterDTO: Chapter): Option[Chapter] = {
@@ -65,8 +74,8 @@ class ChapterCatalogService(log: LoggingAdapter,
           .map(c => chapterMapper.toModifiable(c))
           .map(_.toImmutable)
           */
-        println("Saving [ChapterCatalogService] : " + chapterDTO.toString)
-        mongoService.save(chapterDTO)
+        //println("Saving [ChapterCatalogService] : " + chapterDTO.toString)
+        mongoRepo.save(chapterDTO)
         None // TODO for now, return nothing until we migrate to returning a future
     }
 
@@ -94,7 +103,7 @@ class ChapterCatalogService(log: LoggingAdapter,
             .map(c => chapterMapper.toModifiable(c).toImmutable)
             .toList
             */
-        val f = mongoService.findAllByEpisodeExo(episodeExo)
+        val f = mongoRepo.findAllByEpisodeExo(episodeExo)
         Await.result(f, 10.seconds)
     }
 
