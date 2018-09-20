@@ -8,7 +8,7 @@ import play.api.i18n.{Langs, MessagesApi}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
 import services.SearchService
-import v1.RequestMarkerContext
+import util.{JsonWrites, RequestMarkerContext}
 
 import scala.concurrent.ExecutionContext
 
@@ -30,9 +30,9 @@ class SearchController @Inject() (cc: SearchControllerComponents,
 
     private val log = Logger(getClass).logger
 
-    private implicit val searchWriter: Writes[ResultWrapper] = ResultWrapperWrites.implicitWrapperWrites
+    private implicit val searchWriter: Writes[ResultWrapper] = JsonWrites.implicitWrapperWrites
 
-    def search(q: String, p: Int, s: Int): Action[AnyContent] = SearchAction.async { implicit request =>
+    def search(q: String, p: Option[Int], s: Option[Int]): Action[AnyContent] = SearchAction.async { implicit request =>
         log.trace(s"search: q = $q & p = $p & s = $s")
         searchResourceHandler.search(q,p,s).map { results =>
             Ok(Json.toJson(results))

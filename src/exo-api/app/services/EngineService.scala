@@ -1,14 +1,19 @@
 package services
 
 import exo.engine.ExoEngine
-import exo.engine.domain.dto.ResultWrapper
+import javax.inject._
+import play.api.inject.ApplicationLifecycle
 
 import scala.concurrent.Future
 
 @Singleton
-class EngineService {
+class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
 
     val engine: ExoEngine = new ExoEngine()
     engine.start()
+
+    lifecycle.addStopHook { () =>
+        Future.successful(engine.shutdown())
+    }
 
 }

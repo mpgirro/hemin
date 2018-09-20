@@ -18,7 +18,7 @@ class SearchResourceHandler @Inject() (routerProvider: Provider[SearchRouter],
 
     private val engine = engineService.engine
 
-    def search(q: String, p: Int, s: Int)(implicit mc: MarkerContext): Future[ResultWrapper] = {
+    def search(q: String, p: Option[Int], s: Option[Int])(implicit mc: MarkerContext): Future[ResultWrapper] = {
 
         engine.search(q, s, p)
         /*

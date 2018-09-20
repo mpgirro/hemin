@@ -24,8 +24,10 @@ class SearchRouter @Inject()(controller: SearchController) extends SimpleRouter 
       controller.show(id)
       */
 
+
     case GET(p"/q=$q&p=$p&s=$s") =>
-        controller.search(q,p.toInt,s.toInt)
+        controller.search(q,Option(p.toInt),Option(s.toInt))
+
   }
 
 }

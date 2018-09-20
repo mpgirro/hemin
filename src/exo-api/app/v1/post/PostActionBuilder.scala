@@ -6,7 +6,7 @@ import play.api.{Logger, MarkerContext}
 import play.api.http.{FileMimeTypes, HttpVerbs}
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc._
-import v1.RequestMarkerContext
+import util.RequestMarkerContext
 
 import scala.concurrent.{ExecutionContext, Future}
 

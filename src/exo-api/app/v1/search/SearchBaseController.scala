@@ -2,7 +2,7 @@ package v1.search
 
 import javax.inject.Inject
 import play.api.mvc.{BaseController, ControllerComponents}
-import v1.RequestMarkerContext
+import util.RequestMarkerContext
 
 /**
   * Exposes actions and handler to the PostController by wiring the injected state into the base class.
