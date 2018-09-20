@@ -69,8 +69,14 @@ class ExoEngine {
         bus ! ProposeNewFeed(url)
     }
 
-    def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
-        (bus ? SearchIndex(query, page, size)).map {
+    def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
+
+        // TODO-1 die defaultPage und defaultSize in den Config für Catalog und Index vereinen!
+        // TODO-2 vielleicht in ApplicationConfig?
+        val p: Int = page.map(p => p-1).getOrElse(config.catalogConfig.defaultPage)
+        val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
+
+        (bus ? SearchIndex(query, p, s)).map {
             case SearchResults(_, results) => results
         }
     }
@@ -89,7 +95,7 @@ class ExoEngine {
     }
 
     def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-        val p: Int = page.map(p => p-1).getOrElse(config.catalogConfig.defaultPage)
+        val p: Int = page.getOrElse(config.catalogConfig.defaultPage)
         val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
         (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {

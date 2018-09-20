@@ -1,34 +1,18 @@
 package exo.engine.catalog.mongo
 
+import exo.engine.catalog.mongo.BsonWrites.toBson
 import exo.engine.domain.dto.{Chapter, ImmutableChapter}
-import exo.engine.exception.EchoException
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{Cursor, DefaultDB}
-import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONLong, BSONNumberLike, Macros}
+import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.{Failure, Success}
 
-/**
-  * @author max
-  */
 class ChapterMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
-    // TODO pass the actors EX
-    //import ExecutionContext.Implicits.global // use any appropriate context
-
-    //private val collection: BSONCollection = db("chapters")
-
     private def collection: BSONCollection = db.collection("chapters")
-    //private def collection: BSONCollection = db.collection("chapters")
-
-    //private implicit def writer: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
-    // or provide a custom one
-
-    //private implicit def reader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
-    // or provide a custom one
+    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
 
     private implicit object ChapterReader extends BSONDocumentReader[Chapter] {
         override def read(bson: BSONDocument): Chapter = {
@@ -51,20 +35,20 @@ class ChapterMongoRepository (db: DefaultDB)
                 .setEpisodeExo(episodeExo)
                 .create()
 
-            opt.get // the person is required (or let throw an exception)
+            opt.get // the Chapter is required (or let throw an exception)
         }
     }
 
     private implicit object ChapterWriter extends BSONDocumentWriter[Chapter] {
-        override def write(chapter: Chapter): BSONDocument =
+        override def write(c: Chapter): BSONDocument =
             BSONDocument(
-                "id" -> BSONLong(chapter.getId), // TODO remove; no rel. DB
-                "episodeId" -> BSONLong(chapter.getEpisodeId), // TODO remove; no rel. DB
-                "start" -> chapter.getStart,
-                "title" -> chapter.getTitle,
-                "href" -> chapter.getHref,
-                "image"-> chapter.getImage,
-                "episodeExo" -> chapter.getEpisodeExo
+                "id" -> toBson(c.getId), // TODO remove; no rel. DB
+                "episodeId" -> toBson(c.getEpisodeId), // TODO remove; no rel. DB
+                "start" -> c.getStart,
+                "title" -> c.getTitle,
+                "href" -> c.getHref,
+                "image"-> c.getImage,
+                "episodeExo" -> c.getEpisodeExo
             )
     }
 
@@ -108,34 +92,17 @@ class ChapterMongoRepository (db: DefaultDB)
 
     def findByExo(exo: String): Future[Option[Chapter]] = {
         val query = BSONDocument("exo" -> exo)
-        // run this query over the collection
-        //collection.find(query).one[Chapter]
-
         collection
-            .find(query).one[Chapter]
-
-        //collection.find(query).one[Chapter]
+            .find(query)
+            .one[Chapter]
     }
 
     def findAllByEpisodeExo(episodeExo: String): Future[List[Chapter]] = {
         val query = BSONDocument("episodeExo" -> episodeExo)
-        /*
-        collection.find(query).cursor[Chapter]()
-            .collect[List](-1, // -1 to get all matches
-            Cursor.FailOnError[List[Chapter]]())
-            */
-
         collection
             .find(query)
             .cursor[Chapter]()
             .collect[List](-1, Cursor.FailOnError[List[Chapter]]())
-
-
-        /*
-        collection
-            .find(query).cursor[Chapter]()
-            .collect[List](-1, Cursor.FailOnError[List[Chapter]]()) // -1 to get all matches
-        */
     }
 
 }

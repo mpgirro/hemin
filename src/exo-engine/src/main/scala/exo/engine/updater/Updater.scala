@@ -1,6 +1,7 @@
 package exo.engine.updater
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import com.google.common.base.Strings.isNullOrEmpty
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore.ProposeNewFeed
 import exo.engine.config.UpdaterConfig
@@ -37,9 +38,13 @@ class Updater (config: UpdaterConfig) extends Actor with ActorLogging {
             crawler = ref
 
         case ProposeNewFeed(url) =>
-            catalog ! ProposeNewFeed(url)
+            log.debug("Received ProposeNewFeed({})", url)
+            log.info("Request to propose : {}", url)
+            if (!isNullOrEmpty(url))
+                catalog ! ProposeNewFeed(url)
 
         case ProcessFeed(exo, url, job: FetchJob) =>
+            log.debug("Received ProcessFeed({},{},{})", exo, url, job)
             crawler ! DownloadWithHeadCheck(exo, url, job)
     }
 

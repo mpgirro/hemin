@@ -1,12 +1,11 @@
 package exo.engine.catalog.mongo
 
-import java.time.LocalDateTime
-
-import exo.engine.domain.dto.{Chapter, Episode, ImmutableEpisode}
+import exo.engine.catalog.mongo.BsonWrites.toBson
+import exo.engine.domain.dto.{Episode, ImmutableEpisode}
 import exo.engine.mapper.DateMapper
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike}
+import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -16,8 +15,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class EpisodeMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
-    //private def collection: BSONCollection = db.collection("episodes")
     private def collection: BSONCollection = db.collection("episodes")
+    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
 
     private implicit object EpisodeReader extends BSONDocumentReader[Episode] {
         override def read(bson: BSONDocument): Episode = {
@@ -74,50 +73,41 @@ class EpisodeMongoRepository (db: DefaultDB)
                 .setRegistrationTimestamp(registrationTimestamp)
                 .create()
 
-            opt.get // the person is required (or let throw an exception)
+            opt.get // the Episode is required (or let throw an exception)
         }
     }
 
     private implicit object EpisodeWriter extends BSONDocumentWriter[Episode] {
-        override def write(episode: Episode): BSONDocument =
+        override def write(e: Episode): BSONDocument =
             BSONDocument(
-                "id" -> BSONLong(episode.getId), // TODO remove; no rel. DB
-                "podcastId" -> BSONLong(episode.getPodcastId), // TODO remove; no rel. DB
-                "exo" -> episode.getExo,
-                "podcastExo" -> episode.getPodcastExo,
-                "podcastTitle" -> episode.getPodcastTitle,
-                "title"-> episode.getTitle,
-                "link" -> episode.getLink,
-                "pubDate" -> BSONDateTime(DateMapper.INSTANCE.asMilliseconds(episode.getPubDate)),
-                "guid" -> episode.getGuid,
-                "guidIsPermalink" -> BSONBoolean(episode.getGuidIsPermaLink),
-                "description" -> episode.getDescription,
-                "image" -> episode.getImage,
-                "itunesDuration" -> episode.getItunesDuration,
-                "itunesSubtitle" -> episode.getItunesSubtitle,
-                "itunesAuthor" -> episode.getItunesAuthor,
-                "itunesSummary" -> episode.getItunesSummary,
-                "itunesSeason" -> BSONInteger(episode.getItunesSeason),
-                "itunesEpisode" -> BSONInteger(episode.getItunesEpisode),
-                "itunesEpisodeType" -> episode.getItunesEpisodeType,
-                "enclosureUrl" -> episode.getEnclosureUrl,
-                "enclosureLength" -> BSONLong(episode.getEnclosureLength),
-                "enclosureType" -> episode.getEnclosureType,
-                "contentEncoded" -> episode.getContentEncoded,
-                "registrationTimestamp" -> BSONDateTime(DateMapper.INSTANCE.asMilliseconds(episode.getRegistrationTimestamp)),
+                "id" -> toBson(e.getId), // TODO remove; no rel. DB
+                "podcastId" -> toBson(e.getPodcastId), // TODO remove; no rel. DB
+                "exo" -> e.getExo,
+                "podcastExo" -> e.getPodcastExo,
+                "podcastTitle" -> e.getPodcastTitle,
+                "title"-> e.getTitle,
+                "link" -> e.getLink,
+                "pubDate" -> toBson(e.getPubDate),
+                "guid" -> e.getGuid,
+                "guidIsPermalink" -> toBson(e.getGuidIsPermaLink),
+                "description" -> e.getDescription,
+                "image" -> e.getImage,
+                "itunesDuration" -> e.getItunesDuration,
+                "itunesSubtitle" -> e.getItunesSubtitle,
+                "itunesAuthor" -> e.getItunesAuthor,
+                "itunesSummary" -> e.getItunesSummary,
+                "itunesSeason" -> toBson(e.getItunesSeason),
+                "itunesEpisode" -> toBson(e.getItunesEpisode),
+                "itunesEpisodeType" -> e.getItunesEpisodeType,
+                "enclosureUrl" -> e.getEnclosureUrl,
+                "enclosureLength" -> toBson(e.getEnclosureLength),
+                "enclosureType" -> e.getEnclosureType,
+                "contentEncoded" -> e.getContentEncoded,
+                "registrationTimestamp" -> toBson(e.getRegistrationTimestamp),
             )
     }
 
     def save(episode: Episode): Future[Unit] = {
-
-        //println("Saving [MongoEpisodeService] : " + episode.toString)
-        /*
-        collection
-            .insert[Episode](ordered = false)
-            .one(episode)
-            .map(_ => {})
-            */
-
         collection
             .insert[Episode](ordered = false)
             .one(episode)
@@ -126,11 +116,6 @@ class EpisodeMongoRepository (db: DefaultDB)
 
     def findByExo(exo: String): Future[Option[Episode]] = {
         val query = BSONDocument("exo" -> exo)
-        /*
-        collection
-            .find(query)
-            .one[Episode]
-            */
         collection
             .find(query)
             .one[Episode]

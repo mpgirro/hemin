@@ -3,21 +3,19 @@ package exo.engine.catalog.mongo
 import com.google.common.collect.Sets
 import exo.engine.domain.dto.{ImmutablePodcast, Podcast}
 import exo.engine.mapper.DateMapper
+import exo.engine.catalog.mongo.BsonWrites.toBson
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike}
+import reactivemongo.bson._
 
 import scala.collection.JavaConverters._
 import scala.concurrent.{ExecutionContext, Future}
 
-/**
-  * @author max
-  */
 class PodcastMongoRepository (db: DefaultDB)
                              (implicit ec: ExecutionContext) {
 
-    //private def collection: BSONCollection = db.collection("podcasts")
     private def collection: BSONCollection = db.collection("podcasts")
+    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
 
     private implicit object EpisodeReader extends BSONDocumentReader[Podcast] {
         override def read(bson: BSONDocument): Podcast = {
@@ -68,8 +66,7 @@ class PodcastMongoRepository (db: DefaultDB)
                 .setItunesCategories(
                     Sets.newLinkedHashSet(
                         asJavaCollection(
-                            itunesCategories
-                                .split("|"))))
+                            itunesCategories.split("|"))))
                 .setItunesExplicit(itunesExplicit)
                 .setItunesBlock(itunesBlock)
                 .setItunesType(itunesType)
@@ -82,40 +79,40 @@ class PodcastMongoRepository (db: DefaultDB)
                  .setRegistrationComplete(registrationComplete)
                 .create()
 
-            opt.get // the person is required (or let throw an exception)
+            opt.get // the Podcast is required (or let throw an exception)
         }
     }
 
     private implicit object EpisodeWriter extends BSONDocumentWriter[Podcast] {
-        override def write(podcast: Podcast): BSONDocument =
+        override def write(p: Podcast): BSONDocument =
             BSONDocument(
-                "id" -> BSONLong(podcast.getId), // TODO remove; no rel. DB
-                "exo" -> podcast.getExo,
-                "title"-> podcast.getTitle,
-                "link" -> podcast.getLink,
-                "description" -> podcast.getDescription,
-                "pubDate" -> BSONDateTime(DateMapper.INSTANCE.asMilliseconds(podcast.getPubDate)),
-                "lastBuildDate" -> BSONDateTime(DateMapper.INSTANCE.asMilliseconds(podcast.getLastBuildDate)),
-                "language" -> podcast.getLanguage,
-                "generator" -> podcast.getGenerator,
-                "copyright" -> podcast.getCopyright,
-                "docs" -> podcast.getDocs,
-                "managingEditor" -> podcast.getManagingEditor,
-                "image" -> podcast.getImage,
-                "itunesSummary" -> podcast.getItunesSummary,
-                "itunesAuthor" -> podcast.getItunesAuthor,
-                "itunesKeywords" -> podcast.getItunesKeywords,
-                "itunesCategorie" -> podcast.getItunesCategories.asScala.mkString("|"), // TODO collection!
-                "itunesExplicit" -> BSONBoolean(podcast.getItunesExplicit),
-                "itunesBlock" -> BSONBoolean(podcast.getItunesBlock),
-                "itunesType" -> podcast.getItunesType,
-                "itunesOwnerName" -> podcast.getItunesOwnerName,
-                "itunesOwnerEmail" -> podcast.getItunesOwnerEmail,
-                "feedpressLocale" -> podcast.getFeedpressLocale,
-                "fyydVerify" -> podcast.getFyydVerify,
-                "episodeCount" -> BSONInteger(podcast.getEpisodeCount), // TODO will ich das feld hier ausbauen?
-                "registrationTimestamp" -> BSONDateTime(DateMapper.INSTANCE.asMilliseconds(podcast.getRegistrationTimestamp)),
-                "registrationComplete" -> BSONBoolean(podcast.getRegistrationComplete)
+                "id" -> toBson(p.getId), // TODO remove; no rel. DB
+                "exo" -> p.getExo,
+                "title"-> p.getTitle,
+                "link" -> p.getLink,
+                "description" -> p.getDescription,
+                "pubDate" -> toBson(p.getPubDate),
+                "lastBuildDate" -> toBson(p.getLastBuildDate),
+                "language" -> p.getLanguage,
+                "generator" -> p.getGenerator,
+                "copyright" -> p.getCopyright,
+                "docs" -> p.getDocs,
+                "managingEditor" -> p.getManagingEditor,
+                "image" -> p.getImage,
+                "itunesSummary" -> p.getItunesSummary,
+                "itunesAuthor" -> p.getItunesAuthor,
+                "itunesKeywords" -> p.getItunesKeywords,
+                "itunesCategorie" -> p.getItunesCategories.asScala.mkString("|"), // TODO collection!
+                "itunesExplicit" -> toBson(p.getItunesExplicit),
+                "itunesBlock" -> toBson(p.getItunesBlock),
+                "itunesType" -> p.getItunesType,
+                "itunesOwnerName" -> p.getItunesOwnerName,
+                "itunesOwnerEmail" -> p.getItunesOwnerEmail,
+                "feedpressLocale" -> p.getFeedpressLocale,
+                "fyydVerify" -> p.getFyydVerify,
+                "episodeCount" -> toBson(p.getEpisodeCount), // TODO will ich das feld hier ausbauen?
+                "registrationTimestamp" -> toBson(p.getRegistrationTimestamp),
+                "registrationComplete" -> toBson(p.getRegistrationComplete)
             )
     }
 
@@ -124,7 +121,6 @@ class PodcastMongoRepository (db: DefaultDB)
             .insert[Podcast](ordered = false)
             .one(podcast)
             .map(_ => {})
-
     }
 
     def findByExo(exo: String): Future[Option[Podcast]] = {
