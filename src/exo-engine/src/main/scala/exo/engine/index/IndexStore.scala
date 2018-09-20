@@ -73,7 +73,7 @@ class IndexStore (config: IndexConfig) extends Actor with ActorLogging {
     context.system.scheduler.schedule(config.commitInterval, config.commitInterval, self, CommitIndex)
 
     override def postRestart(cause: Throwable): Unit = {
-        log.info("{} has been restarted or resumed", self.path.name)
+        log.warning("{} has been restarted or resumed", self.path.name)
         cause match {
             case e: SearchException =>
                 log.error("Error trying to search the index; reason: {}", e.getMessage)

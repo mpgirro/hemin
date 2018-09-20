@@ -76,7 +76,7 @@ class CrawlerWorker (config: CrawlerConfig) extends Actor with ActorLogging {
     }
 
     override def postRestart(cause: Throwable): Unit = {
-        log.info("{} has been restarted or resumed", self.path.name)
+        log.warning("{} has been restarted or resumed", self.path.name)
         cause match {
             case e: EchoException =>
                 log.error("HEAD response prevented fetching resource : {} [reason : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))

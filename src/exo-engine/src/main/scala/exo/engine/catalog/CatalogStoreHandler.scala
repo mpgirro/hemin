@@ -113,7 +113,7 @@ class CatalogStoreHandler(workerIndex: Int,
     private val idMapper = IdMapper.INSTANCE
 
     override def postRestart(cause: Throwable): Unit = {
-        log.info("{} has been restarted or resumed", self.path.name)
+        log.warning("{} has been restarted or resumed", self.path.name)
 
         repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
         emf = repositoryFactoryBuilder.getEntityManagerFactory

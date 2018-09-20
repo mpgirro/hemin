@@ -60,7 +60,7 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
     private var currPodcastExo = ""
 
     override def postRestart(cause: Throwable): Unit = {
-        log.info("{} has been restarted or resumed", self.path.name)
+        log.warning("{} has been restarted or resumed", self.path.name)
         cause match {
             case e: FeedParsingException =>
                 log.error("FeedParsingException occured while processing feed : {}", currFeedUrl)
