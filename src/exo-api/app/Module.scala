@@ -14,7 +14,9 @@ class Module(environment: Environment, configuration: Configuration)
     extends AbstractModule with ScalaModule {
 
     override def configure(): Unit = {
-        bind[PostRepository].to[PostRepositoryImpl].in[Singleton]
+        bind[PostRepository]
+            .to[PostRepositoryImpl]
+            .in[Singleton]
 
         /*
          * This is important!

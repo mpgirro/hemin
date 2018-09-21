@@ -16,6 +16,16 @@ Once you have sbt installed, the following at the command prompt will start up P
 sbt run
 ```
 
+---
+
+Use 
+
+```
+sbt compile start
+```
+
+instead of `sbt compile run` because the later delays compilation and initialization until first request to allow for faster change-refresh-see-change development cycle.
+
 Play will start up on the HTTP port at <http://localhost:9000/>.   You don't need to deploy or reload anything -- changing any source code while the server is running will automatically recompile and hot-reload the application on the next HTTP request. 
 
 ### Usage

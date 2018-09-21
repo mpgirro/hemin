@@ -20,7 +20,7 @@ class HomeController @Inject()(cc: ControllerComponents,
 
     def propose = Action { implicit request =>
         request.body.asText.map(url => {
-            log.warn(s"propose: $url")
+            log.trace(s"propose: $url")
             engineService.engine.propose(url)
             Ok
         }).getOrElse({
