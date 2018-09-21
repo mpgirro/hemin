@@ -13,7 +13,7 @@ class SearchService @Inject()(engineService: EngineService) {
 
     private val engine = engineService.engine
 
-    def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
+    def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
         engine.search(query, page, size)
     }
 

@@ -1,5 +1,7 @@
 package v1.search
 
+import com.google.common.base.Strings.isNullOrEmpty
+import com.typesafe.config.ConfigFactory
 import exo.engine.domain.dto.ResultWrapper
 import javax.inject.{Inject, Provider}
 import play.api.MarkerContext
@@ -16,11 +18,31 @@ class SearchResourceHandler @Inject() (routerProvider: Provider[SearchRouter],
                                        engineService: EngineService)
                                       (implicit ec: ExecutionContext) {
 
+    private val CONFIG = ConfigFactory.load()
+    // TODO these values are used by searcher and gateway, so save them somewhere more common for both
+    private val DEFAULT_PAGE: Int = Option(CONFIG.getInt("search.default-page")).getOrElse(1)
+    private val DEFAULT_SIZE: Int = Option(CONFIG.getInt("search.default-size")).getOrElse(20)
+
     private val engine = engineService.engine
 
-    def search(q: String, p: Option[Int], s: Option[Int])(implicit mc: MarkerContext): Future[ResultWrapper] = {
+    def search(query: String, page: Option[Int], size: Option[Int])(implicit mc: MarkerContext): Future[ResultWrapper] = {
 
-        engine.search(q, s, p)
+        val p: Int = page.getOrElse(DEFAULT_PAGE)
+        val s: Int = size.getOrElse(DEFAULT_SIZE)
+
+        if (isNullOrEmpty(query)) {
+            return Future { ResultWrapper.empty() }
+        }
+
+        if (p < 1) {
+            return Future { ResultWrapper.empty() }
+        }
+
+        if (s < 1) {
+            return Future { ResultWrapper.empty() }
+        }
+
+        engine.search(query, p, s)
         /*
         val resultFuture = engine.search(q, s, p)
         resultFuture.map { maybeResultData =>
