@@ -25,8 +25,8 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 After a production build, a Docker image can be built with:
 
 ```
-docker build -t echo-web:latest . 
-docker run -p 80:80 --name echo-web echo-web 
+docker build -t disposia-web:latest . 
+docker run -p 80:80 --name disposia-web disposia-web 
 ```
 
 ## Running unit tests
