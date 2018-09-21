@@ -1,7 +1,7 @@
 package io.disposia.engine.config
 
 /**
-  * Configuration for [[exo.engine.ExoApp]]
+  * Configuration for [[io.disposia.ExoApp]]
   */
 case class AppConfig (
                      

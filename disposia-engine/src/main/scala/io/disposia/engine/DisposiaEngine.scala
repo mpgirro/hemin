@@ -18,7 +18,7 @@ import scala.language.postfixOps
 /**
   * @author max
   */
-class ExoEngine {
+class DisposiaEngine {
 
     /*
     private val CONFIG = ConfigFactory.load()
@@ -34,7 +34,7 @@ class ExoEngine {
     private var config: ExoConfig = _
     private implicit var internalTimeout: Timeout = _
 
-    private val log = Logger(classOf[ExoEngine])
+    private val log = Logger(classOf[DisposiaEngine])
 
     private var master: ActorRef = _
 

@@ -13,7 +13,7 @@ import scala.util.{Failure, Success}
 /**
   * @author max
   */
-object ExoApp {
+object DisposiaApp {
 
     private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
@@ -21,7 +21,7 @@ object ExoApp {
 
     private val log = Logger(classOf[App])
 
-    private val engine = new ExoEngine()
+    private val engine = new DisposiaEngine()
     private var shutdown = false
 
     private val usageMap = Map(
