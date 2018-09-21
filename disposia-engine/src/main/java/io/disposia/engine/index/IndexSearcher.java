@@ -1,8 +1,8 @@
-package exo.engine.index;
+package io.disposia.engine.index;
 
-import exo.engine.domain.dto.IndexDoc;
-import exo.engine.domain.dto.ResultWrapper;
-import exo.engine.exception.SearchException;
+import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.dto.ResultWrapper;
+import io.disposia.engine.exception.SearchException;
 
 import java.util.Optional;
 

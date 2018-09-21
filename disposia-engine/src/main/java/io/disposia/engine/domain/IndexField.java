@@ -1,4 +1,4 @@
-package exo.engine.domain;
+package io.disposia.engine.domain;
 
 /**
  * @author max

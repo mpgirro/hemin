@@ -1,7 +1,7 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 /**
-  * Configuration for [[exo.engine.catalog.CatalogStore]]
+  * Configuration for [[io.disposia.engine.catalog.CatalogStore]]
   */
 case class CatalogConfig (
     workerCount: Int,

@@ -1,4 +1,4 @@
-package exo.engine.parse.api;
+package io.disposia.engine.parse.api;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

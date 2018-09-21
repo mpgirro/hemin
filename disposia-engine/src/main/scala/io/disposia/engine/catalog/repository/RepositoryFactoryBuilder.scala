@@ -1,4 +1,4 @@
-package exo.engine.catalog.repository
+package io.disposia.engine.catalog.repository
 
 import java.util.Properties
 import javax.persistence.{EntityManager, EntityManagerFactory}
@@ -84,7 +84,7 @@ class RepositoryFactoryBuilder (val databaseUrl: String) {
         entityManagerFactoryBean.setJpaDialect(new HibernateJpaDialect)
         entityManagerFactoryBean.setPersistenceUnitName(persistanceUnitName)
         entityManagerFactoryBean.setDataSource(dataSource)
-        entityManagerFactoryBean.setPackagesToScan("io.disposia.engine.domain.entity", "exo.engine.catalog")
+        entityManagerFactoryBean.setPackagesToScan("io.disposia.engine.domain.entity", "io.disposia.engine.catalog")
 
         entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter)
         entityManagerFactoryBean.setJpaPropertyMap(jpaPropertiesMap)

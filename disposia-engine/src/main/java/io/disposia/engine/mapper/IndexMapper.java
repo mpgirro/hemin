@@ -1,7 +1,7 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
-import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.*;
+import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.domain.dto.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;

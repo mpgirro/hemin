@@ -1,4 +1,4 @@
-package exo.engine.parser
+package io.disposia.engine.parser
 
 import java.time.LocalDateTime
 
@@ -6,19 +6,19 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Send}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogBroker
-import exo.engine.catalog.CatalogStore._
-import exo.engine.config.ParserConfig
-import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
-import exo.engine.domain.FeedStatus
-import exo.engine.domain.dto.Episode
-import exo.engine.exception.FeedParsingException
-import exo.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
-import exo.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
-import exo.engine.parse.api.FyydDirectoryAPI
-import exo.engine.parse.rss.RomeFeedParser
-import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogBroker
+import io.disposia.engine.catalog.CatalogStore._
+import io.disposia.engine.config.ParserConfig
+import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
+import io.disposia.engine.domain.FeedStatus
+import io.disposia.engine.domain.dto.Episode
+import io.disposia.engine.exception.FeedParsingException
+import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
+import io.disposia.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
+import io.disposia.engine.parse.api.FyydDirectoryAPI
+import io.disposia.engine.parse.rss.RomeFeedParser
+import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 

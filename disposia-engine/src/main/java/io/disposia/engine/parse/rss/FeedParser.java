@@ -1,7 +1,7 @@
-package exo.engine.parse.rss;
+package io.disposia.engine.parse.rss;
 
-import exo.engine.domain.dto.Episode;
-import exo.engine.domain.dto.Podcast;
+import io.disposia.engine.domain.dto.Episode;
+import io.disposia.engine.domain.dto.Podcast;
 
 import java.util.List;
 

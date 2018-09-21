@@ -1,4 +1,4 @@
-package exo.engine.index
+package io.disposia.engine.index
 
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
@@ -6,11 +6,11 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.config.IndexConfig
-import exo.engine.domain.dto.{IndexDoc, ResultWrapper}
-import exo.engine.exception.SearchException
-import exo.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.config.IndexConfig
+import io.disposia.engine.domain.dto.{IndexDoc, ResultWrapper}
+import io.disposia.engine.exception.SearchException
+import io.disposia.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._

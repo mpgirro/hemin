@@ -1,13 +1,13 @@
-package exo.engine.index
+package io.disposia.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.config.IndexConfig
-import exo.engine.domain.dto._
-import exo.engine.exception.SearchException
-import exo.engine.index.IndexStore._
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.config.IndexConfig
+import io.disposia.engine.domain.dto._
+import io.disposia.engine.exception.SearchException
+import io.disposia.engine.index.IndexStore._
 
 import scala.collection.mutable
 import scala.compat.java8.OptionConverters._

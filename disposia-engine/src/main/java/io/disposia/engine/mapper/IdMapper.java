@@ -1,6 +1,6 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
-import exo.engine.domain.dto.*;
+import io.disposia.engine.domain.dto.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;

@@ -1,8 +1,8 @@
-package exo.engine.index;
+package io.disposia.engine.index;
 
-import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.IndexDoc;
-import exo.engine.mapper.IndexMapper;
+import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -20,7 +20,7 @@ import java.nio.file.Paths;
 /**
  * @author Maximilian Irro
  */
-public class LuceneCommitter implements exo.engine.index.IndexCommitter {
+public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter {
 
     private static final Logger log = LoggerFactory.getLogger(LuceneCommitter.class);
 

@@ -1,9 +1,9 @@
-package exo.engine.index
+package io.disposia.engine.index
 
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import exo.engine.index.IndexStore._
+import io.disposia.engine.index.IndexStore._
 
 /**
   * @author Maximilian Irro

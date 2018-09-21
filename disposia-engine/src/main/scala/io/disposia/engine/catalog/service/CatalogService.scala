@@ -1,4 +1,4 @@
-package exo.engine.catalog.service
+package io.disposia.engine.catalog.service
 
 import javax.persistence.EntityManager
 

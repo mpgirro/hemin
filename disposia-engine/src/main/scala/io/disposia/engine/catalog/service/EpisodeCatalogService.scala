@@ -1,9 +1,9 @@
-package exo.engine.catalog.service
+package io.disposia.engine.catalog.service
 
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
-import exo.engine.catalog.mongo.EpisodeMongoRepository
-import exo.engine.catalog.repository.{EpisodeRepository, RepositoryFactoryBuilder}
+import io.disposia.engine.catalog.mongo.EpisodeMongoRepository
+import io.disposia.engine.catalog.repository.{EpisodeRepository, RepositoryFactoryBuilder}
 import io.disposia.engine.domain.dto.{Episode, Podcast}
 import io.disposia.engine.mapper.{EpisodeMapper, PodcastMapper, TeaserMapper}
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory

@@ -1,6 +1,6 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 /**
-  * Configuration for [[exo.engine.updater.Updater]]
+  * Configuration for [[io.disposia.engine.updater.Updater]]
   */
 case class UpdaterConfig ()

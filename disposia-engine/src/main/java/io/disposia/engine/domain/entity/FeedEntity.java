@@ -1,6 +1,6 @@
-package exo.engine.domain.entity;
+package io.disposia.engine.domain.entity;
 
-import exo.engine.domain.FeedStatus;
+import io.disposia.engine.domain.FeedStatus;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

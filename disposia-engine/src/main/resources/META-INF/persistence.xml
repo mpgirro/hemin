@@ -6,10 +6,10 @@
     <persistence-unit name="EchoActorEnginePersistenceUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
         <!--<non-jta-data-source>DefaultDS</non-jta-data-source>-->
-        <class>exo.engine.domain.entity.PodcastEntity</class>
-        <class>exo.engine.domain.entity.EpisodeEntity</class>
-        <class>exo.engine.domain.entity.FeedEntity</class>
-        <class>exo.engine.domain.entity.ChapterEntity</class>
+        <class>io.disposia.engine.domain.entity.PodcastEntity</class>
+        <class>io.disposia.engine.domain.entity.EpisodeEntity</class>
+        <class>io.disposia.engine.domain.entity.FeedEntity</class>
+        <class>io.disposia.engine.domain.entity.ChapterEntity</class>
         <properties>
             <property name="hibernate.connection.driver_class" value="org.h2.Driver" />
             <!-- <property name="hibernate.connection.url" value="jdbc:h2:/Users/max/volumes/echo/db;AUTO_SERVER=TRUE;MVCC=true" /> -->

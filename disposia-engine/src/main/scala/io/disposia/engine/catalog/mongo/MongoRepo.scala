@@ -1,4 +1,4 @@
-package exo.engine.catalog.mongo
+package io.disposia.engine.catalog.mongo
 
 import io.disposia.engine.domain.dto.Podcast
 import reactivemongo.api.{Cursor, DefaultDB, MongoConnection, MongoDriver}

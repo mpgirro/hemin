@@ -1,12 +1,12 @@
-package exo.engine.crawler
+package io.disposia.engine.crawler
 
 import java.nio.file.Paths
 import java.util.Optional
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
-import exo.engine.domain.HeadResult
-import exo.engine.exception.EchoException
+import io.disposia.engine.domain.HeadResult
+import io.disposia.engine.exception.EchoException
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration._

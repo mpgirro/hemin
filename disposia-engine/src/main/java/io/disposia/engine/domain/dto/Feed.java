@@ -1,8 +1,8 @@
-package exo.engine.domain.dto;
+package io.disposia.engine.domain.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import exo.engine.domain.FeedStatus;
+import io.disposia.engine.domain.FeedStatus;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;

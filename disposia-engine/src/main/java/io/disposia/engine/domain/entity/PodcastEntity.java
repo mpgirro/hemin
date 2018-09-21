@@ -1,4 +1,4 @@
-package exo.engine.domain.entity;
+package io.disposia.engine.domain.entity;
 
 import javax.persistence.*;
 import javax.persistence.Entity;

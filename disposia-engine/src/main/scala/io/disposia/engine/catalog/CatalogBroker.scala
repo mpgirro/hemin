@@ -1,12 +1,12 @@
-package exo.engine.catalog
+package io.disposia.engine.catalog
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, Terminated}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
 import io.disposia.engine.config.CatalogConfig
 
 import scala.collection.JavaConverters._

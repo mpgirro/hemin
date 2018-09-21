@@ -1,4 +1,4 @@
-package exo.engine.crawler
+package io.disposia.engine.crawler
 
 import java.time.LocalDateTime
 
@@ -7,16 +7,16 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Send}
 import akka.stream._
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogBroker
-import exo.engine.catalog.CatalogStore._
-import exo.engine.config.CrawlerConfig
-import exo.engine.crawler.Crawler._
-import exo.engine.domain.FeedStatus
-import exo.engine.exception.EchoException
-import exo.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
-import exo.engine.parse.api.FyydDirectoryAPI
-import exo.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogBroker
+import io.disposia.engine.catalog.CatalogStore._
+import io.disposia.engine.config.CrawlerConfig
+import io.disposia.engine.crawler.Crawler._
+import io.disposia.engine.domain.FeedStatus
+import io.disposia.engine.exception.EchoException
+import io.disposia.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
+import io.disposia.engine.parse.api.FyydDirectoryAPI
+import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}

@@ -1,4 +1,4 @@
-package exo.engine.util;
+package io.disposia.engine.util;
 
 import org.hashids.Hashids;
 import org.slf4j.Logger;

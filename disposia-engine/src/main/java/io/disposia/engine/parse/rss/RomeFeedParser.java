@@ -1,4 +1,4 @@
-package exo.engine.parse.rss;
+package io.disposia.engine.parse.rss;
 
 import com.rometools.modules.atom.modules.AtomLinkModule;
 import com.rometools.modules.content.ContentModule;
@@ -13,10 +13,10 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndImage;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
-import exo.engine.domain.dto.*;
-import exo.engine.exception.FeedParsingException;
-import exo.engine.parse.rss.rome.PodloveSimpleChapterModule;
-import exo.engine.util.UrlUtil;
+import io.disposia.engine.domain.dto.*;
+import io.disposia.engine.exception.FeedParsingException;
+import io.disposia.engine.parse.rss.rome.PodloveSimpleChapterModule;
+import io.disposia.engine.util.UrlUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.InputSource;

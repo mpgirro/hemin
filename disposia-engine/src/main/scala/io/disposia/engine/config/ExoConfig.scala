@@ -1,4 +1,4 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}

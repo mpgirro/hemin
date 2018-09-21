@@ -1,10 +1,10 @@
-package exo.engine.crawler
+package io.disposia.engine.crawler
 
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import exo.engine.EngineProtocol._
-import exo.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
 
 /**
   * @author Maximilian Irro

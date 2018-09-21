@@ -1,4 +1,4 @@
-package exo.engine.domain.dto;
+package io.disposia.engine.domain.dto;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

@@ -1,4 +1,4 @@
-package exo.engine.catalog.mongo
+package io.disposia.engine.catalog.mongo
 
 import java.time.LocalDateTime
 

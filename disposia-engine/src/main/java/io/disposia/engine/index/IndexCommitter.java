@@ -1,10 +1,10 @@
-package exo.engine.index;
+package io.disposia.engine.index;
 
 
-import exo.engine.domain.dto.Episode;
-import exo.engine.domain.dto.IndexDoc;
-import exo.engine.domain.dto.Podcast;
-import exo.engine.mapper.IndexMapper;
+import io.disposia.engine.domain.dto.Episode;
+import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.dto.Podcast;
+import io.disposia.engine.mapper.IndexMapper;
 
 /**
  * This interface is used to standardize writing to search indizes.

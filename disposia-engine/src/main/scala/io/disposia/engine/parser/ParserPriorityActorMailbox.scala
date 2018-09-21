@@ -1,10 +1,10 @@
-package exo.engine.parser
+package io.disposia.engine.parser
 
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import exo.engine.EngineProtocol._
-import exo.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 /**
   * @author Maximilian Irro

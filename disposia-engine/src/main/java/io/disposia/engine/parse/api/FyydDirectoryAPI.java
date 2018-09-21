@@ -1,8 +1,8 @@
-package exo.engine.parse.api;
+package io.disposia.engine.parse.api;
 
-import exo.engine.domain.dto.Episode;
-import exo.engine.domain.dto.ImmutableEpisode;
-import exo.engine.mapper.DateMapper;
+import io.disposia.engine.domain.dto.Episode;
+import io.disposia.engine.domain.dto.ImmutableEpisode;
+import io.disposia.engine.mapper.DateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

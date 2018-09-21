@@ -1,4 +1,4 @@
-package exo.engine.catalog.repository
+package io.disposia.engine.catalog.repository
 
 import io.disposia.engine.domain.entity.{ChapterEntity, EpisodeEntity}
 import org.springframework.data.jpa.repository.{JpaRepository, Query}

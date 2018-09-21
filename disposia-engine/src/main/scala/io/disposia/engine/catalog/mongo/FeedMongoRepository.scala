@@ -1,6 +1,6 @@
-package exo.engine.catalog.mongo
+package io.disposia.engine.catalog.mongo
 
-import exo.engine.catalog.mongo.BsonWrites.toBson
+import io.disposia.engine.catalog.mongo.BsonWrites.toBson
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.domain.dto.{Feed, ImmutableFeed}
 import io.disposia.engine.mapper.DateMapper

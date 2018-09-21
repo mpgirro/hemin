@@ -1,10 +1,10 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
-import exo.engine.domain.dto.Feed;
-import exo.engine.domain.dto.ImmutableFeed;
-import exo.engine.domain.dto.ModifiableFeed;
-import exo.engine.domain.entity.FeedEntity;
-import exo.engine.domain.entity.PodcastEntity;
+import io.disposia.engine.domain.dto.Feed;
+import io.disposia.engine.domain.dto.ImmutableFeed;
+import io.disposia.engine.domain.dto.ModifiableFeed;
+import io.disposia.engine.domain.entity.FeedEntity;
+import io.disposia.engine.domain.entity.PodcastEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

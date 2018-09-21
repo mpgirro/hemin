@@ -1,9 +1,9 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 import scala.concurrent.duration.FiniteDuration
 
 /**
-  * Configuration for [[exo.engine.index.IndexStore]]
+  * Configuration for [[io.disposia.engine.index.IndexStore]]
   */
 case class IndexConfig (
     indexPath: String,

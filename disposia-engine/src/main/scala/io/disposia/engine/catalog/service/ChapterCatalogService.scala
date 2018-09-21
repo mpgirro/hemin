@@ -1,10 +1,10 @@
-package exo.engine.catalog.service
+package io.disposia.engine.catalog.service
 
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
 import akka.util.Timeout
-import exo.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository}
-import exo.engine.catalog.repository.{ChapterRepository, RepositoryFactoryBuilder}
+import io.disposia.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository}
+import io.disposia.engine.catalog.repository.{ChapterRepository, RepositoryFactoryBuilder}
 import io.disposia.engine.domain.dto.{Chapter, ModifiableChapter}
 import io.disposia.engine.mapper.ChapterMapper
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory

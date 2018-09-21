@@ -1,11 +1,11 @@
-package exo.engine.index;
+package io.disposia.engine.index;
 
-import exo.engine.domain.IndexField;
-import exo.engine.domain.dto.ImmutableResultWrapper;
-import exo.engine.domain.dto.IndexDoc;
-import exo.engine.domain.dto.ResultWrapper;
-import exo.engine.exception.SearchException;
-import exo.engine.mapper.IndexMapper;
+import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.domain.dto.ImmutableResultWrapper;
+import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.dto.ResultWrapper;
+import io.disposia.engine.exception.SearchException;
+import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -29,7 +29,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 /**
  * @author Maximilian Irro
  */
-public class LuceneSearcher implements exo.engine.index.IndexSearcher {
+public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
 
     private static final Logger log = LoggerFactory.getLogger(LuceneSearcher.class);
 

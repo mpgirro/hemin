@@ -1,4 +1,4 @@
-package exo.engine.exception;
+package io.disposia.engine.exception;
 
 /**
  * @author Maximilian Irro

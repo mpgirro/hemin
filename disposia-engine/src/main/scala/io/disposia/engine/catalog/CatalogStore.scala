@@ -1,4 +1,4 @@
-package exo.engine.catalog
+package io.disposia.engine.catalog
 
 import java.sql.{Connection, DriverManager}
 import java.time.LocalDateTime
@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
+import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.config.CatalogConfig
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.domain.dto.{Chapter, Episode, Feed, Podcast}

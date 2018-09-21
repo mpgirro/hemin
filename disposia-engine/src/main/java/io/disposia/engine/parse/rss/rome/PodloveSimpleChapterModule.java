@@ -1,4 +1,4 @@
-package exo.engine.parse.rss.rome;
+package io.disposia.engine.parse.rss.rome;
 
 import com.rometools.rome.feed.CopyFrom;
 import com.rometools.rome.feed.module.Module;

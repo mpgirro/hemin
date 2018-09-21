@@ -1,4 +1,4 @@
-package exo.engine.crawler
+package io.disposia.engine.crawler
 
 import java.io.UnsupportedEncodingException
 import java.net.{ConnectException, SocketTimeoutException, UnknownHostException}
@@ -9,9 +9,9 @@ import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.config.CrawlerConfig
-import exo.engine.exception.EchoException
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.config.CrawlerConfig
+import io.disposia.engine.exception.EchoException
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._

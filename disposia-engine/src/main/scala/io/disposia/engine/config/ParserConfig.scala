@@ -1,7 +1,7 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 /**
-  * Configuration for [[exo.engine.parser.Parser]]
+  * Configuration for [[io.disposia.engine.parser.Parser]]
   */
 case class ParserConfig (
     workerCount: Int

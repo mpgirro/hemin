@@ -1,4 +1,4 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 /**
   * Configuration for [[exo.engine.ExoApp]]

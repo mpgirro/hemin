@@ -1,12 +1,12 @@
-package exo.engine.parser
+package io.disposia.engine.parser
 
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.config.ParserConfig
-import exo.engine.exception.FeedParsingException
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.config.ParserConfig
+import io.disposia.engine.exception.FeedParsingException
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._

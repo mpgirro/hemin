@@ -1,4 +1,4 @@
-package exo.engine.util;
+package io.disposia.engine.util;
 
 /**
  * @author Maximilian Irro

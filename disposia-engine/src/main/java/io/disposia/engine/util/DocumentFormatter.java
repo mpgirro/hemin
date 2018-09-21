@@ -1,6 +1,6 @@
-package exo.engine.util;
+package io.disposia.engine.util;
 
-import exo.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.dto.IndexDoc;
 import org.jsoup.Jsoup;
 
 /**

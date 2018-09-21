@@ -1,7 +1,7 @@
-package exo.engine.config
+package io.disposia.engine.config
 
 /**
-  * Configuration for [[exo.engine.crawler.Crawler]]
+  * Configuration for [[io.disposia.engine.crawler.Crawler]]
   */
 case class CrawlerConfig (
     workerCount: Int,

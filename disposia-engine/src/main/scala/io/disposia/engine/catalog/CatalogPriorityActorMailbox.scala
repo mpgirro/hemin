@@ -1,10 +1,10 @@
-package exo.engine.catalog
+package io.disposia.engine.catalog
 
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogStore._
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogStore._
 
 /**
   * @author Maximilian Irro

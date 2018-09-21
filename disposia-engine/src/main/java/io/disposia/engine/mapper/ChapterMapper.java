@@ -1,10 +1,10 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
-import exo.engine.domain.dto.ImmutableChapter;
-import exo.engine.domain.dto.ModifiableChapter;
-import exo.engine.domain.dto.Chapter;
-import exo.engine.domain.entity.ChapterEntity;
-import exo.engine.domain.entity.EpisodeEntity;
+import io.disposia.engine.domain.dto.ImmutableChapter;
+import io.disposia.engine.domain.dto.ModifiableChapter;
+import io.disposia.engine.domain.dto.Chapter;
+import io.disposia.engine.domain.entity.ChapterEntity;
+import io.disposia.engine.domain.entity.EpisodeEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

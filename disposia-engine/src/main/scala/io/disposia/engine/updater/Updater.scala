@@ -1,12 +1,12 @@
-package exo.engine.updater
+package io.disposia.engine.updater
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.google.common.base.Strings.isNullOrEmpty
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogStore.ProposeNewFeed
-import exo.engine.config.UpdaterConfig
-import exo.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
-import exo.engine.updater.Updater.ProcessFeed
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogStore.ProposeNewFeed
+import io.disposia.engine.config.UpdaterConfig
+import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
+import io.disposia.engine.updater.Updater.ProcessFeed
 
 /**
   * @author Maximilian Irro

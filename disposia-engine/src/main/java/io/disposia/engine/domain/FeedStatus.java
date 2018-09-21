@@ -1,4 +1,4 @@
-package exo.engine.domain;
+package io.disposia.engine.domain;
 
 import java.util.Collections;
 import java.util.Map;

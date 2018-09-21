@@ -1,4 +1,4 @@
-package exo.engine.catalog
+package io.disposia.engine.catalog
 
 import java.time.LocalDateTime
 
@@ -7,11 +7,11 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.catalog.CatalogStore._
-import exo.engine.catalog.mongo.ChapterMongoRepository
-import exo.engine.catalog.repository.RepositoryFactoryBuilder
-import exo.engine.catalog.service._
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.catalog.CatalogStore._
+import io.disposia.engine.catalog.mongo.ChapterMongoRepository
+import io.disposia.engine.catalog.repository.RepositoryFactoryBuilder
+import io.disposia.engine.catalog.service._
 import io.disposia.engine.config.CatalogConfig
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import io.disposia.engine.domain.FeedStatus

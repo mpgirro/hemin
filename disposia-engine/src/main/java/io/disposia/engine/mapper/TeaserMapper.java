@@ -1,11 +1,11 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
-import exo.engine.domain.dto.Episode;
-import exo.engine.domain.dto.ImmutableEpisode;
-import exo.engine.domain.dto.ImmutablePodcast;
-import exo.engine.domain.dto.Podcast;
-import exo.engine.domain.entity.EpisodeEntity;
-import exo.engine.domain.entity.PodcastEntity;
+import io.disposia.engine.domain.dto.Episode;
+import io.disposia.engine.domain.dto.ImmutableEpisode;
+import io.disposia.engine.domain.dto.ImmutablePodcast;
+import io.disposia.engine.domain.dto.Podcast;
+import io.disposia.engine.domain.entity.EpisodeEntity;
+import io.disposia.engine.domain.entity.PodcastEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.ReportingPolicy;

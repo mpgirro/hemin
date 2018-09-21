@@ -1,9 +1,9 @@
-package exo.engine.catalog.service
+package io.disposia.engine.catalog.service
 
 import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
-import exo.engine.catalog.mongo.FeedMongoRepository
-import exo.engine.catalog.repository.{FeedRepository, RepositoryFactoryBuilder}
+import io.disposia.engine.catalog.mongo.FeedMongoRepository
+import io.disposia.engine.catalog.repository.{FeedRepository, RepositoryFactoryBuilder}
 import io.disposia.engine.domain.dto.Feed
 import io.disposia.engine.mapper.FeedMapper
 import org.springframework.data.domain.PageRequest

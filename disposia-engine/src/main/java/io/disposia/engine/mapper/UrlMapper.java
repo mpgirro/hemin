@@ -1,4 +1,4 @@
-package exo.engine.mapper;
+package io.disposia.engine.mapper;
 
 import java.net.MalformedURLException;
 import java.net.URL;

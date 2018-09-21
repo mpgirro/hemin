@@ -1,4 +1,4 @@
-package exo.engine.catalog.repository
+package io.disposia.engine.catalog.repository
 
 import io.disposia.engine.domain.entity.PodcastEntity
 import org.springframework.data.domain.Pageable
