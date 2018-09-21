@@ -85,14 +85,14 @@ class ExoEngine {
         bus ! ProposeNewFeed(url)
     }
 
-    def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
+    def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
 
         // TODO-1 die defaultPage und defaultSize in den Config für Catalog und Index vereinen!
         // TODO-2 vielleicht in ApplicationConfig?
-        val p: Int = page.map(p => p-1).getOrElse(config.catalogConfig.defaultPage)
-        val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
+        //val p: Int = page.map(p => p-1).getOrElse(config.catalogConfig.defaultPage)
+        //val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
-        (bus ? SearchIndex(query, p, s)).map {
+        (bus ? SearchIndex(query, page, size)).map {
             case SearchResults(_, results) => results
         }
     }

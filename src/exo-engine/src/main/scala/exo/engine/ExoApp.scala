@@ -125,7 +125,7 @@ object ExoApp {
 
     private def search(query: String): Unit = {
         engine
-            .search(query, Some(1), Some(20))
+            .search(query, 1, 20)
             .onComplete {
                 case Success(results) =>
                     println("Found "+results.getResults.size()+" results for query '" + query.mkString(" ") + "'")
