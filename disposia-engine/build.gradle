@@ -27,11 +27,11 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 assert System.properties['java.specification.version'] == '1.8'
 
-group 'fm.exo'
+group 'io.disposia'
 version '1.0-SNAPSHOT'
 description = ''
 
-mainClassName = 'exo.engine.ExoApp'
+mainClassName = 'io.disposia.engine.ExoApp'
 
 compileJava {
     options.compilerArgs = [

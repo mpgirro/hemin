@@ -59,7 +59,7 @@
     <logger name="v1.post" level="TRACE" />
     <logger name="v1.search" level="TRACE" />
 
-    <logger name="exo.engine" level="INFO" />
+    <logger name="io.disposia" level="INFO" />
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/> <!-- TODO: obsolete? -->

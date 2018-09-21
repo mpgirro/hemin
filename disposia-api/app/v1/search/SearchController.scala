@@ -1,6 +1,6 @@
 package v1.search
 
-import exo.engine.domain.dto.ResultWrapper
+import io.disposia.engine.domain.dto.ResultWrapper
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes

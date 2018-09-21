@@ -2,8 +2,8 @@ package util
 
 import java.time.LocalDateTime
 
-import exo.engine.domain.dto.{IndexDoc, ResultWrapper}
-import exo.engine.mapper.DateMapper
+import io.disposia.engine.domain.dto.{IndexDoc, ResultWrapper}
+import io.disposia.engine.mapper.DateMapper
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
