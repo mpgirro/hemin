@@ -47,10 +47,16 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
     private implicit val INTERNAL_TIMEOUT = config.internalTimeout
 
     private var index: ActorRef = _
-    private var parser: ActorRef = _
-    private var crawler: ActorRef = _
     private var catalog: ActorRef = _
+    private var crawler: ActorRef = _
+    private var parser: ActorRef = _
     private var updater: ActorRef = _
+
+    private var indexStartupComplete = false
+    private var catalogStartupComplete = false
+    private var crawlerStartupComplete = false
+    private var parserStartupComplete = false
+    private var updaterStartupComplete = false
 
     override def preStart(): Unit = {
 
@@ -64,24 +70,28 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
 
 
         // pass around references not provided by constructors due to circular dependencies
+        index ! ActorRefSupervisor(self)
+
         crawler ! ActorRefCatalogStoreActor(catalog)
         crawler ! ActorRefIndexStoreActor(index)
         crawler ! ActorRefParserActor(parser)
         crawler ! ActorRefCatalogStoreActor(catalog)
+        crawler ! ActorRefSupervisor(self)
 
         parser ! ActorRefCatalogStoreActor(catalog)
         parser ! ActorRefIndexStoreActor(index)
         parser ! ActorRefCrawlerActor(crawler)
+        parser ! ActorRefSupervisor(self)
 
         catalog ! ActorRefCatalogStoreActor(catalog)
         catalog ! ActorRefIndexStoreActor(index)
         catalog ! ActorRefCrawlerActor(crawler)
         catalog ! ActorRefUpdaterActor(updater)
+        catalog ! ActorRefSupervisor(self)
 
         updater ! ActorRefCatalogStoreActor(catalog)
         updater ! ActorRefCrawlerActor(crawler)
-
-        log.info("up and running")
+        updater ! ActorRefSupervisor(self)
     }
 
     override def postStop: Unit = {
@@ -101,10 +111,34 @@ class NodeMaster (config: ExoConfig) extends Actor with ActorLogging {
         case msg: ParserMessage  => parser.tell(msg, sender())
         case msg: UpdaterMessage => updater.tell(msg, sender())
 
+        case ReportCatalogStoreStartupComplete =>
+            log.info("Catalog reported startup complete")
+            catalogStartupComplete = true
+        case ReportIndexStoreStartupComplete   =>
+            log.info("Index reported startup complete")
+            indexStartupComplete = true
+        case ReportCrawlerStartupComplete      =>
+            log.info("Crawler reported startup complete")
+            crawlerStartupComplete = true
+        case ReportParserStartupComplete       =>
+            log.info("Parser reported startup complete")
+            parserStartupComplete = true
+        case ReportUpdaterStartupComplete      =>
+            log.info("Updater reported startup complete")
+            updaterStartupComplete = true
+
+        case EngineOperational =>
+            if (isEngineOperational)
+                sender ! StartupComplete
+            else
+                sender ! StartupInProgress
+
         case Terminated(corpse) => onTerminated(corpse)
 
         case ShutdownSystem   => onSystemShutdown()
     }
+
+    private def isEngineOperational: Boolean = catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && updaterStartupComplete
 
     private def onTerminated(corpse: ActorRef): Unit = {
         log.error("Oh noh! A critical subsystem died : {}", corpse.path)

@@ -5,14 +5,14 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import exo.engine.EngineProtocol.ShutdownSystem
+import exo.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import exo.engine.catalog.CatalogStore._
 import exo.engine.config.ExoConfig
 import exo.engine.domain.dto._
 import exo.engine.index.IndexStore.{SearchIndex, SearchResults}
 
 import scala.concurrent.duration._
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
 /**
@@ -57,6 +57,22 @@ class ExoEngine {
         // init the actorsystem and local master for this node
         val system = ActorSystem("exo", globalConfig)
         master = system.actorOf(Props(new NodeMaster(config)), NodeMaster.name)
+
+        // wait until all actors in the hierarchy report they are up and running
+        var warmup = true
+        while (warmup) {
+            val request = bus ? EngineOperational
+            val response = Await.result(request, 10.seconds) // TODO read timeout from config
+            response match {
+                case StartupComplete   =>
+                    warmup = false
+                case StartupInProgress =>
+                    warmup = true
+                    Thread.sleep(100)
+            }
+        }
+
+        log.info("engine is up and running")
     }
 
     def shutdown(): Unit = {

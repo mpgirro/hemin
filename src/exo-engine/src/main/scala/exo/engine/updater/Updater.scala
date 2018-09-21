@@ -26,6 +26,7 @@ class Updater (config: UpdaterConfig) extends Actor with ActorLogging {
 
     private var catalog: ActorRef = _
     private var crawler: ActorRef = _
+    private var supervisor: ActorRef = _
 
     override def receive: Receive = {
 
@@ -36,6 +37,11 @@ class Updater (config: UpdaterConfig) extends Actor with ActorLogging {
         case ActorRefCrawlerActor(ref) =>
             log.debug("Received ActorRefCrawlerActor(_)")
             crawler = ref
+
+        case ActorRefSupervisor(ref) =>
+            log.debug("Received ActorRefSupervisor(_)")
+            supervisor = ref
+            supervisor ! ReportUpdaterStartupComplete
 
         case ProposeNewFeed(url) =>
             log.debug("Received ProposeNewFeed({})", url)

@@ -16,6 +16,7 @@ import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
 
 import scala.collection.JavaConverters._
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * @author Maximilian Irro
@@ -78,6 +79,8 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     private val WORKER_COUNT: Int = Option(CONFIG.getInt("echo.catalog.worker-count")).getOrElse(5)
     */
 
+    private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.catalog.dispatcher")
+
     private var currentWorkerIndex = 0
 
     private var catalogStore: ActorRef = _
@@ -86,6 +89,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     private var updater: ActorRef = _
     private var supervisor: ActorRef = _
 
+    private var workerReportedStartupFinished = 0
     private var router: Router = {
         val routees = Vector.fill(config.workerCount) {
             val catalogStore = createCatalogStoreWorkerActor(config.databaseUrl)
@@ -96,7 +100,9 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     }
 
     override def preStart(): Unit = {
-        runLiquibaseUpdate()
+        Future {
+            runLiquibaseUpdate()
+        }
     }
 
     override def postStop: Unit = {
@@ -128,6 +134,11 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
+            reportStartupCompleteIfViable()
+
+        case ReportWorkerStartupComplete =>
+            workerReportedStartupFinished += 1
+            reportStartupCompleteIfViable()
 
         case Terminated(corpse) =>
             log.error(s"A ${self.path} worker died : {}", corpse.path.name)
@@ -141,6 +152,12 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
             log.debug("Routing work of kind : {}", work.getClass)
             router.route(work, sender())
 
+    }
+
+    private def reportStartupCompleteIfViable(): Unit = {
+        if (workerReportedStartupFinished == config.workerCount && supervisor != null) {
+            supervisor ! ReportCatalogStoreStartupComplete
+        }
     }
 
     private def createCatalogStoreWorkerActor(databaseUrl: String): ActorRef = {

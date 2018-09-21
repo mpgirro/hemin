@@ -41,7 +41,9 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
     private var catalog: ActorRef = _
     private var index: ActorRef = _
     private var crawler: ActorRef = _
+    private var supervisor: ActorRef = _
 
+    private var workerReportedStartupFinished = 0
     private var router: Router = {
         val routees = Vector.fill(config.workerCount) {
             val parser = createWorker()
@@ -78,6 +80,15 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
             crawler = ref
             router.routees.foreach(r => r.send(msg, sender()))
 
+        case ActorRefSupervisor(ref) =>
+            log.debug("Received ActorRefSupervisor(_)")
+            supervisor = ref
+            reportStartupCompleteIfViable()
+
+        case ReportWorkerStartupComplete =>
+            workerReportedStartupFinished += 1
+            reportStartupCompleteIfViable()
+
         case PoisonPill =>
             log.debug("Received a PosionPill -> forwarding it to all routees")
             router.routees.foreach(r => r.send(PoisonPill, sender()))
@@ -85,6 +96,12 @@ class Parser (config: ParserConfig) extends Actor with ActorLogging {
         case work =>
             log.debug("Routing work of kind : {}", work.getClass)
             router.route(work, sender())
+    }
+
+    private def reportStartupCompleteIfViable(): Unit = {
+        if (workerReportedStartupFinished == config.workerCount && supervisor != null) {
+            supervisor ! ReportParserStartupComplete
+        }
     }
 
     private def createWorker(): ActorRef = {

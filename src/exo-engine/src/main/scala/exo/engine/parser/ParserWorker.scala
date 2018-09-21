@@ -99,6 +99,7 @@ class ParserWorker (config: ParserConfig) extends Actor with ActorLogging {
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
+            supervisor ! ReportWorkerStartupComplete
 
         case ParseNewPodcastData(feedUrl, podcastExo, feedData) => onParseNewPodcastData(feedUrl, podcastExo, feedData)
 

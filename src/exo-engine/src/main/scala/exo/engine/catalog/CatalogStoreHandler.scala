@@ -55,6 +55,8 @@ class CatalogStoreHandler(workerIndex: Int,
     private val mediator = DistributedPubSub(context.system).mediator
     */
 
+    private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.catalog.dispatcher")
+
     private val exoGenerator: ExoGenerator = new ExoGenerator(workerIndex)
 
     private var catalogStore: ActorRef = _
@@ -73,10 +75,6 @@ class CatalogStoreHandler(workerIndex: Int,
 
     // My settings (see available connection options)
     val mongoUri = s"mongodb://localhost:27017/$dbName" // ?authMode=scram-sha1
-
-    // TODO pass the actors EX
-    import ExecutionContext.Implicits.global // use any appropriate context
-
 
     // Connect to the database: Must be done only once per application
     val driver = MongoDriver()
@@ -150,6 +148,7 @@ class CatalogStoreHandler(workerIndex: Int,
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
+            supervisor ! ReportWorkerStartupComplete
 
         case ProposeNewFeed(feedUrl) => proposeFeed(feedUrl)
 

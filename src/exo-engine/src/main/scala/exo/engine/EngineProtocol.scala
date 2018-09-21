@@ -23,6 +23,18 @@ object EngineProtocol {
     case class ActorRefUpdaterActor(ref: ActorRef) extends ActorRefInfo
     case class ActorRefSupervisor(ref: ActorRef) extends ActorRefInfo
 
+    // Startup sequence messages
+    case class ReportCatalogStoreStartupComplete()
+    case class ReportIndexStoreStartupComplete()
+    case class ReportCrawlerStartupComplete()
+    case class ReportParserStartupComplete()
+    case class ReportUpdaterStartupComplete()
+    case class ReportWorkerStartupComplete() // for worker/handler delegation children
+
+    case class EngineOperational()
+    case class StartupComplete()
+    case class StartupInProgress()
+
     // These are maintenance methods, I use during development
     case class DebugPrintAllPodcasts()    // User/CLI -> CatalogStore
     case class DebugPrintAllEpisodes()    // User/CLI -> CatalogStore

@@ -47,7 +47,9 @@ class Crawler (config: CrawlerConfig) extends Actor with ActorLogging {
 
     private var catalog: ActorRef = _
     private var parser: ActorRef = _
+    private var supervisor: ActorRef = _
 
+    private var workerReportedStartupFinished = 0
     private var router: Router = {
         val routees = Vector.fill(config.workerCount) {
             val crawler = createWorker()
@@ -88,6 +90,15 @@ class Crawler (config: CrawlerConfig) extends Actor with ActorLogging {
             parser = ref
             router.routees.foreach(r => r.send(msg, sender()))
 
+        case ActorRefSupervisor(ref) =>
+            log.debug("Received ActorRefSupervisor(_)")
+            supervisor = ref
+            reportStartupCompleteIfViable()
+
+        case ReportWorkerStartupComplete =>
+            workerReportedStartupFinished += 1
+            reportStartupCompleteIfViable()
+
         case Terminated(corpse) =>
             log.error(s"A ${self.path} worker died : {}", corpse.path.name)
             context.stop(self)
@@ -99,6 +110,12 @@ class Crawler (config: CrawlerConfig) extends Actor with ActorLogging {
         case work =>
             log.debug("Routing work of kind : {}", work.getClass)
             router.route(work, sender())
+    }
+
+    private def reportStartupCompleteIfViable(): Unit = {
+        if (workerReportedStartupFinished == config.workerCount && supervisor != null) {
+            supervisor ! ReportCrawlerStartupComplete
+        }
     }
 
     private def createWorker(): ActorRef = {

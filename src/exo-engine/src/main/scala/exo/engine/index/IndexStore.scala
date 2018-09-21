@@ -97,6 +97,7 @@ class IndexStore (config: IndexConfig) extends Actor with ActorLogging {
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
+            supervisor ! ReportIndexStoreStartupComplete
 
         case CommitIndex =>
             commitIndexIfChanged()

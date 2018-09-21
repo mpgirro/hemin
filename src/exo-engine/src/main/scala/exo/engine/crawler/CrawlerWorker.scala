@@ -109,6 +109,7 @@ class CrawlerWorker (config: CrawlerConfig) extends Actor with ActorLogging {
         case ActorRefSupervisor(ref) =>
             log.debug("Received ActorRefSupervisor(_)")
             supervisor = ref
+            supervisor ! ReportWorkerStartupComplete
 
         case DownloadWithHeadCheck(exo, url, job) =>
             log.debug("Received Download({},'{}',{},_)", exo, url, job.getClass.getSimpleName)
