@@ -11,7 +11,7 @@ import {Feed} from './feed.model';
 @Injectable()
 export class PodcastService {
 
-  private baseUrl = '/api/podcast';  // URL to web API
+  private baseUrl = '/api/v1/podcast';  // URL to web API
 
   constructor(private http: HttpClient) { }
 

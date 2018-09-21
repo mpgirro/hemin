@@ -10,7 +10,7 @@ import { catchError, tap } from 'rxjs/operators';
 @Injectable()
 export class SearchService {
 
-  private baseUrl = '/api/search?';  // URL to web API
+  private baseUrl = '/api/v1/search?';  // URL to web API
 
   constructor(private http: HttpClient) { }
 

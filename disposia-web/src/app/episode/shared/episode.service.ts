@@ -10,7 +10,7 @@ import {ArrayWrapper} from '../../arraywrapper.model';
 @Injectable()
 export class EpisodeService {
 
-  private baseUrl = '/api/episode';  // URL to web API
+  private baseUrl = '/api/v1/episode';  // URL to web API
 
   constructor(private http: HttpClient) { }
 
