@@ -55,7 +55,7 @@ class DisposiaEngine {
         internalTimeout = config.internalTimeout
 
         // init the actorsystem and local master for this node
-        val system = ActorSystem("exo", globalConfig)
+        val system = ActorSystem("disposia", globalConfig)
         master = system.actorOf(Props(new NodeMaster(config)), NodeMaster.name)
 
         // wait until all actors in the hierarchy report they are up and running
