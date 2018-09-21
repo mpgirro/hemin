@@ -7,7 +7,6 @@ import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.libs.json.{Json, Writes}
 import play.api.mvc._
-import services.SearchService
 import util.{JsonWrites, RequestMarkerContext}
 
 import scala.concurrent.ExecutionContext
@@ -18,13 +17,12 @@ import scala.concurrent.ExecutionContext
   */
 class SearchController @Inject() (cc: SearchControllerComponents,
                                   searchActionBuilder: SearchActionBuilder,
-                                  searchResourceHandler: SearchResourceHandler,
+                                  searchResourceHandler: SearchService,
                                   actionBuilder: DefaultActionBuilder,
                                   parsers: PlayBodyParsers,
                                   messagesApi: MessagesApi,
                                   langs: Langs,
-                                  fileMimeTypes: FileMimeTypes,
-                                  searchService: SearchService)
+                                  fileMimeTypes: FileMimeTypes)
                                  (implicit ec: ExecutionContext)
     extends SearchBaseController(cc) {
 

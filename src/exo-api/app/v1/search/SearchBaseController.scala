@@ -14,5 +14,5 @@ class SearchBaseController @Inject() (pcc: SearchControllerComponents)
 
   def SearchAction: SearchActionBuilder = pcc.searchActionBuilder
 
-  def searchResourceHandler: SearchResourceHandler = pcc.searchResourceHandler
+  def searchResourceHandler: SearchService = pcc.searchResourceHandler
 }

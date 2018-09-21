@@ -14,12 +14,11 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Controls access to the backend data, returning [[exo.engine.domain.dto.ResultWrapper]]
   */
-class SearchResourceHandler @Inject() (routerProvider: Provider[SearchRouter],
-                                       engineService: EngineService)
-                                      (implicit ec: ExecutionContext) {
+class SearchService @Inject()(engineService: EngineService)
+                             (implicit ec: ExecutionContext) {
 
+    // TODO dont use CONFIG this way, and defauts via Option doesn't work anyway
     private val CONFIG = ConfigFactory.load()
-    // TODO these values are used by searcher and gateway, so save them somewhere more common for both
     private val DEFAULT_PAGE: Int = Option(CONFIG.getInt("search.default-page")).getOrElse(1)
     private val DEFAULT_SIZE: Int = Option(CONFIG.getInt("search.default-size")).getOrElse(20)
 
@@ -43,22 +42,6 @@ class SearchResourceHandler @Inject() (routerProvider: Provider[SearchRouter],
         }
 
         engine.search(query, p, s)
-        /*
-        val resultFuture = engine.search(q, s, p)
-        resultFuture.map { maybeResultData =>
-            maybeResultData.map { resultData =>
-                resultData
-            }
-        }
-        */
     }
-
-    /*
-    def find(implicit mc: MarkerContext): Future[Iterable[ResultWrapper]] = {
-        postRepository.list().map { postDataList =>
-            postDataList.map(postData => createPostResource(postData))
-        }
-    }
-    */
 
 }

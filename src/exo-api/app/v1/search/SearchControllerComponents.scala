@@ -12,7 +12,7 @@ import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers
   * controller only has to have one thing injected.
   */
 case class SearchControllerComponents @Inject()(searchActionBuilder: SearchActionBuilder,
-                                                searchResourceHandler: SearchResourceHandler,
+                                                searchResourceHandler: SearchService,
                                                 actionBuilder: DefaultActionBuilder,
                                                 parsers: PlayBodyParsers,
                                                 messagesApi: MessagesApi,

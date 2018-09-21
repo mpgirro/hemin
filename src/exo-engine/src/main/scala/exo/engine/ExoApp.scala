@@ -82,19 +82,19 @@ object ExoApp {
             //case "search" :: query :: _   => usage("search")
 
             case "get" :: "podcast" :: Nil        => usage("get podcast")
-            case "get" :: "podcast" :: exo :: Nil => getPodcast(exo)
+            case "get" :: "podcast" :: exo :: Nil => printPodcast(exo)
             case "get" :: "podcast" :: exo :: _   => usage("get podcast")
 
             case "get" :: "podcast-feeds" :: Nil        => usage("get podcast")
-            case "get" :: "podcast-feeds" :: exo :: Nil => getFeedsByPodcast(exo)
+            case "get" :: "podcast-feeds" :: exo :: Nil => printFeedsByPodcast(exo)
             case "get" :: "podcast-feeds" :: exo :: _   => usage("get podcast")
 
             case "get" :: "episode" :: Nil        => usage("get episode")
-            case "get" :: "episode" :: exo :: Nil => getEpisode(exo)
+            case "get" :: "episode" :: exo :: Nil => printEpisode(exo)
             case "get" :: "episode" :: exo :: _   => usage("get episode")
 
             case "get" :: "episode-chapters" :: Nil        => usage("get chapters")
-            case "get" :: "episode-chapters" :: exo :: Nil => getChaptersByEpisode(exo)
+            case "get" :: "episode-chapters" :: exo :: Nil => printChaptersByEpisode(exo)
             case "get" :: "episode-chapters" :: exo :: _   => usage("get chapters")
 
             case _  => help()
@@ -138,7 +138,7 @@ object ExoApp {
             }
     }
 
-    private def getPodcast(exo: String): Unit = {
+    private def printPodcast(exo: String): Unit = {
         engine
             .findPodcast(exo)
             .onComplete {
@@ -151,7 +151,7 @@ object ExoApp {
             }
     }
 
-    private def getEpisode(exo: String): Unit = {
+    private def printEpisode(exo: String): Unit = {
         engine
             .findEpisode(exo)
             .onComplete {
@@ -164,7 +164,7 @@ object ExoApp {
             }
     }
 
-    private def getChaptersByEpisode(exo: String): Unit = {
+    private def printChaptersByEpisode(exo: String): Unit = {
         engine
             .findChaptersByEpisode(exo)
             .onComplete {
@@ -177,7 +177,7 @@ object ExoApp {
             }
     }
 
-    private def getFeedsByPodcast(exo: String): Unit = {
+    private def printFeedsByPodcast(exo: String): Unit = {
         engine
             .findFeedsByPodcast(exo)
             .onComplete {
