@@ -5,8 +5,8 @@ import akka.event.LoggingAdapter
 import akka.util.Timeout
 import exo.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository}
 import exo.engine.catalog.repository.{ChapterRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.{Chapter, ModifiableChapter}
-import exo.engine.mapper.ChapterMapper
+import io.disposia.engine.domain.dto.{Chapter, ModifiableChapter}
+import io.disposia.engine.mapper.ChapterMapper
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.transaction.annotation.Transactional
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}

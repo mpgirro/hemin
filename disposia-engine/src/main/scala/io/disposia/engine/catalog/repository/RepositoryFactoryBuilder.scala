@@ -84,7 +84,7 @@ class RepositoryFactoryBuilder (val databaseUrl: String) {
         entityManagerFactoryBean.setJpaDialect(new HibernateJpaDialect)
         entityManagerFactoryBean.setPersistenceUnitName(persistanceUnitName)
         entityManagerFactoryBean.setDataSource(dataSource)
-        entityManagerFactoryBean.setPackagesToScan("exo.engine.domain.entity", "exo.engine.catalog")
+        entityManagerFactoryBean.setPackagesToScan("io.disposia.engine.domain.entity", "exo.engine.catalog")
 
         entityManagerFactoryBean.setJpaVendorAdapter(jpaVendorAdapter)
         entityManagerFactoryBean.setJpaPropertyMap(jpaPropertiesMap)

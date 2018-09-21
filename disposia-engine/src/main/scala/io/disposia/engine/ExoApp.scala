@@ -1,16 +1,18 @@
-package exo.engine
+package io.disposia.engine
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import exo.engine.util.DocumentFormatter
+import io.disposia.engine.util.DocumentFormatter
 
 import scala.collection.JavaConverters._
-import scala.concurrent.{ExecutionContext, blocking}
 import scala.concurrent.duration._
+import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
-import scala.language.postfixOps
 import scala.util.{Failure, Success}
 
+/**
+  * @author max
+  */
 object ExoApp {
 
     private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC

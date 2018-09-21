@@ -1,9 +1,6 @@
-package exo.engine
+package io.disposia.engine
 
 import akka.actor.ActorRef
-import com.google.common.collect.ImmutableList
-import exo.engine.domain.dto._
-
 
 /**
   * @author Maximilian Irro

@@ -7,7 +7,7 @@ import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLog
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
 import exo.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
-import exo.engine.config.CatalogConfig
+import io.disposia.engine.config.CatalogConfig
 
 import scala.collection.JavaConverters._
 

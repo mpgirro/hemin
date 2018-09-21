@@ -1,6 +1,6 @@
 package exo.engine.catalog.repository
 
-import exo.engine.domain.entity.FeedEntity
+import io.disposia.engine.domain.entity.FeedEntity
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 import org.springframework.data.repository.query.Param
 

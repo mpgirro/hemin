@@ -7,9 +7,9 @@ import akka.actor.{Actor, ActorLogging, ActorRef, PoisonPill, Props, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import exo.engine.EngineProtocol._
-import exo.engine.config.CatalogConfig
-import exo.engine.domain.FeedStatus
-import exo.engine.domain.dto.{Chapter, Episode, Feed, Podcast}
+import io.disposia.engine.config.CatalogConfig
+import io.disposia.engine.domain.FeedStatus
+import io.disposia.engine.domain.dto.{Chapter, Episode, Feed, Podcast}
 import liquibase.{Contexts, LabelExpression, Liquibase}
 import liquibase.database.{Database, DatabaseFactory}
 import liquibase.database.jvm.JdbcConnection

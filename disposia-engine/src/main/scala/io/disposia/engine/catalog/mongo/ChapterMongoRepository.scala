@@ -1,7 +1,7 @@
 package exo.engine.catalog.mongo
 
 import exo.engine.catalog.mongo.BsonWrites.toBson
-import exo.engine.domain.dto.{Chapter, ImmutableChapter}
+import io.disposia.engine.domain.dto.{Chapter, ImmutableChapter}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.bson._

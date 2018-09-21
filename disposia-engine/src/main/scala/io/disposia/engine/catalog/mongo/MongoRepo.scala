@@ -1,6 +1,6 @@
 package exo.engine.catalog.mongo
 
-import exo.engine.domain.dto.Podcast
+import io.disposia.engine.domain.dto.Podcast
 import reactivemongo.api.{Cursor, DefaultDB, MongoConnection, MongoDriver}
 import reactivemongo.bson.{BSONDocumentWriter, BSONDocumentReader, Macros, document}
 

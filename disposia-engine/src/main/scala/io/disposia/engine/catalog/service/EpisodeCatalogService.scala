@@ -4,8 +4,8 @@ import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
 import exo.engine.catalog.mongo.EpisodeMongoRepository
 import exo.engine.catalog.repository.{EpisodeRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.{Episode, Podcast}
-import exo.engine.mapper.{EpisodeMapper, PodcastMapper, TeaserMapper}
+import io.disposia.engine.domain.dto.{Episode, Podcast}
+import io.disposia.engine.mapper.{EpisodeMapper, PodcastMapper, TeaserMapper}
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional

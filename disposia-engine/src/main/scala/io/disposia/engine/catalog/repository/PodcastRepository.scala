@@ -1,6 +1,6 @@
 package exo.engine.catalog.repository
 
-import exo.engine.domain.entity.PodcastEntity
+import io.disposia.engine.domain.entity.PodcastEntity
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 import org.springframework.data.repository.query.Param

@@ -4,8 +4,8 @@ import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
 import exo.engine.catalog.mongo.FeedMongoRepository
 import exo.engine.catalog.repository.{FeedRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.Feed
-import exo.engine.mapper.FeedMapper
+import io.disposia.engine.domain.dto.Feed
+import io.disposia.engine.mapper.FeedMapper
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository

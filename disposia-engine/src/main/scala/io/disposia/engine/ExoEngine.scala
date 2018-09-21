@@ -1,15 +1,15 @@
-package exo.engine
+package io.disposia.engine
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import exo.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
-import exo.engine.catalog.CatalogStore._
-import exo.engine.config.ExoConfig
-import exo.engine.domain.dto._
-import exo.engine.index.IndexStore.{SearchIndex, SearchResults}
+import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
+import io.disposia.engine.catalog.CatalogStore._
+import io.disposia.engine.config.ExoConfig
+import io.disposia.engine.domain.dto._
+import io.disposia.engine.index.IndexStore.{SearchIndex, SearchResults}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}

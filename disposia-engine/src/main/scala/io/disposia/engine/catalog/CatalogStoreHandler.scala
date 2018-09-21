@@ -12,14 +12,14 @@ import exo.engine.catalog.CatalogStore._
 import exo.engine.catalog.mongo.ChapterMongoRepository
 import exo.engine.catalog.repository.RepositoryFactoryBuilder
 import exo.engine.catalog.service._
-import exo.engine.config.CatalogConfig
-import exo.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
-import exo.engine.domain.FeedStatus
-import exo.engine.domain.dto._
-import exo.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent}
-import exo.engine.mapper._
-import exo.engine.updater.Updater.ProcessFeed
-import exo.engine.util.ExoGenerator
+import io.disposia.engine.config.CatalogConfig
+import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
+import io.disposia.engine.domain.FeedStatus
+import io.disposia.engine.domain.dto._
+import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent}
+import io.disposia.engine.mapper._
+import io.disposia.engine.updater.Updater.ProcessFeed
+import io.disposia.engine.util.ExoGenerator
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronizationManager
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}

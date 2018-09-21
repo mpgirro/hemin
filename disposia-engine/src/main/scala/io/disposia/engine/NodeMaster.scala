@@ -1,24 +1,20 @@
-package exo.engine
+package io.disposia.engine
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
-import akka.pattern.{CircuitBreaker, ask}
-import akka.cluster.Cluster
-import com.typesafe.config.ConfigFactory
-import exo.engine.EngineProtocol._
-import exo.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
-import exo.engine.catalog.{CatalogBroker, CatalogStore}
-import exo.engine.catalog.CatalogStore.CatalogMessage
-import exo.engine.config.ExoConfig
-import exo.engine.crawler.Crawler
-import exo.engine.crawler.Crawler.CrawlerMessage
-import exo.engine.index.{IndexBroker, IndexStore}
-import exo.engine.index.IndexStore.IndexMessage
-import exo.engine.parser.Parser
-import exo.engine.parser.Parser.ParserMessage
-import exo.engine.updater.Updater
-import exo.engine.updater.Updater.UpdaterMessage
+import io.disposia.engine.EngineProtocol._
+import io.disposia.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
+import io.disposia.engine.catalog.CatalogStore
+import io.disposia.engine.catalog.CatalogStore.CatalogMessage
+import io.disposia.engine.config.ExoConfig
+import io.disposia.engine.crawler.Crawler
+import io.disposia.engine.crawler.Crawler.CrawlerMessage
+import io.disposia.engine.index.IndexStore
+import io.disposia.engine.index.IndexStore.IndexMessage
+import io.disposia.engine.parser.Parser
+import io.disposia.engine.parser.Parser.ParserMessage
+import io.disposia.engine.updater.Updater
+import io.disposia.engine.updater.Updater.UpdaterMessage
 
-import scala.concurrent.duration._
 import scala.language.postfixOps
 
 /**

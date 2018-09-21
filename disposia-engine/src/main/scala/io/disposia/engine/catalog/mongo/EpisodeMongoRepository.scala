@@ -1,8 +1,8 @@
 package exo.engine.catalog.mongo
 
 import exo.engine.catalog.mongo.BsonWrites.toBson
-import exo.engine.domain.dto.{Episode, ImmutableEpisode}
-import exo.engine.mapper.DateMapper
+import io.disposia.engine.domain.dto.{Episode, ImmutableEpisode}
+import io.disposia.engine.mapper.DateMapper
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._

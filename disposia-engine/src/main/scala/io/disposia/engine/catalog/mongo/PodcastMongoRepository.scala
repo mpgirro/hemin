@@ -1,8 +1,8 @@
 package exo.engine.catalog.mongo
 
 import com.google.common.collect.Sets
-import exo.engine.domain.dto.{ImmutablePodcast, Podcast}
-import exo.engine.mapper.DateMapper
+import io.disposia.engine.domain.dto.{ImmutablePodcast, Podcast}
+import io.disposia.engine.mapper.DateMapper
 import exo.engine.catalog.mongo.BsonWrites.toBson
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection

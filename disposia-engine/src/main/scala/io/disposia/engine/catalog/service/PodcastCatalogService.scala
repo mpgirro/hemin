@@ -4,8 +4,8 @@ import javax.persistence.EntityManager
 import akka.event.LoggingAdapter
 import exo.engine.catalog.mongo.PodcastMongoRepository
 import exo.engine.catalog.repository.{PodcastRepository, RepositoryFactoryBuilder}
-import exo.engine.domain.dto.Podcast
-import exo.engine.mapper.{PodcastMapper, TeaserMapper}
+import io.disposia.engine.domain.dto.Podcast
+import io.disposia.engine.mapper.{PodcastMapper, TeaserMapper}
 import org.springframework.data.domain.{PageRequest, Sort}
 import org.springframework.data.domain.Sort.Direction
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory

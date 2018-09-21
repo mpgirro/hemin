@@ -1,9 +1,9 @@
 package exo.engine.catalog.mongo
 
 import exo.engine.catalog.mongo.BsonWrites.toBson
-import exo.engine.domain.FeedStatus
-import exo.engine.domain.dto.{Feed, ImmutableFeed}
-import exo.engine.mapper.DateMapper
+import io.disposia.engine.domain.FeedStatus
+import io.disposia.engine.domain.dto.{Feed, ImmutableFeed}
+import io.disposia.engine.mapper.DateMapper
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.bson._

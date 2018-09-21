@@ -2,7 +2,7 @@ package exo.engine.catalog.mongo
 
 import java.time.LocalDateTime
 
-import exo.engine.mapper.DateMapper
+import io.disposia.engine.mapper.DateMapper
 import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONInteger, BSONLong}
 
 /**
