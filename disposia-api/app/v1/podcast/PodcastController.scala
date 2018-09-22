@@ -1,6 +1,6 @@
-package v1.search
+package v1.podcast
 
-import io.disposia.engine.domain.dto.ResultWrapper
+import io.disposia.engine.domain.dto.{Podcast, ResultWrapper}
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes
@@ -15,25 +15,27 @@ import scala.concurrent.ExecutionContext
 /**
   * @author max
   */
-class SearchController @Inject() (cc: SearchControllerComponents,
-                                  searchActionBuilder: SearchActionBuilder,
-                                  searchService: SearchService,
+class PodcastController @Inject()(cc: PodcastControllerComponents,
+                                  podcastActionBuilder: PodcastActionBuilder,
+                                  podcastService: PodcastService,
                                   actionBuilder: DefaultActionBuilder,
                                   parsers: PlayBodyParsers,
                                   messagesApi: MessagesApi,
                                   langs: Langs,
                                   fileMimeTypes: FileMimeTypes)
                                  (implicit ec: ExecutionContext)
-    extends SearchBaseController(cc) {
+    extends PodcastBaseController(cc) {
 
     private val log = Logger(getClass).logger
 
-    private implicit val searchWriter: Writes[ResultWrapper] = JsonWrites.implicitWrapperWrites
+    private implicit val podcastWriter: Writes[Podcast] = JsonWrites.implicitPodcastWrites
 
-    def search(q: String, p: Option[Int], s: Option[Int]): Action[AnyContent] = SearchAction.async { implicit request =>
-        log.trace(s"search: q = $q & p = $p & s = $s")
-        searchService.search(q,p,s).map { results =>
-            Ok(Json.toJson(results))
+    def find(id: String): Action[AnyContent] =
+        PodcastAction.async { implicit request =>
+            log.trace(s"find: id = $id")
+            podcastService.find(id).map { podcast =>
+                Ok(Json.toJson(podcast))
+            }
         }
-    }
+
 }
