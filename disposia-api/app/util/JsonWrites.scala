@@ -5,7 +5,6 @@ import java.time.LocalDateTime
 import io.disposia.engine.domain.dto.{IndexDoc, Podcast, ResultWrapper}
 import io.disposia.engine.mapper.DateMapper
 import play.api.libs.json._
-import shapeless.TypeCase
 
 import scala.collection.JavaConverters._
 
@@ -20,17 +19,18 @@ object JsonWrites {
     private def toNullJson(d: LocalDateTime): JsValue = Option(d).map(toJson).getOrElse(JsNull)
     private def toNullJson(is: java.util.Set[String]): JsValue = Option(is).map(toJson).getOrElse(JsNull)
     private def toNullJson(is: java.util.List[IndexDoc]): JsValue = Option(is).map(toJson).getOrElse(JsNull)
-    private def toNullJson(is: Iterable[IndexDoc]): JsValue = Option(is).map(toJson).getOrElse(JsNull)
+    private def toNullJson(is: Iterable[IndexDoc]): JsValue = Option(is).map(jsonFromDocumentIterable).getOrElse(JsNull)
 
     private def toJson(b: Boolean): JsBoolean = JsBoolean(b)
     private def toJson(i: Integer): JsNumber = JsNumber(i.toInt)
     private def toJson(s: String): JsString = JsString(s)
     private def toJson(d: LocalDateTime): JsString = toJson(DateMapper.INSTANCE.asString(d))
-    private def toJson(ss: java.util.Set[String]): JsArray = toJson(ss.asScala)
-    private def toJson(is: java.util.List[IndexDoc]): JsArray = toJson(is.asScala)
+    private def toJson(ss: java.util.Set[String]): JsArray = jsonFromStringIterable(ss.asScala)
+    private def toJson(is: java.util.List[IndexDoc]): JsArray = jsonFromDocumentIterable(is.asScala)
 
-    private def toJson(ss: Iterable[String]): JsArray = JsArray(ss.map(s => JsString(s)).toVector)
-    private def toJson(is: Iterable[IndexDoc]): JsArray = JsArray(is.map(implicitIndexDocWrites.writes).toVector)
+    private def jsonFromStringIterable(ss: Iterable[String]): JsArray = JsArray(ss.map(s => JsString(s)).toVector)
+    private def jsonFromDocumentIterable(is: Iterable[IndexDoc]): JsArray = JsArray(is.map(implicitIndexDocWrites.writes).toVector)
+
 
     /**
       * Mapping to write a ResultWrapper out as a JSON value.

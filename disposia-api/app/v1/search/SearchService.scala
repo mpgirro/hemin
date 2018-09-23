@@ -24,24 +24,16 @@ class SearchService @Inject()(engineService: EngineService)
 
     private val engine = engineService.engine
 
-    def search(query: String, page: Option[Int], size: Option[Int])(implicit mc: MarkerContext): Future[ResultWrapper] = {
+    def search(query: String, page: Option[Int], size: Option[Int])(implicit mc: MarkerContext): Future[ResultWrapper] =
+        search(query, page.getOrElse(DEFAULT_PAGE), size.getOrElse(DEFAULT_SIZE))
 
-        val p: Int = page.getOrElse(DEFAULT_PAGE)
-        val s: Int = size.getOrElse(DEFAULT_SIZE)
+    private def search(q: String, p: Int, s: Int)(implicit mc: MarkerContext): Future[ResultWrapper] = {
 
-        if (isNullOrEmpty(query)) {
-            return Future { ResultWrapper.empty() }
-        }
+        if (isNullOrEmpty(q)) return Future { ResultWrapper.empty() }
+        if (p < 1)            return Future { ResultWrapper.empty() }
+        if (s < 1)            return Future { ResultWrapper.empty() }
 
-        if (p < 1) {
-            return Future { ResultWrapper.empty() }
-        }
-
-        if (s < 1) {
-            return Future { ResultWrapper.empty() }
-        }
-
-        engine.search(query, p, s)
+        engine.search(q, p, s)
     }
 
 }
