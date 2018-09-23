@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+function propose
+{
+    curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/propose
+}
+
+function search
+{
+    curl "http://localhost:9000/api/v1/search?q=${1}&p=1&s=20"
+}
+
+function podcast
+{
+    curl "http://localhost:9000/api/v1/podcast/${1}"
+}
+
+function episode
+{
+    curl "http://localhost:9000/api/v1/episode/${1}"
+}
+
+COMMAND=$@
+
+case $1 in
+    "propose")
+        propose $2
+        ;;
+    "search")
+        search $2
+        ;;
+    "podcast")
+        podcast $2
+        ;;
+    "episode")
+        propose $2
+        ;;
+    *)
+        # unknown option
+        echo "Unknown command: ${$1}"
+        exit 1
+        ;;
+esac
