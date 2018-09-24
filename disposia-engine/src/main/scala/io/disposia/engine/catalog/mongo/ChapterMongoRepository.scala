@@ -1,56 +1,23 @@
 package io.disposia.engine.catalog.mongo
 
-import io.disposia.engine.catalog.mongo.BsonWrites.toBson
-import io.disposia.engine.domain.dto.{Chapter, ImmutableChapter}
+import io.disposia.engine.domain.dto.Chapter
+import reactivemongo.api.Cursor
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChapterMongoRepository (db: DefaultDB)
+class ChapterMongoRepository (collection: BSONCollection)
                              (implicit ec: ExecutionContext) {
 
+    /*
     private def collection: BSONCollection = db.collection("chapters")
     collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
+    */
 
-    private implicit object ChapterReader extends BSONDocumentReader[Chapter] {
-        override def read(bson: BSONDocument): Chapter = {
-            val builder = ImmutableChapter.builder()
-            val opt: Option[Chapter] = for {
-                id <- bson.getAs[BSONNumberLike]("id").map(_.toLong) // TODO remove; no rel. DB
-                episodeId <- bson.getAs[BSONNumberLike]("episodeId").map(_.toLong) // TODO remove; no rel. DB
-                start <- bson.getAs[String]("start")
-                title <- bson.getAs[String]("title")
-                href <- bson.getAs[String]("href")
-                image <- bson.getAs[String]("image")
-                episodeExo <- bson.getAs[String]("episodeExo")
-            } yield builder
-                .setId(id)
-                .setEpisodeId(episodeId)
-                .setStart(start)
-                .setTitle(title)
-                .setHref(href)
-                .setImage(image)
-                .setEpisodeExo(episodeExo)
-                .create()
+    private implicit val chapterWriter: BsonConversion.ChapterWriter.type = BsonConversion.ChapterWriter
+    private implicit val chapterReader: BsonConversion.ChapterReader.type = BsonConversion.ChapterReader
 
-            opt.get // the Chapter is required (or let throw an exception)
-        }
-    }
-
-    private implicit object ChapterWriter extends BSONDocumentWriter[Chapter] {
-        override def write(c: Chapter): BSONDocument =
-            BSONDocument(
-                "id" -> toBson(c.getId), // TODO remove; no rel. DB
-                "episodeId" -> toBson(c.getEpisodeId), // TODO remove; no rel. DB
-                "start" -> c.getStart,
-                "title" -> c.getTitle,
-                "href" -> c.getHref,
-                "image"-> c.getImage,
-                "episodeExo" -> c.getEpisodeExo
-            )
-    }
 
     // TODO this writes, but does not OVERWRITE existing chapter with same EXO!!
     def save(chapter: Chapter): Future[Unit] = {

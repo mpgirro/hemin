@@ -9,6 +9,7 @@ import io.disposia.engine.domain.dto.{Chapter, ModifiableChapter}
 import io.disposia.engine.mapper.ChapterMapper
 import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.transaction.annotation.Transactional
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.collection.JavaConverters._
@@ -21,7 +22,7 @@ import scala.util.{Failure, Success}
   */
 class ChapterCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            db: DefaultDB)
+                            collection: BSONCollection)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -30,7 +31,7 @@ class ChapterCatalogService(log: LoggingAdapter,
 
     private val chapterMapper = ChapterMapper.INSTANCE
 
-    private val mongoRepo = new ChapterMongoRepository(db)
+    private val mongoRepo = new ChapterMongoRepository(collection)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)

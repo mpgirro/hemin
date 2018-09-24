@@ -22,11 +22,13 @@ import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.ExoGenerator
 import org.springframework.orm.jpa.EntityManagerHolder
 import org.springframework.transaction.support.TransactionSynchronizationManager
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future, blocking}
+import scala.util.{Failure, Success}
 
 /**
   * @author Maximilian Irro
@@ -71,16 +73,16 @@ class CatalogStoreHandler(workerIndex: Int,
 
 
     // TODO experimental
-    val dbName = "exodb"
+    //val dbName = "exodb"
 
     // My settings (see available connection options)
-    val mongoUri = s"mongodb://localhost:27017/$dbName" // ?authMode=scram-sha1
+    val mongoUri = s"mongodb://localhost:27017/disposia" // ?authMode=scram-sha1
 
     // Connect to the database: Must be done only once per application
-    val driver = MongoDriver()
-    val parsedUri = MongoConnection.parseURI(mongoUri)
+    //val driver = MongoDriver()
+    //val parsedUri = MongoConnection.parseURI(mongoUri)
     //val connection = parsedUri.map(driver.connection(_))
-    val connection: MongoConnection = driver.connection(List("localhost"))
+    //val connection: MongoConnection = driver.connection(List("localhost"))
 
     /*
     // Database and collections: Get references
@@ -96,12 +98,53 @@ class CatalogStoreHandler(workerIndex: Int,
 
     // - - - - - - - - -
 
+    lazy val (connection, dbName) = {
+        val driver = MongoDriver()
+
+        //registerDriverShutdownHook(driver)
+
+        (for {
+            parsedUri <- MongoConnection.parseURI(mongoUri)
+            con <- driver.connection(parsedUri, strictUri = true)
+            db <- parsedUri.db match {
+                case Some(dbName) => Success(dbName)
+                case _            => Failure[String](new IllegalArgumentException(
+                    s"cannot resolve connection from URI: $parsedUri"
+                ))
+            }
+        } yield con -> db).get
+    }
+
+    private lazy val lnm = s"${connection.supervisor}/${connection.name}"
+
+    @inline private def resolveDB(ec: ExecutionContext) =
+        connection.database(dbName)(ec).andThen {
+            case _ => /*logger.debug*/ log.info(s"[$lnm] MongoDB resolved: $dbName")
+        }
+
+    def db(implicit ec: ExecutionContext): DefaultDB =
+        Await.result(resolveDB(ec), 10.seconds)
+
+    def mongoCollection(collectionName: String)(implicit ec: ExecutionContext): BSONCollection = {
+        //db(ec).apply(collectionName)
+        val theDB = db(ec)
+        theDB[BSONCollection](collectionName)
+    }
 
 
-    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder,db)
-    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder,db)
-    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, db)
-    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder,db)
+
+    /* TODO
+     private def registerDriverShutdownHook(mongoDriver: MongoDriver): Unit =
+        lifecycle.addStopHook { () =>
+          logger.info(s"[$lnm] Stopping the MongoDriver...")
+          Future(mongoDriver.close())
+        }
+     */
+
+    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder, mongoCollection("podcasts"))
+    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder, mongoCollection("episodes"))
+    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, mongoCollection("feeds"))
+    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder, mongoCollection("chapters"))
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE
@@ -112,6 +155,9 @@ class CatalogStoreHandler(workerIndex: Int,
 
     override def postRestart(cause: Throwable): Unit = {
         log.warning("{} has been restarted or resumed", self.path.name)
+
+        //log.info(s"[$lnm] Stopping the MongoDriver...")
+        //Future(mongoDriver.close())
 
         repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
         emf = repositoryFactoryBuilder.getEntityManagerFactory

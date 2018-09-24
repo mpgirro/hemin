@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.support.JpaRepositoryFactory
 import org.springframework.stereotype.Repository
 import org.springframework.transaction.annotation.Transactional
 import reactivemongo.api.DefaultDB
+import reactivemongo.api.collections.bson.BSONCollection
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -22,7 +23,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 @Transactional
 class EpisodeCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            db: DefaultDB)
+                            collection: BSONCollection)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -33,7 +34,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     private val episodeMapper = EpisodeMapper.INSTANCE
     private val teaserMapper = TeaserMapper.INSTANCE
 
-    private val mongoRepo = new EpisodeMongoRepository(db)
+    private val mongoRepo = new EpisodeMongoRepository(collection)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)

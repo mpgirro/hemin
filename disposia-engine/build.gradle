@@ -31,7 +31,7 @@ group 'io.disposia'
 version '1.0-SNAPSHOT'
 description = ''
 
-mainClassName = 'io.disposia.engine.ExoApp'
+mainClassName = 'io.disposia.engine.DisposiaApp'
 
 compileJava {
     options.compilerArgs = [
