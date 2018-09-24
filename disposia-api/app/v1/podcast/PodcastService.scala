@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 // TODO das hier ist ein Service
 
 /**
-  * Controls access to the backend data, returning [[io.disposia.engine.domain.dto.ResultWrapper]]
+  * Controls access to the backend data, returning [[io.disposia.engine.domain.dto.Podcast]]
   */
 class PodcastService @Inject()(engineService: EngineService)
                               (implicit ec: ExecutionContext) {

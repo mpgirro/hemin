@@ -138,6 +138,13 @@ class DisposiaEngine {
         }
     }
 
+    def findFeed(exo: String): Future[Option[Feed]] = {
+        (bus ? GetFeed(exo)).map {
+            case FeedResult(feed) => Some(feed)
+            case NothingFound(unknown)  => None
+        }
+    }
+
     private def breakerOpen(name: String): Unit = {
         log.warn("{} Circuit Breaker is open", name)
     }

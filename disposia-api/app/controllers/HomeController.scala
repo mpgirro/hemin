@@ -18,15 +18,4 @@ class HomeController @Inject()(cc: ControllerComponents,
         Ok(views.html.index())
     }
 
-    def propose = Action { implicit request =>
-        request.body.asText.map(url => {
-            log.trace(s"propose: $url")
-            engineService.engine.propose(url)
-            Ok
-        }).getOrElse({
-            log.warn(s"propose: No URL in body [BadRequest]")
-            BadRequest
-        })
-    }
-
 }

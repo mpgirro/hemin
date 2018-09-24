@@ -47,14 +47,15 @@ object CatalogStore {
     case class UpdateEpisode(podcastExo: String, episode: Episode) extends CatalogEvent
     case class UpdateEpisodeWithChapters(podcastExo: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
     // CatalogQueries
-    case class GetPodcast(podcastExo: String) extends CatalogQuery
+    case class GetPodcast(exo: String) extends CatalogQuery
     case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
     case class GetAllPodcastsRegistrationComplete(page: Int, size: Int) extends CatalogQuery
     case class GetAllFeeds(page: Int, size: Int) extends CatalogQuery
-    case class GetEpisode(episodeExo: String) extends CatalogQuery
+    case class GetEpisode(exo: String) extends CatalogQuery
     case class GetEpisodesByPodcast(podcastExo: String) extends CatalogQuery
     case class GetFeedsByPodcast(podcastExo: String) extends CatalogQuery
     case class GetChaptersByEpisode(episodeExo: String) extends CatalogQuery
+    case class GetFeed(exo: String) extends CatalogQuery
     case class CheckPodcast(exo: String) extends CatalogQuery
     case class CheckFeed(exo: String) extends CatalogQuery
     case class CheckAllPodcasts() extends CatalogQuery
@@ -67,6 +68,7 @@ object CatalogStore {
     case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
     case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
     case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
+    case class FeedResult(feed: Feed) extends CatalogQueryResult
     case class NothingFound(exo: String) extends CatalogQueryResult
 }
 

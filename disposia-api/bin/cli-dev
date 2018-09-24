@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 function propose() {
-    curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/propose
+    curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/feed/propose
 }
 
 function search() {
@@ -28,6 +28,10 @@ function episode_chapters() {
     curl "http://localhost:9000/api/v1/episode/${1}/chapters"
 }
 
+function feed() {
+    curl "http://localhost:9000/api/v1/feed/${1}"
+}
+
 COMMAND=$@
 
 case $1 in
@@ -51,6 +55,9 @@ case $1 in
         ;;
     "episode-chapters")
         episode_chapters $2
+        ;;
+    "feed")
+        feed $2
         ;;
     *)
         # unknown option

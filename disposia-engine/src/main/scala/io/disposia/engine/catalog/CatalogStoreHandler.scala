@@ -178,7 +178,7 @@ class CatalogStoreHandler(workerIndex: Int,
 
         case UpdateLinkByExo(exo, newUrl) => onUpdateLinkByExo(exo, newUrl)
 
-        case GetPodcast(podcastExo) => onGetPodcast(podcastExo)
+        case GetPodcast(exo) => onGetPodcast(exo)
 
         case GetAllPodcasts(page, size) => onGetAllPodcasts(page, size)
 
@@ -186,13 +186,15 @@ class CatalogStoreHandler(workerIndex: Int,
 
         case GetAllFeeds(page, size) => onGetAllFeeds(page, size)
 
-        case GetEpisode(podcastExo) => onGetEpisode(podcastExo)
+        case GetEpisode(exo) => onGetEpisode(exo)
 
         case GetEpisodesByPodcast(podcastExo) => onGetEpisodesByPodcast(podcastExo)
 
         case GetFeedsByPodcast(podcastExo) => onGetFeedsByPodcast(podcastExo)
 
         case GetChaptersByEpisode(episodeExo) => onGetChaptersByEpisode(episodeExo)
+
+        case GetFeed(exo) => onGetFeed(exo)
 
         case RegisterEpisodeIfNew(podcastExo, episode) => onRegisterEpisodeIfNew(podcastExo, episode)
 
@@ -516,6 +518,25 @@ class CatalogStoreHandler(workerIndex: Int,
         }
         val chapters = doInTransaction(task, List(chapterService)).asInstanceOf[List[Chapter]]
         sender ! ChaptersByEpisodeResult(chapters.map(c => idMapper.clearImmutable(c)))
+    }
+
+    private def onGetFeed(exo: String): Unit = {
+        log.debug("Received GetFeed('{}')", exo)
+        def task = () => {
+            feedService.findOneByExo(exo).map(e => {
+                Some(e)
+            }).getOrElse({
+                log.error("Database does not contain Feed (EXO) : {}", exo)
+                None
+            })
+        }
+        doInTransaction(task, List(feedService))
+            .asInstanceOf[Option[Feed]]
+            .map(e => {
+                sender ! FeedResult(idMapper.clearImmutable(e))
+            }).getOrElse({
+            sender ! NothingFound(exo)
+        })
     }
 
     private def onCheckPodcast(podcastId: String): Unit = {

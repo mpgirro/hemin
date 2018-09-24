@@ -1,7 +1,4 @@
 GET   /                               controllers.HomeController.index
-
-POST  /api/v1/propose                 controllers.HomeController.propose
-
 ->    /v1/posts                       v1.post.PostRouter
 GET   /api/v1/search                  v1.search.SearchController.search(q: String, p: Option[Int], s: Option[Int])
 GET   /api/v1/podcast/:id             v1.podcast.PodcastController.find(id: String)
@@ -9,6 +6,8 @@ GET   /api/v1/podcast/:id/episodes    v1.podcast.PodcastController.episodes(id: 
 GET   /api/v1/podcast/:id/feeds       v1.podcast.PodcastController.feeds(id: String)
 GET   /api/v1/episode/:id             v1.episode.EpisodeController.find(id: String)
 GET   /api/v1/episode/:id/chapters    v1.episode.EpisodeController.chapters(id: String)
+GET   /api/v1/feed/:id                v1.feed.FeedController.find(id: String)
+POST  /api/v1/feed/propose            v1.feed.FeedController.propose
 
 # Map static resources from the /public folder to the /assets URL path
 GET   /assets/*file                   controllers.Assets.at(path="/public", file)
