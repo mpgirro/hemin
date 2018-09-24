@@ -2,7 +2,7 @@ package v1.podcast
 
 import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.config.ConfigFactory
-import io.disposia.engine.domain.dto.{Podcast, ResultWrapper}
+import io.disposia.engine.domain.dto.{Episode, Feed, Podcast, ResultWrapper}
 import javax.inject.{Inject, Provider}
 import play.api.MarkerContext
 import services.EngineService
@@ -20,5 +20,9 @@ class PodcastService @Inject()(engineService: EngineService)
     private val engine = engineService.engine
 
     def find(id: String)(implicit mc: MarkerContext): Future[Option[Podcast]] = engine.findPodcast(id)
+
+    def episodes(id: String)(implicit mc: MarkerContext): Future[List[Episode]] = engine.findEpisodesByPodcast(id)
+
+    def feeds(id: String)(implicit mc: MarkerContext): Future[List[Feed]] = engine.findFeedsByPodcast(id)
 
 }
