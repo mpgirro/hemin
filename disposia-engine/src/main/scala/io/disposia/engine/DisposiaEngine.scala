@@ -3,6 +3,7 @@ package io.disposia.engine
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
+import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
@@ -15,21 +16,7 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-/**
-  * @author max
-  */
 class DisposiaEngine {
-
-    /*
-    private val CONFIG = ConfigFactory.load()
-    private implicit val INTERNAL_TIMEOUT: Timeout = Option(CONFIG.getInt("echo.internal-timeout")).getOrElse(5).seconds
-    private val DEFAULT_PAGE: Int = Option(CONFIG.getInt("echo.gateway.default-page")).getOrElse(1)
-    private val DEFAULT_SIZE: Int = Option(CONFIG.getInt("echo.gateway.default-size")).getOrElse(20)
-
-    private val BREAKER_CALL_TIMEOUT: FiniteDuration = Option(CONFIG.getInt("echo.gateway.breaker-call-timeout")).getOrElse(5).seconds
-    private val BREAKER_RESET_TIMEOUT: FiniteDuration = Option(CONFIG.getInt("echo.gateway.breaker-reset-timeout")).getOrElse(10).seconds
-    private val MAX_BREAKER_FAILURES: Int = 2 // TODO read from config
-    */
 
     private var config: ExoConfig = _
     private implicit var internalTimeout: Timeout = _
@@ -85,12 +72,19 @@ class DisposiaEngine {
         bus ! ProposeNewFeed(url)
     }
 
+    def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
+        val p: Int = page.getOrElse(config.indexConfig.defaultPage)
+        val s: Int = size.getOrElse(config.indexConfig.defaultSize)
+
+        search(query, p, s)
+    }
+
+
     def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
 
-        // TODO-1 die defaultPage und defaultSize in den Config für Catalog und Index vereinen!
-        // TODO-2 vielleicht in ApplicationConfig?
-        //val p: Int = page.map(p => p-1).getOrElse(config.catalogConfig.defaultPage)
-        //val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
+        if (isNullOrEmpty(query)) return Future { ResultWrapper.empty() }
+        if (page < 1)             return Future { ResultWrapper.empty() }
+        if (size < 1)             return Future { ResultWrapper.empty() }
 
         (bus ? SearchIndex(query, page, size)).map {
             case SearchResults(_, results) => results
@@ -111,7 +105,7 @@ class DisposiaEngine {
     }
 
     def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-        val p: Int = page.getOrElse(config.catalogConfig.defaultPage)
+        val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
         val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
         (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
@@ -140,8 +134,8 @@ class DisposiaEngine {
 
     def findFeed(exo: String): Future[Option[Feed]] = {
         (bus ? GetFeed(exo)).map {
-            case FeedResult(feed) => Some(feed)
-            case NothingFound(unknown)  => None
+            case FeedResult(feed)      => Some(feed)
+            case NothingFound(unknown) => None
         }
     }
 

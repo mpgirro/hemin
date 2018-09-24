@@ -44,7 +44,9 @@ object ExoConfig {
                 indexPath      = config.getString("echo.index.index-path"), // TODO add to config file
                 createIndex    = config.getBoolean("echo.index.create-index"),
                 commitInterval = config.getInt("echo.index.commit-interval").seconds,
-                workerCount    = config.getInt("echo.index.handler-count")
+                workerCount    = config.getInt("echo.index.handler-count"),
+                defaultPage    = config.getInt("echo.index.default-page"),
+                defaultSize    = config.getInt("echo.index.default-size"),
             ),
             parserConfig = ParserConfig(
                 workerCount = config.getInt("echo.parser.worker-count")
@@ -68,6 +70,8 @@ object ExoConfig {
             "echo.index.create-index"         -> false,
             "echo.index.commit-interval"      -> 3,
             "echo.index.handler-count"        -> 5,
+            "echo.index.default-page"         -> 1,
+            "echo.index.default-size"         -> 20,
             "echo.parser.worker-count"        -> 2,
             "echo.internal-timeout"           -> 5
         )

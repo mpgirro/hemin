@@ -9,5 +9,7 @@ case class IndexConfig (
     indexPath: String,
     createIndex: Boolean,
     commitInterval: FiniteDuration,
-    workerCount: Int
+    workerCount: Int,
+    defaultPage: Int,
+    defaultSize: Int
 )
