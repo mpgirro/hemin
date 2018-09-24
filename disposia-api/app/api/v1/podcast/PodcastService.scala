@@ -21,6 +21,8 @@ class PodcastService @Inject()(engineService: EngineService)
 
     def find(id: String)(implicit mc: MarkerContext): Future[Option[Podcast]] = engine.findPodcast(id)
 
+    def all(p: Option[Int], s: Option[Int])(implicit mc: MarkerContext): Future[List[Podcast]] = engine.findAllPodcasts(p, s)
+
     def episodes(id: String)(implicit mc: MarkerContext): Future[List[Episode]] = engine.findEpisodesByPodcast(id)
 
     def feeds(id: String)(implicit mc: MarkerContext): Future[List[Feed]] = engine.findFeedsByPodcast(id)

@@ -43,6 +43,14 @@ class PodcastController @Inject()(cc: PodcastControllerComponents,
             }
         }
 
+    def all(p: Option[Int], s: Option[Int]): Action[AnyContent] =
+        PodcastAction.async { implicit request =>
+            log.trace(s"GET all podcast: p = $p & s = $s")
+            podcastService.all(p, s).map { podcasts =>
+                Ok(Json.toJson(ArrayWrapper(podcasts)))
+            }
+        }
+
     def episodes(id: String): Action[AnyContent] =
         PodcastAction.async { implicit request =>
             log.trace(s"GET episodes by podcast: id = $id")
