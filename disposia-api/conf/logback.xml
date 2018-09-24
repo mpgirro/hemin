@@ -56,7 +56,7 @@
     <logger name="application" level="DEBUG" />
     <logger name="controllers" level="TRACE" />
     <logger name="services" level="INFO" />
-    <logger name="v1" level="TRACE" />
+    <logger name="api.v1" level="TRACE" />
 
     <logger name="io.disposia" level="INFO" />
     <logger name="ch.qos.logback" level="WARN"/>
