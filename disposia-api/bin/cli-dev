@@ -1,23 +1,31 @@
 #!/usr/bin/env bash
 
-function propose
-{
+function propose() {
     curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/propose
 }
 
-function search
-{
+function search() {
     curl "http://localhost:9000/api/v1/search?q=${1}&p=1&s=20"
 }
 
-function podcast
-{
+function podcast() {
     curl "http://localhost:9000/api/v1/podcast/${1}"
 }
 
-function episode
-{
+function podcast_episodes() {
+    curl "http://localhost:9000/api/v1/podcast/${1}/episodes"
+}
+
+function podcast_feeds() {
+    curl "http://localhost:9000/api/v1/podcast/${1}/feeds"
+}
+
+function episode() {
     curl "http://localhost:9000/api/v1/episode/${1}"
+}
+
+function episode_chapters() {
+    curl "http://localhost:9000/api/v1/episode/${1}/chapters"
 }
 
 COMMAND=$@
@@ -32,8 +40,17 @@ case $1 in
     "podcast")
         podcast $2
         ;;
+    "podcast-episodes")
+        podcast_episodes $2
+        ;;
+    "podcast-feeds")
+        podcast_feeds $2
+        ;;
     "episode")
-        propose $2
+        episode $2
+        ;;
+    "episode-chapters")
+        episode_chapters $2
         ;;
     *)
         # unknown option
