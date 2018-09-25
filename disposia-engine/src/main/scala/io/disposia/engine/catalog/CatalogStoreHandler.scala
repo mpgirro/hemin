@@ -126,9 +126,9 @@ class CatalogStoreHandler(workerIndex: Int,
         Await.result(resolveDB(ec), 10.seconds)
 
     def mongoCollection(collectionName: String)(implicit ec: ExecutionContext): BSONCollection = {
-        //db(ec).apply(collectionName)
-        val theDB = db(ec)
-        theDB[BSONCollection](collectionName)
+        db(ec).apply(collectionName)
+        //val theDB = db(ec)
+        //theDB[BSONCollection](collectionName)
     }
 
 
@@ -471,8 +471,24 @@ class CatalogStoreHandler(workerIndex: Int,
         doInTransaction(task, List(podcastService,episodeService))
     }
 
-    private def onGetPodcast(podcastExo: String): Unit = {
-        log.debug("Received GetPodcast('{}')", podcastExo)
+    private def onGetPodcast(exo: String): Unit = {
+        log.debug("Received GetPodcast('{}')", exo)
+
+        val theSender = sender()
+        podcastService
+            .find(exo)
+            .onComplete {
+                case Success(podcast) =>
+                    podcast match {
+                        case Some(p) => theSender ! PodcastResult(idMapper.clearImmutable(p))
+                        case None    =>
+                            log.warning("Database does not contain Podcast (EXO) : {}", exo)
+                            theSender ! NothingFound(exo)
+                    }
+                case Failure(reason)  => log.error("Could not retrieve Podcast : {}", reason)
+            }
+
+        /*
         def task = () => {
             podcastService.findOneByExo(podcastExo).map(p => {
                 Some(p)
@@ -488,6 +504,7 @@ class CatalogStoreHandler(workerIndex: Int,
             }).getOrElse({
                 sender ! NothingFound(podcastExo)
             })
+            */
     }
 
     private def onGetAllPodcasts(page: Int, size: Int): Unit = {
@@ -518,8 +535,24 @@ class CatalogStoreHandler(workerIndex: Int,
         sender ! AllFeedsResult(feeds.map(f => idMapper.clearImmutable(f)))
     }
 
-    private def onGetEpisode(episodeExo: String): Unit= {
-        log.debug("Received GetEpisode('{}')", episodeExo)
+    private def onGetEpisode(exo: String): Unit= {
+        log.debug("Received GetEpisode('{}')", exo)
+
+        val theSender = sender()
+        episodeService
+            .find(exo)
+            .onComplete {
+                case Success(episode) =>
+                    episode match {
+                        case Some(e) => theSender ! EpisodeResult(idMapper.clearImmutable(e))
+                        case None    =>
+                            log.warning("Database does not contain Episode (EXO) : {}", exo)
+                            theSender ! NothingFound(exo)
+                    }
+                case Failure(reason)  => log.error("Could not retrieve Episode : {}", reason)
+          }
+
+        /*
         def task = () => {
             episodeService.findOneByExo(episodeExo).map(e => {
                 Some(e)
@@ -535,6 +568,7 @@ class CatalogStoreHandler(workerIndex: Int,
             }).getOrElse({
                 sender ! NothingFound(episodeExo)
             })
+            */
     }
 
     private def onGetEpisodesByPodcast(podcastId: String): Unit = {
@@ -568,6 +602,22 @@ class CatalogStoreHandler(workerIndex: Int,
 
     private def onGetFeed(exo: String): Unit = {
         log.debug("Received GetFeed('{}')", exo)
+
+        val theSender = sender()
+        feedService
+            .find(exo)
+            .onComplete {
+                case Success(feed) =>
+                    feed match {
+                        case Some(f) => theSender ! FeedResult(idMapper.clearImmutable(f))
+                        case None    =>
+                            log.warning("Database does not contain Feed (EXO) : {}", exo)
+                            theSender ! NothingFound(exo)
+                    }
+                case Failure(reason)  => log.error("Could not retrieve Feed : {}", reason)
+            }
+
+        /*
         def task = () => {
             feedService.findOneByExo(exo).map(e => {
                 Some(e)
@@ -583,6 +633,7 @@ class CatalogStoreHandler(workerIndex: Int,
             }).getOrElse({
             sender ! NothingFound(exo)
         })
+        */
     }
 
     private def onCheckPodcast(podcastId: String): Unit = {

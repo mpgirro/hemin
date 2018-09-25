@@ -32,7 +32,7 @@ class EpisodeMongoRepository (collection: BSONCollection)
             .one(episode)
             .map(_ => {})
             */
-        println("Writing Episode DTO to mongodb collection : " + collection.name)
+        //println("Writing Episode DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> episode.getExo)
         collection
             .update(query, episode, upsert = true)

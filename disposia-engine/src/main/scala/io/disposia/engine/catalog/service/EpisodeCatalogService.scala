@@ -50,7 +50,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
             .onComplete {
                 case Success(result) =>
                     result match {
-                        case Some(e) => log.info("Saved to MongoDB : {}", e)
+                        case Some(e) => log.debug("Saved to MongoDB : {}", e)
                         case None    => log.warning("Episode was not saved to MongoDB")
                     }
                 case Failure(reason) =>
@@ -71,17 +71,17 @@ class EpisodeCatalogService(log: LoggingAdapter,
             .map(e => episodeMapper.toImmutable(e))
     }
 
+    def find(exo: String): Future[Option[Episode]] = {
+        log.debug("Request to get Episode (EXO) : {}", exo)
+        mongoRepo.findByExo(exo)
+    }
+
     @Transactional(readOnly = true)
     def findOneByExo(episodeExo: String): Option[Episode] = {
         log.debug("Request to get Episode (EXO) : {}", episodeExo)
         Option(episodeExo)
           .map(exo => episodeRepository.findOneByExo(exo))
           .map(e => episodeMapper.toImmutable(e))
-
-        /*
-        val r = mongoService.findByExo(episodeExo)
-        Await.result(r, 10.seconds)
-        */
     }
 
     @Transactional(readOnly = true)

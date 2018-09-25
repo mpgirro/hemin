@@ -36,7 +36,7 @@ class ChapterMongoRepository (collection: BSONCollection)
             .one(chapter)
             .map(_ => {})
             */
-        println("Writing Chapter DTO to mongodb collection : " + collection.name)
+        //println("Writing Chapter DTO to mongodb collection : " + collection.name)
         collection
             .insert[Chapter](ordered = false)
             .one(chapter)

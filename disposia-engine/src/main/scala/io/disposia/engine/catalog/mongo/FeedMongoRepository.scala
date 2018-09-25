@@ -25,7 +25,7 @@ class FeedMongoRepository (collection: BSONCollection)
             .one(feed)
             .map(_ => {})
             */
-        println("Writing Feed DTO to mongodb collection : " + collection.name)
+        //println("Writing Feed DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> feed.getExo)
         collection
             .update(query, feed, upsert = true)

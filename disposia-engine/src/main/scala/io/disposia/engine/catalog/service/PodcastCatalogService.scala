@@ -15,7 +15,8 @@ import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 
 import scala.collection.JavaConverters._
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
 /**
@@ -50,7 +51,7 @@ class PodcastCatalogService(log: LoggingAdapter,
             .onComplete {
                 case Success(result) =>
                     result match {
-                        case Some(p) => log.info("Saved to MongoDB : {}", p)
+                        case Some(p) => log.debug("Saved to MongoDB : {}", p)
                         case None    => log.warning("Podcast was not saved to MongoDB")
                     }
                 case Failure(reason) =>
@@ -69,6 +70,11 @@ class PodcastCatalogService(log: LoggingAdapter,
         Option(dbId)
           .map(id => podcastRepository.findOne(id))
           .map(p => podcastMapper.toImmutable(p))
+    }
+
+    def find(exo: String): Future[Option[Podcast]] = {
+        log.debug("Request to get Podcast (EXO) : {}", exo)
+        mongoRepo.findByExo(exo)
     }
 
     @Transactional

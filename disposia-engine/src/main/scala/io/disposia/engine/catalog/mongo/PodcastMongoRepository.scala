@@ -27,12 +27,11 @@ class PodcastMongoRepository (collection: BSONCollection)
                     println("ERROR on saving podcast : " + e.writeErrors)
             })
          */
-        println("Writing Podcast DTO to mongodb collection : " + collection.name)
+        //println("Writing Podcast DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> podcast.getExo)
         collection
             .update(query, podcast, upsert = true)
-            .flatMap { _ =>
-                findByExo(podcast.getExo) }
+            .flatMap { _ => findByExo(podcast.getExo) }
 
     }
 

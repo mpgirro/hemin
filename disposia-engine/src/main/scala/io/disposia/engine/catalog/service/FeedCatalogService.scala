@@ -49,7 +49,7 @@ class FeedCatalogService(log: LoggingAdapter,
             .onComplete {
                 case Success(result) =>
                     result match {
-                        case Some(f) => log.info("Saved to MongoDB : {}", f)
+                        case Some(f) => log.debug("Saved to MongoDB : {}", f)
                         case None    => log.warning("Feed was not saved to MongoDB")
                     }
                 case Failure(reason) =>
@@ -60,6 +60,11 @@ class FeedCatalogService(log: LoggingAdapter,
           .map(f => feedMapper.toEntity(f))
           .map(f => feedRepository.save(f))
           .map(f => feedMapper.toImmutable(f))
+    }
+
+    def find(exo: String): Future[Option[Feed]] = {
+        log.debug("Request to get Feed (EXO) : {}", exo)
+        mongoRepo.findByExo(exo)
     }
 
     @Transactional
