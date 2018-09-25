@@ -25,7 +25,7 @@ import scala.util.{Failure, Success}
 @Transactional
 class FeedCatalogService(log: LoggingAdapter,
                          rfb: RepositoryFactoryBuilder,
-                         collection: BSONCollection)
+                         db: DefaultDB)
                         (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -34,7 +34,7 @@ class FeedCatalogService(log: LoggingAdapter,
 
     private val feedMapper = FeedMapper.INSTANCE
 
-    private val mongoRepo = new FeedMongoRepository(collection)
+    private val mongoRepo = new FeedMongoRepository(db, ec)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -64,7 +64,7 @@ class FeedCatalogService(log: LoggingAdapter,
 
     def find(exo: String): Future[Option[Feed]] = {
         log.debug("Request to get Feed (EXO) : {}", exo)
-        mongoRepo.findByExo(exo)
+        mongoRepo.find(exo)
     }
 
     @Transactional
@@ -118,7 +118,7 @@ class FeedCatalogService(log: LoggingAdapter,
             .map(f => feedMapper.toImmutable(f))
             .toList
             */
-        val r = mongoRepo.findAllByEpisodeExo(podcastExo)
+        val r = mongoRepo.findAllByPodcast(podcastExo)
         Await.result(r, 10.seconds)
     }
 

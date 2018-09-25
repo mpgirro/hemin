@@ -1,21 +1,25 @@
 package io.disposia.engine.catalog.mongo
 
+import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.dto.Podcast
+import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PodcastMongoRepository (collection: BSONCollection)
-                             (implicit ec: ExecutionContext) {
+class PodcastMongoRepository (db: DefaultDB, ec: ExecutionContext)
+    extends MongoRepository[Podcast] {
+    
+    private val log = Logger(classOf[PodcastMongoRepository])
 
-    /*
-    private def collection: BSONCollection = db.collection("podcasts")
-    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
-    */
+    override protected[this] implicit def executionContext: ExecutionContext = ec
 
-    private implicit val podcastWriter: BsonConversion.PodcastWriter.type = BsonConversion.PodcastWriter
-    private implicit val podcastReader: BsonConversion.PodcastReader.type = BsonConversion.PodcastReader
+    override protected[this] implicit def writer: BSONDocumentWriter[Podcast] = BsonConversion.PodcastWriter
+
+    override protected[this] implicit def reader: BSONDocumentReader[Podcast] = BsonConversion.PodcastReader
+
+    override protected[this] def collection(): BSONCollection = db.apply("podcasts")
 
     def save(podcast: Podcast): Future[Option[Podcast]] = {
         /*
@@ -29,17 +33,16 @@ class PodcastMongoRepository (collection: BSONCollection)
          */
         //println("Writing Podcast DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> podcast.getExo)
-        collection
+        collection()
             .update(query, podcast, upsert = true)
-            .flatMap { _ => findByExo(podcast.getExo) }
+            .flatMap { _ => find(podcast.getExo) }
 
     }
 
-    def findByExo(exo: String): Future[Option[Podcast]] = {
+    def find(exo: String): Future[Option[Podcast]] = {
+        log.debug("Request to get Podcast (EXO) : {}", exo)
         val query = BSONDocument("exo" -> exo)
-        collection
-            .find(query)
-            .one[Podcast]
+        findOneByQuery(query)
     }
 
 }

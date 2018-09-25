@@ -24,7 +24,7 @@ import scala.util.{Failure, Success}
 @Transactional
 class EpisodeCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            collection: BSONCollection)
+                            db: DefaultDB)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -35,7 +35,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
     private val episodeMapper = EpisodeMapper.INSTANCE
     private val teaserMapper = TeaserMapper.INSTANCE
 
-    private val mongoRepo = new EpisodeMongoRepository(collection)
+    private val mongoRepo = new EpisodeMongoRepository(db, ec)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -73,7 +73,7 @@ class EpisodeCatalogService(log: LoggingAdapter,
 
     def find(exo: String): Future[Option[Episode]] = {
         log.debug("Request to get Episode (EXO) : {}", exo)
-        mongoRepo.findByExo(exo)
+        mongoRepo.findOne(exo)
     }
 
     @Transactional(readOnly = true)

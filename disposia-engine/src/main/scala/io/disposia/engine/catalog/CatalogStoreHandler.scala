@@ -141,10 +141,10 @@ class CatalogStoreHandler(workerIndex: Int,
         }
      */
 
-    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder, mongoCollection("podcasts"))
-    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder, mongoCollection("episodes"))
-    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, mongoCollection("feeds"))
-    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder, mongoCollection("chapters"))
+    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder, db)
+    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder, db)
+    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, db)
+    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder, db)
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE

@@ -1,22 +1,25 @@
 package io.disposia.engine.catalog.mongo
 
+import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.dto.Feed
-import reactivemongo.api.Cursor
 import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedMongoRepository (collection: BSONCollection)
-                          (implicit ec: ExecutionContext) {
+class FeedMongoRepository (db: DefaultDB, ec: ExecutionContext)
+    extends MongoRepository[Feed] {
 
-    /*
-    private def collection: BSONCollection = db.collection("feeds")
-    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
-    */
+    private val log = Logger(classOf[FeedMongoRepository])
 
-    private implicit val feedWriter: BsonConversion.FeedWriter.type = BsonConversion.FeedWriter
-    private implicit val feedReader: BsonConversion.FeedReader.type = BsonConversion.FeedReader
+    override protected[this] implicit def executionContext: ExecutionContext = ec
+
+    override protected[this] implicit def writer: BSONDocumentWriter[Feed] = BsonConversion.FeedWriter
+
+    override protected[this] implicit def reader: BSONDocumentReader[Feed] = BsonConversion.FeedReader
+
+    override protected[this] def collection(): BSONCollection = db.apply("feeds")
 
     def save(feed: Feed): Future[Option[Feed]] = {
         /*
@@ -27,10 +30,10 @@ class FeedMongoRepository (collection: BSONCollection)
             */
         //println("Writing Feed DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> feed.getExo)
-        collection
+        collection()
             .update(query, feed, upsert = true)
             .flatMap { _ =>
-                findByExo(feed.getExo) }
+                find(feed.getExo) }
         /*
         val writeRes: Future[WriteResult] =
             collection.insert[BSONDocument](ordered = false).one(document)
@@ -52,19 +55,15 @@ class FeedMongoRepository (collection: BSONCollection)
         */
     }
 
-    def findByExo(exo: String): Future[Option[Feed]] = {
+    def find(exo: String): Future[Option[Feed]] = {
+        log.debug("Request to get Feed (EXO) : {}", exo)
         val query = BSONDocument("exo" -> exo)
-        collection
-            .find(query)
-            .one[Feed]
+        findOneByQuery(query)
     }
 
-    def findAllByEpisodeExo(podcastExo: String): Future[List[Feed]] = {
+    def findAllByPodcast(podcastExo: String): Future[List[Feed]] = {
         val query = BSONDocument("podcastExo" -> podcastExo)
-        collection
-            .find(query)
-            .cursor[Feed]()
-            .collect[List](-1, Cursor.FailOnError[List[Feed]]()) // -1 to get all matches
+        findAllByQuery(query)
     }
 
 }

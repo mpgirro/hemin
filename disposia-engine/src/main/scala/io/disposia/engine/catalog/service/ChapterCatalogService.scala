@@ -22,7 +22,7 @@ import scala.util.{Failure, Success}
   */
 class ChapterCatalogService(log: LoggingAdapter,
                             rfb: RepositoryFactoryBuilder,
-                            collection: BSONCollection)
+                            db: DefaultDB)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -31,7 +31,7 @@ class ChapterCatalogService(log: LoggingAdapter,
 
     private val chapterMapper = ChapterMapper.INSTANCE
 
-    private val mongoRepo = new ChapterMongoRepository(collection)
+    private val mongoRepo = new ChapterMongoRepository(db, ec)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -102,7 +102,7 @@ class ChapterCatalogService(log: LoggingAdapter,
             .map(c => chapterMapper.toModifiable(c).toImmutable)
             .toList
             */
-        val f = mongoRepo.findAllByEpisodeExo(episodeExo)
+        val f = mongoRepo.findAllByEpisode(episodeExo)
         Await.result(f, 10.seconds)
     }
 

@@ -1,23 +1,25 @@
 package io.disposia.engine.catalog.mongo
 
+import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.dto.Chapter
-import reactivemongo.api.Cursor
+import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChapterMongoRepository (collection: BSONCollection)
-                             (implicit ec: ExecutionContext) {
+class ChapterMongoRepository (db: DefaultDB, ec: ExecutionContext)
+    extends MongoRepository[Chapter] {
 
-    /*
-    private def collection: BSONCollection = db.collection("chapters")
-    collection.create() // TODO ensure that the collection exists -> brauch ich das? mache ich nur weil Podcasts/Chapters gerade nicht geschrieben werden
-    */
+    private val log = Logger(classOf[ChapterMongoRepository])
 
-    private implicit val chapterWriter: BsonConversion.ChapterWriter.type = BsonConversion.ChapterWriter
-    private implicit val chapterReader: BsonConversion.ChapterReader.type = BsonConversion.ChapterReader
+    override protected[this] implicit def executionContext: ExecutionContext = ec
 
+    override protected[this] implicit def writer: BSONDocumentWriter[Chapter] = BsonConversion.ChapterWriter
+
+    override protected[this] implicit def reader: BSONDocumentReader[Chapter] = BsonConversion.ChapterReader
+
+    override def collection(): BSONCollection = db.apply("chapters")
 
     // TODO this writes, but does not OVERWRITE existing chapter with same EXO!!
     def save(chapter: Chapter): Future[Unit] = {
@@ -58,18 +60,15 @@ class ChapterMongoRepository (collection: BSONCollection)
     }
 
     def findByExo(exo: String): Future[Option[Chapter]] = {
+        log.debug("Request to get Chapter (EXO) : {}", exo)
         val query = BSONDocument("exo" -> exo)
-        collection
-            .find(query)
-            .one[Chapter]
+        findOneByQuery(query)
     }
 
-    def findAllByEpisodeExo(episodeExo: String): Future[List[Chapter]] = {
+    def findAllByEpisode(episodeExo: String): Future[List[Chapter]] = {
+        log.debug("Request to get all Chapters by Episode (EXO) : {}", episodeExo)
         val query = BSONDocument("episodeExo" -> episodeExo)
-        collection
-            .find(query)
-            .cursor[Chapter]()
-            .collect[List](-1, Cursor.FailOnError[List[Chapter]]())
+        findAllByQuery(query)
     }
 
 }
