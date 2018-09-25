@@ -15,9 +15,9 @@ class FeedMongoRepository (db: DefaultDB, ec: ExecutionContext)
 
     override protected[this] implicit def executionContext: ExecutionContext = ec
 
-    override protected[this] implicit def writer: BSONDocumentWriter[Feed] = BsonConversion.FeedWriter
+    override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.FeedWriter
 
-    override protected[this] implicit def reader: BSONDocumentReader[Feed] = BsonConversion.FeedReader
+    override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.FeedReader
 
     override protected[this] def collection(): BSONCollection = db.apply("feeds")
 
@@ -33,7 +33,7 @@ class FeedMongoRepository (db: DefaultDB, ec: ExecutionContext)
         collection()
             .update(query, feed, upsert = true)
             .flatMap { _ =>
-                find(feed.getExo) }
+                findOne(feed.getExo) }
         /*
         val writeRes: Future[WriteResult] =
             collection.insert[BSONDocument](ordered = false).one(document)
@@ -55,7 +55,7 @@ class FeedMongoRepository (db: DefaultDB, ec: ExecutionContext)
         */
     }
 
-    def find(exo: String): Future[Option[Feed]] = {
+    def findOne(exo: String): Future[Option[Feed]] = {
         log.debug("Request to get Feed (EXO) : {}", exo)
         val query = BSONDocument("exo" -> exo)
         findOneByQuery(query)

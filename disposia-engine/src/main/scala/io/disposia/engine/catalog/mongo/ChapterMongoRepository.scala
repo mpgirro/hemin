@@ -15,9 +15,9 @@ class ChapterMongoRepository (db: DefaultDB, ec: ExecutionContext)
 
     override protected[this] implicit def executionContext: ExecutionContext = ec
 
-    override protected[this] implicit def writer: BSONDocumentWriter[Chapter] = BsonConversion.ChapterWriter
+    override protected[this] implicit def bsonWriter: BSONDocumentWriter[Chapter] = BsonConversion.ChapterWriter
 
-    override protected[this] implicit def reader: BSONDocumentReader[Chapter] = BsonConversion.ChapterReader
+    override protected[this] implicit def bsonReader: BSONDocumentReader[Chapter] = BsonConversion.ChapterReader
 
     override def collection(): BSONCollection = db.apply("chapters")
 

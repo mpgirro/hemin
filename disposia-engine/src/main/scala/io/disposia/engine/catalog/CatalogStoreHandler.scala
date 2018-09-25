@@ -9,7 +9,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.Publish
 import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.catalog.mongo.ChapterMongoRepository
+import io.disposia.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository, FeedMongoRepository, PodcastMongoRepository}
 import io.disposia.engine.catalog.repository.RepositoryFactoryBuilder
 import io.disposia.engine.catalog.service._
 import io.disposia.engine.config.CatalogConfig
@@ -124,14 +124,11 @@ class CatalogStoreHandler(workerIndex: Int,
 
     def db(implicit ec: ExecutionContext): DefaultDB =
         Await.result(resolveDB(ec), 10.seconds)
-
-    def mongoCollection(collectionName: String)(implicit ec: ExecutionContext): BSONCollection = {
-        db(ec).apply(collectionName)
-        //val theDB = db(ec)
-        //theDB[BSONCollection](collectionName)
-    }
-
-
+    
+    private val podcastRepo: PodcastMongoRepository = new PodcastMongoRepository(db, executionContext)
+    private val episodetRepo: EpisodeMongoRepository = new EpisodeMongoRepository(db, executionContext)
+    private val feedRepo: FeedMongoRepository = new FeedMongoRepository(db, executionContext)
+    private val chapterRepo: ChapterMongoRepository = new ChapterMongoRepository(db, executionContext)
 
     /* TODO
      private def registerDriverShutdownHook(mongoDriver: MongoDriver): Unit =
@@ -475,17 +472,17 @@ class CatalogStoreHandler(workerIndex: Int,
         log.debug("Received GetPodcast('{}')", exo)
 
         val theSender = sender()
-        podcastService
-            .find(exo)
+        podcastRepo
+            .findOne(exo)
             .onComplete {
                 case Success(podcast) =>
                     podcast match {
-                        case Some(p) => theSender ! PodcastResult(idMapper.clearImmutable(p))
+                        case Some(p) => theSender ! PodcastResult(p)
                         case None    =>
                             log.warning("Database does not contain Podcast (EXO) : {}", exo)
                             theSender ! NothingFound(exo)
                     }
-                case Failure(reason)  => log.error("Could not retrieve Podcast : {}", reason)
+                case Failure(reason) => log.error("Could not retrieve Podcast : {}", reason)
             }
 
         /*
@@ -539,17 +536,17 @@ class CatalogStoreHandler(workerIndex: Int,
         log.debug("Received GetEpisode('{}')", exo)
 
         val theSender = sender()
-        episodeService
-            .find(exo)
+        episodetRepo
+            .findOne(exo)
             .onComplete {
                 case Success(episode) =>
                     episode match {
-                        case Some(e) => theSender ! EpisodeResult(idMapper.clearImmutable(e))
+                        case Some(e) => theSender ! EpisodeResult(e)
                         case None    =>
                             log.warning("Database does not contain Episode (EXO) : {}", exo)
                             theSender ! NothingFound(exo)
                     }
-                case Failure(reason)  => log.error("Could not retrieve Episode : {}", reason)
+                case Failure(reason) => log.error("Could not retrieve Episode : {}", reason)
           }
 
         /*
@@ -574,47 +571,78 @@ class CatalogStoreHandler(workerIndex: Int,
     private def onGetEpisodesByPodcast(podcastId: String): Unit = {
         log.debug("Received GetEpisodesByPodcast('{}')", podcastId)
 
+        val theSender = sender()
+        episodetRepo
+            .findAllByPodcast(podcastId)
+            .onComplete {
+                case Success(es) => theSender ! EpisodesByPodcastResult(es)
+                case Failure(ex) => log.error("Could not retrieve Episodes by Podcast : {}", ex)
+            }
+
+        /*
         def task = () => {
             episodeService.findAllByPodcastAsTeaser(podcastId)
         }
         val episodes = doInTransaction(task, List(episodeService)).asInstanceOf[List[Episode]]
         sender ! EpisodesByPodcastResult(episodes.map(e => idMapper.clearImmutable(e)))
+        */
     }
 
     private def onGetFeedsByPodcast(podcastId: String): Unit = {
         log.debug("Received GetFeedsByPodcast('{}')", podcastId)
+
+        val theSender = sender()
+        feedRepo
+            .findAllByPodcast(podcastId)
+            .onComplete {
+                case Success(fs) => theSender ! FeedsByPodcastResult(fs)
+                case Failure(ex) => log.error("Could not retrieve Feeds by Podcast : {}", ex)
+            }
+
+        /*
         def task = () => {
             feedService.findAllByPodcast(podcastId)
         }
         val feeds = doInTransaction(task, List(feedService)).asInstanceOf[List[Feed]]
         sender ! FeedsByPodcastResult(feeds.map(f => idMapper.clearImmutable(f)))
+        */
     }
 
     private def onGetChaptersByEpisode(episodeId: String): Unit = {
         log.debug("Received GetChaptersByEpisode('{}')", episodeId)
 
+        val theSender = sender()
+        chapterRepo
+            .findAllByEpisode(episodeId)
+            .onComplete {
+                case Success(cs) => theSender ! ChaptersByEpisodeResult(cs)
+                case Failure(ex) => log.error("Could not retrieve Chapters By Episode : {}", ex)
+            }
+
+        /*
         def task = () => {
             chapterService.findAllByEpisode(episodeId)
         }
         val chapters = doInTransaction(task, List(chapterService)).asInstanceOf[List[Chapter]]
         sender ! ChaptersByEpisodeResult(chapters.map(c => idMapper.clearImmutable(c)))
+        */
     }
 
     private def onGetFeed(exo: String): Unit = {
         log.debug("Received GetFeed('{}')", exo)
 
         val theSender = sender()
-        feedService
-            .find(exo)
+        feedRepo
+            .findOne(exo)
             .onComplete {
                 case Success(feed) =>
                     feed match {
-                        case Some(f) => theSender ! FeedResult(idMapper.clearImmutable(f))
+                        case Some(f) => theSender ! FeedResult(f)
                         case None    =>
                             log.warning("Database does not contain Feed (EXO) : {}", exo)
                             theSender ! NothingFound(exo)
                     }
-                case Failure(reason)  => log.error("Could not retrieve Feed : {}", reason)
+                case Failure(reason) => log.error("Could not retrieve Feed : {}", reason)
             }
 
         /*

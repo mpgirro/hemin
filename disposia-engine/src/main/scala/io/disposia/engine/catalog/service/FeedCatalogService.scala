@@ -64,7 +64,7 @@ class FeedCatalogService(log: LoggingAdapter,
 
     def find(exo: String): Future[Option[Feed]] = {
         log.debug("Request to get Feed (EXO) : {}", exo)
-        mongoRepo.find(exo)
+        mongoRepo.findOne(exo)
     }
 
     @Transactional

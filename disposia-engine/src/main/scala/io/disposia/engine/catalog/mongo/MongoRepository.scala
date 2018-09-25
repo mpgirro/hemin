@@ -9,8 +9,8 @@ import scala.concurrent.{ExecutionContext, Future}
 trait MongoRepository[T] {
 
     protected[this] implicit def executionContext: ExecutionContext
-    protected[this] implicit def writer: BSONDocumentWriter[T]
-    protected[this] implicit def reader: BSONDocumentReader[T]
+    protected[this] implicit def bsonWriter: BSONDocumentWriter[T]
+    protected[this] implicit def bsonReader: BSONDocumentReader[T]
 
     protected[this] def collection(): BSONCollection
 

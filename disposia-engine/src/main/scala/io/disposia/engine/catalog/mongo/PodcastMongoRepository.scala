@@ -10,14 +10,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PodcastMongoRepository (db: DefaultDB, ec: ExecutionContext)
     extends MongoRepository[Podcast] {
-    
+
     private val log = Logger(classOf[PodcastMongoRepository])
 
     override protected[this] implicit def executionContext: ExecutionContext = ec
 
-    override protected[this] implicit def writer: BSONDocumentWriter[Podcast] = BsonConversion.PodcastWriter
+    override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = BsonConversion.PodcastWriter
 
-    override protected[this] implicit def reader: BSONDocumentReader[Podcast] = BsonConversion.PodcastReader
+    override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = BsonConversion.PodcastReader
 
     override protected[this] def collection(): BSONCollection = db.apply("podcasts")
 
@@ -35,11 +35,11 @@ class PodcastMongoRepository (db: DefaultDB, ec: ExecutionContext)
         val query = BSONDocument("exo" -> podcast.getExo)
         collection()
             .update(query, podcast, upsert = true)
-            .flatMap { _ => find(podcast.getExo) }
+            .flatMap { _ => findOne(podcast.getExo) }
 
     }
 
-    def find(exo: String): Future[Option[Podcast]] = {
+    def findOne(exo: String): Future[Option[Podcast]] = {
         log.debug("Request to get Podcast (EXO) : {}", exo)
         val query = BSONDocument("exo" -> exo)
         findOneByQuery(query)

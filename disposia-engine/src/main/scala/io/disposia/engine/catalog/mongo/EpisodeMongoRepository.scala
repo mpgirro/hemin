@@ -18,9 +18,9 @@ class EpisodeMongoRepository (db: DefaultDB, ec: ExecutionContext)
 
     override protected[this] implicit def executionContext: ExecutionContext = ec
 
-    override protected[this] implicit def writer: BSONDocumentWriter[Episode] = BsonConversion.EpisodeWriter
+    override protected[this] implicit def bsonWriter: BSONDocumentWriter[Episode] = BsonConversion.EpisodeWriter
 
-    override protected[this] implicit def reader: BSONDocumentReader[Episode] = BsonConversion.EpisodeReader
+    override protected[this] implicit def bsonReader: BSONDocumentReader[Episode] = BsonConversion.EpisodeReader
 
     override protected[this] def collection(): BSONCollection = db.apply("episodes")
 

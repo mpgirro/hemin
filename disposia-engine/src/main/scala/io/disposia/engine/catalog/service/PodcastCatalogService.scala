@@ -72,9 +72,9 @@ class PodcastCatalogService(log: LoggingAdapter,
           .map(p => podcastMapper.toImmutable(p))
     }
 
-    def find(exo: String): Future[Option[Podcast]] = {
+    def findOne(exo: String): Future[Option[Podcast]] = {
         log.debug("Request to get Podcast (EXO) : {}", exo)
-        mongoRepo.find(exo)
+        mongoRepo.findOne(exo)
     }
 
     @Transactional
