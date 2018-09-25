@@ -16,6 +16,7 @@ import reactivemongo.api.collections.bson.BSONCollection
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
   * @author Maximilian Irro
@@ -43,7 +44,18 @@ class FeedCatalogService(log: LoggingAdapter,
     @Transactional
     def save(feedDTO: Feed): Option[Feed] = {
         log.debug("Request to save Feed : {}", feedDTO)
-        mongoRepo.save(feedDTO)
+        mongoRepo
+            .save(feedDTO)
+            .onComplete {
+                case Success(result) =>
+                    result match {
+                        case Some(f) => log.info("Saved to MongoDB : {}", f)
+                        case None    => log.warning("Feed was not saved to MongoDB")
+                    }
+                case Failure(reason) =>
+                    log.error("Saving to MongoDB failed : {}", reason)
+                    reason.printStackTrace()
+            }
         Option(feedDTO)
           .map(f => feedMapper.toEntity(f))
           .map(f => feedRepository.save(f))

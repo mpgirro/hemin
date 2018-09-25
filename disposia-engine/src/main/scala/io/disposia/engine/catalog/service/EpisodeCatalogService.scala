@@ -15,6 +15,7 @@ import reactivemongo.api.collections.bson.BSONCollection
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /**
   * @author Maximilian Irro
@@ -44,7 +45,18 @@ class EpisodeCatalogService(log: LoggingAdapter,
     @Transactional
     def save(episodeDTO: Episode): Option[Episode] = {
         log.debug("Request to save Episode : {}", episodeDTO)
-        mongoRepo.save(episodeDTO)
+        mongoRepo
+            .save(episodeDTO)
+            .onComplete {
+                case Success(result) =>
+                    result match {
+                        case Some(e) => log.info("Saved to MongoDB : {}", e)
+                        case None    => log.warning("Episode was not saved to MongoDB")
+                    }
+                case Failure(reason) =>
+                    log.error("Saving to MongoDB failed : {}", reason)
+                    reason.printStackTrace()
+            }
         Option(episodeDTO)
           .map(e => episodeMapper.toEntity(e))
           .map(e => episodeRepository.save(e))

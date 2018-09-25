@@ -16,6 +16,7 @@ import reactivemongo.api.collections.bson.BSONCollection
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 /**
   * @author Maximilian Irro
@@ -44,7 +45,18 @@ class PodcastCatalogService(log: LoggingAdapter,
     @Transactional
     def save(podcastDTO: Podcast): Option[Podcast] = {
         log.debug("Request to save Podcast : {}", podcastDTO)
-        mongoRepo.save(podcastDTO)
+        mongoRepo
+            .save(podcastDTO)
+            .onComplete {
+                case Success(result) =>
+                    result match {
+                        case Some(p) => log.info("Saved to MongoDB : {}", p)
+                        case None    => log.warning("Podcast was not saved to MongoDB")
+                    }
+                case Failure(reason) =>
+                    log.error("Saving to MongoDB failed : {}", reason)
+                    reason.printStackTrace()
+            }
         Option(podcastDTO)
           .map(p => podcastMapper.toEntity(p))
           .map(p => podcastRepository.save(p))

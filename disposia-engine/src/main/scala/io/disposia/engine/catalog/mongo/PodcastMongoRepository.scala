@@ -17,7 +17,7 @@ class PodcastMongoRepository (collection: BSONCollection)
     private implicit val podcastWriter: BsonConversion.PodcastWriter.type = BsonConversion.PodcastWriter
     private implicit val podcastReader: BsonConversion.PodcastReader.type = BsonConversion.PodcastReader
 
-    def save(podcast: Podcast): Future[Unit] = {
+    def save(podcast: Podcast): Future[Option[Podcast]] = {
         /*
         collection
             .insert[Podcast](ordered = false)
@@ -27,14 +27,12 @@ class PodcastMongoRepository (collection: BSONCollection)
                     println("ERROR on saving podcast : " + e.writeErrors)
             })
          */
-        println("Writing podcast to mongodb : " + podcast.getExo)
+        println("Writing Podcast DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> podcast.getExo)
         collection
             .update(query, podcast, upsert = true)
-            .map {
-                case ok if ok.ok   => println("podcast saved successfully")
-                case error         => println("ERROR on saving podcast : " + error.errmsg)
-            }
+            .flatMap { _ =>
+                findByExo(podcast.getExo) }
 
     }
 

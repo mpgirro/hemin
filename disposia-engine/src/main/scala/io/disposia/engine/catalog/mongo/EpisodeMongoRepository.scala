@@ -25,20 +25,19 @@ class EpisodeMongoRepository (collection: BSONCollection)
     private implicit val episodeWriter: BsonConversion.EpisodeWriter.type = BsonConversion.EpisodeWriter
     private implicit val episodeReader: BsonConversion.EpisodeReader.type = BsonConversion.EpisodeReader
 
-    def save(episode: Episode): Future[Unit] = {
+    def save(episode: Episode): Future[Option[Episode]] = {
         /*
         collection
             .insert[Episode](ordered = false)
             .one(episode)
             .map(_ => {})
             */
+        println("Writing Episode DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> episode.getExo)
         collection
             .update(query, episode, upsert = true)
-            .map {
-                case ok if ok.ok   => println("episode saved successfully")
-                case error         => println("ERROR on saving episode : " + error.errmsg)
-            }
+            .flatMap { _ =>
+                findByExo(episode.getExo) }
     }
 
     def findByExo(exo: String): Future[Option[Episode]] = {

@@ -18,20 +18,19 @@ class FeedMongoRepository (collection: BSONCollection)
     private implicit val feedWriter: BsonConversion.FeedWriter.type = BsonConversion.FeedWriter
     private implicit val feedReader: BsonConversion.FeedReader.type = BsonConversion.FeedReader
 
-    def save(feed: Feed): Future[Unit] = {
+    def save(feed: Feed): Future[Option[Feed]] = {
         /*
         collection
             .insert[Feed](ordered = false)
             .one(feed)
             .map(_ => {})
             */
+        println("Writing Feed DTO to mongodb collection : " + collection.name)
         val query = BSONDocument("exo" -> feed.getExo)
         collection
             .update(query, feed, upsert = true)
-            .map(e => {
-                if (!e.ok)
-                    println("ERROR on saving feed : " + e.writeErrors)
-            })
+            .flatMap { _ =>
+                findByExo(feed.getExo) }
         /*
         val writeRes: Future[WriteResult] =
             collection.insert[BSONDocument](ordered = false).one(document)

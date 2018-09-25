@@ -92,7 +92,7 @@ class CatalogStoreHandler(workerIndex: Int,
     val db: DefaultDB = Await.result(mongoConnection.database(dbName), 10.seconds)
     */
     //val db: Future[DefaultDB] = connection.database(dbName)
-    val db: DefaultDB = Await.result(connection.database(dbName), 10.seconds) // TODO read timeout from config
+    //val db: DefaultDB = Await.result(connection.database(dbName), 10.seconds) // TODO read timeout from config
 
     //val mongoService = new ChapterMongoRepository(db)
 

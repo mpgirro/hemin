@@ -68,7 +68,9 @@ class ChapterCatalogService(log: LoggingAdapter,
     @Transactional
     def save(chapterDTO: Chapter): Option[Chapter] = {
         log.debug("Request to save Chapter : {}", chapterDTO)
-        mongoRepo.save(chapterDTO)
+        mongoRepo
+            .save(chapterDTO)
+
         Option(chapterDTO)
           .map(c => chapterMapper.toEntity(c))
           .map(c => chapterRepository.save(c))
