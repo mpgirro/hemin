@@ -47,14 +47,10 @@ class FeedCatalogService(log: LoggingAdapter,
         mongoRepo
             .save(feedDTO)
             .onComplete {
-                case Success(result) =>
-                    result match {
-                        case Some(f) => log.debug("Saved to MongoDB : {}", f)
-                        case None    => log.warning("Feed was not saved to MongoDB")
-                    }
-                case Failure(reason) =>
-                    log.error("Saving to MongoDB failed : {}", reason)
-                    reason.printStackTrace()
+                case Success(f)  => log.debug("Saved to MongoDB : {}", f)
+                case Failure(ex) =>
+                    log.error("Saving to MongoDB failed : {}", ex)
+                    ex.printStackTrace()
             }
         Option(feedDTO)
           .map(f => feedMapper.toEntity(f))

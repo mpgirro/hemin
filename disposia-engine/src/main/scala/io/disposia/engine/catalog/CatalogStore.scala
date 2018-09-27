@@ -38,13 +38,13 @@ object CatalogStore {
     case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
     case class RegisterEpisodeIfNew(podcastExo: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
     // CatalogEvents
-    case class AddPodcastAndFeedIfUnknown(podcast: Podcast, feed: Feed) extends CatalogEvent
+    //case class AddPodcastAndFeedIfUnknown(podcast: Podcast, feed: Feed) extends CatalogEvent
     case class FeedStatusUpdate(podcastExo: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
     case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
     case class UpdateLinkByExo(exo: String, newUrl: String) extends CatalogEvent
     case class SaveChapter(chapter: Chapter) extends CatalogEvent
     case class UpdatePodcast(podcastExo: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
-    case class UpdateEpisode(podcastExo: String, episode: Episode) extends CatalogEvent
+    case class UpdateEpisode(episode: Episode) extends CatalogEvent
     case class UpdateEpisodeWithChapters(podcastExo: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
     // CatalogQueries
     case class GetPodcast(exo: String) extends CatalogQuery
@@ -58,7 +58,7 @@ object CatalogStore {
     case class GetFeed(exo: String) extends CatalogQuery
     case class CheckPodcast(exo: String) extends CatalogQuery
     case class CheckFeed(exo: String) extends CatalogQuery
-    case class CheckAllPodcasts() extends CatalogQuery
+    //case class CheckAllPodcasts() extends CatalogQuery
     case class CheckAllFeeds() extends CatalogQuery
     // CatalogQueryResults
     case class PodcastResult(podcast: Podcast) extends CatalogQueryResult

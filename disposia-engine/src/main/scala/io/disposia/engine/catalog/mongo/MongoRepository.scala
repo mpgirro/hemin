@@ -1,6 +1,7 @@
 package io.disposia.engine.catalog.mongo
 
-import reactivemongo.api.Cursor
+import com.typesafe.scalalogging.Logger
+import reactivemongo.api.{Cursor, QueryOpts}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 
@@ -8,21 +9,62 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MongoRepository[T] {
 
-    protected[this] implicit def executionContext: ExecutionContext
-    protected[this] implicit def bsonWriter: BSONDocumentWriter[T]
-    protected[this] implicit def bsonReader: BSONDocumentReader[T]
+  protected[this] implicit def executionContext: ExecutionContext
+  protected[this] implicit def bsonWriter: BSONDocumentWriter[T]
+  protected[this] implicit def bsonReader: BSONDocumentReader[T]
 
-    protected[this] def collection(): BSONCollection
+  protected[this] def collection: BSONCollection
 
-    protected[this] def findOneByQuery(query: BSONDocument): Future[Option[T]] =
-        collection()
-            .find(query)
-            .one[T]
+  protected[this] def log: Logger
 
-    protected[this] def findAllByQuery(query: BSONDocument): Future[List[T]] =
-        collection()
-            .find(query)
-            .cursor[T]()
-            .collect[List](-1, Cursor.FailOnError[List[T]]())
+  /**
+    * Find one by example
+    *
+    * @param example
+    * @return The object matching the given example
+    */
+  def findOne(example: T): Future[Option[T]] = findOne(bsonWriter.write(example))
+
+  /**
+    * Find many by example
+    *
+    * @param example
+    * @return List of objects matching the given example
+    */
+  def findAll(example: T): Future[List[T]] = findAll(bsonWriter.write(example))
+
+  protected[this] def findOne(query: BSONDocument): Future[Option[T]] =
+    collection
+      .find(query)
+      .one[T]
+      .recover {
+        case ex: Throwable =>
+          log.error("Error on findOne({}) : {}", query, ex)
+          None
+      }
+
+  protected[this] def findAll(query: BSONDocument): Future[List[T]] =
+    collection
+      .find(query)
+      .cursor[T]()
+      .collect[List](-1, Cursor.FailOnError[List[T]]())
+      .recover {
+        case ex: Throwable =>
+          log.error("Error on findAll({}) : {}", query, ex)
+          List()
+      }
+
+  // TODO untested!
+  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
+    collection
+      .find(query)
+      .options(QueryOpts(page*size, size)) // TODO start, pageSize --> (page*size, size)
+      .cursor[T]()
+      .collect[List](-1, Cursor.FailOnError[List[T]]())
+      .recover {
+        case ex: Throwable =>
+          log.error("Error on findAll({}) : {}", query, ex)
+          List()
+      }
 
 }

@@ -36,9 +36,9 @@ object EngineProtocol {
     case class DebugPrintAllPodcasts()    // User/CLI -> CatalogStore
     case class DebugPrintAllEpisodes()    // User/CLI -> CatalogStore
     case class DebugPrintAllFeeds()
-    case class DebugPrintCountAllPodcasts()
-    case class DebugPrintCountAllEpisodes()
-    case class DebugPrintCountAllFeeds()
+    //case class DebugPrintCountAllPodcasts()
+    //case class DebugPrintCountAllEpisodes()
+    //case class DebugPrintCountAllFeeds()
     case class LoadTestFeeds()            // CLI -> CatalogStore
     case class LoadMassiveFeeds()         // CLI -> CatalogStore
 

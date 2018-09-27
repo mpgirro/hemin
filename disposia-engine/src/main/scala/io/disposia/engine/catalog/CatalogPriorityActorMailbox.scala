@@ -16,9 +16,9 @@ class CatalogPriorityActorMailbox(settings: ActorSystem.Settings, config: Config
         case DebugPrintAllPodcasts      => 0
         case DebugPrintAllEpisodes      => 0
         case DebugPrintAllFeeds         => 0
-        case DebugPrintCountAllPodcasts => 0
-        case DebugPrintCountAllEpisodes => 0
-        case DebugPrintCountAllFeeds    => 0
+        //case DebugPrintCountAllPodcasts => 0
+        //case DebugPrintCountAllEpisodes => 0
+        //case DebugPrintCountAllFeeds    => 0
         case GetPodcast(_)              => 1
         case GetAllPodcasts             => 1
         case GetEpisode(_)              => 1
@@ -28,7 +28,7 @@ class CatalogPriorityActorMailbox(settings: ActorSystem.Settings, config: Config
         case ProposeNewFeed(_)          => 4
         case CheckPodcast(_)            => 5
         case CheckFeed(_)               => 5
-        case CheckAllPodcasts           => 5
+        //case CheckAllPodcasts           => 5
         case CheckAllFeeds              => 5
         case _                          => 6
     })

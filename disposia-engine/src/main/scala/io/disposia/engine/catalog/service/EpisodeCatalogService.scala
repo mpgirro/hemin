@@ -48,14 +48,10 @@ class EpisodeCatalogService(log: LoggingAdapter,
         mongoRepo
             .save(episodeDTO)
             .onComplete {
-                case Success(result) =>
-                    result match {
-                        case Some(e) => log.debug("Saved to MongoDB : {}", e)
-                        case None    => log.warning("Episode was not saved to MongoDB")
-                    }
-                case Failure(reason) =>
-                    log.error("Saving to MongoDB failed : {}", reason)
-                    reason.printStackTrace()
+                case Success(e)  => log.debug("Saved to MongoDB : {}", e)
+                case Failure(ex) =>
+                    log.error("Saving to MongoDB failed : {}", ex)
+                    ex.printStackTrace()
             }
         Option(episodeDTO)
           .map(e => episodeMapper.toEntity(e))

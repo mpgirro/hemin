@@ -49,14 +49,10 @@ class PodcastCatalogService(log: LoggingAdapter,
         mongoRepo
             .save(podcastDTO)
             .onComplete {
-                case Success(result) =>
-                    result match {
-                        case Some(p) => log.debug("Saved to MongoDB : {}", p)
-                        case None    => log.warning("Podcast was not saved to MongoDB")
-                    }
-                case Failure(reason) =>
-                    log.error("Saving to MongoDB failed : {}", reason)
-                    reason.printStackTrace()
+                case Success(p)  => log.debug("Saved to MongoDB : {}", p)
+                case Failure(ex) =>
+                    log.error("Saving to MongoDB failed : {}", ex)
+                    ex.printStackTrace()
             }
         Option(podcastDTO)
           .map(p => podcastMapper.toEntity(p))
