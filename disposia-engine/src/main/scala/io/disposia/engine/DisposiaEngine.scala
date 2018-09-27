@@ -18,137 +18,134 @@ import scala.language.postfixOps
 
 class DisposiaEngine {
 
-    private var config: ExoConfig = _
-    private implicit var internalTimeout: Timeout = _
+  private var config: ExoConfig = _
+  private implicit var internalTimeout: Timeout = _
 
-    private val log = Logger(classOf[DisposiaEngine])
+  private val log = Logger(classOf[DisposiaEngine])
 
-    private var master: ActorRef = _
+  private var master: ActorRef = _
 
-    private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
+  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
-    /* TODO ich will einen CircuitBreaker, habe aber keinen Scheduler weil das hier kein Actor ist
-    private val indexBreaker =
-        CircuitBreaker(context.system.scheduler, MAX_BREAKER_FAILURES, BREAKER_CALL_TIMEOUT, BREAKER_RESET_TIMEOUT)
-            .onOpen(breakerOpen("Index"))
-            .onClose(breakerClose("Index"))
-            .onHalfOpen(breakerHalfOpen("Index"))
-    */
+  /* TODO ich will einen CircuitBreaker, habe aber keinen Scheduler weil das hier kein Actor ist
+  private val indexBreaker =
+      CircuitBreaker(context.system.scheduler, MAX_BREAKER_FAILURES, BREAKER_CALL_TIMEOUT, BREAKER_RESET_TIMEOUT)
+          .onOpen(breakerOpen("Index"))
+          .onClose(breakerClose("Index"))
+          .onHalfOpen(breakerHalfOpen("Index"))
+  */
 
-    def start(): Unit = {
-        // load and init the configuration
-        val globalConfig = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-        config = ExoConfig.load(globalConfig)
-        internalTimeout = config.internalTimeout
+  def start(): Unit = {
+    // load and init the configuration
+    val globalConfig = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
+    config = ExoConfig.load(globalConfig)
+    internalTimeout = config.internalTimeout
 
-        // init the actorsystem and local master for this node
-        val system = ActorSystem("disposia", globalConfig)
-        master = system.actorOf(Props(new NodeMaster(config)), NodeMaster.name)
+    // init the actorsystem and local master for this node
+    val system = ActorSystem("disposia", globalConfig)
+    master = system.actorOf(Props(new NodeMaster(config)), NodeMaster.name)
 
-        // wait until all actors in the hierarchy report they are up and running
-        var warmup = true
-        while (warmup) {
-            val request = bus ? EngineOperational
-            val response = Await.result(request, 10.seconds) // TODO read timeout from config
-            response match {
-                case StartupComplete   =>
-                    warmup = false
-                case StartupInProgress =>
-                    warmup = true
-                    Thread.sleep(100)
-            }
-        }
-
-        log.info("engine is up and running")
+    // wait until all actors in the hierarchy report they are up and running
+    var warmup = true
+    while (warmup) {
+      val request = bus ? EngineOperational
+      val response = Await.result(request, 10.seconds) // TODO read timeout from config
+      response match {
+        case StartupComplete   =>
+          warmup = false
+        case StartupInProgress =>
+          warmup = true
+          Thread.sleep(100)
+      }
     }
 
-    def shutdown(): Unit = {
-        master ! ShutdownSystem
+    log.info("engine is up and running")
+  }
+
+  def shutdown(): Unit = {
+    master ! ShutdownSystem
+  }
+
+  def bus(): ActorRef = master
+
+  def propose(url: String): Unit = bus ! ProposeNewFeed(url)
+
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
+    val p: Int = page.getOrElse(config.indexConfig.defaultPage)
+    val s: Int = size.getOrElse(config.indexConfig.defaultSize)
+
+    search(query, p, s)
+  }
+
+  def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
+
+    if (isNullOrEmpty(query)) return Future { ResultWrapper.empty() }
+    if (page < 1)             return Future { ResultWrapper.empty() }
+    if (size < 1)             return Future { ResultWrapper.empty() }
+
+    (bus ? SearchIndex(query, page, size)).map {
+      case SearchResults(_, results) => results
     }
+  }
 
-    def bus(): ActorRef = master
-
-    def propose(url: String): Unit = {
-        bus ! ProposeNewFeed(url)
+  def findEpisode(exo: String): Future[Option[Episode]] = {
+    (bus ? GetEpisode(exo)).map {
+      case EpisodeResult(episode) => Some(episode)
+      case NothingFound(unknown)  => None
     }
+  }
 
-    def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultWrapper] = {
-        val p: Int = page.getOrElse(config.indexConfig.defaultPage)
-        val s: Int = size.getOrElse(config.indexConfig.defaultSize)
-
-        search(query, p, s)
+  def findChaptersByEpisode(exo: String): Future[List[Chapter]] = {
+    (bus ? GetChaptersByEpisode(exo)).map {
+      case ChaptersByEpisodeResult(chapters) => chapters
     }
+  }
 
+  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
+    val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
+    val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
-    def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
-
-        if (isNullOrEmpty(query)) return Future { ResultWrapper.empty() }
-        if (page < 1)             return Future { ResultWrapper.empty() }
-        if (size < 1)             return Future { ResultWrapper.empty() }
-
-        (bus ? SearchIndex(query, page, size)).map {
-            case SearchResults(_, results) => results
-        }
+    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
+      case AllPodcastsResult(podcasts) => podcasts
     }
+  }
 
-    def findEpisode(exo: String): Future[Option[Episode]] = {
-        (bus ? GetEpisode(exo)).map {
-            case EpisodeResult(episode) => Some(episode)
-            case NothingFound(unknown)  => None
-        }
+  def findPodcast(exo: String): Future[Option[Podcast]] = {
+    (bus ? GetPodcast(exo)).map {
+      case PodcastResult(podcast) => Some(podcast)
+      case NothingFound(unknown)  => None
     }
+  }
 
-    def findChaptersByEpisode(exo: String): Future[List[Chapter]] = {
-        (bus ? GetChaptersByEpisode(exo)).map {
-            case ChaptersByEpisodeResult(chapters) => chapters
-        }
+  def findEpisodesByPodcast(exo: String): Future[List[Episode]] = {
+    (bus ? GetEpisodesByPodcast(exo)).map {
+      case EpisodesByPodcastResult(episodes) => episodes
     }
+  }
 
-    def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-        val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
-        val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
-
-        (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
-            case AllPodcastsResult(podcasts) => podcasts
-        }
+  def findFeedsByPodcast(exo: String): Future[List[Feed]] = {
+    (bus ? GetFeedsByPodcast(exo)).map {
+      case FeedsByPodcastResult(feeds) => feeds
     }
+  }
 
-    def findPodcast(exo: String): Future[Option[Podcast]] = {
-        (bus ? GetPodcast(exo)).map {
-            case PodcastResult(podcast) => Some(podcast)
-            case NothingFound(unknown)  => None
-        }
+  def findFeed(exo: String): Future[Option[Feed]] = {
+    (bus ? GetFeed(exo)).map {
+      case FeedResult(feed)      => Some(feed)
+      case NothingFound(unknown) => None
     }
+  }
 
-    def findEpisodesByPodcast(exo: String): Future[List[Episode]] = {
-        (bus ? GetEpisodesByPodcast(exo)).map {
-            case EpisodesByPodcastResult(episodes) => episodes
-        }
-    }
+  private def breakerOpen(name: String): Unit = {
+    log.warn("{} Circuit Breaker is open", name)
+  }
 
-    def findFeedsByPodcast(exo: String): Future[List[Feed]] = {
-        (bus ? GetFeedsByPodcast(exo)).map {
-            case FeedsByPodcastResult(feeds) => feeds
-        }
-    }
+  private def breakerClose(name: String): Unit = {
+    log.warn("{} Circuit Breaker is closed", name)
+  }
 
-    def findFeed(exo: String): Future[Option[Feed]] = {
-        (bus ? GetFeed(exo)).map {
-            case FeedResult(feed)      => Some(feed)
-            case NothingFound(unknown) => None
-        }
-    }
-
-    private def breakerOpen(name: String): Unit = {
-        log.warn("{} Circuit Breaker is open", name)
-    }
-
-    private def breakerClose(name: String): Unit = {
-        log.warn("{} Circuit Breaker is closed", name)
-    }
-
-    private def breakerHalfOpen(name: String): Unit = {
-        log.warn("{} Circuit Breaker is half-open, next message goes through", name)
-    }
+  private def breakerHalfOpen(name: String): Unit = {
+    log.warn("{} Circuit Breaker is half-open, next message goes through", name)
+  }
 
 }
