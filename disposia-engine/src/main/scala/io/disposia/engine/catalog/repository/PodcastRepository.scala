@@ -5,9 +5,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 import org.springframework.data.repository.query.Param
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 trait PodcastRepository extends JpaRepository[PodcastEntity, java.lang.Long] {
 
     def findOneByExo(exo: String): PodcastEntity

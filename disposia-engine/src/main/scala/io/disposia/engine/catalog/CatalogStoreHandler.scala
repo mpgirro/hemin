@@ -70,7 +70,7 @@ class CatalogStoreHandler(workerIndex: Int,
     // TODO experimental
     //val dbName = "exodb"
 
-    // My settings (see available connection options)
+    // TODO add and read from CONFIG
     val mongoUri = s"mongodb://localhost:27017/disposia" // ?authMode=scram-sha1
 
     // Connect to the database: Must be done only once per application
@@ -133,10 +133,10 @@ class CatalogStoreHandler(workerIndex: Int,
         }
      */
 
-    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder, db)
-    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder, db)
-    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder, db)
-    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder, db)
+    private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder)
+    private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder)
+    private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder)
+    private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder)
 
     private val podcastMapper = PodcastMapper.INSTANCE
     private val episodeMapper = EpisodeMapper.INSTANCE
@@ -1202,6 +1202,7 @@ class CatalogStoreHandler(workerIndex: Int,
       * @param task the function to be executed inside a transaction
       * @param services all services used within the callable function, which therefore require a refresh before doing the work
       */
+    @Deprecated
     private def doInTransaction(task: () => Any, services: List[CatalogService] ): Any = {
         blocking {
             val em: EntityManager = emf.createEntityManager()

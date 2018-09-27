@@ -17,12 +17,9 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.concurrent.duration._
 import scala.util.{Failure, Success}
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 class ChapterCatalogService(log: LoggingAdapter,
-                            rfb: RepositoryFactoryBuilder,
-                            db: DefaultDB)
+                            rfb: RepositoryFactoryBuilder)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -30,8 +27,6 @@ class ChapterCatalogService(log: LoggingAdapter,
     private var chapterRepository: ChapterRepository = _
 
     private val chapterMapper = ChapterMapper.INSTANCE
-
-    private val mongoRepo = new ChapterMongoRepository(db, ec)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -68,9 +63,6 @@ class ChapterCatalogService(log: LoggingAdapter,
     @Transactional
     def save(chapterDTO: Chapter): Option[Chapter] = {
         log.debug("Request to save Chapter : {}", chapterDTO)
-        mongoRepo
-            .save(chapterDTO)
-
         Option(chapterDTO)
           .map(c => chapterMapper.toEntity(c))
           .map(c => chapterRepository.save(c))
@@ -95,15 +87,12 @@ class ChapterCatalogService(log: LoggingAdapter,
 
     @Transactional
     def findAllByEpisode(episodeExo: String): List[Chapter] = {
-        /*
         log.debug("Request to get all Chapters by Episode (EXO) : {}", episodeExo)
         chapterRepository.findAllByEpisodeExo(episodeExo)
             .asScala
             .map(c => chapterMapper.toModifiable(c).toImmutable)
             .toList
-            */
-        val f = mongoRepo.findAllByEpisode(episodeExo)
-        Await.result(f, 10.seconds)
+
     }
 
 }

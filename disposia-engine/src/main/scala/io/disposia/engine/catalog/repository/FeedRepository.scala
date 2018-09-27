@@ -4,9 +4,7 @@ import io.disposia.engine.domain.entity.FeedEntity
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 import org.springframework.data.repository.query.Param
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 trait FeedRepository extends JpaRepository[FeedEntity, java.lang.Long] {
 
     def findOneByExo(exo: String): FeedEntity

@@ -18,14 +18,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 @Repository
 @Transactional
 class FeedCatalogService(log: LoggingAdapter,
-                         rfb: RepositoryFactoryBuilder,
-                         db: DefaultDB)
+                         rfb: RepositoryFactoryBuilder)
                         (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -33,8 +30,6 @@ class FeedCatalogService(log: LoggingAdapter,
     private var feedRepository: FeedRepository = _
 
     private val feedMapper = FeedMapper.INSTANCE
-
-    private val mongoRepo = new FeedMongoRepository(db, ec)
 
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
@@ -44,23 +39,10 @@ class FeedCatalogService(log: LoggingAdapter,
     @Transactional
     def save(feedDTO: Feed): Option[Feed] = {
         log.debug("Request to save Feed : {}", feedDTO)
-        mongoRepo
-            .save(feedDTO)
-            .onComplete {
-                case Success(f)  => log.debug("Saved to MongoDB : {}", f)
-                case Failure(ex) =>
-                    log.error("Saving to MongoDB failed : {}", ex)
-                    ex.printStackTrace()
-            }
         Option(feedDTO)
           .map(f => feedMapper.toEntity(f))
           .map(f => feedRepository.save(f))
           .map(f => feedMapper.toImmutable(f))
-    }
-
-    def find(exo: String): Future[Option[Feed]] = {
-        log.debug("Request to get Feed (EXO) : {}", exo)
-        mongoRepo.findOne(exo)
     }
 
     @Transactional

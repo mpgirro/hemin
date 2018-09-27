@@ -4,9 +4,7 @@ import io.disposia.engine.domain.entity.{EpisodeEntity, PodcastEntity}
 import org.springframework.data.jpa.repository.{JpaRepository, Query}
 import org.springframework.data.repository.query.Param
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 trait EpisodeRepository extends JpaRepository[EpisodeEntity, java.lang.Long] {
 
     def findOneByExo(exo: String): EpisodeEntity

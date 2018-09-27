@@ -2,9 +2,7 @@ package io.disposia.engine.catalog.service
 
 import javax.persistence.EntityManager
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 trait CatalogService {
 
     def refresh(em: EntityManager): Unit

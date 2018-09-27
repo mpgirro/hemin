@@ -19,8 +19,7 @@ object BsonConversion {
   def toBson(value: LocalDateTime): Option[BSONDateTime] =
     Option(value).flatMap(d => Option(BSONDateTime(DateMapper.INSTANCE.asMilliseconds(d))))
 
-  def toBson(values: Iterable[Chapter]): BSONArray =
-    BSONArray.apply(values.map(c => ChapterWriter.write(c)))
+  //def toBson(values: Iterable[Chapter]): BSONArray = BSONArray.apply(values.map(c => ChapterWriter.write(c)))
 
 
   def toDocument(map: Map[String, Option[BSONValue]]): BSONDocument =
@@ -35,14 +34,14 @@ object BsonConversion {
 
   def asChapterList(key: String)(implicit bson: BSONDocument): Option[List[Chapter]] = bson.getAs[List[Chapter]](key)
 
-  implicit val podcastWriter: BSONDocumentWriter[Podcast] = PodcastWriter
-  implicit val podcastReader: BSONDocumentReader[Podcast] = PodcastReader
-  implicit val episodeWriter: BSONDocumentWriter[Episode] = EpisodeWriter
-  implicit val episodeReader: BSONDocumentReader[Episode] = EpisodeReader
-  implicit val feedWriter: BSONDocumentWriter[Feed] = FeedWriter
-  implicit val feedReader: BSONDocumentReader[Feed] = FeedReader
-  implicit val chapterWriter: BSONDocumentWriter[Chapter] = ChapterWriter
-  implicit val chapterReader: BSONDocumentReader[Chapter] = ChapterReader
+  private implicit val podcastWriter: BSONDocumentWriter[Podcast] = PodcastWriter
+  private implicit val podcastReader: BSONDocumentReader[Podcast] = PodcastReader
+  private implicit val episodeWriter: BSONDocumentWriter[Episode] = EpisodeWriter
+  private implicit val episodeReader: BSONDocumentReader[Episode] = EpisodeReader
+  private implicit val feedWriter: BSONDocumentWriter[Feed] = FeedWriter
+  private implicit val feedReader: BSONDocumentReader[Feed] = FeedReader
+  private implicit val chapterWriter: BSONDocumentWriter[Chapter] = ChapterWriter
+  private implicit val chapterReader: BSONDocumentReader[Chapter] = ChapterReader
 
   object PodcastReader extends BSONDocumentReader[Podcast] {
     override def read(bson: BSONDocument): Podcast = {

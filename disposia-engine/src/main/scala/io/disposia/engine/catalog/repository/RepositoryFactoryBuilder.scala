@@ -15,9 +15,7 @@ import org.springframework.transaction.interceptor.{MatchAlwaysTransactionAttrib
 
 import scala.collection.JavaConverters._
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 class RepositoryFactoryBuilder (val databaseUrl: String) {
 
     private val persistanceUnitName = "EchoActorEnginePersistenceUnit" + (100 + (new scala.util.Random).nextInt(( 999 - 100) + 1))

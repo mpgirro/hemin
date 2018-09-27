@@ -17,14 +17,11 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-/**
-  * @author Maximilian Irro
-  */
+@Deprecated
 @Repository
 @Transactional
 class EpisodeCatalogService(log: LoggingAdapter,
-                            rfb: RepositoryFactoryBuilder,
-                            db: DefaultDB)
+                            rfb: RepositoryFactoryBuilder)
                            (implicit ec: ExecutionContext)
     extends CatalogService {
 
@@ -35,8 +32,6 @@ class EpisodeCatalogService(log: LoggingAdapter,
     private val episodeMapper = EpisodeMapper.INSTANCE
     private val teaserMapper = TeaserMapper.INSTANCE
 
-    private val mongoRepo = new EpisodeMongoRepository(db, ec)
-
     override def refresh(em: EntityManager): Unit = {
         repositoryFactory = rfb.createRepositoryFactory(em)
         episodeRepository = repositoryFactory.getRepository(classOf[EpisodeRepository])
@@ -45,14 +40,6 @@ class EpisodeCatalogService(log: LoggingAdapter,
     @Transactional
     def save(episodeDTO: Episode): Option[Episode] = {
         log.debug("Request to save Episode : {}", episodeDTO)
-        mongoRepo
-            .save(episodeDTO)
-            .onComplete {
-                case Success(e)  => log.debug("Saved to MongoDB : {}", e)
-                case Failure(ex) =>
-                    log.error("Saving to MongoDB failed : {}", ex)
-                    ex.printStackTrace()
-            }
         Option(episodeDTO)
           .map(e => episodeMapper.toEntity(e))
           .map(e => episodeRepository.save(e))
@@ -65,11 +52,6 @@ class EpisodeCatalogService(log: LoggingAdapter,
         Option(dbId)
             .map(id => episodeRepository.findOne(id))
             .map(e => episodeMapper.toImmutable(e))
-    }
-
-    def find(exo: String): Future[Option[Episode]] = {
-        log.debug("Request to get Episode (EXO) : {}", exo)
-        mongoRepo.findOne(exo)
     }
 
     @Transactional(readOnly = true)
