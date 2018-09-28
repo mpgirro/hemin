@@ -1,4 +1,4 @@
-package io.disposia.engine.catalog.mongo
+package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import reactivemongo.api.{Cursor, QueryOpts}

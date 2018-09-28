@@ -10,7 +10,8 @@ import io.disposia.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisode
   * @author Maximilian Irro
   */
 
-class ParserPriorityActorMailbox(settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox(
+class ParserPriorityMailbox(settings: ActorSystem.Settings, config: Config)
+  extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {
         case ActorRefCatalogStoreActor(_)  => 0

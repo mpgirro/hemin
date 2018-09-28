@@ -1,4 +1,4 @@
-package io.disposia.engine.config
+package io.disposia.engine.updater
 
 /**
   * Configuration for [[io.disposia.engine.updater.Updater]]

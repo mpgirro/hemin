@@ -1,15 +1,15 @@
-package io.disposia.engine.catalog.mongo
+package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.dto.Podcast
-import io.disposia.engine.catalog.mongo.BsonConversion.{toBson,toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion.{toBson,toDocument}
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PodcastMongoRepository (db: DefaultDB, ec: ExecutionContext)
+class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
   extends MongoRepository[Podcast] {
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
@@ -20,7 +20,7 @@ class PodcastMongoRepository (db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] def collection: BSONCollection = db.apply("podcasts")
 
-  override protected[this] def log: Logger = Logger(classOf[PodcastMongoRepository])
+  override protected[this] def log: Logger = Logger(getClass)
 
   def save(podcast: Podcast): Future[Podcast] = {
     /*

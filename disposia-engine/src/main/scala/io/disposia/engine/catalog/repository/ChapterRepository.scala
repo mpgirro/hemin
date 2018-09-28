@@ -1,7 +1,7 @@
-package io.disposia.engine.catalog.mongo
+package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.catalog.mongo.BsonConversion.{toBson, toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
 import io.disposia.engine.domain.dto.Chapter
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.api.collections.bson.BSONCollection
@@ -10,7 +10,7 @@ import reactivemongo.bson._
 import scala.concurrent.{ExecutionContext, Future}
 
 @Deprecated
-class ChapterMongoRepository (db: DefaultDB, ec: ExecutionContext)
+class ChapterRepository(db: DefaultDB, ec: ExecutionContext)
   extends MongoRepository[Chapter] {
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
@@ -21,7 +21,7 @@ class ChapterMongoRepository (db: DefaultDB, ec: ExecutionContext)
 
   override def collection: BSONCollection = db.apply("chapters")
 
-  override protected[this] def log: Logger = Logger(classOf[ChapterMongoRepository])
+  override protected[this] def log: Logger = Logger(getClass)
 
   // TODO this writes, but does not OVERWRITE existing chapter with same EXO!!
   def save(chapter: Chapter): Future[Unit] = {

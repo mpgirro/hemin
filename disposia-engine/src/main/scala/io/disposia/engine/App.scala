@@ -10,7 +10,7 @@ import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
-object DisposiaApp {
+object App {
 
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
@@ -18,7 +18,7 @@ object DisposiaApp {
 
   private val log = Logger(classOf[App])
 
-  private val engine = new DisposiaEngine()
+  private val engine = new Engine()
   private var shutdown = false
 
   private val usageMap = Map(

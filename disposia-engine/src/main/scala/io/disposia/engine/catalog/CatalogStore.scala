@@ -5,8 +5,7 @@ import java.time.LocalDateTime
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository, FeedMongoRepository, PodcastMongoRepository}
-import io.disposia.engine.config.CatalogConfig
+import io.disposia.engine.catalog.repository.{ChapterRepository, EpisodeRepository, FeedRepository, PodcastRepository}
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.domain.dto._
@@ -70,7 +69,8 @@ object CatalogStore {
     //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
-class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
+class CatalogStore(config: CatalogConfig)
+  extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
@@ -113,10 +113,10 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
 
   private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
 
-  private val podcastRepo: PodcastMongoRepository = new PodcastMongoRepository(db, executionContext)
-  private val episodetRepo: EpisodeMongoRepository = new EpisodeMongoRepository(db, executionContext)
-  private val feedRepo: FeedMongoRepository = new FeedMongoRepository(db, executionContext)
-  private val chapterRepo: ChapterMongoRepository = new ChapterMongoRepository(db, executionContext)
+  private val podcasts: PodcastRepository = new PodcastRepository(db, executionContext)
+  private val episodes: EpisodeRepository = new EpisodeRepository(db, executionContext)
+  private val feeds: FeedRepository = new FeedRepository(db, executionContext)
+  private val chapters: ChapterRepository = new ChapterRepository(db, executionContext)
 
   /* TODO
    private def registerDriverShutdownHook(mongoDriver: MongoDriver): Unit =
@@ -253,7 +253,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def proposeFeed(url: String): Unit = {
     log.info("Received msg proposing a new feed: " + url)
 
-    feedRepo
+    feeds
       .findAllByUrl(url)
       .onComplete {
         case Success(fs) =>
@@ -279,10 +279,10 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
             // Note: we chain the create calls to ensure that the
             // message to the Updater is only dispatched once we can
             // be sure the podcast and the feed are in the database
-            podcastRepo
+            podcasts
               .save(podcast)
               .foreach(_ => {
-                feedRepo
+                feeds
                   .save(feed)
                   .foreach(_ => {
                     /*
@@ -350,11 +350,11 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onFeedStatusUpdate(podcastExo: String, url: String, timestamp: LocalDateTime, status: FeedStatus): Unit = {
     log.debug("Received FeedStatusUpdate({},{},{})", url, timestamp, status)
 
-    feedRepo
+    feeds
       .findOneByUrlAndPodcastExo(url, podcastExo)
       .foreach {
         case Some(f) =>
-          feedRepo.save(feedMapper
+          feeds.save(feedMapper
             .toImmutable(f)
             .withLastChecked(timestamp)
             .withLastStatus(status))
@@ -435,7 +435,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
      * jenen feed den ich immer benutze um updates zu laden
      */
 
-    podcastRepo
+    podcasts
       .findOne(podcastExo)
       .map {
         case Some(p) => podcastMapper.update(podcast, p)
@@ -446,7 +446,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
       .foreach(p => {
         p.setRegistrationComplete(true)
         //podcastService.save(p)
-        podcastRepo.save(p)
+        podcasts.save(p)
 
         // TODO we will fetch feeds for checking new episodes, but not because we updated podcast metadata
         // crawler ! FetchFeedForUpdateEpisodes(feedUrl, podcastId)
@@ -474,7 +474,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onUpdateEpisode(episode: Episode): Unit = {
     log.debug("Received UpdateEpisode({})", episode.getExo)
 
-    episodetRepo
+    episodes
       .findOne(episode.getExo)
       .map {
         case Some(e) => episodeMapper.update(episode, e)
@@ -483,7 +483,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
           episodeMapper.toModifiable(episode)
       }
       .foreach(e => {
-        episodetRepo.save(e)
+        episodes.save(e)
       })
 
     // TODO delete
@@ -529,13 +529,13 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onUpdateFeedMetadataUrl(oldUrl: String, newUrl: String): Unit = {
     log.debug("Received UpdateFeedUrl('{}','{}')", oldUrl, newUrl)
 
-    feedRepo
+    feeds
       .findAllByUrl(oldUrl)
       .onComplete {
         case Success(fs) =>
           if (fs.nonEmpty) {
             fs.foreach(f => {
-              feedRepo.save(feedMapper
+              feeds.save(feedMapper
                 .toImmutable(f)
                 .withUrl(newUrl))
             })
@@ -566,15 +566,15 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onUpdateLinkByExo(exo: String, newUrl: String): Unit = {
     log.debug("Received UpdateLinkByExo({},'{}')", exo, newUrl)
 
-    podcastRepo
+    podcasts
       .findOne(exo)
       .foreach {
-        case Some(p) => podcastRepo.save(podcastMapper.toImmutable(p).withLink(newUrl))
+        case Some(p) => podcasts.save(podcastMapper.toImmutable(p).withLink(newUrl))
         case None =>
-          episodetRepo
+          episodes
             .findOne(exo)
             .foreach {
-              case Some(e) => episodetRepo.save(episodeMapper.toImmutable(e).withLink(newUrl))
+              case Some(e) => episodes.save(episodeMapper.toImmutable(e).withLink(newUrl))
               case None    => log.error("Cannot update Link URL - no Podcast or Episode found by EXO : {}", exo)
             }
       }
@@ -604,7 +604,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetPodcast('{}')", exo)
 
     val theSender = sender()
-    podcastRepo
+    podcasts
       .findOne(exo)
       .andThen {
         case Success(p)  => p
@@ -648,7 +648,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetAllPodcasts({},{})", page, size)
 
     val theSender = sender()
-    podcastRepo
+    podcasts
       .findAll(page, size)
       .andThen {
         case Success(ps) => ps
@@ -681,7 +681,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetAllPodcastsRegistrationComplete({},{})", page, size)
 
     val theSender = sender()
-    podcastRepo
+    podcasts
       .findAllRegistrationCompleteAsTeaser(page, size)
       .andThen {
         case Success(ps) => ps
@@ -707,7 +707,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetAllFeeds({},{})", page, size)
 
     val theSender = sender()
-    feedRepo
+    feeds
       .findAll(page, size)
       .andThen {
         case Success(fs) => fs
@@ -733,7 +733,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetEpisode('{}')", exo)
 
     val theSender = sender()
-    episodetRepo
+    episodes
       .findOne(exo)
       .andThen {
         case Success(e)  => e
@@ -777,7 +777,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetEpisodesByPodcast('{}')", podcastId)
 
     val theSender = sender()
-    episodetRepo
+    episodes
       .findAllByPodcast(podcastId)
       .andThen {
         case Success(es) => es
@@ -811,7 +811,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetFeedsByPodcast('{}')", podcastId)
 
     val theSender = sender()
-    feedRepo
+    feeds
       .findAllByPodcast(podcastId)
       .andThen {
         case Success(fs) => fs
@@ -845,7 +845,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetChaptersByEpisode('{}')", episodeId)
 
     val theSender = sender()
-    episodetRepo
+    episodes
       .findOne(episodeId)
       .map {
         case Some(e) =>
@@ -873,7 +873,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetFeed('{}')", exo)
 
     val theSender = sender()
-    feedRepo
+    feeds
       .findOne(exo)
       .andThen {
         case Success(f)  => f
@@ -916,7 +916,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onCheckPodcast(podcastId: String): Unit = {
     log.debug("Received CheckPodcast({})", podcastId)
 
-    feedRepo
+    feeds
       .findAllByPodcast(podcastId)
       .onComplete {
         case Success(fs) =>
@@ -948,7 +948,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onCheckFeed(feedId: String): Unit = {
     log.debug("Received CheckFeed({})", feedId)
 
-    feedRepo
+    feeds
       .findOne(feedId)
       .foreach {
         case Some(f) => updater ! ProcessFeed(f.getPodcastExo, f.getUrl, UpdateEpisodesFetchJob(null, null))
@@ -1020,18 +1020,18 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private def onRegisterEpisodeIfNew(podcastExo: String, episode: Episode): Unit = {
     log.debug("Received RegisterEpisodeIfNew({}, '{}')", podcastExo, episode.getTitle)
 
-    podcastRepo
+    podcasts
       .findOne(podcastExo)
       .foreach {
         case Some(p) =>
           Option(episode.getGuid)
             .map(guid => {
-              episodetRepo
+              episodes
                 .findAllByPodcastAndGuid(podcastExo, guid)
                 .map(es => es.headOption)
             })
             .getOrElse({
-              episodetRepo
+              episodes
                 .findOneByEnclosure(episode.getEnclosureUrl, episode.getEnclosureLength, episode.getEnclosureType)
             })
             .map {
@@ -1051,7 +1051,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
                 })
 
                 // save asynchronously
-                episodetRepo
+                episodes
                   .save(e)
                   .onComplete {
                     case Success(_) =>
@@ -1177,7 +1177,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received DebugPrintAllPodcasts")
     log.info("All Podcasts in database:")
 
-    podcastRepo
+    podcasts
       .findAll(0, config.maxPageSize)
       .onComplete {
         case Success(ps) => ps.foreach(p => println(s"${p.getExo} : ${p.getTitle}"))
@@ -1197,7 +1197,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received DebugPrintAllEpisodes")
     log.info("All Episodes in database:")
 
-    episodetRepo
+    episodes
       .findAll(0, config.maxPageSize)
       .onComplete {
         case Success(es) => es.foreach(e => println(s"${e.getExo} : ${e.getTitle}"))
@@ -1217,7 +1217,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received DebugPrintAllFeeds")
     log.info("All Feeds in database:")
 
-    feedRepo
+    feeds
       .findAll(0, config.maxPageSize)
       .onComplete {
         case Success(fs) => fs.foreach(f => println(s"${f.getExo} : ${f.getUrl}"))

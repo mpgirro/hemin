@@ -5,7 +5,6 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import io.disposia.engine.catalog.CatalogStore
 import io.disposia.engine.catalog.CatalogStore.CatalogMessage
-import io.disposia.engine.config.ExoConfig
 import io.disposia.engine.crawler.Crawler
 import io.disposia.engine.crawler.Crawler.CrawlerMessage
 import io.disposia.engine.index.IndexStore
@@ -19,14 +18,14 @@ import scala.language.postfixOps
 
 object NodeMaster {
   final val name = "node"
-  def props(config: ExoConfig): Props = Props(new NodeMaster(config))
+  def props(config: EngineConfig): Props = Props(new NodeMaster(config))
 
   case class GetCatalogBroker()
   case class GetIndexBroker()
   case class GetUpdater()
 }
 
-class NodeMaster (config: ExoConfig)
+class NodeMaster (config: EngineConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)

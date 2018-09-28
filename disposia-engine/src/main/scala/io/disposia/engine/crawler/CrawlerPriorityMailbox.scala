@@ -9,7 +9,7 @@ import io.disposia.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadChec
 /**
   * @author Maximilian Irro
   */
-class CrawlerPriorityActorMailbox (settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox(
+class CrawlerPriorityMailbox(settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {
         case ActorRefParserActor(_)        => 0

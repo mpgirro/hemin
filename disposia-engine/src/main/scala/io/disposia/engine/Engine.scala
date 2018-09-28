@@ -8,7 +8,6 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.config.ExoConfig
 import io.disposia.engine.domain.dto._
 import io.disposia.engine.index.IndexStore.{SearchIndex, SearchResults}
 
@@ -16,12 +15,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-class DisposiaEngine {
+class Engine {
 
-  private var config: ExoConfig = _
+  private var config: EngineConfig = _
   private implicit var internalTimeout: Timeout = _
 
-  private val log = Logger(classOf[DisposiaEngine])
+  private val log = Logger(classOf[Engine])
 
   private var master: ActorRef = _
 
@@ -38,7 +37,7 @@ class DisposiaEngine {
   def start(): Unit = {
     // load and init the configuration
     val globalConfig = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-    config = ExoConfig.load(globalConfig)
+    config = EngineConfig.load(globalConfig)
     internalTimeout = config.internalTimeout
 
     // init the actorsystem and local master for this node
@@ -89,7 +88,7 @@ class DisposiaEngine {
   }
 
   def findPodcast(exo: String): Future[Option[Podcast]] =
-    (bus ? GetPodcast(exo)).map { 
+    (bus ? GetPodcast(exo)).map {
       case PodcastResult(p) => p
     }
 
