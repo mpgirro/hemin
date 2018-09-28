@@ -17,6 +17,11 @@ trait MongoRepository[T] {
 
   protected[this] def log: Logger
 
+  def drop: Future[Boolean] = {
+    log.debug("Dropping collection : {}", collection.name)
+    collection.drop(failIfNotFound = true)
+  }
+
   /**
     * Find one by example
     *

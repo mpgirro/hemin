@@ -36,11 +36,11 @@ object EngineConfig {
     EngineConfig(
       appConfig = AppConfig(),
       catalogConfig = CatalogConfig(
-        workerCount = config.getInt("echo.catalog.worker-count"),
-        mongoUri    = config.getString("echo.catalog.mongo-uri"),
-        defaultPage = config.getInt("echo.catalog.default-page"),
-        defaultSize = config.getInt("echo.catalog.default-size"),
-        maxPageSize = config.getInt("echo.catalog.max-page-size")
+        mongoUri       = config.getString("echo.catalog.mongo-uri"),
+        createDatabase = config.getBoolean("echo.catalog.create-database"),
+        defaultPage    = config.getInt("echo.catalog.default-page"),
+        defaultSize    = config.getInt("echo.catalog.default-size"),
+        maxPageSize    = config.getInt("echo.catalog.max-page-size")
       ),
       crawlerConfig = CrawlerConfig(
         workerCount      = config.getInt("echo.crawler.worker-count"),
@@ -68,8 +68,8 @@ object EngineConfig {
 
   private def defaultConfig(): Config = {
     val defaults = Map(
-      "echo.catalog.worker-count"       -> 5,
       "echo.catalog.mongo-uri"          -> "mongodb://localhost:27017/disposia",
+      "echo.catalog.create-database"    -> true,
       "echo.catalog.default-page"       -> 1,
       "echo.catalog.default-size"       -> 20,
       "echo.catalog.max-page-size"      -> 10000,

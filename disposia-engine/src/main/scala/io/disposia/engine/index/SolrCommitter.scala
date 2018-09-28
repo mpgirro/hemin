@@ -26,7 +26,7 @@ class SolrCommitter(config: IndexConfig, executorService: ExecutorService) {
     .build()
 
   if (config.createIndex) try
-    this.solr.deleteByQuery("*:*")
+    solr.deleteByQuery("*:*")
   catch {
     case ex@(_: SolrServerException | _: IOException) =>
       log.error("Error deleting all old document from Solr collection")

@@ -114,6 +114,13 @@ class CatalogStore(config: CatalogConfig)
   private val feeds: FeedRepository = new FeedRepository(db, executionContext)
   //private val chapters: ChapterRepository = new ChapterRepository(db, executionContext)
 
+  // white all data if we please
+  if (config.createDatabase) {
+    podcasts.drop
+    episodes.drop
+    feeds.drop
+  }
+
   /* TODO
    private def registerDriverShutdownHook(mongoDriver: MongoDriver): Unit =
       lifecycle.addStopHook { () =>
