@@ -1,7 +1,7 @@
 package io.disposia.engine.index;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.IndexDoc;
 import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -17,9 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.file.Paths;
 
-/**
- * @author Maximilian Irro
- */
 public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter {
 
     private static final Logger log = LoggerFactory.getLogger(LuceneCommitter.class);

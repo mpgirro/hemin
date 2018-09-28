@@ -1,8 +1,5 @@
 package io.disposia.engine.domain;
 
-/**
- * @author max
- */
 public class IndexField {
 
     public static final String DOC_TYPE = "doc_type";

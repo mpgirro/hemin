@@ -1,8 +1,5 @@
 package io.disposia.engine.exception;
 
-/**
- * @author Maximilian Irro
- */
 public class EchoException extends Exception {
 
 //    private static final Logger log = LoggerFactory.getLogger(EchoException.class);

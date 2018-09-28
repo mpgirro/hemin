@@ -2,7 +2,7 @@ package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
-import io.disposia.engine.domain.dto.Episode
+import io.disposia.engine.domain.Episode
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -23,13 +23,6 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(episode: Episode): Future[Episode] = {
-    /*
-    collection
-        .insert[Episode](ordered = false)
-        .one(episode)
-        .map(_ => {})
-        */
-    //println("Writing Episode DTO to mongodb collection : " + collection.name)
     val query = BSONDocument("exo" -> episode.getExo)
     collection
       .update(query, episode, upsert = true)

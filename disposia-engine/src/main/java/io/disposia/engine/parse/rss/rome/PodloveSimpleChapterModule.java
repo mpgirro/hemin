@@ -5,9 +5,6 @@ import com.rometools.rome.feed.module.Module;
 
 import java.util.List;
 
-/**
- * @author Maximilian Irro
- */
 public interface PodloveSimpleChapterModule extends Module, CopyFrom {
 
     String URI = "http://podlove.org/simple-chapters";

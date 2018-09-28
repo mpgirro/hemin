@@ -10,8 +10,7 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogBroker
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
-import io.disposia.engine.domain.FeedStatus
-import io.disposia.engine.domain.dto.Episode
+import io.disposia.engine.domain.{Episode, FeedStatus}
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
 import io.disposia.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}

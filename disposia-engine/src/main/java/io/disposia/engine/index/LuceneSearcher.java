@@ -1,9 +1,9 @@
 package io.disposia.engine.index;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.dto.ImmutableResultWrapper;
-import io.disposia.engine.domain.dto.IndexDoc;
-import io.disposia.engine.domain.dto.ResultWrapper;
+import io.disposia.engine.domain.ImmutableResultWrapper;
+import io.disposia.engine.domain.IndexDoc;
+import io.disposia.engine.domain.ResultWrapper;
 import io.disposia.engine.exception.SearchException;
 import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
@@ -26,9 +26,6 @@ import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-/**
- * @author Maximilian Irro
- */
 public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
 
     private static final Logger log = LoggerFactory.getLogger(LuceneSearcher.class);

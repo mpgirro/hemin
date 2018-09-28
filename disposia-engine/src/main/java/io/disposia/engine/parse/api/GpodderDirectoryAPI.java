@@ -9,7 +9,6 @@ import java.util.List;
  *
  * For DirectoryAPI documentation, see https://gpoddernet.readthedocs.io/en/latest/api/
  *
- * @author Maximilian Irro
  */
 public class GpodderDirectoryAPI extends DirectoryAPI {
 

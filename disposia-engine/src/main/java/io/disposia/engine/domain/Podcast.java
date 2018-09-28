@@ -1,7 +1,8 @@
-package io.disposia.engine.domain.dto;
+package io.disposia.engine.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.disposia.engine.domain.ImmutablePodcast;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -22,8 +23,6 @@ import java.util.Set;
  * <s>Note</s>: This class is abstract instead of an interface to be able to overwrite
  * the java.lang.Object equals(), hashCode() and toString() methods, because Java 8
  * default interface methods can never overwrite class implementations
- *
- * @author Maximilian Irro
  */
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers

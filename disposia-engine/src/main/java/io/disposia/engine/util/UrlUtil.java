@@ -1,8 +1,5 @@
 package io.disposia.engine.util;
 
-/**
- * @author Maximilian Irro
- */
 public class UrlUtil {
 
     public static String sanitize(String url){

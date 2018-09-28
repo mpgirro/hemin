@@ -1,11 +1,8 @@
 package io.disposia.engine.util;
 
-import io.disposia.engine.domain.dto.IndexDoc;
+import io.disposia.engine.domain.IndexDoc;
 import org.jsoup.Jsoup;
 
-/**
- * @author Maximilian Irro
- */
 public class DocumentFormatter {
 
     private static final String NEWLINE = System.getProperty("line.separator");

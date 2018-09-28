@@ -1,16 +1,13 @@
-package io.disposia.engine.domain.dto;
+package io.disposia.engine.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.disposia.engine.domain.ImmutableIndexDoc;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
 import java.time.LocalDateTime;
-import java.util.List;
 
-/**
- * @author Maximilian Irro
- */
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers
 @Value.Style(
@@ -20,24 +17,15 @@ import java.util.List;
         create     = "new",             // generates public no args constructor
         build      = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableEpisode.class)
-@JsonDeserialize(as = ImmutableEpisode.class)
-public interface Episode {
+@JsonSerialize(as = ImmutableIndexDoc.class)
+@JsonDeserialize(as = ImmutableIndexDoc.class)
+public interface IndexDoc {
 
     @Nullable
-    Long getId();
-
-    @Nullable
-    Long getPodcastId();
+    String getDocType();
 
     @Nullable
     String getExo();
-
-    @Nullable
-    String getPodcastExo();
-
-    @Nullable
-    String getPodcastTitle();
 
     @Nullable
     String getTitle();
@@ -46,25 +34,13 @@ public interface Episode {
     String getLink();
 
     @Nullable
-    LocalDateTime getPubDate();
-
-    @Nullable
-    String getGuid();
-
-    @Nullable
-    Boolean getGuidIsPermaLink();
-
-    @Nullable
     String getDescription();
 
     @Nullable
+    LocalDateTime getPubDate();
+
+    @Nullable
     String getImage();
-
-    @Nullable
-    String getItunesDuration();
-
-    @Nullable
-    String getItunesSubtitle();
 
     @Nullable
     String getItunesAuthor();
@@ -73,30 +49,18 @@ public interface Episode {
     String getItunesSummary();
 
     @Nullable
-    Integer getItunesSeason();
+    String getPodcastTitle(); // will be the same as the title if marshalled from a Podcast
 
     @Nullable
-    Integer getItunesEpisode();
-
-    @Nullable
-    String getItunesEpisodeType();
-
-    @Nullable
-    String getEnclosureUrl();
-
-    @Nullable
-    Long getEnclosureLength();
-
-    @Nullable
-    String getEnclosureType();
+    String getChapterMarks();
 
     @Nullable
     String getContentEncoded();
 
     @Nullable
-    LocalDateTime getRegistrationTimestamp();
+    String getTranscript();
 
     @Nullable
-    List<Chapter> getChapters();
+    String getWebsiteData();
 
 }

@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import akka.cluster.pubsub.DistributedPubSub
 import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
-import io.disposia.engine.domain.dto._
+import io.disposia.engine.domain._
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
 

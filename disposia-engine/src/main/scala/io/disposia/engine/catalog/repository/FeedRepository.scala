@@ -2,7 +2,7 @@ package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
-import io.disposia.engine.domain.dto.Feed
+import io.disposia.engine.domain.Feed
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.bson._
@@ -23,13 +23,6 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(feed: Feed): Future[Feed] = {
-    /*
-    collection
-        .insert[Feed](ordered = false)
-        .one(feed)
-        .map(_ => {})
-        */
-    //println("Writing Feed DTO to mongodb collection : " + collection.name)
     val query = BSONDocument("exo" -> feed.getExo)
     collection
       .update(query, feed, upsert = true)
@@ -39,25 +32,6 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
           case None    => throw new RuntimeException("Saving Feed to database was unsuccessful : " + feed)
         }
       }
-    /*
-    val writeRes: Future[WriteResult] =
-        collection.insert[BSONDocument](ordered = false).one(document)
-    */
-
-    /*
-    val document = FeedWriter.write(feed)
-    val writeRes: Future[WriteResult] = collection
-            .insert[BSONDocument](ordered = false)
-            .one(document)
-
-    writeRes.onComplete { // Dummy callbacks
-        case Failure(e) => e.printStackTrace()
-        case Success(writeResult) =>
-            println(s"successfully inserted Feed with result: $writeResult")
-    }
-
-    writeRes.map(_ => {}) // in this example, do nothing with the success
-    */
   }
 
   def findOne(exo: String): Future[Option[Feed]] = {

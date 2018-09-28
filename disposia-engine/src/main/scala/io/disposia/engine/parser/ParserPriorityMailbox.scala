@@ -6,10 +6,6 @@ import com.typesafe.config.Config
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
-/**
-  * @author Maximilian Irro
-  */
-
 class ParserPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

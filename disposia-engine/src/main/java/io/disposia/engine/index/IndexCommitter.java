@@ -1,17 +1,15 @@
 package io.disposia.engine.index;
 
 
-import io.disposia.engine.domain.dto.Episode;
-import io.disposia.engine.domain.dto.IndexDoc;
-import io.disposia.engine.domain.dto.Podcast;
+import io.disposia.engine.domain.Episode;
+import io.disposia.engine.domain.IndexDoc;
+import io.disposia.engine.domain.Podcast;
 import io.disposia.engine.mapper.IndexMapper;
 
 /**
  * This interface is used to standardize writing to search indizes.
  * Currently only Apache Lucene is supported, but this could be
  * extended to support Apache Solr or ElasticSearch as well.
- *
- * @author Maximilian Irro
  */
 public interface IndexCommitter {
 

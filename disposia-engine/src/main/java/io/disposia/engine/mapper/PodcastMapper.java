@@ -1,10 +1,9 @@
 package io.disposia.engine.mapper;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.dto.ImmutablePodcast;
-import io.disposia.engine.domain.dto.ModifiablePodcast;
-import io.disposia.engine.domain.dto.Podcast;
-import io.disposia.engine.domain.entity.PodcastEntity;
+import io.disposia.engine.domain.ImmutablePodcast;
+import io.disposia.engine.domain.ModifiablePodcast;
+import io.disposia.engine.domain.Podcast;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,9 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-/**
- * @author Maximilian Irro
- */
 @Mapper(
     uses = {UrlMapper.class, DateMapper.class},
     nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
@@ -25,20 +21,6 @@ import java.util.stream.Stream;
 public interface PodcastMapper {
 
     PodcastMapper INSTANCE = Mappers.getMapper( PodcastMapper.class );
-
-    @Mapping(target = "episodes", ignore = true)
-    @Mapping(target = "feeds", ignore = true)
-    PodcastEntity toEntity(Podcast dto);
-
-    ModifiablePodcast toModifiable(PodcastEntity podcast);
-
-    default ImmutablePodcast toImmutable(PodcastEntity podcast) {
-        return Optional
-            .ofNullable(podcast)
-            .map(this::toModifiable)
-            .map(ModifiablePodcast::toImmutable)
-            .orElse(null);
-    }
 
     default ModifiablePodcast toModifiable(Podcast podcast) {
         return Optional

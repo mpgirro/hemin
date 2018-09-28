@@ -1,14 +1,12 @@
-package io.disposia.engine.domain.dto;
+package io.disposia.engine.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.disposia.engine.domain.ImmutableChapter;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
 
-/**
- * @author Maximilian Irro
- */
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers
 @Value.Style(

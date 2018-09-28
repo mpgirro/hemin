@@ -1,13 +1,10 @@
 package io.disposia.engine.parse.rss;
 
-import io.disposia.engine.domain.dto.Episode;
-import io.disposia.engine.domain.dto.Podcast;
+import io.disposia.engine.domain.Episode;
+import io.disposia.engine.domain.Podcast;
 
 import java.util.List;
 
-/**
- * @author Maximilian Irro
- */
 public interface FeedParser {
 
     String NAMESPACE_ITUNES = "http://www.itunes.com/dtds/podcast-1.0.dtd";

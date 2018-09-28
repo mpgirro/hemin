@@ -6,9 +6,6 @@ import com.typesafe.config.Config
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 
-/**
-  * @author Maximilian Irro
-  */
 class CatalogPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

@@ -5,10 +5,6 @@ import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
 import io.disposia.engine.index.IndexStore._
 
-/**
-  * @author Maximilian Irro
-  */
-
 class IndexStorePriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

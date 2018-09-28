@@ -6,9 +6,6 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Optional;
 
-/**
- * @author Maximilian Irro
- */
 public class DateMapper {
 
     public static DateMapper INSTANCE = new DateMapper();

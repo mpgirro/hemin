@@ -1,7 +1,7 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.dto.*;
+import io.disposia.engine.domain.*;
+import io.disposia.engine.domain.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -15,9 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * @author Maximilian Irro
- */
 @Mapper(uses = {PodcastMapper.class, EpisodeMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface IndexMapper {

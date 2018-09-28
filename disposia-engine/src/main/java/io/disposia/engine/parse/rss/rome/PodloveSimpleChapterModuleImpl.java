@@ -9,10 +9,6 @@ import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-/**
- * @author Maximilian Irro
- */
-
 public class PodloveSimpleChapterModuleImpl extends ModuleImpl implements PodloveSimpleChapterModule, Cloneable, Serializable {
 
     private List<PodloveSimpleChapterItem> chapters;

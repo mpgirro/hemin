@@ -1,14 +1,12 @@
-package io.disposia.engine.domain.dto;
+package io.disposia.engine.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.disposia.engine.domain.ImmutableArrayWrapper;
 import org.immutables.value.Value;
 
 import java.util.List;
 
-/**
- * @author Maximilian Irro
- */
 @Value.Immutable
 @Value.Style(
     jdkOnly    = true,              // prevent usage of Guava collections

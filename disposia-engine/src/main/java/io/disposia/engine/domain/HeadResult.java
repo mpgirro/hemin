@@ -7,8 +7,6 @@ import java.util.Optional;
 
 /**
  * This is an **toImmutable** DTO, with Jackson serialization capability (see https://blog.pchudzik.com/201704/immutable-dto/)
- *
- * @author Maximilian Irro
  */
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class HeadResult {

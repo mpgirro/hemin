@@ -2,7 +2,7 @@ package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
-import io.disposia.engine.domain.dto.Chapter
+import io.disposia.engine.domain.Chapter
 import reactivemongo.api.{Cursor, DefaultDB}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -25,40 +25,10 @@ class ChapterRepository(db: DefaultDB, ec: ExecutionContext)
 
   // TODO this writes, but does not OVERWRITE existing chapter with same EXO!!
   def save(chapter: Chapter): Future[Unit] = {
-
-    //println("Saving [MongoChapterService] : " + chapter.toString)
-
-    /*
-    collection.flatMap(_
-        .insert[Chapter](ordered = false).one(chapter)
-    ).map(_ => {})
-    */
-
-    /*
-    collection
-        .insert[Chapter](ordered = false)
-        .one(chapter)
-        .map(_ => {})
-        */
-    //println("Writing Chapter DTO to mongodb collection : " + collection.name)
     collection
       .insert[Chapter](ordered = false)
       .one(chapter)
       .map(_ => {})
-
-
-    /*
-    val writeRes: Future[WriteResult] =
-        collection.insert[Chapter](ordered = false).one(chapter)
-
-    writeRes.onComplete { // Dummy callbacks
-        case Failure(e) => e.printStackTrace()
-        case Success(writeResult) =>
-            println(s"successfully inserted document with result: $writeResult")
-    }
-
-    writeRes.map(_ => {}) // in this example, do nothing with the success
-    */
   }
 
   def findByExo(exo: String): Future[Option[Chapter]] = {

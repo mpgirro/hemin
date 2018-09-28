@@ -8,7 +8,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.domain.dto._
+import io.disposia.engine.domain._
 import io.disposia.engine.index.IndexStore.{SearchIndex, SearchResults}
 
 import scala.concurrent.duration._

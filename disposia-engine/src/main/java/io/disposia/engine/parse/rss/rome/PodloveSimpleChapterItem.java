@@ -2,9 +2,6 @@ package io.disposia.engine.parse.rss.rome;
 
 import com.rometools.rome.feed.CopyFrom;
 
-/**
- * @author Maximilian Irro
- */
 public class PodloveSimpleChapterItem implements CopyFrom {
 
     private String start;

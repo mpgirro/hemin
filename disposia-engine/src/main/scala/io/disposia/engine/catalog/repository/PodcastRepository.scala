@@ -1,8 +1,8 @@
 package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.domain.dto.Podcast
-import io.disposia.engine.catalog.repository.BsonConversion.{toBson,toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
+import io.disposia.engine.domain.Podcast
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -23,16 +23,6 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(podcast: Podcast): Future[Podcast] = {
-    /*
-    collection
-        .insert[Podcast](ordered = false)
-        .one(podcast)
-        .map(e => {
-            if (!e.ok)
-                println("ERROR on saving podcast : " + e.writeErrors)
-        })
-     */
-    //println("Writing Podcast DTO to mongodb collection : " + collection.name)
     val query = BSONDocument("exo" -> podcast.getExo)
     collection
       .update(query, podcast, upsert = true)
@@ -42,7 +32,6 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
             case None => throw new RuntimeException("Saving Podcast to database was unsuccessful : " + podcast)
           }
       }
-
   }
 
   def findOne(exo: String): Future[Option[Podcast]] = {

@@ -12,7 +12,6 @@ import java.util.List;
  *
  * For DirectoryAPI documentation, see https://blog.panoptikum.io/api/
  *
- * @author Maximilian Irro
  */
 public class PanoptikumDirectoryAPI extends DirectoryAPI {
 

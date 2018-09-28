@@ -6,9 +6,6 @@ import com.typesafe.config.Config
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
 
-/**
-  * @author Maximilian Irro
-  */
 class CrawlerPriorityMailbox(settings: ActorSystem.Settings, config: Config) extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {

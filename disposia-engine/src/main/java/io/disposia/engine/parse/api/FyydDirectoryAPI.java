@@ -1,7 +1,7 @@
 package io.disposia.engine.parse.api;
 
-import io.disposia.engine.domain.dto.Episode;
-import io.disposia.engine.domain.dto.ImmutableEpisode;
+import io.disposia.engine.domain.Episode;
+import io.disposia.engine.domain.ImmutableEpisode;
 import io.disposia.engine.mapper.DateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,8 +18,6 @@ import java.util.stream.Collectors;
  *
  *
  * For DirectoryAPI documentation, see https://github.com/eazyliving/fyyd-api
- *
- * @author Maximilian Irro
  */
 public class FyydDirectoryAPI extends DirectoryAPI {
 

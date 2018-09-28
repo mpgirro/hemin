@@ -10,9 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * @author Maximilian Irro
- */
 public class PodcastSimpleChapterParser implements ModuleParser {
 
     private static final Namespace PSC_NS = Namespace.getNamespace(PodloveSimpleChapterModule.URI);

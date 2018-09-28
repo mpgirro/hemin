@@ -13,7 +13,9 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndImage;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
-import io.disposia.engine.domain.dto.*;
+import io.disposia.engine.domain.Episode;
+import io.disposia.engine.domain.Podcast;
+import io.disposia.engine.domain.*;
 import io.disposia.engine.exception.FeedParsingException;
 import io.disposia.engine.parse.rss.rome.PodloveSimpleChapterModule;
 import io.disposia.engine.util.UrlUtil;
@@ -32,9 +34,6 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-/**
- * @author Maximilian Irro
- */
 public class RomeFeedParser implements FeedParser {
 
     private static final Logger log = LoggerFactory.getLogger(RomeFeedParser.class);

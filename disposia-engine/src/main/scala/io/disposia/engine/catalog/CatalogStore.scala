@@ -7,8 +7,7 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.catalog.repository.{ChapterRepository, EpisodeRepository, FeedRepository, PodcastRepository}
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
-import io.disposia.engine.domain.FeedStatus
-import io.disposia.engine.domain.dto._
+import io.disposia.engine.domain._
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.mapper._
 import io.disposia.engine.updater.Updater.ProcessFeed

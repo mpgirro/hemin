@@ -10,9 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-/**
- * @author Maximilian Irro
- */
 public abstract class DirectoryAPI {
 
     protected Gson gson = new Gson();

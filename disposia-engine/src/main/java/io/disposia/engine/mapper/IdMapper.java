@@ -1,6 +1,10 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.dto.*;
+import io.disposia.engine.domain.Chapter;
+import io.disposia.engine.domain.Episode;
+import io.disposia.engine.domain.Feed;
+import io.disposia.engine.domain.Podcast;
+import io.disposia.engine.domain.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -15,8 +19,6 @@ import java.util.Optional;
  *
  * Identification in a global scope is done by using the EXO (= external ID) value,
  * which this mapper leaves untouched.
- *
- * @author Maximilian Irro
  */
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface IdMapper {
