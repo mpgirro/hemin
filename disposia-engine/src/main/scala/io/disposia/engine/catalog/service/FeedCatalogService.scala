@@ -90,14 +90,10 @@ class FeedCatalogService(log: LoggingAdapter,
     @Transactional
     def findAllByPodcast(podcastExo: String): List[Feed] = {
         log.debug("Request to get all Feeds by Podcast (EXO) : {}", podcastExo)
-        /*
         feedRepository.findAllByPodcast(podcastExo)
             .asScala
             .map(f => feedMapper.toImmutable(f))
             .toList
-            */
-        val r = mongoRepo.findAllByPodcast(podcastExo)
-        Await.result(r, 10.seconds)
     }
 
     @Transactional
