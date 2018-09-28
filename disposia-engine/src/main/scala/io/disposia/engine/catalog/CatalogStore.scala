@@ -6,8 +6,6 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.catalog.mongo.{ChapterMongoRepository, EpisodeMongoRepository, FeedMongoRepository, PodcastMongoRepository}
-import io.disposia.engine.catalog.repository.RepositoryFactoryBuilder
-import io.disposia.engine.catalog.service._
 import io.disposia.engine.config.CatalogConfig
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import io.disposia.engine.domain.FeedStatus
@@ -16,13 +14,10 @@ import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.mapper._
 import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.ExoGenerator
-import javax.persistence.{EntityManager, EntityManagerFactory}
-import org.springframework.orm.jpa.EntityManagerHolder
-import org.springframework.transaction.support.TransactionSynchronizationManager
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext, blocking}
+import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
 
 object CatalogStore {
@@ -78,17 +73,6 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  /*
-  private val CONFIG = ConfigFactory.load()
-  private val MAX_PAGE_SIZE: Int = Option(CONFIG.getInt("echo.catalog.max-page-size")).getOrElse(10000)
-  */
-
-  /*
-  private val catalogEventStream = CONFIG.getString("echo.catalog.event-stream")
-  private val indexEventStream = CONFIG.getString("echo.index.event-stream")
-  private val mediator = DistributedPubSub(context.system).mediator
-  */
-
   private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.catalog.dispatcher")
 
   private val exoGenerator: ExoGenerator = new ExoGenerator(1) // TODO get shardId from Config
@@ -99,38 +83,10 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
   private var updater: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private var repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
-  private var emf: EntityManagerFactory = repositoryFactoryBuilder.getEntityManagerFactory
-
-
-
-  // TODO experimental
-  //val dbName = "exodb"
-
   // TODO add and read from CONFIG
-  val mongoUri = s"mongodb://localhost:27017/disposia" // ?authMode=scram-sha1
+  private val mongoUri = s"mongodb://localhost:27017/disposia" // ?authMode=scram-sha1
 
-  // Connect to the database: Must be done only once per application
-  //val driver = MongoDriver()
-  //val parsedUri = MongoConnection.parseURI(mongoUri)
-  //val connection = parsedUri.map(driver.connection(_))
-  //val connection: MongoConnection = driver.connection(List("localhost"))
-
-  /*
-  // Database and collections: Get references
-  val futureConnection: Future[MongoConnection] = Future.fromTry(connection)
-  //def db: Future[DefaultDB] = futureConnection.flatMap(_.database(dbName))
-  val mongoConnection: MongoConnection = Await.result(futureConnection, 10.seconds)
-  val db: DefaultDB = Await.result(mongoConnection.database(dbName), 10.seconds)
-  */
-  //val db: Future[DefaultDB] = connection.database(dbName)
-  //val db: DefaultDB = Await.result(connection.database(dbName), 10.seconds) // TODO read timeout from config
-
-  //val mongoService = new ChapterMongoRepository(db)
-
-  // - - - - - - - - -
-
-  lazy val (connection, dbName) = {
+  private lazy val (connection, dbName) = {
     val driver = MongoDriver()
 
     //registerDriverShutdownHook(driver)
@@ -154,8 +110,7 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
       case _ => /*logger.debug*/ log.info(s"[$lnm] MongoDB resolved: $dbName")
     }
 
-  def db(implicit ec: ExecutionContext): DefaultDB =
-    Await.result(resolveDB(ec), 10.seconds)
+  private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
 
   private val podcastRepo: PodcastMongoRepository = new PodcastMongoRepository(db, executionContext)
   private val episodetRepo: EpisodeMongoRepository = new EpisodeMongoRepository(db, executionContext)
@@ -170,11 +125,6 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
       }
    */
 
-  private val podcastService = new PodcastCatalogService(log, repositoryFactoryBuilder)
-  private val episodeService = new EpisodeCatalogService(log, repositoryFactoryBuilder)
-  private val feedService = new FeedCatalogService(log, repositoryFactoryBuilder)
-  private val chapterService = new ChapterCatalogService(log, repositoryFactoryBuilder)
-
   private val podcastMapper = PodcastMapper.INSTANCE
   private val episodeMapper = EpisodeMapper.INSTANCE
   private val feedMapper = FeedMapper.INSTANCE
@@ -188,18 +138,11 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     //log.info(s"[$lnm] Stopping the MongoDriver...")
     //Future(mongoDriver.close())
 
-    repositoryFactoryBuilder = new RepositoryFactoryBuilder(config.databaseUrl)
-    emf = repositoryFactoryBuilder.getEntityManagerFactory
-
     super.postRestart(cause)
   }
 
   override def postStop(): Unit = {
     log.info("shutting down")
-
-    Option(emf)
-      .filter(_.isOpen)
-      .foreach(_.close())
   }
 
   override def receive: Receive = {
@@ -1233,25 +1176,4 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     }
   */
 
-  /**
-    *
-    * @param task the function to be executed inside a transaction
-    * @param services all services used within the callable function, which therefore require a refresh before doing the work
-    */
-  @Deprecated
-  private def doInTransaction(task: () => Any, services: List[CatalogService] ): Any = {
-    blocking {
-      val em: EntityManager = emf.createEntityManager()
-      TransactionSynchronizationManager.bindResource(emf, new EntityManagerHolder(em))
-      try {
-        services.foreach(_.refresh(em))
-        task()
-      } finally {
-        Option(em)
-          .filter(_.isOpen)
-          .foreach(_.close())
-        TransactionSynchronizationManager.unbindResource(emf)
-      }
-    }
-  }
 }
