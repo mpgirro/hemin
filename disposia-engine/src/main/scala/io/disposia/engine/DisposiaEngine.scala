@@ -88,53 +88,42 @@ class DisposiaEngine {
     }
   }
 
-  def findEpisode(exo: String): Future[Option[Episode]] = {
-    (bus ? GetEpisode(exo)).map {
-      case EpisodeResult(episode) => Some(episode)
-      case NothingFound(unknown)  => None
+  def findPodcast(exo: String): Future[Option[Podcast]] =
+    (bus ? GetPodcast(exo)).map { 
+      case PodcastResult(p) => p
     }
-  }
 
-  def findChaptersByEpisode(exo: String): Future[List[Chapter]] = {
-    (bus ? GetChaptersByEpisode(exo)).map {
-      case ChaptersByEpisodeResult(chapters) => chapters
+  def findEpisode(exo: String): Future[Option[Episode]] =
+    (bus ? GetEpisode(exo)).map {
+      case EpisodeResult(e) => e
     }
-  }
+
+  def findFeed(exo: String): Future[Option[Feed]] =
+    (bus ? GetFeed(exo)).map {
+      case FeedResult(f) => f
+    }
 
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
     val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
     val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
-    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
-      case AllPodcastsResult(podcasts) => podcasts
-    }
+    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map { case AllPodcastsResult(ps) => ps }
   }
 
-  def findPodcast(exo: String): Future[Option[Podcast]] = {
-    (bus ? GetPodcast(exo)).map {
-      case PodcastResult(podcast) => Some(podcast)
-      case NothingFound(unknown)  => None
-    }
-  }
-
-  def findEpisodesByPodcast(exo: String): Future[List[Episode]] = {
+  def findEpisodesByPodcast(exo: String): Future[List[Episode]] =
     (bus ? GetEpisodesByPodcast(exo)).map {
-      case EpisodesByPodcastResult(episodes) => episodes
+      case EpisodesByPodcastResult(es) => es
     }
-  }
 
-  def findFeedsByPodcast(exo: String): Future[List[Feed]] = {
+  def findFeedsByPodcast(exo: String): Future[List[Feed]] =
     (bus ? GetFeedsByPodcast(exo)).map {
-      case FeedsByPodcastResult(feeds) => feeds
+      case FeedsByPodcastResult(fs) => fs
     }
-  }
 
-  def findFeed(exo: String): Future[Option[Feed]] = {
-    (bus ? GetFeed(exo)).map {
-      case FeedResult(feed)      => Some(feed)
-      case NothingFound(unknown) => None
+  def findChaptersByEpisode(exo: String): Future[List[Chapter]] =
+    (bus ? GetChaptersByEpisode(exo)).map {
+      case ChaptersByEpisodeResult(cs) => cs
     }
-  }
 
   private def breakerOpen(name: String): Unit = {
     log.warn("{} Circuit Breaker is open", name)

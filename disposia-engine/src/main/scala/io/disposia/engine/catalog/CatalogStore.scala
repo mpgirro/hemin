@@ -16,6 +16,7 @@ import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.ExoGenerator
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
@@ -58,15 +59,15 @@ object CatalogStore {
     //case class CheckAllPodcasts() extends CatalogQuery
     case class CheckAllFeeds() extends CatalogQuery
     // CatalogQueryResults
-    case class PodcastResult(podcast: Podcast) extends CatalogQueryResult
+    case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
     case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
     case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
-    case class EpisodeResult(episode: Episode) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
+    case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
     case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
     case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
     case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
-    case class FeedResult(feed: Feed) extends CatalogQueryResult
-    case class NothingFound(exo: String) extends CatalogQueryResult
+    case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
+    //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
 class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
@@ -605,12 +606,23 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     podcastRepo
       .findOne(exo)
+      .andThen {
+        case Success(p)  => p
+        case Failure(ex) =>
+          onError(s"Error on retrieving Podcast (EXO=$exo) from database : ", ex)
+          None // we have no results to return
+      }
+      .map { p =>
+        theSender ! PodcastResult(p)
+      }
+      /*
       .foreach {
         case Some(p) => theSender ! PodcastResult(p)
         case None =>
           log.warning("Database does not contain Podcast (EXO) : {}", exo)
           theSender ! NothingFound(exo)
       }
+      */
 
     // TODO delete
     /*
@@ -638,10 +650,21 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     podcastRepo
       .findAll(page, size)
+      .andThen {
+        case Success(ps) => ps
+        case Failure(ex) =>
+          onError(s"Could not get all Podcasts by page=$page and size=$size", ex)
+          List() // we have no results to return
+      }
+      .map { ps =>
+        theSender ! AllPodcastsResult(ps)
+      }
+      /*
       .onComplete {
         case Success(ps) => theSender ! AllPodcastsResult(ps)
         case Failure(ex) => onError(s"Could not get all Podcasts by page=$page and size=$size", ex)
       }
+      */
 
     // TODO delete
     /*
@@ -660,9 +683,14 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     podcastRepo
       .findAllRegistrationCompleteAsTeaser(page, size)
-      .onComplete {
-        case Success(ps) => theSender ! AllPodcastsResult(ps)
-        case Failure(ex) => onError(s"Could not get all Podcasts by page=$page and size=$size and registrationCompelete=TRUE", ex)
+      .andThen {
+        case Success(ps) => ps
+        case Failure(ex) =>
+          onError(s"Could not get all Podcasts by page=$page and size=$size and registrationCompelete=TRUE", ex)
+          List() // we have no results to return
+      }
+      .map { ps =>
+        theSender ! AllPodcastsResult(ps)
       }
 
     // TODO delete
@@ -681,9 +709,14 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     feedRepo
       .findAll(page, size)
-      .onComplete {
-        case Success(fs) => theSender ! AllFeedsResult(fs)
-        case Failure(ex) => onError(s"Could not get all Podcasts by page=$page and size=$size", ex)
+      .andThen {
+        case Success(fs) => fs
+        case Failure(ex) =>
+          onError(s"Could not get all Feeds by page=$page and size=$size", ex)
+          List() // we have no results to return
+      }
+      .map { fs =>
+        theSender ! AllFeedsResult(fs)
       }
 
     // TODO delete
@@ -702,12 +735,23 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     episodetRepo
       .findOne(exo)
+      .andThen {
+        case Success(e)  => e
+        case Failure(ex) =>
+          onError(s"Error on retrieving Episode (EXO=$exo) from database : ", ex)
+          None // we have no results to return
+      }
+      .map { e =>
+        theSender ! EpisodeResult(e)
+      }
+      /*
       .foreach {
         case Some(e) => theSender ! EpisodeResult(e)
         case None =>
           log.warning("Database does not contain Episode (EXO) : {}", exo)
           theSender ! NothingFound(exo)
       }
+      */
 
     // TODO delete
     /*
@@ -735,10 +779,23 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     episodetRepo
       .findAllByPodcast(podcastId)
+      .andThen {
+        case Success(es) => es
+        case Failure(ex) =>
+          onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
+          List() // we have no results to return
+      }
+      .map { es =>
+        theSender ! EpisodesByPodcastResult(es)
+      }
+      /*
       .onComplete {
         case Success(es) => theSender ! EpisodesByPodcastResult(es)
-        case Failure(ex) => onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
+        case Failure(ex) =>
+          onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
+          theSender ! EpisodesByPodcastResult(List())
       }
+      */
 
     // TODO delete
     /*
@@ -756,10 +813,23 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     feedRepo
       .findAllByPodcast(podcastId)
+      .andThen {
+        case Success(fs) => fs
+        case Failure(ex) =>
+          onError(s"Could not get all Feeds by Podcast (ID=$podcastId)", ex)
+          List() // we have no results to return
+      }
+      .map { fs =>
+        theSender ! FeedsByPodcastResult(fs)
+      }
+      /*
       .onComplete {
         case Success(fs) => theSender ! FeedsByPodcastResult(fs)
-        case Failure(ex) => onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
+        case Failure(ex) =>
+          onError(s"Could not get all Feeds by Podcast (ID=$podcastId)", ex)
+          theSender ! FeedsByPodcastResult(List())
       }
+      */
 
     // TODO delete
     /*
@@ -775,12 +845,19 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     log.debug("Received GetChaptersByEpisode('{}')", episodeId)
 
     val theSender = sender()
-    chapterRepo
-      .findAllByEpisode(episodeId)
-      .onComplete {
-        case Success(cs) => theSender ! ChaptersByEpisodeResult(cs)
-        case Failure(ex) => log.error("Could not retrieve Chapters By Episode : {}", ex)
+    episodetRepo
+      .findOne(episodeId)
+      .map {
+        case Some(e) =>
+          Option(e.getChapters) match {
+            case Some(cs) => cs.asScala.toList
+            case None     => List()
+          }
+        case None =>
+          log.warning("Database does not contain Episode (EXO) : {}", episodeId)
+          List()
       }
+      .foreach { cs => theSender ! ChaptersByEpisodeResult(cs) }
 
     // TODO delete
     /*
@@ -798,12 +875,23 @@ class CatalogStore(config: CatalogConfig) extends Actor with ActorLogging {
     val theSender = sender()
     feedRepo
       .findOne(exo)
+      .andThen {
+        case Success(f)  => f
+        case Failure(ex) =>
+          onError(s"Error on retrieving Feed (EXO=$exo) from database : ", ex)
+          None // we have no results to return
+      }
+      .map { f =>
+        theSender ! FeedResult(f)
+      }
+      /*
       .foreach {
         case Some(f) => theSender ! FeedResult(f)
         case None =>
           log.warning("Database does not contain Feed (EXO) : {}", exo)
           theSender ! NothingFound(exo)
       }
+      */
 
     // TODO delete
     /*
