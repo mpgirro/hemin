@@ -58,13 +58,13 @@ class PostActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: Pla
 
   type PostRequestBlock[A] = PostRequest[A] => Future[Result]
 
-  private val logger = Logger(this.getClass)
+  private val log = Logger(this.getClass)
 
   override def invokeBlock[A](request: Request[A],
                               block: PostRequestBlock[A]): Future[Result] = {
     // Convert to marker context and use request in block
     implicit val markerContext: MarkerContext = requestHeaderToMarkerContext(request)
-    logger.trace(s"invokeBlock: ")
+    //logger.trace(s"invokeBlock: ")
 
     val future = block(new PostRequest(request, messagesApi))
 
