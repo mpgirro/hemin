@@ -1,0 +1,13 @@
+version: '2'
+services:
+  solr:
+    image: solr:7.5.0
+    container_name: "solr"
+    ports:
+      - 8983:8983
+    volumes:
+      - ./data/solr:/opt/solr/server/solr/mycores
+    entrypoint:
+      - docker-entrypoint.sh
+      - solr-precreate
+      - disposia
