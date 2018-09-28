@@ -106,7 +106,9 @@ class Engine {
     val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
     val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
-    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map { case AllPodcastsResult(ps) => ps }
+    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
+      case AllPodcastsResult(ps) => ps
+    }
   }
 
   def findEpisodesByPodcast(exo: String): Future[List[Episode]] =

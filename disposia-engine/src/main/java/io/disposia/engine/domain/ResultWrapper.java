@@ -12,11 +12,11 @@ import java.util.List;
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers
 @Value.Style(
-    jdkOnly    = true,              // prevent usage of Guava collections
-    get        = {"is*", "get*"},   // Detect 'get' and 'is' prefixes in accessor methods
-    init       = "set*",
-    create     = "new",             // generates public no args constructor
-    build      = "create"           // rename 'build' method on builder to 'create'
+    jdkOnly = true,              // prevent usage of Guava collections
+    get     = {"is*", "get*"},   // Detect 'get' and 'is' prefixes in accessor methods
+    init    = "set*",
+    create  = "new",             // generates public no args constructor
+    build   = "create"           // rename 'build' method on builder to 'create'
 )
 @JsonSerialize(as = ImmutableResultWrapper.class)
 @JsonDeserialize(as = ImmutableResultWrapper.class)
