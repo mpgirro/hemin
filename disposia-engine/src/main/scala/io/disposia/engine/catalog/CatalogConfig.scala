@@ -5,7 +5,7 @@ package io.disposia.engine.catalog
   */
 case class CatalogConfig (
   workerCount: Int,
-  databaseUrl: String,
+  mongoUri: String,
   defaultPage: Int,
   defaultSize: Int,
   maxPageSize: Int

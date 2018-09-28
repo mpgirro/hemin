@@ -83,16 +83,13 @@ class CatalogStore(config: CatalogConfig)
   private var updater: ActorRef = _
   private var supervisor: ActorRef = _
 
-  // TODO add and read from CONFIG
-  private val mongoUri = s"mongodb://localhost:27017/disposia" // ?authMode=scram-sha1
-
   private lazy val (connection, dbName) = {
     val driver = MongoDriver()
 
     //registerDriverShutdownHook(driver)
 
     (for {
-      parsedUri <- MongoConnection.parseURI(mongoUri)
+      parsedUri <- MongoConnection.parseURI(config.mongoUri)
       con <- driver.connection(parsedUri, strictUri = true)
       db <- parsedUri.db match {
         case Some(dbName) => Success(dbName)

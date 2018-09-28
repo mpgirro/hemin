@@ -5,10 +5,12 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.domain._
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
+import io.disposia.engine.util.ExecutorServiceWrapper
 
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.compat.java8.OptionConverters._
-import scala.concurrent.{ExecutionContext, Future, blocking}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future, blocking}
 import scala.language.postfixOps
 
 object IndexStore {
@@ -39,16 +41,17 @@ class IndexStore (config: IndexConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private val indexCommitter: IndexCommitter = new LuceneCommitter(config.indexPath, config.createIndex) // TODO do not alway re-create the index
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
+
+  private val indexCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
   private val indexSearcher: IndexSearcher = new LuceneSearcher(indexCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
+  private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var indexChanged = false
   private val cache: mutable.Queue[IndexDoc] = new mutable.Queue
   private val updateWebsiteQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateImageQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
-
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
 
   private var supervisor: ActorRef = _
 
@@ -88,6 +91,7 @@ class IndexStore (config: IndexConfig)
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.getExo)
       cache.enqueue(doc)
+      solrCommiter.add(doc)
 
     case UpdateDocWebsiteDataIndexEvent(exo, html) =>
       log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", exo)
@@ -106,7 +110,7 @@ class IndexStore (config: IndexConfig)
       log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
 
       var currQuery = query // make a copy in case of an exception
-    val origSender = sender()
+      val origSender = sender()
 
       Future {
         var results: ResultWrapper = null

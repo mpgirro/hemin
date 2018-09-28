@@ -37,7 +37,7 @@ object EngineConfig {
       appConfig = AppConfig(),
       catalogConfig = CatalogConfig(
         workerCount = config.getInt("echo.catalog.worker-count"),
-        databaseUrl = config.getString("echo.catalog.database-url"),
+        mongoUri    = config.getString("echo.catalog.mongo-uri"),
         defaultPage = config.getInt("echo.catalog.default-page"),
         defaultSize = config.getInt("echo.catalog.default-size"),
         maxPageSize = config.getInt("echo.catalog.max-page-size")
@@ -49,12 +49,15 @@ object EngineConfig {
         downloadMaxBytes = config.getLong("echo.crawler.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
       ),
       indexConfig = IndexConfig(
-        indexPath      = config.getString("echo.index.index-path"), // TODO add to config file
-        createIndex    = config.getBoolean("echo.index.create-index"),
-        commitInterval = config.getInt("echo.index.commit-interval").seconds,
-        workerCount    = config.getInt("echo.index.handler-count"),
-        defaultPage    = config.getInt("echo.index.default-page"),
-        defaultSize    = config.getInt("echo.index.default-size"),
+        luceneIndexPath = config.getString("echo.index.lucene-index-path"), // TODO add to config file
+        solrUri         = config.getString("echo.index.solr-uri"),
+        solrQueueSize   = config.getInt("echo.index.solr-queue-size"),
+        solrThreadCount = config.getInt("echo.index.solr-thread-count"),
+        createIndex     = config.getBoolean("echo.index.create-index"),
+        commitInterval  = config.getInt("echo.index.commit-interval").seconds,
+        workerCount     = config.getInt("echo.index.handler-count"),
+        defaultPage     = config.getInt("echo.index.default-page"),
+        defaultSize     = config.getInt("echo.index.default-size"),
       ),
       parserConfig = ParserConfig(
         workerCount = config.getInt("echo.parser.worker-count")
@@ -66,7 +69,7 @@ object EngineConfig {
   private def defaultConfig(): Config = {
     val defaults = Map(
       "echo.catalog.worker-count"       -> 5,
-      "echo.catalog.database-url"       -> "jdbc:h2:mem:echo1",
+      "echo.catalog.mongo-uri"          -> "mongodb://localhost:27017/disposia",
       "echo.catalog.default-page"       -> 1,
       "echo.catalog.default-size"       -> 20,
       "echo.catalog.max-page-size"      -> 10000,
@@ -74,7 +77,10 @@ object EngineConfig {
       "echo.crawler.fetch-websites"     -> false, // TODO rename to config file
       "echo.crawler.download-timeout"   -> 10, // TODO add to config file
       "echo.crawler.download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
-      "echo.index.index-path"           -> "/Users/max/volumes/echo/index_1",
+      "echo.index.lucene-index-path"    -> "./data/index",
+      "echo.index.solr-uri"             -> "http://localhost:8983/solr/disposia",
+      "echo.index.solr-queue-size"      -> 20,
+      "echo.index.solr-thread-count"    -> 4,
       "echo.index.create-index"         -> false,
       "echo.index.commit-interval"      -> 3,
       "echo.index.handler-count"        -> 5,
