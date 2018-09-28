@@ -1,6 +1,6 @@
 package services
 
-import io.disposia.engine.DisposiaEngine
+import io.disposia.engine.Engine
 import javax.inject._
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
@@ -13,7 +13,7 @@ class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
     private val log = Logger(getClass).logger
 
     log.info("Starting engine")
-    val engine: DisposiaEngine = new DisposiaEngine()
+    val engine: Engine = new Engine()
     engine.start()
 
     lifecycle.addStopHook { () =>
