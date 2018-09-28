@@ -33,8 +33,6 @@ class ParserWorker (config: ParserConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  //private val CONFIG = ConfigFactory.load()
-
   private val podcastMapper = PodcastMapper.INSTANCE
   private val episodeMapper = EpisodeMapper.INSTANCE
   private val indexMapper = IndexMapper.INSTANCE

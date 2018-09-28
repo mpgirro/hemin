@@ -3,12 +3,8 @@ package io.disposia.engine.crawler
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
-import akka.cluster.pubsub.DistributedPubSub
-import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Send}
 import akka.stream._
-import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
-import io.disposia.engine.catalog.CatalogBroker
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.crawler.Crawler._
 import io.disposia.engine.domain.FeedStatus

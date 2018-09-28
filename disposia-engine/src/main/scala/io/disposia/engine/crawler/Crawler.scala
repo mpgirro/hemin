@@ -8,7 +8,6 @@ import javax.net.ssl.SSLHandshakeException
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.exception.EchoException
 
