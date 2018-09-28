@@ -3,15 +3,12 @@ package util
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.FeedStatus
-import io.disposia.engine.domain.dto._
+import io.disposia.engine.domain._
 import io.disposia.engine.mapper.DateMapper
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
 
-/**
-  * @author max
-  */
 object JsonWrites {
 
     private def toNullJson(b: Boolean): JsValue = Option(b).map(toJson).getOrElse(JsNull)
@@ -42,7 +39,7 @@ object JsonWrites {
             "results" -> JsArray(as.results.map(fmt.writes).toVector)
         ))
 
-        /**
+    /**
       * Mapping to write a ResultWrapper out as a JSON value.
       */
     implicit val implicitWrapperWrites: Writes[ResultWrapper] =

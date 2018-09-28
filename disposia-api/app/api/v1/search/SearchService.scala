@@ -2,7 +2,7 @@ package api.v1.search
 
 import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.config.ConfigFactory
-import io.disposia.engine.domain.dto.ResultWrapper
+import io.disposia.engine.domain.ResultWrapper
 import javax.inject.{Inject, Provider}
 import play.api.MarkerContext
 import services.EngineService
@@ -12,7 +12,7 @@ import scala.concurrent.{ExecutionContext, Future}
 // TODO das hier ist ein Service
 
 /**
-  * Controls access to the backend data, returning [[io.disposia.engine.domain.dto.ResultWrapper]]
+  * Controls access to the backend data, returning [[io.disposia.engine.domain.ResultWrapper]]
   */
 class SearchService @Inject()(engineService: EngineService)
                              (implicit ec: ExecutionContext) {

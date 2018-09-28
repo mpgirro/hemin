@@ -1,6 +1,6 @@
 package api.v1.episode
 
-import io.disposia.engine.domain.dto._
+import io.disposia.engine.domain._
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes

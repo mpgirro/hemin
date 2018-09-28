@@ -1,6 +1,6 @@
 package api.v1.search
 
-import io.disposia.engine.domain.dto.ResultWrapper
+import io.disposia.engine.domain.ResultWrapper
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes
@@ -11,10 +11,6 @@ import util.{JsonWrites, RequestMarkerContext}
 
 import scala.concurrent.ExecutionContext
 
-
-/**
-  * @author max
-  */
 class SearchController @Inject() (cc: SearchControllerComponents,
                                   searchActionBuilder: SearchActionBuilder,
                                   searchService: SearchService,
