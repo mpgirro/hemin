@@ -25,9 +25,11 @@ class SolrCommitter(config: IndexConfig, executorService: ExecutorService) {
     .withExecutorService(executorService)
     .build()
 
-  if (config.createIndex) try
+  if (config.createIndex) try {
+    log.info("Deleting all Solr documents on startup")
     solr.deleteByQuery("*:*")
-  catch {
+    solr.commit()
+  } catch {
     case ex@(_: SolrServerException | _: IOException) =>
       log.error("Error deleting all old document from Solr collection")
       ex.printStackTrace()

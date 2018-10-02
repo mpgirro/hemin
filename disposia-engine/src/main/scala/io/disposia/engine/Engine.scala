@@ -9,7 +9,8 @@ import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
-import io.disposia.engine.index.IndexStore.{SearchIndex, SearchResults}
+import io.disposia.engine.index.IndexStore.{IndexSearch, IndexSearchResults}
+import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -82,8 +83,8 @@ class Engine {
     if (page < 1)             return Future { ResultWrapper.empty() }
     if (size < 1)             return Future { ResultWrapper.empty() }
 
-    (bus ? SearchIndex(query, page, size)).map {
-      case SearchResults(_, results) => results
+    (bus ? SearcherRequest(query, page, size)).map {
+      case SearcherResults(rs) => rs
     }
   }
 

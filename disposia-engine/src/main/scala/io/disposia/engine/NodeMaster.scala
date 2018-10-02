@@ -11,6 +11,8 @@ import io.disposia.engine.index.IndexStore
 import io.disposia.engine.index.IndexStore.IndexMessage
 import io.disposia.engine.parser.Parser
 import io.disposia.engine.parser.Parser.ParserMessage
+import io.disposia.engine.searcher.Searcher
+import io.disposia.engine.searcher.Searcher.SearcherMessage
 import io.disposia.engine.updater.Updater
 import io.disposia.engine.updater.Updater.UpdaterMessage
 
@@ -42,23 +44,26 @@ class NodeMaster (config: EngineConfig)
   private var catalog: ActorRef = _
   private var crawler: ActorRef = _
   private var parser: ActorRef = _
+  private var searcher: ActorRef = _
   private var updater: ActorRef = _
 
   private var indexStartupComplete = false
   private var catalogStartupComplete = false
   private var crawlerStartupComplete = false
   private var parserStartupComplete = false
+  private var searcherStartupComplete = false
   private var updaterStartupComplete = false
 
   override def preStart(): Unit = {
 
     //val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
 
-    index   = context.watch(context.actorOf(IndexStore.props(config.indexConfig),     IndexStore.name))
-    parser  = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
-    crawler = context.watch(context.actorOf(Crawler.props(config.crawlerConfig),      Crawler.name))
-    catalog = context.watch(context.actorOf(CatalogStore.props(config.catalogConfig), CatalogStore.name))
-    updater = context.watch(context.actorOf(Updater.props(config.updaterConfig),      Updater.name))
+    index    = context.watch(context.actorOf(IndexStore.props(config.indexConfig),     IndexStore.name))
+    parser   = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
+    crawler  = context.watch(context.actorOf(Crawler.props(config.crawlerConfig),      Crawler.name))
+    catalog  = context.watch(context.actorOf(CatalogStore.props(config.catalogConfig), CatalogStore.name))
+    searcher = context.watch(context.actorOf(Searcher.props(config.indexConfig),       Searcher.name))
+    updater  = context.watch(context.actorOf(Updater.props(config.updaterConfig),      Updater.name))
 
 
     // pass around references not provided by constructors due to circular dependencies
@@ -81,6 +86,8 @@ class NodeMaster (config: EngineConfig)
     catalog ! ActorRefUpdaterActor(updater)
     catalog ! ActorRefSupervisor(self)
 
+    searcher ! ActorRefSupervisor(self)
+
     updater ! ActorRefCatalogStoreActor(catalog)
     updater ! ActorRefCrawlerActor(crawler)
     updater ! ActorRefSupervisor(self)
@@ -97,11 +104,12 @@ class NodeMaster (config: EngineConfig)
     case GetIndexBroker => sender ! index
     case GetUpdater => sender ! updater
 
-    case msg: CatalogMessage => catalog.tell(msg, sender())
-    case msg: CrawlerMessage => crawler.tell(msg, sender())
-    case msg: IndexMessage   => index.tell(msg, sender())
-    case msg: ParserMessage  => parser.tell(msg, sender())
-    case msg: UpdaterMessage => updater.tell(msg, sender())
+    case msg: CatalogMessage  => catalog.tell(msg, sender())
+    case msg: CrawlerMessage  => crawler.tell(msg, sender())
+    case msg: IndexMessage    => index.tell(msg, sender())
+    case msg: ParserMessage   => parser.tell(msg, sender())
+    case msg: SearcherMessage => searcher.tell(msg, sender())
+    case msg: UpdaterMessage  => updater.tell(msg, sender())
 
     case ReportCatalogStoreStartupComplete =>
       log.info("Catalog reported startup complete")
@@ -115,6 +123,9 @@ class NodeMaster (config: EngineConfig)
     case ReportParserStartupComplete       =>
       log.info("Parser reported startup complete")
       parserStartupComplete = true
+    case ReportSearcherStartupComplete       =>
+      log.info("Searcher reported startup complete")
+      searcherStartupComplete = true
     case ReportUpdaterStartupComplete      =>
       log.info("Updater reported startup complete")
       updaterStartupComplete = true
@@ -130,7 +141,7 @@ class NodeMaster (config: EngineConfig)
     case ShutdownSystem   => onSystemShutdown()
   }
 
-  private def isEngineOperational: Boolean = catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && updaterStartupComplete
+  private def isEngineOperational: Boolean = catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && searcherStartupComplete && updaterStartupComplete
 
   private def onTerminated(corpse: ActorRef): Unit = {
     log.error("Oh noh! A critical subsystem died : {}", corpse.path)
@@ -143,8 +154,10 @@ class NodeMaster (config: EngineConfig)
     // it is important to shutdown all actor(supervisor) befor shutting down the actor system
     context.system.stop(crawler)    // these have a too full inbox usually to let them finish processing
     context.system.stop(catalog)
-    context.system.stop(index)
     context.system.stop(parser)
+    context.system.stop(index)
+    context.system.stop(searcher)
+    context.system.stop(updater)
 
     //cluster.leave(cluster.selfAddress) // leave the cluster before shutdown
 

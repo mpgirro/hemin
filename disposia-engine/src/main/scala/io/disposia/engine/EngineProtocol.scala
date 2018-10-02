@@ -7,9 +7,6 @@ import akka.actor.ActorRef
   */
 object EngineProtocol {
 
-    // Gateway(= Web) -> Searcher; CLI -> Gateway (Benchmark)
-    case class SearchRequest(query: String, page: Option[Int], size: Option[Int])
-
     // These messages are sent to propagate actorRefs to other actors, to overcome circular dependencies
     trait ActorRefInfo
 
@@ -25,6 +22,7 @@ object EngineProtocol {
     case class ReportIndexStoreStartupComplete()
     case class ReportCrawlerStartupComplete()
     case class ReportParserStartupComplete()
+    case class ReportSearcherStartupComplete()
     case class ReportUpdaterStartupComplete()
     case class ReportWorkerStartupComplete() // for worker/handler delegation children
 

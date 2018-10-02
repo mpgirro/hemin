@@ -38,7 +38,7 @@ import java.util.Set;
 public interface Podcast {
 
     @Nullable
-    Long getId();
+    String getId();
 
     @Nullable
     String getExo();

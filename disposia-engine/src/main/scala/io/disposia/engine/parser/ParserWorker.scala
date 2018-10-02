@@ -97,6 +97,8 @@ class ParserWorker (config: ParserConfig)
 
     case ParseFyydEpisodes(podcastExo, json) => onParseFyydEpisodes(podcastExo, json)
 
+    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+
   }
 
   private def onParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String): Unit = {

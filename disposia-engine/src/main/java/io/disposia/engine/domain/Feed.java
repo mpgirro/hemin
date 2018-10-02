@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
 public interface Feed {
 
     @Nullable
-    Long getId();
+    String getId();
 
     @Nullable
     Long getPodcastId();

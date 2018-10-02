@@ -6,6 +6,8 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.solr.common.SolrDocument;
+import org.apache.solr.common.SolrInputDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -14,6 +16,8 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Mapper(uses = {PodcastMapper.class, EpisodeMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
@@ -85,53 +89,144 @@ public interface IndexMapper {
             .orElse(null);
     }
 
-    default ImmutableIndexDoc toImmutable(Document doc) {
+    default ImmutableIndexDoc toImmutable(org.apache.lucene.document.Document doc) {
 
         if (doc == null) return null;
 
-        switch (doc.get(IndexField.DOC_TYPE)) {
+        final String docType = doc.get(IndexField.DOC_TYPE);
+        if (isNullOrEmpty(docType)) {
+            throw new RuntimeException("Document type is required but found NULL");
+        }
+
+        switch (docType) {
             case "podcast": return toImmutable(PodcastMapper.INSTANCE.toImmutable(doc));
             case "episode": return toImmutable(EpisodeMapper.INSTANCE.toImmutable(doc));
-            default: throw new RuntimeException("Unsupported lucene document type : " + doc.get(IndexField.DOC_TYPE));
+            default: throw new RuntimeException("Unsupported document type : " + docType);
         }
     }
 
-    default Document toLucene(IndexDoc doc) {
+    default ImmutableIndexDoc toImmutable(SolrDocument doc) {
+
+        if (doc == null) return null;
+
+        final String docType = (String) doc.getFieldValue(IndexField.DOC_TYPE);
+        if (isNullOrEmpty(docType)) {
+            throw new RuntimeException("Document type is required but found NULL");
+        }
+
+        switch (docType) {
+            case "podcast": return toImmutable(PodcastMapper.INSTANCE.toImmutable(doc));
+            case "episode": return toImmutable(EpisodeMapper.INSTANCE.toImmutable(doc));
+            default: throw new RuntimeException("Unsupported document type : " + docType);
+        }
+    }
+
+    default org.apache.lucene.document.Document toLucene(IndexDoc doc) {
 
         if (doc == null) return null;
 
         final Document lucene = new Document();
 
-        Optional.ofNullable(doc.getDocType())
+        Optional
+            .ofNullable(doc.getDocType())
             .ifPresent(value -> lucene.add(new StringField(IndexField.DOC_TYPE, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getExo())
+        Optional
+            .ofNullable(doc.getExo())
             .ifPresent(value -> lucene.add(new StringField(IndexField.EXO, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getTitle())
+        Optional
+            .ofNullable(doc.getTitle())
             .ifPresent(value -> lucene.add(new TextField(IndexField.TITLE, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getLink())
+        Optional
+            .ofNullable(doc.getLink())
             .ifPresent(value -> lucene.add(new TextField(IndexField.LINK, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getDescription())
+        Optional
+            .ofNullable(doc.getDescription())
             .ifPresent(value -> lucene.add(new TextField(IndexField.DESCRIPTION, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getPodcastTitle())
+        Optional
+            .ofNullable(doc.getPodcastTitle())
             .ifPresent(value -> lucene.add(new TextField(IndexField.PODCAST_TITLE, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getPubDate())
+        Optional
+            .ofNullable(doc.getPubDate())
             .map(DateMapper.INSTANCE::asString)
             .ifPresent(value -> lucene.add(new StringField(IndexField.PUB_DATE, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getImage())
+        Optional
+            .ofNullable(doc.getImage())
             .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_IMAGE, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getItunesAuthor())
+        Optional
+            .ofNullable(doc.getItunesAuthor())
             .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_AUTHOR, value, Field.Store.NO)));
-        Optional.ofNullable(doc.getItunesSummary())
+        Optional
+            .ofNullable(doc.getItunesSummary())
             .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_SUMMARY, value, Field.Store.YES)));
-        Optional.ofNullable(doc.getChapterMarks())
+        Optional
+            .ofNullable(doc.getChapterMarks())
             .ifPresent(value -> lucene.add(new TextField(IndexField.CHAPTER_MARKS, value, Field.Store.NO)));
-        Optional.ofNullable(doc.getContentEncoded())
+        Optional
+            .ofNullable(doc.getContentEncoded())
             .ifPresent(value -> lucene.add(new TextField(IndexField.CONTENT_ENCODED, value, Field.Store.NO)));
-        Optional.ofNullable(doc.getTranscript())
+        Optional
+            .ofNullable(doc.getTranscript())
             .ifPresent(value -> lucene.add(new TextField(IndexField.TRANSCRIPT, value, Field.Store.NO)));
-        Optional.ofNullable(doc.getWebsiteData())
+        Optional
+            .ofNullable(doc.getWebsiteData())
             .ifPresent(value -> lucene.add(new TextField(IndexField.WEBSITE_DATA, value, Field.Store.NO)));
 
         return lucene;
     }
+
+    /*
+    default SolrInputDocument toSolr(IndexDoc doc ) {
+
+        if (doc == null) return null;
+
+        final SolrInputDocument solr = new SolrInputDocument();
+
+        Optional
+            .ofNullable(doc.getDocType())
+            .ifPresent(value -> solr.addField(IndexField.DOC_TYPE, value));
+        Optional
+            .ofNullable(doc.getExo())
+            .ifPresent(value -> solr.addField(IndexField.EXO, value));
+        Optional
+            .ofNullable(doc.getTitle())
+            .ifPresent(value -> solr.addField(IndexField.TITLE, value));
+        Optional
+            .ofNullable(doc.getLink())
+            .ifPresent(value -> solr.addField(IndexField.LINK, value));
+        Optional
+            .ofNullable(doc.getDescription())
+            .ifPresent(value -> solr.addField(IndexField.DESCRIPTION, value));
+        Optional
+            .ofNullable(doc.getPodcastTitle())
+            .ifPresent(value -> solr.addField(IndexField.PODCAST_TITLE, value));
+        Optional
+            .ofNullable(doc.getPubDate())
+            .map(DateMapper.INSTANCE::asString)
+            .ifPresent(value -> solr.addField(IndexField.PUB_DATE, value));
+        Optional
+            .ofNullable(doc.getImage())
+            .ifPresent(value -> solr.addField(IndexField.ITUNES_IMAGE, value));
+        Optional
+            .ofNullable(doc.getItunesAuthor())
+            .ifPresent(value -> solr.addField(IndexField.ITUNES_AUTHOR, value));
+        Optional
+            .ofNullable(doc.getItunesSummary())
+            .ifPresent(value -> solr.addField(IndexField.ITUNES_SUMMARY, value));
+        Optional
+            .ofNullable(doc.getChapterMarks())
+            .ifPresent(value -> solr.addField(IndexField.CHAPTER_MARKS, value));
+        Optional
+            .ofNullable(doc.getContentEncoded())
+            .ifPresent(value -> solr.addField(IndexField.CONTENT_ENCODED, value));
+        Optional
+            .ofNullable(doc.getTranscript())
+            .ifPresent(value -> solr.addField(IndexField.TRANSCRIPT, value));
+        Optional
+            .ofNullable(doc.getWebsiteData())
+            .ifPresent(value -> solr.addField(IndexField.WEBSITE_DATA, value));
+
+        return solr;
+    }
+    */
+
 }

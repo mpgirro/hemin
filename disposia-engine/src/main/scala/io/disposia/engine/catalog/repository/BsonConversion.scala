@@ -47,7 +47,7 @@ object BsonConversion {
       implicit val implicitBson: BSONDocument = bson
       val p = ImmutablePodcast.builder()
 
-      asLong("id").map(p.setId(_))
+      asString("id").map(p.setId)
       asString("exo").map(p.setExo)
       asString("title").map(p.setTitle)
       asString("link").map(p.setLink)
@@ -117,7 +117,7 @@ object BsonConversion {
       implicit val implicitBson: BSONDocument = bson
       val e = ImmutableEpisode.builder()
 
-      asLong("id").map(e.setId(_))
+      asString("id").map(e.setId)
       asLong("podcastId").map(e.setPodcastId(_))
       asString("exo").map(e.setExo)
       asString("podcastExo").map(e.setPodcastExo)
@@ -200,7 +200,7 @@ object BsonConversion {
       implicit val implicitBson: BSONDocument = bson
       val f = ImmutableFeed.builder()
 
-      asLong("id").map(f.setId(_))
+      asString("id").map(f.setId)
       asLong("podcastId").map(f.setPodcastId(_))
       asString("exo").map(f.setExo)
       asString("podcastExo").map(f.setPodcastExo)

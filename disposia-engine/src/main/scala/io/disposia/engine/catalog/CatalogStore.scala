@@ -116,6 +116,7 @@ class CatalogStore(config: CatalogConfig)
 
   // white all data if we please
   if (config.createDatabase) {
+    log.info("Dropping database collections on startup")
     podcasts.drop
     episodes.drop
     feeds.drop
@@ -226,7 +227,7 @@ class CatalogStore(config: CatalogConfig)
 
     case DebugPrintAllFeeds => debugPrintAllFeeds()
 
-    case unhandled => log.warning("Received message of unhandeled type : {}", unhandled.getClass)
+    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
 
@@ -255,6 +256,7 @@ class CatalogStore(config: CatalogConfig)
           if (fs.isEmpty) {
             val podcastExo = exoGenerator.getNewExo
             var podcast = ImmutablePodcast.builder()
+              .setId(podcastExo)
               .setExo(podcastExo)
               .setTitle(podcastExo)
               .setDescription(url)
@@ -263,6 +265,7 @@ class CatalogStore(config: CatalogConfig)
               .create()
             val feedExo = exoGenerator.getNewExo
             val feed = ImmutableFeed.builder()
+              .setId(feedExo)
               .setExo(feedExo)
               .setPodcastExo(podcastExo)
               .setUrl(url)
@@ -610,7 +613,9 @@ class CatalogStore(config: CatalogConfig)
                 val e = episodeMapper.toModifiable(episode)
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
-                e.setExo(exoGenerator.getNewExo)
+                val episodeExo = exoGenerator.getNewExo
+                e.setId(episodeExo)
+                e.setExo(episodeExo)
                 e.setPodcastExo(podcastExo)
                 e.setPodcastTitle(p.getTitle) // we'll not re-use this DTO, but extract the info again a bit further down
                 e.setRegistrationTimestamp(LocalDateTime.now())

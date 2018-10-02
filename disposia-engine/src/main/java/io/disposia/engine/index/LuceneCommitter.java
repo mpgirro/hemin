@@ -25,7 +25,7 @@ public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter 
 
     private final IndexMapper indexMapper = IndexMapper.INSTANCE;
 
-    public LuceneCommitter(final String indexPath, final boolean create) throws IOException {
+    public LuceneCommitter(String indexPath, boolean create) throws IOException {
 
         final Directory dir = FSDirectory.open(Paths.get(indexPath));
         final Analyzer analyzer = new StandardAnalyzer();

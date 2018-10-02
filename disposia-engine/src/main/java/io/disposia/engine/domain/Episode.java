@@ -23,7 +23,7 @@ import java.util.List;
 public interface Episode {
 
     @Nullable
-    Long getId();
+    String getId();
 
     @Nullable
     Long getPodcastId();

@@ -4,6 +4,7 @@ import io.disposia.engine.domain.IndexField;
 import io.disposia.engine.domain.ImmutablePodcast;
 import io.disposia.engine.domain.ModifiablePodcast;
 import io.disposia.engine.domain.Podcast;
+import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -92,6 +93,29 @@ public interface PodcastMapper {
                     .findFirst()
                     .orElse(null))
                 .setImage(d.get(IndexField.ITUNES_IMAGE))
+                .create())
+            .orElse(null);
+    }
+
+    default ImmutablePodcast toImmutable(SolrDocument doc) {
+        return Optional
+            .ofNullable(doc)
+            .map(d -> ImmutablePodcast.builder()
+                .setExo((String) d.getFieldValue(IndexField.EXO))
+                .setTitle((String) d.getFieldValue(IndexField.TITLE))
+                .setLink((String) d.getFieldValue(IndexField.LINK))
+                .setPubDate(Optional
+                    .ofNullable(d.getFieldValue(IndexField.PUB_DATE))
+                    .map(o -> (String) o)
+                    .map(DateMapper.INSTANCE::asLocalDateTime)
+                    .orElse(null))
+                .setDescription(Stream
+                    .of(d.getFieldValue(IndexField.ITUNES_SUMMARY), d.getFieldValue(IndexField.DESCRIPTION))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .map(o -> (String) o)
+                    .orElse(null))
+                .setImage((String) d.get(IndexField.ITUNES_IMAGE))
                 .create())
             .orElse(null);
     }

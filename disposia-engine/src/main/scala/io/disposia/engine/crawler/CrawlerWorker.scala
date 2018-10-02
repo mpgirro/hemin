@@ -116,6 +116,8 @@ class CrawlerWorker (config: CrawlerConfig)
     case LoadFyydEpisodes(podcastId, fyydId) =>
       onLoadFyydEpisodes(podcastId, fyydId)
 
+    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+
   }
 
   /*

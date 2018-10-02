@@ -49,6 +49,8 @@ class Updater (config: UpdaterConfig)
     case ProcessFeed(exo, url, job: FetchJob) =>
       log.debug("Received ProcessFeed({},{},{})", exo, url, job)
       crawler ! DownloadWithHeadCheck(exo, url, job)
+
+    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
   }
 
 }

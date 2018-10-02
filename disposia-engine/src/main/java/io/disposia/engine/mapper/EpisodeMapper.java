@@ -4,6 +4,7 @@ import io.disposia.engine.domain.IndexField;
 import io.disposia.engine.domain.Episode;
 import io.disposia.engine.domain.ImmutableEpisode;
 import io.disposia.engine.domain.ModifiableEpisode;
+import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -92,6 +93,31 @@ public interface EpisodeMapper {
                 .setImage(d.get(IndexField.ITUNES_IMAGE))
                 .setItunesDuration(d.get(IndexField.ITUNES_DURATION))
                 .setPodcastTitle(d.get(IndexField.PODCAST_TITLE))
+                .create())
+            .orElse(null);
+    }
+
+    default ImmutableEpisode toImmutable(SolrDocument doc) {
+        return Optional
+            .ofNullable(doc)
+            .map(d -> ImmutableEpisode.builder()
+                .setExo((String) d.getFieldValue(IndexField.EXO))
+                .setTitle((String) d.getFieldValue(IndexField.TITLE))
+                .setLink((String) d.getFieldValue(IndexField.LINK))
+                .setPubDate(Optional
+                    .ofNullable(d.getFieldValue(IndexField.PUB_DATE))
+                    .map(o -> (String) o)
+                    .map(DateMapper.INSTANCE::asLocalDateTime)
+                    .orElse(null))
+                .setDescription(Stream
+                    .of(d.getFieldValue(IndexField.ITUNES_SUMMARY), d.getFieldValue(IndexField.DESCRIPTION))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .map(o -> (String) o)
+                    .orElse(null))
+                .setImage((String) d.getFieldValue(IndexField.ITUNES_IMAGE))
+                .setItunesDuration((String) d.getFieldValue(IndexField.ITUNES_DURATION))
+                .setPodcastTitle((String) d.getFieldValue(IndexField.PODCAST_TITLE))
                 .create())
             .orElse(null);
     }

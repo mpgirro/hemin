@@ -31,9 +31,9 @@ object IndexStore {
   // IndexCommands
   case class CommitIndex() extends IndexCommand
   // IndexQueries
-  case class SearchIndex(query: String, page: Int, size: Int) extends IndexQuery
+  case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
-  case class SearchResults(query: String, results: ResultWrapper) extends IndexQueryResult
+  case class IndexSearchResults(results: ResultWrapper) extends IndexQueryResult
 }
 
 class IndexStore (config: IndexConfig)
@@ -65,7 +65,7 @@ class IndexStore (config: IndexConfig)
         log.error("Error trying to search the index; reason: {}", e.getMessage)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
-        sender ! SearchResults("UNKNOWN", ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+        sender ! IndexSearchResults(ResultWrapper.empty()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
       //currQuery = ""
     }
     super.postRestart(cause)
@@ -106,28 +106,30 @@ class IndexStore (config: IndexConfig)
       log.debug("Received IndexStoreUpdateDocLink({},'{}')", exo, link)
       updateLinkQueue.enqueue((exo, link))
 
-    case SearchIndex(query, page, size) =>
+    case IndexSearch(query, page, size) =>
       log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
 
-      var currQuery = query // make a copy in case of an exception
+      //var currQuery = query // make a copy in case of an exception
       val origSender = sender()
 
       Future {
         var results: ResultWrapper = null
         blocking {
-          results = indexSearcher.search(currQuery, page, size)
+          results = indexSearcher.search(query, page, size)
         }
 
         if (results.getTotalHits > 0){
-          origSender ! SearchResults(currQuery,results)
+          origSender ! IndexSearchResults(results)
         } else {
           log.warning("No Podcast matching query: '{}' found in the index", query)
           //sender ! NoIndexResultsFound(query)
-          origSender ! SearchResults(currQuery,ResultWrapper.empty())
+          origSender ! IndexSearchResults(ResultWrapper.empty())
         }
 
-        currQuery = "" // wipe the copy
+        //currQuery = "" // wipe the copy
       }
+
+    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
 
