@@ -1,13 +1,11 @@
 package io.disposia.engine.mapper;
 
 import io.disposia.engine.domain.*;
-import io.disposia.engine.domain.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.SolrInputDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -109,7 +107,7 @@ public interface IndexMapper {
 
         if (doc == null) return null;
 
-        final String docType = (String) doc.getFieldValue(IndexField.DOC_TYPE);
+        final String docType = SolrFieldMapper.INSTANCE.firstStringOrNull(doc, IndexField.DOC_TYPE);
         if (isNullOrEmpty(docType)) {
             throw new RuntimeException("Document type is required but found NULL");
         }
@@ -129,47 +127,47 @@ public interface IndexMapper {
 
         Optional
             .ofNullable(doc.getDocType())
-            .ifPresent(value -> lucene.add(new StringField(IndexField.DOC_TYPE, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new StringField(IndexField.DOC_TYPE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getExo())
-            .ifPresent(value -> lucene.add(new StringField(IndexField.EXO, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new StringField(IndexField.EXO, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getTitle())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.TITLE, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.TITLE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getLink())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.LINK, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.LINK, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getDescription())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.DESCRIPTION, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.DESCRIPTION, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getPodcastTitle())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.PODCAST_TITLE, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.PODCAST_TITLE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getPubDate())
             .map(DateMapper.INSTANCE::asString)
-            .ifPresent(value -> lucene.add(new StringField(IndexField.PUB_DATE, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new StringField(IndexField.PUB_DATE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getImage())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_IMAGE, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.ITUNES_IMAGE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getItunesAuthor())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_AUTHOR, value, Field.Store.NO)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.ITUNES_AUTHOR, x, Field.Store.NO)));
         Optional
             .ofNullable(doc.getItunesSummary())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.ITUNES_SUMMARY, value, Field.Store.YES)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.ITUNES_SUMMARY, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getChapterMarks())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.CHAPTER_MARKS, value, Field.Store.NO)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.CHAPTER_MARKS, x, Field.Store.NO)));
         Optional
             .ofNullable(doc.getContentEncoded())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.CONTENT_ENCODED, value, Field.Store.NO)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.CONTENT_ENCODED, x, Field.Store.NO)));
         Optional
             .ofNullable(doc.getTranscript())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.TRANSCRIPT, value, Field.Store.NO)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.TRANSCRIPT, x, Field.Store.NO)));
         Optional
             .ofNullable(doc.getWebsiteData())
-            .ifPresent(value -> lucene.add(new TextField(IndexField.WEBSITE_DATA, value, Field.Store.NO)));
+            .ifPresent(x -> lucene.add(new TextField(IndexField.WEBSITE_DATA, x, Field.Store.NO)));
 
         return lucene;
     }

@@ -6,7 +6,6 @@ import io.disposia.engine.domain.ImmutableEpisode;
 import io.disposia.engine.domain.ModifiableEpisode;
 import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
@@ -101,23 +100,21 @@ public interface EpisodeMapper {
         return Optional
             .ofNullable(doc)
             .map(d -> ImmutableEpisode.builder()
-                .setExo((String) d.getFieldValue(IndexField.EXO))
-                .setTitle((String) d.getFieldValue(IndexField.TITLE))
-                .setLink((String) d.getFieldValue(IndexField.LINK))
+                .setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
+                .setTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.TITLE))
+                .setLink(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.LINK))
                 .setPubDate(Optional
-                    .ofNullable(d.getFieldValue(IndexField.PUB_DATE))
-                    .map(o -> (String) o)
+                    .ofNullable(SolrFieldMapper.INSTANCE.firstDateOrNull(d, IndexField.PUB_DATE))
                     .map(DateMapper.INSTANCE::asLocalDateTime)
                     .orElse(null))
                 .setDescription(Stream
-                    .of(d.getFieldValue(IndexField.ITUNES_SUMMARY), d.getFieldValue(IndexField.DESCRIPTION))
+                    .of(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_SUMMARY), SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.DESCRIPTION))
                     .filter(Objects::nonNull)
                     .findFirst()
-                    .map(o -> (String) o)
                     .orElse(null))
-                .setImage((String) d.getFieldValue(IndexField.ITUNES_IMAGE))
-                .setItunesDuration((String) d.getFieldValue(IndexField.ITUNES_DURATION))
-                .setPodcastTitle((String) d.getFieldValue(IndexField.PODCAST_TITLE))
+                .setImage(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_IMAGE))
+                .setItunesDuration(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_DURATION))
+                .setPodcastTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.PODCAST_TITLE))
                 .create())
             .orElse(null);
     }

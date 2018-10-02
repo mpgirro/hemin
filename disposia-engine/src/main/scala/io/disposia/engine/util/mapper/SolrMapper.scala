@@ -1,9 +1,14 @@
 package io.disposia.engine.util.mapper
 
+import java.util
+import java.util.List
+
 import io.disposia.engine.domain.{Episode, IndexDoc, IndexField, Podcast}
 import io.disposia.engine.mapper.IndexMapper
 import org.apache.lucene.document.{Field, StringField, TextField}
-import org.apache.solr.common.SolrInputDocument
+import org.apache.solr.common.{SolrDocument, SolrInputDocument}
+
+import scala.collection.JavaConverters._
 
 object SolrMapper {
 
@@ -57,5 +62,12 @@ object SolrMapper {
         d
       }
       .orNull
+
+  def firstOrNull(doc: SolrDocument, fieldName: String): String = doc
+    .getFieldValue(fieldName)
+    .asInstanceOf[util.List[String]]
+    .asScala
+    .headOption
+    .orNull
 
 }

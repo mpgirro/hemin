@@ -45,6 +45,17 @@ class Searcher (config: IndexConfig)
 
   private val indexMapper = IndexMapper.INSTANCE
 
+  private val searchFields = List(
+    IndexField.TITLE,
+    IndexField.DESCRIPTION,
+    IndexField.PODCAST_TITLE,
+    IndexField.CONTENT_ENCODED,
+    IndexField.TRANSCRIPT,
+    IndexField.WEBSITE_DATA,
+    IndexField.ITUNES_AUTHOR,
+    IndexField.ITUNES_SUMMARY,
+    IndexField.CHAPTER_MARKS)
+
   override def postStop: Unit = {
 
     log.info("shutting down")
@@ -61,13 +72,22 @@ class Searcher (config: IndexConfig)
       log.debug("Received SearchRequest('{}',{},{}) message", query, page, size)
 
       val theSender = sender()
-      searchSolr(query, page, size, None, None, None)
+      searchSolr(query, page, size, queryOperator=Some("AND"), None, None)
         .onComplete {
           case Success(rs) => theSender ! SearcherResults(rs)
-          case Failure(ex) => log.error("Error on querying Solr : {}", ex)
+          case Failure(ex) =>
+            log.error("Error on querying Solr : {}", ex)
+            ex.printStackTrace()
         }
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
+
+  private def buildQuery(query: String): String = {
+    val q = query.trim
+    searchFields
+      .map(f => s"$f:($q)")
+      .mkString(" ")
   }
 
   private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): Future[ResultWrapper] = Future {
@@ -79,6 +99,25 @@ class Searcher (config: IndexConfig)
     val offset = (p-1) * s
 
     val query = new SolrQuery()
+      .setStart(offset)
+      .setParam("defType", "edismax")
+      .setQuery(buildQuery(q))
+      .setRows(s)
+
+    // When you assign mm (Minimum 'Should' Match), we remove q.op
+    // because we can't set two params to the same function
+    // q.op=AND == mm=100% | q.op=OR == mm=0%
+    /*
+    minMatch match {
+      case Some(mm) => query.setParam("mm", mm) // "100%"
+      case None =>
+        query.setParam("q.op", queryOperator.getOrElse("AND"))
+    }
+    */
+
+    query.setParam("qf", "title^1 podcast_title^1 chapter_marks^1 description^1e-13 itunes_summary^1e-13 itunes_author^1e-13 content_encoded^1e-13 transcript^1e-13 website_data^1e-13")
+
+    /*
     query.setQuery(q.trim) // Strip whitespace (or other characters) from the beginning and end of a string
     query.setFields(
       IndexField.TITLE,
@@ -91,8 +130,9 @@ class Searcher (config: IndexConfig)
       IndexField.ITUNES_AUTHOR,
       IndexField.ITUNES_SUMMARY,
       IndexField.CHAPTER_MARKS)
-    query.setStart(offset)
-    query.setRows(s)
+      */
+    //query.setQuery(buildQuery(q))
+
 
     val response: QueryResponse = solr.query(query)
     val docList: SolrDocumentList = response.getResults()
