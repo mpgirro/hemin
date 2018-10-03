@@ -3,6 +3,7 @@ package io.disposia.engine.catalog.repository
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain._
+import io.disposia.engine.experimental.Image
 import io.disposia.engine.mapper.DateMapper
 import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONString, BSONValue}
 
@@ -20,6 +21,11 @@ object BsonConversion {
 
   //def toBson(values: Iterable[Chapter]): BSONArray = BSONArray.apply(values.map(c => ChapterWriter.write(c)))
 
+  def toBsonI(value: Option[Int]): Option[BSONInteger] = value.flatMap(toBson)
+  def toBsonL(value: Option[Long]): Option[BSONLong] = value.flatMap(toBson)
+  def toBsonS(value: Option[String]): Option[BSONString] = value.flatMap(toBson)
+  def toBsonB(value: Option[Boolean]): Option[BSONBoolean] = value.flatMap(toBson)
+  def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBson)
 
   def toDocument(map: Map[String, Option[BSONValue]]): BSONDocument =
     BSONDocument.apply(map.collect { case (key, Some(value)) => key -> value })
@@ -41,6 +47,8 @@ object BsonConversion {
   private implicit val feedReader: BSONDocumentReader[Feed] = FeedReader
   private implicit val chapterWriter: BSONDocumentWriter[Chapter] = ChapterWriter
   private implicit val chapterReader: BSONDocumentReader[Chapter] = ChapterReader
+  private implicit val imageWriter: BSONDocumentWriter[Image] = ImageWriter
+  private implicit val imageReader: BSONDocumentReader[Image] = ImageReader
 
   object PodcastReader extends BSONDocumentReader[Podcast] {
     override def read(bson: BSONDocument): Podcast = {
@@ -216,8 +224,8 @@ object BsonConversion {
   object FeedWriter extends BSONDocumentWriter[Feed] {
     override def write(f: Feed): BSONDocument =
       toDocument(Map(
-        "id"                    -> toBson(f.getId),        // TODO remove; no rel. DB
-        "podcastId"             -> toBson(f.getPodcastId), // TODO remove; no rel. DB
+        "id"                    -> toBson(f.getId),
+        "podcastId"             -> toBson(f.getPodcastId),
         //"exo"                   -> toBson(f.getExo),
         //"podcastExo"            -> toBson(f.getPodcastExo),
         "url"                   -> toBson(f.getUrl),
@@ -232,8 +240,8 @@ object BsonConversion {
       implicit val implicitBson: BSONDocument = bson
       val c = ImmutableChapter.builder()
 
-      asLong("id").map(c.setId(_))
-      asLong("episodeId").map(c.setEpisodeId(_))
+      asString("id").map(c.setId)
+      asString("episodeId").map(c.setEpisodeId)
       asString("start").map(c.setStart)
       asString("title").map(c.setTitle)
       asString("href").map(c.setHref)
@@ -254,6 +262,36 @@ object BsonConversion {
         "href"       -> toBson(c.getHref),
         "image"      -> toBson(c.getImage),
         //"episodeExo" -> toBson(c.getEpisodeExo)
+      ))
+  }
+
+  object ImageReader extends BSONDocumentReader[Image] {
+    override def read(bson: BSONDocument): Image = {
+      implicit val implicitBson: BSONDocument = bson
+      Image(
+        id          = asString("id"),
+        associateId = asString("associateId"),
+        //data =  // TODO implement!
+        hash        = asString("hash"),
+        name        = asString("name"),
+        contentType = asString("contentType"),
+        size        = asLong("size"),
+        createdAt   = asLocalDateTime("createdAt")
+      )
+    }
+  }
+
+  object ImageWriter extends BSONDocumentWriter[Image] {
+    override def write(i: Image): BSONDocument =
+      toDocument(Map(
+        "id"          -> toBsonS(i.id),
+        "associateId" -> toBsonS(i.associateId),
+        //"data"        -> toBson(i.data), // TODO implement!
+        "hash"        -> toBsonS(i.hash),
+        "name"        -> toBsonS(i.name),
+        "contentType" -> toBsonS(i.contentType),
+        "size"        -> toBsonL(i.size),
+        "createdAt"   -> toBsonD(i.createdAt)
       ))
   }
 

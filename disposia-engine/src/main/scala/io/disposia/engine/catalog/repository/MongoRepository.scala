@@ -13,10 +13,43 @@ trait MongoRepository[T] {
   protected[this] implicit def bsonWriter: BSONDocumentWriter[T]
   protected[this] implicit def bsonReader: BSONDocumentReader[T]
 
-  protected[this] def collection: BSONCollection
-
   protected[this] def log: Logger
 
+  protected[this] def collection: BSONCollection
+
+  /**
+    * Save entity to database collection
+    *
+    * @param t save entity to database
+    * @return the entity as it was written to the database collection, eventually
+    */
+  def save(t: T): Future[T]
+
+  /**
+    * Find one entity by ID
+    *
+    * @param id the ID of the entity
+    * @return  the entity eventually, or None if not found
+    */
+  def findOne(id: String): Future[Option[T]]
+
+  /**
+    * Find one entity by ID, if the Option contains an ID
+    *
+    * @param optId the ID of the entity wrapped in a Future
+    * @return the entity eventually, or None if not found
+    */
+  def findOne(optId: Option[String]): Future[Option[T]] =
+    optId match {
+      case Some(id) => findOne(id)
+      case None     => Future { None }
+    }
+
+  /**
+    * Drops the collection of this repository
+    *
+    * @return true if drop was successful
+    */
   def drop: Future[Boolean] = {
     log.debug("Dropping collection : {}", collection.name)
     collection.drop(failIfNotFound = true)

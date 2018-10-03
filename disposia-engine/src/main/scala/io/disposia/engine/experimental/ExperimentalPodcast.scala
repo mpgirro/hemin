@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 
 case class ExperimentalPodcast (
-                               id: String,
+                               id: Option[String] = None,
                                title: Option[String] = None,
                                link: Option[String] = None,
                                description: Option[String] = None,

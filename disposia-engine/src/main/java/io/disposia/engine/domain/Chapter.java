@@ -21,10 +21,10 @@ import javax.annotation.Nullable;
 public interface Chapter {
 
     @Nullable
-    Long getId();
+    String getId();
 
     @Nullable
-    Long getEpisodeId();
+    String getEpisodeId();
 
     @Nullable
     String getStart();

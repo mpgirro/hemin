@@ -12,6 +12,8 @@ import scala.concurrent.{ExecutionContext, Future}
 class FeedRepository(db: DefaultDB, ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
+  override protected[this] def log: Logger = Logger(getClass)
+
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
   override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.FeedWriter
@@ -20,9 +22,7 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] def collection: BSONCollection = db.apply("feeds")
 
-  override protected[this] def log: Logger = Logger(getClass)
-
-  def save(feed: Feed): Future[Feed] = {
+  override def save(feed: Feed): Future[Feed] = {
     val query = BSONDocument("id" -> feed.getId)
     collection
       .update(query, feed, upsert = true)
@@ -34,7 +34,7 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
       }
   }
 
-  def findOne(id: String): Future[Option[Feed]] = {
+  override def findOne(id: String): Future[Option[Feed]] = {
     log.debug("Request to get Feed (ID) : {}", id)
     val query = toDocument(Map("id" -> toBson(id)))
     findOne(query)
