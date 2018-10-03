@@ -13,9 +13,9 @@ import scala.util.control.NonFatal
 class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorService {
 
   def execute(command: Runnable) {
-    ec.execute(new Runnable {
-      def run() {
-        try command.run() catch { case NonFatal(ex) => ec.reportFailure(ex) }
+    ec.execute(() => {
+      try command.run() catch {
+        case NonFatal(ex) => ec.reportFailure(ex)
       }
     })
   }
@@ -67,19 +67,17 @@ class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorServ
   private[this] def executeWithPromise[T](callback: => T): Promise[TaskState[T]] = {
     val promise = Promise[TaskState[T]]()
 
-    ec.execute(new Runnable {
-      def run() {
-        if (!promise.isCompleted)
-          try {
-            val result = callback
-            promise.tryComplete(Success(Finished(result)))
-          }
-          catch {
-            case NonFatal(ex) =>
-              promise.tryComplete(Failure(ex))
-              ec.reportFailure(ex)
-          }
-      }
+    ec.execute(() => {
+      if (!promise.isCompleted)
+        try {
+          val result = callback
+          promise.tryComplete(Success(Finished(result)))
+        }
+        catch {
+          case NonFatal(ex) =>
+            promise.tryComplete(Failure(ex))
+            ec.reportFailure(ex)
+        }
     })
 
     promise
@@ -133,7 +131,7 @@ class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorServ
     }
   }
 
-  private[this] def invokeAll[T](tasks: java.util.Collection[_ <: Callable[T]], atMost: Duration) = {
+  private[this] def invokeAll[T](tasks: java.util.Collection[_ <: Callable[T]], atMost: Duration): java.util.List[java.util.concurrent.Future[T]] = {
     if (tasks.size() == 0)
       throw new IllegalArgumentException("tasks is empty")
 
@@ -147,7 +145,7 @@ class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorServ
     promises.map(wrapPromiseInJavaFuture).toList.asJava
   }
 
-  private[this] def durationFor(timeout: Long, unit: TimeUnit) = unit match {
+  private[this] def durationFor(timeout: Long, unit: TimeUnit): FiniteDuration = unit match {
     case TimeUnit.NANOSECONDS => timeout.nanos
     case TimeUnit.MICROSECONDS => timeout.micros
     case _ => unit.toMillis(timeout).millis

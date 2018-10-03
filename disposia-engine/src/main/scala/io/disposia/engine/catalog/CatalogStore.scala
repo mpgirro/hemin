@@ -11,7 +11,7 @@ import io.disposia.engine.domain._
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.mapper._
 import io.disposia.engine.updater.Updater.ProcessFeed
-import io.disposia.engine.util.ExoGenerator
+import io.disposia.engine.util.IdGenerator
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.collection.JavaConverters._
@@ -75,7 +75,7 @@ class CatalogStore(config: CatalogConfig)
 
   private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.catalog.dispatcher")
 
-  private val exoGenerator: ExoGenerator = new ExoGenerator(1) // TODO get shardId from Config
+  private val idGenerator = new IdGenerator(1)  // TODO get shardId from Config
 
   private var catalogStore: ActorRef = _
   private var indexStore: ActorRef = _
@@ -254,7 +254,7 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty) {
-            val podcastExo = exoGenerator.getNewExo
+            val podcastExo = idGenerator.newId
             var podcast = ImmutablePodcast.builder()
               .setId(podcastExo)
               .setExo(podcastExo)
@@ -263,7 +263,7 @@ class CatalogStore(config: CatalogConfig)
               .setRegistrationComplete(false)
               .setRegistrationTimestamp(LocalDateTime.now())
               .create()
-            val feedExo = exoGenerator.getNewExo
+            val feedExo = idGenerator.newId
             val feed = ImmutableFeed.builder()
               .setId(feedExo)
               .setExo(feedExo)
@@ -613,7 +613,7 @@ class CatalogStore(config: CatalogConfig)
                 val e = episodeMapper.toModifiable(episode)
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
-                val episodeExo = exoGenerator.getNewExo
+                val episodeExo = idGenerator.newId
                 e.setId(episodeExo)
                 e.setExo(episodeExo)
                 e.setPodcastExo(podcastExo)
