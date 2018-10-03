@@ -3,13 +3,11 @@ package io.disposia.engine
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
 import akka.util.Timeout
-import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
-import io.disposia.engine.index.IndexStore.{IndexSearch, IndexSearchResults}
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 
 import scala.concurrent.duration._
@@ -63,7 +61,7 @@ class Engine {
   }
 
   def shutdown(): Unit = {
-    master ! ShutdownSystem
+    bus ! ShutdownSystem
   }
 
   def bus(): ActorRef = master
@@ -77,16 +75,10 @@ class Engine {
     search(query, p, s)
   }
 
-  def search(query: String, page: Int, size: Int): Future[ResultWrapper] = {
-
-    if (isNullOrEmpty(query)) return Future { ResultWrapper.empty() }
-    if (page < 1)             return Future { ResultWrapper.empty() }
-    if (size < 1)             return Future { ResultWrapper.empty() }
-
+  def search(query: String, page: Int, size: Int): Future[ResultWrapper] =
     (bus ? SearcherRequest(query, page, size)).map {
       case SearcherResults(rs) => rs
     }
-  }
 
   def findPodcast(id: String): Future[Option[Podcast]] =
     (bus ? GetPodcast(id)).map {

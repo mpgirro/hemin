@@ -1,4 +1,4 @@
-package io.disposia.engine.experimental
+package io.disposia.engine.newdomain.podcast
 
 /**
   * @author max

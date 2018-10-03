@@ -1,4 +1,4 @@
-package io.disposia.engine.experimental
+package io.disposia.engine.newdomain.podcast
 
 /**
   * @author max
@@ -14,4 +14,3 @@ case class PodcastItunesInfo (
                                ownerName: Option[String] = None,
                                ownerEmail: Option[String] = None
                              )
-

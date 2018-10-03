@@ -3,7 +3,7 @@ package io.disposia.engine.catalog.repository
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain._
-import io.disposia.engine.experimental.Image
+import io.disposia.engine.newdomain.Image
 import io.disposia.engine.mapper.DateMapper
 import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONString, BSONValue}
 

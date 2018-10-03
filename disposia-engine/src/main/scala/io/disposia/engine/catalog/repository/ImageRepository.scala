@@ -2,7 +2,7 @@ package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
-import io.disposia.engine.experimental.Image
+import io.disposia.engine.newdomain.Image
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}

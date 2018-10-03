@@ -1,9 +1,11 @@
-package io.disposia.engine.experimental
+package io.disposia.engine.newdomain.podcast
 
 import java.time.LocalDateTime
 
-
-case class PodcastRegistrationInfo (
+/**
+  * @author max
+  */
+case class PodcastRegistrationInfo(
                                      timestamp: Option[LocalDateTime] = None,
                                      complete: Option[Boolean] = None
                                    )
