@@ -40,8 +40,10 @@ public interface Podcast {
     @Nullable
     String getId();
 
+    /*
     @Nullable
     String getExo();
+    */
 
     @Nullable
     String getTitle();

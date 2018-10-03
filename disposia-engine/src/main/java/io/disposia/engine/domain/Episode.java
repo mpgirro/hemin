@@ -26,13 +26,15 @@ public interface Episode {
     String getId();
 
     @Nullable
-    Long getPodcastId();
+    String getPodcastId();
 
+    /*
     @Nullable
     String getExo();
 
     @Nullable
     String getPodcastExo();
+    */
 
     @Nullable
     String getPodcastTitle();

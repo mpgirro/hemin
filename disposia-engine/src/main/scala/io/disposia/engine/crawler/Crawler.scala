@@ -23,8 +23,8 @@ object Crawler {
   case class NewPodcastFetchJob() extends FetchJob
   case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
   case class WebsiteFetchJob() extends FetchJob
-  case class DownloadWithHeadCheck(exo: String, url: String, job: FetchJob) extends CrawlerMessage
-  case class DownloadContent(exo: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
+  case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage
+  case class DownloadContent(id: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
 }
 
 class Crawler (config: CrawlerConfig)

@@ -80,7 +80,7 @@ public interface PodcastMapper {
             .ofNullable(doc)
             .map(d -> ImmutablePodcast.builder()
                 .setId(d.get(IndexField.ID))
-                .setExo(d.get(IndexField.EXO))
+                //.setExo(d.get(IndexField.EXO))
                 .setTitle(d.get(IndexField.TITLE))
                 .setLink(d.get(IndexField.LINK))
                 .setPubDate(Optional
@@ -102,7 +102,7 @@ public interface PodcastMapper {
             .ofNullable(doc)
             .map(d -> ImmutablePodcast.builder()
                 .setId(SolrFieldMapper.INSTANCE.stringOrNull(d, IndexField.ID))
-                .setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
+                //.setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
                 .setTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.TITLE))
                 .setLink(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.LINK))
                 .setPubDate(Optional

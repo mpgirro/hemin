@@ -48,7 +48,7 @@ object BsonConversion {
       val p = ImmutablePodcast.builder()
 
       asString("id").map(p.setId)
-      asString("exo").map(p.setExo)
+      //asString("exo").map(p.setExo)
       asString("title").map(p.setTitle)
       asString("link").map(p.setLink)
       asString("description").map(p.setDescription)
@@ -83,7 +83,7 @@ object BsonConversion {
     override def write(p: Podcast): BSONDocument =
       toDocument(Map(
         "id"                    -> toBson(p.getId), // TODO remove; no rel. DB
-        "exo"                   -> toBson(p.getExo),
+        //"exo"                   -> toBson(p.getExo),
         "title"                 -> toBson(p.getTitle),
         "link"                  -> toBson(p.getLink),
         "description"           -> toBson(p.getDescription),
@@ -118,10 +118,10 @@ object BsonConversion {
       val e = ImmutableEpisode.builder()
 
       asString("id").map(e.setId)
-      asLong("podcastId").map(e.setPodcastId(_))
-      asString("exo").map(e.setExo)
-      asString("podcastExo").map(e.setPodcastExo)
-      asString("podcastTitle").map(e.setPodcastExo)
+      asString("podcastId").map(e.setPodcastId)
+      //asString("exo").map(e.setExo)
+      //asString("podcastExo").map(e.setPodcastExo)
+      asString("podcastTitle").map(e.setPodcastTitle)
       asString("title").map(e.setTitle)
       asString("link").map(e.setLink)
       asLocalDateTime("pubDate").map(e.setPubDate)
@@ -152,8 +152,8 @@ object BsonConversion {
       val doc: BSONDocument = toDocument(Map(
         "id"                    -> toBson(e.getId),        // TODO remove; no rel. DB
         "podcastId"             -> toBson(e.getPodcastId), // TODO remove; no rel. DB
-        "exo"                   -> toBson(e.getExo),
-        "podcastExo"            -> toBson(e.getPodcastExo),
+        //"exo"                   -> toBson(e.getExo),
+        //"podcastExo"            -> toBson(e.getPodcastExo),
         "podcastTitle"          -> toBson(e.getPodcastTitle),
         "title"                 -> toBson(e.getTitle),
         "link"                  -> toBson(e.getLink),
@@ -201,9 +201,9 @@ object BsonConversion {
       val f = ImmutableFeed.builder()
 
       asString("id").map(f.setId)
-      asLong("podcastId").map(f.setPodcastId(_))
-      asString("exo").map(f.setExo)
-      asString("podcastExo").map(f.setPodcastExo)
+      asString("podcastId").map(f.setPodcastId)
+      //asString("exo").map(f.setExo)
+      //asString("podcastExo").map(f.setPodcastExo)
       asString("url").map(f.setUrl)
       asLocalDateTime("lastChecked").map(f.setLastChecked)
       asString("lastStatus").map(status => f.setLastStatus(FeedStatus.getByName(status)))
@@ -218,8 +218,8 @@ object BsonConversion {
       toDocument(Map(
         "id"                    -> toBson(f.getId),        // TODO remove; no rel. DB
         "podcastId"             -> toBson(f.getPodcastId), // TODO remove; no rel. DB
-        "exo"                   -> toBson(f.getExo),
-        "podcastExo"            -> toBson(f.getPodcastExo),
+        //"exo"                   -> toBson(f.getExo),
+        //"podcastExo"            -> toBson(f.getPodcastExo),
         "url"                   -> toBson(f.getUrl),
         "lastChecked"           -> toBson(f.getLastChecked),
         "lastStatus"            -> toBson(f.getLastStatus.getName),
@@ -238,7 +238,7 @@ object BsonConversion {
       asString("title").map(c.setTitle)
       asString("href").map(c.setHref)
       asString("image").map(c.setImage)
-      asString("episodeExo").map(c.setEpisodeExo)
+     // asString("episodeExo").map(c.setEpisodeExo)
 
       c.create()
     }
@@ -253,7 +253,7 @@ object BsonConversion {
         "title"      -> toBson(c.getTitle),
         "href"       -> toBson(c.getHref),
         "image"      -> toBson(c.getImage),
-        "episodeExo" -> toBson(c.getEpisodeExo)
+        //"episodeExo" -> toBson(c.getEpisodeExo)
       ))
   }
 

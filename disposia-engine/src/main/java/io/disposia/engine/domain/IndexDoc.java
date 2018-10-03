@@ -27,8 +27,10 @@ public interface IndexDoc {
     @Nullable
     String getDocType();
 
+    /*
     @Nullable
     String getExo();
+    */
 
     @Nullable
     String getTitle();

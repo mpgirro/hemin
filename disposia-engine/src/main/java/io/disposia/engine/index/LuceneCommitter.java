@@ -69,7 +69,7 @@ public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter 
 
         final Document luceneDoc = indexMapper.toLucene(indexDoc);
         try {
-            writer.updateDocument(new Term(IndexField.EXO, indexDoc.getExo()), luceneDoc);
+            writer.updateDocument(new Term(IndexField.ID, indexDoc.getId()), luceneDoc);
         } catch (IOException e) {
             log.error("Error updating index entry for : {} ; reason was : {}, {}", indexDoc, e.getMessage(), e);
         }

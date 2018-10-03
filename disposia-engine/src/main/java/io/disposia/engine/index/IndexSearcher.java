@@ -10,7 +10,7 @@ public interface IndexSearcher {
 
     ResultWrapper search(String query, int page, int size) throws SearchException;
 
-    Optional<IndexDoc> findByExo(String id) throws SearchException;
+    Optional<IndexDoc> findById(String id) throws SearchException;
 
     void refresh();
 

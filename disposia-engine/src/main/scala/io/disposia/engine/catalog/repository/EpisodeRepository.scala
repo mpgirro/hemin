@@ -23,10 +23,10 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(episode: Episode): Future[Episode] = {
-    val query = BSONDocument("exo" -> episode.getExo)
+    val query = BSONDocument("id" -> episode.getId)
     collection
       .update(query, episode, upsert = true)
-      .flatMap { _ => findOne(episode.getExo)
+      .flatMap { _ => findOne(episode.getId)
         .map {
           case Some(e) => e
           case None    => throw new RuntimeException("Saving Episode to database was unsuccessful : " + episode)
@@ -34,15 +34,15 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
       }
   }
 
-  def findOne(exo: String): Future[Option[Episode]] = {
-    log.debug("Request to get Episode (EXO) : {}", exo)
-    val query = toDocument(Map("exo" -> toBson(exo)))
+  def findOne(id: String): Future[Option[Episode]] = {
+    log.debug("Request to get Episode (ID) : {}", id)
+    val query = toDocument(Map("id" -> toBson(id)))
     findOne(query)
   }
 
-  def findAllByPodcast(podcastExo: String): Future[List[Episode]] = {
-    log.debug("Request to get all Episodes by Podcast (EXO) : {}", podcastExo)
-    val query = toDocument(Map("podcastExo" -> toBson(podcastExo)))
+  def findAllByPodcast(podcastId: String): Future[List[Episode]] = {
+    log.debug("Request to get all Episodes by Podcast (ID) : {}", podcastId)
+    val query = toDocument(Map("podcastId" -> toBson(podcastId)))
     findAll(query)
   }
 
@@ -52,10 +52,10 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
     findAll(query, page, size)
   }
 
-  def findAllByPodcastAndGuid(podcastExo: String, guid: String): Future[List[Episode]] = {
-    log.debug("Request to get all Episodes by Podcast (EXO) : {} and GUID : {}", podcastExo, guid)
+  def findAllByPodcastAndGuid(podcastId: String, guid: String): Future[List[Episode]] = {
+    log.debug("Request to get all Episodes by Podcast (ID) : {} and GUID : {}", podcastId, guid)
     val query = toDocument(Map(
-      "podcastExo" -> toBson(podcastExo),
+      "podcastId" -> toBson(podcastId),
       "guid"       -> toBson(guid)
     ))
     findAll(query)

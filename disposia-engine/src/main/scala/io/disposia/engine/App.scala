@@ -27,8 +27,8 @@ object App {
     "benchmark feed" -> "feed <url>",
     "benchmark index"-> "",
     "benchmark search"-> "",
-    "check podcast"  -> "[all|<exo>]",
-    "check feed"     -> "[all|<exo>]",
+    "check podcast"  -> "[all|<id>]",
+    "check feed"     -> "[all|<id>]",
     "count"          -> "[podcasts|episodes|feeds]",
     "search"         -> "query [query [query]]",
     "print database" -> "[podcasts|episodes|feeds]",
@@ -36,8 +36,8 @@ object App {
     "load fyyd"      -> "[episodes <podcastId> <fyydId>]",
     "save feeds"     -> "<dest>",
     "crawl fyyd"     -> "count",
-    "get podcast"    -> "<exo>",
-    "get episode"    -> "<exo>",
+    "get podcast"    -> "<id>",
+    "get episode"    -> "<id>",
     "request mean episodes" -> ""
   )
 
@@ -80,21 +80,21 @@ object App {
       case "search" :: query :: Nil => search(query)
       //case "search" :: query :: _   => usage("search")
 
-      case "get" :: "podcast" :: Nil        => usage("get podcast")
-      case "get" :: "podcast" :: exo :: Nil => printPodcast(exo)
-      case "get" :: "podcast" :: exo :: _   => usage("get podcast")
+      case "get" :: "podcast" :: Nil       => usage("get podcast")
+      case "get" :: "podcast" :: id :: Nil => printPodcast(id)
+      case "get" :: "podcast" :: id :: _   => usage("get podcast")
 
-      case "get" :: "podcast-feeds" :: Nil        => usage("get podcast")
-      case "get" :: "podcast-feeds" :: exo :: Nil => printFeedsByPodcast(exo)
-      case "get" :: "podcast-feeds" :: exo :: _   => usage("get podcast")
+      case "get" :: "podcast-feeds" :: Nil       => usage("get podcast")
+      case "get" :: "podcast-feeds" :: id :: Nil => printFeedsByPodcast(id)
+      case "get" :: "podcast-feeds" :: id :: _   => usage("get podcast")
 
-      case "get" :: "episode" :: Nil        => usage("get episode")
-      case "get" :: "episode" :: exo :: Nil => printEpisode(exo)
-      case "get" :: "episode" :: exo :: _   => usage("get episode")
+      case "get" :: "episode" :: Nil       => usage("get episode")
+      case "get" :: "episode" :: id :: Nil => printEpisode(id)
+      case "get" :: "episode" :: id :: _   => usage("get episode")
 
-      case "get" :: "episode-chapters" :: Nil        => usage("get chapters")
-      case "get" :: "episode-chapters" :: exo :: Nil => printChaptersByEpisode(exo)
-      case "get" :: "episode-chapters" :: exo :: _   => usage("get chapters")
+      case "get" :: "episode-chapters" :: Nil       => usage("get chapters")
+      case "get" :: "episode-chapters" :: id :: Nil => printChaptersByEpisode(id)
+      case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
 
       case _  => help()
     }
@@ -137,35 +137,35 @@ object App {
       }
   }
 
-  private def printPodcast(exo: String): Unit = {
+  private def printPodcast(id: String): Unit = {
     engine
-      .findPodcast(exo)
+      .findPodcast(id)
       .onComplete {
         case Success(result) =>
           result match {
             case Some(p) => println(p.toString)
-            case None    => println("Unknown EXO")
+            case None    => println("Unknown ID")
           }
         case Failure(reason)  => println("ERROR: " + reason.getMessage)
       }
   }
 
-  private def printEpisode(exo: String): Unit = {
+  private def printEpisode(id: String): Unit = {
     engine
-      .findEpisode(exo)
+      .findEpisode(id)
       .onComplete {
         case Success(result) =>
           result match {
             case Some(e) => println(e.toString)
-            case None    => println("Unknown EXO")
+            case None    => println("Unknown ID")
           }
         case Failure(reason)  => println("ERROR: " + reason.getMessage)
       }
   }
 
-  private def printChaptersByEpisode(exo: String): Unit = {
+  private def printChaptersByEpisode(id: String): Unit = {
     engine
-      .findChaptersByEpisode(exo)
+      .findChaptersByEpisode(id)
       .onComplete {
         case Success(cs) =>
           if (cs.isEmpty)
@@ -176,9 +176,9 @@ object App {
       }
   }
 
-  private def printFeedsByPodcast(exo: String): Unit = {
+  private def printFeedsByPodcast(id: String): Unit = {
     engine
-      .findFeedsByPodcast(exo)
+      .findFeedsByPodcast(id)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty)

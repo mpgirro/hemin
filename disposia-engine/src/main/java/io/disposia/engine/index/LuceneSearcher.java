@@ -167,11 +167,11 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
     }
 
     @Override
-    public synchronized Optional<IndexDoc> findByExo(String exo) throws SearchException {
+    public synchronized Optional<IndexDoc> findById(String id) throws SearchException {
         IndexSearcher indexSearcher = null;
         try {
 
-            final Query query = new TermQuery(new Term(IndexField.EXO, exo));
+            final Query query = new TermQuery(new Term(IndexField.ID, id));
             indexSearcher = this.searcherManager.acquire();
             indexSearcher.setSimilarity(new ClassicSimilarity());
 
@@ -179,8 +179,8 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
 
             final TopDocs topDocs = indexSearcher.search(query, 1);
             if (topDocs.totalHits > 1) {
-                log.error("Searcher found multiple documents for unique {} : {}", IndexField.EXO, exo);
-                throw new SearchException("Multiple documents found in index for unique EXO '" + exo + "'");
+                log.error("Searcher found multiple documents for unique {} : {}", IndexField.ID, id);
+                throw new SearchException("Multiple documents found in index for unique ID '" + id + "'");
             }
             if (topDocs.totalHits == 1) {
                 final ScoreDoc[] hits = indexSearcher.search(query, 1).scoreDocs;
@@ -189,7 +189,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
                     .map(indexMapper::toImmutable);
             }
         } catch (IOException e) {
-            log.error("Lucene Index has encountered an error retrieving a Lucene document by EXO : {} ; reason was : {}, {}", exo, e.getMessage(), e);
+            log.error("Lucene Index has encountered an error retrieving a Lucene document by ID : {} ; reason was : {}, {}", id, e.getMessage(), e);
         } finally {
             if (indexSearcher != null) {
                 try {

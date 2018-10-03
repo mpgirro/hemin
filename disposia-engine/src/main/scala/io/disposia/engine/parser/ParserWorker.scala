@@ -45,7 +45,7 @@ class ParserWorker (config: ParserConfig)
   private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
 
   private var currFeedUrl = ""
-  private var currPodcastExo = ""
+  private var currPodcastId = ""
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
@@ -53,10 +53,10 @@ class ParserWorker (config: ParserConfig)
       case e: FeedParsingException =>
         log.error("FeedParsingException occured while processing feed : {}", currFeedUrl)
         //directoryStore ! FeedStatusUpdate(currPodcastExo, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
-        val catalogEvent = FeedStatusUpdate(currPodcastExo, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
+        val catalogEvent = FeedStatusUpdate(currPodcastId, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
-        currPodcastExo = ""
+        currPodcastId = ""
         currFeedUrl = ""
       case e: java.lang.StackOverflowError =>
         log.error("StackOverflowError parsing : {} ; reason: {}", currFeedUrl, e.getMessage, e)
@@ -89,59 +89,59 @@ class ParserWorker (config: ParserConfig)
       supervisor = ref
       supervisor ! ReportWorkerStartupComplete
 
-    case ParseNewPodcastData(feedUrl, podcastExo, feedData) => onParseNewPodcastData(feedUrl, podcastExo, feedData)
+    case ParseNewPodcastData(feedUrl, podcastId, feedData) => onParseNewPodcastData(feedUrl, podcastId, feedData)
 
-    case ParseUpdateEpisodeData(feedUrl, podcastExo, episodeFeedData) => onParseUpdateEpisodeData(feedUrl, podcastExo, episodeFeedData)
+    case ParseUpdateEpisodeData(feedUrl, podcastId, episodeFeedData) => onParseUpdateEpisodeData(feedUrl, podcastId, episodeFeedData)
 
-    case ParseWebsiteData(exo, html) => onParseWebsiteData(exo, html)
+    case ParseWebsiteData(id, html) => onParseWebsiteData(id, html)
 
-    case ParseFyydEpisodes(podcastExo, json) => onParseFyydEpisodes(podcastExo, json)
+    case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
 
-  private def onParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String): Unit = {
+  private def onParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String): Unit = {
     log.debug("Received ParseNewPodcastData for feed: " + feedUrl)
 
     currFeedUrl = feedUrl
-    currPodcastExo = podcastExo
+    currPodcastId = podcastId
 
-    parse(podcastExo, feedUrl, feedData, isNewPodcast = true)
+    parse(podcastId, feedUrl, feedData, isNewPodcast = true)
 
     currFeedUrl = ""
-    currPodcastExo = ""
+    currPodcastId = ""
   }
 
-  private def onParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String): Unit = {
-    log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastExo)
+  private def onParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String): Unit = {
+    log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastId)
 
     currFeedUrl = feedUrl
-    currPodcastExo = podcastExo
+    currPodcastId = podcastId
 
-    parse(podcastExo, feedUrl, episodeFeedData, isNewPodcast = false)
+    parse(podcastId, feedUrl, episodeFeedData, isNewPodcast = false)
 
     currFeedUrl = ""
-    currPodcastExo = ""
+    currPodcastId = ""
   }
 
-  private def onParseWebsiteData(exo: String, html: String): Unit = {
-    log.debug("Received ParseWebsiteData({},_)", exo)
+  private def onParseWebsiteData(id: String, html: String): Unit = {
+    log.debug("Received ParseWebsiteData({},_)", id)
 
     val readableText = Jsoup.parse(html).text()
 
-    val indexEvent = UpdateDocWebsiteDataIndexEvent(exo, readableText)
+    val indexEvent = UpdateDocWebsiteDataIndexEvent(id, readableText)
     //mediator ! Publish(indexEventStream, indexEvent)
     index ! indexEvent
   }
 
-  private def onParseFyydEpisodes(podcastExo: String, json: String): Unit = {
-    log.debug("Received ParseFyydEpisodes({},_)", podcastExo)
+  private def onParseFyydEpisodes(podcastId: String, json: String): Unit = {
+    log.debug("Received ParseFyydEpisodes({},_)", podcastId)
 
     val episodes: List[Episode] = fyydAPI.getEpisodes(json).asScala.toList
-    log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastExo)
+    log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastId)
     for(episode <- episodes){
-      registerEpisode(podcastExo, episode)
+      registerEpisode(podcastId, episode)
     }
   }
 
@@ -159,7 +159,7 @@ class ParserWorker (config: ParserConfig)
   }
   */
 
-  private def parse(podcastExo: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
+  private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
     val parser = RomeFeedParser.of(feedData)
     Option(parser.getPodcast) match {
@@ -168,7 +168,8 @@ class ParserWorker (config: ParserConfig)
         // TODO try-catch for Feedparseerror here, send update
         // directoryStore ! FeedStatusUpdate(feedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
 
-        p.setExo(podcastExo)
+        //p.setExo(podcastId)
+        p.setId(podcastId)
 
         Option(p.getTitle).foreach(t => p.setTitle(t.trim))
         Option(p.getDescription).foreach(d => p.setDescription(Jsoup.clean(d, Whitelist.basic())))
@@ -189,13 +190,13 @@ class ParserWorker (config: ParserConfig)
           // request that the podcasts website will get added to the index as well, if possible
           Option(p.getLink) match {
             case Some(link) =>
-              crawler ! DownloadWithHeadCheck(p.getExo, link, WebsiteFetchJob())
-            case None => log.debug("No link set for podcast {} --> no website data will be added to the index", p.getExo)
+              crawler ! DownloadWithHeadCheck(p.getId, link, WebsiteFetchJob())
+            case None => log.debug("No link set for podcast {} --> no website data will be added to the index", p.getId)
           }
         }
 
         // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
-        val catalogEvent = UpdatePodcast(podcastExo, feedUrl, p.toImmutable)
+        val catalogEvent = UpdatePodcast(podcastId, feedUrl, p.toImmutable)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
 
@@ -203,7 +204,7 @@ class ParserWorker (config: ParserConfig)
         Option(parser.getEpisodes) match {
           case Some(es) =>
             for(e <- es.asScala){
-              registerEpisode(podcastExo, e)
+              registerEpisode(podcastId, e)
             }
           case None => log.warning("Parsing generated a NULL-List[Episode] for feed: {}", feedUrl)
         }
@@ -211,7 +212,7 @@ class ParserWorker (config: ParserConfig)
     }
   }
 
-  private def registerEpisode(podcastExo: String, episode: Episode): Unit = {
+  private def registerEpisode(podcastId: String, episode: Episode): Unit = {
 
     val e = episodeMapper.toModifiable(episode)
 
@@ -227,7 +228,7 @@ class ParserWorker (config: ParserConfig)
     })
     */
 
-    val catalogCommand = RegisterEpisodeIfNew(podcastExo, e.toImmutable)
+    val catalogCommand = RegisterEpisodeIfNew(podcastId, e.toImmutable)
     //sendCatalogCommand(catalogCommand)
     catalog ! catalogCommand
   }

@@ -88,18 +88,18 @@ class Engine {
     }
   }
 
-  def findPodcast(exo: String): Future[Option[Podcast]] =
-    (bus ? GetPodcast(exo)).map {
+  def findPodcast(id: String): Future[Option[Podcast]] =
+    (bus ? GetPodcast(id)).map {
       case PodcastResult(p) => p
     }
 
-  def findEpisode(exo: String): Future[Option[Episode]] =
-    (bus ? GetEpisode(exo)).map {
+  def findEpisode(id: String): Future[Option[Episode]] =
+    (bus ? GetEpisode(id)).map {
       case EpisodeResult(e) => e
     }
 
-  def findFeed(exo: String): Future[Option[Feed]] =
-    (bus ? GetFeed(exo)).map {
+  def findFeed(id: String): Future[Option[Feed]] =
+    (bus ? GetFeed(id)).map {
       case FeedResult(f) => f
     }
 
@@ -112,18 +112,18 @@ class Engine {
     }
   }
 
-  def findEpisodesByPodcast(exo: String): Future[List[Episode]] =
-    (bus ? GetEpisodesByPodcast(exo)).map {
+  def findEpisodesByPodcast(id: String): Future[List[Episode]] =
+    (bus ? GetEpisodesByPodcast(id)).map {
       case EpisodesByPodcastResult(es) => es
     }
 
-  def findFeedsByPodcast(exo: String): Future[List[Feed]] =
-    (bus ? GetFeedsByPodcast(exo)).map {
+  def findFeedsByPodcast(id: String): Future[List[Feed]] =
+    (bus ? GetFeedsByPodcast(id)).map {
       case FeedsByPodcastResult(fs) => fs
     }
 
-  def findChaptersByEpisode(exo: String): Future[List[Chapter]] =
-    (bus ? GetChaptersByEpisode(exo)).map {
+  def findChaptersByEpisode(id: String): Future[List[Chapter]] =
+    (bus ? GetChaptersByEpisode(id)).map {
       case ChaptersByEpisodeResult(cs) => cs
     }
 

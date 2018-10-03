@@ -4,7 +4,7 @@ public class IndexField {
 
     public static final String DOC_TYPE = "doc_type";
     public static final String ID = "id";
-    public static final String EXO = "exo";
+    //public static final String EXO = "exo";
     public static final String TITLE = "title";
     public static final String DESCRIPTION = "description";
     public static final String LINK = "link";

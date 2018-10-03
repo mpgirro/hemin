@@ -22,7 +22,7 @@ public interface TeaserMapper {
         return Optional
             .ofNullable(podcast)
             .map(p -> ImmutablePodcast.builder()
-                .setExo(p.getExo())
+                //.setExo(p.getExo())
                 .setTitle(p.getTitle())
                 .setImage(p.getImage())
                 .setLanguage(p.getLanguage())
@@ -42,7 +42,7 @@ public interface TeaserMapper {
         return Optional
             .ofNullable(episode)
             .map(e -> ImmutableEpisode.builder()
-                .setExo(e.getExo())
+                //.setExo(e.getExo())
                 .setTitle(e.getTitle())
                 .setPubDate(e.getPubDate())
                 .setDescription(e.getDescription())

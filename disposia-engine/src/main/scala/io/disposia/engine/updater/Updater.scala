@@ -13,7 +13,7 @@ object Updater {
     Props(new Updater(config)).withDispatcher("echo.updater.dispatcher")
 
   trait UpdaterMessage
-  case class ProcessFeed(exo: String, url: String, job: FetchJob) extends UpdaterMessage
+  case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
 }
 
 class Updater (config: UpdaterConfig)
@@ -46,9 +46,9 @@ class Updater (config: UpdaterConfig)
       if (!isNullOrEmpty(url))
         catalog ! ProposeNewFeed(url)
 
-    case ProcessFeed(exo, url, job: FetchJob) =>
-      log.debug("Received ProcessFeed({},{},{})", exo, url, job)
-      crawler ! DownloadWithHeadCheck(exo, url, job)
+    case ProcessFeed(id, url, job: FetchJob) =>
+      log.debug("Received ProcessFeed({},{},{})", id, url, job)
+      crawler ! DownloadWithHeadCheck(id, url, job)
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
   }

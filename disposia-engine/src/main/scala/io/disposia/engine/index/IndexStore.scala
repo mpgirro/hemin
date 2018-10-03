@@ -26,9 +26,9 @@ object IndexStore {
   trait IndexQueryResult extends IndexMessage
   // IndexEvents
   case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
-  case class UpdateDocWebsiteDataIndexEvent(exo: String, html: String) extends IndexEvent
-  case class UpdateDocImageIndexEvent(exo: String, image: String) extends IndexEvent
-  case class UpdateDocLinkIndexEvent(exo: String, newLink: String) extends IndexEvent
+  case class UpdateDocWebsiteDataIndexEvent(id: String, html: String) extends IndexEvent
+  case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
+  case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent
   // IndexCommands
   case class CommitIndex() extends IndexCommand
   // IndexQueries
@@ -90,22 +90,22 @@ class IndexStore (config: IndexConfig)
       commitIndexIfChanged()
 
     case AddDocIndexEvent(doc) =>
-      log.debug("Received IndexStoreAddDoc({})", doc.getExo)
+      log.debug("Received IndexStoreAddDoc({})", doc.getId)
       cache.enqueue(doc)
       solrCommiter.save(doc)
 
-    case UpdateDocWebsiteDataIndexEvent(exo, html) =>
-      log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", exo)
-      updateWebsiteQueue.enqueue((exo,html))
+    case UpdateDocWebsiteDataIndexEvent(id, html) =>
+      log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", id)
+      updateWebsiteQueue.enqueue((id,html))
 
     // TODO this fix is not done in the Directory and only correct data gets send to the index anyway...
-    case UpdateDocImageIndexEvent(exo, image) =>
-      log.debug("Received IndexStoreUpdateDocImage({},{})", exo, image)
-      updateImageQueue.enqueue((exo, image))
+    case UpdateDocImageIndexEvent(id, image) =>
+      log.debug("Received IndexStoreUpdateDocImage({},{})", id, image)
+      updateImageQueue.enqueue((id, image))
 
-    case UpdateDocLinkIndexEvent(exo, link) =>
-      log.debug("Received IndexStoreUpdateDocLink({},'{}')", exo, link)
-      updateLinkQueue.enqueue((exo, link))
+    case UpdateDocLinkIndexEvent(id, link) =>
+      log.debug("Received IndexStoreUpdateDocLink({},'{}')", id, link)
+      updateLinkQueue.enqueue((id, link))
 
     case IndexSearch(query, page, size) =>
       log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
@@ -185,11 +185,11 @@ class IndexStore (config: IndexConfig)
 
   private def processWebsiteQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
-      val (exo,html) = queue.dequeue()
-      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val (id,html) = queue.dequeue()
+      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
         case Some(doc) => luceneCommitter.update(doc.withWebsiteData(html))
-        case None      => log.error("Could not retrieve from index for update website (EXO) : {}", exo)
+        case None      => log.error("Could not retrieve from index for update website (ID) : {}", id)
       }
 
       processWebsiteQueue(queue)
@@ -198,11 +198,11 @@ class IndexStore (config: IndexConfig)
 
   private def processImageQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
-      val (exo,image) = queue.dequeue()
-      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val (id,image) = queue.dequeue()
+      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
         case Some(doc) => luceneCommitter.update(doc.withImage(image))
-        case None      => log.error("Could not retrieve from index for update image (EXO) : {}", exo)
+        case None      => log.error("Could not retrieve from index for update image (ID) : {}", id)
       }
 
       processImageQueue(queue)
@@ -211,11 +211,11 @@ class IndexStore (config: IndexConfig)
 
   private def processLinkQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
-      val (exo,link) = queue.dequeue()
-      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val (id,link) = queue.dequeue()
+      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
         case Some(doc) => luceneCommitter.update(doc.withLink(link))
-        case None      => log.error("Could not retrieve from index for update link (EXO) : {}", exo)
+        case None      => log.error("Could not retrieve from index for update link (ID) : {}", id)
       }
 
       processLinkQueue(queue)

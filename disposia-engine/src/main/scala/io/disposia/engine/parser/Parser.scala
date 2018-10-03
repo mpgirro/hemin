@@ -14,10 +14,10 @@ object Parser {
   def props(config: ParserConfig): Props = Props(new Parser(config))
 
   trait ParserMessage
-  case class ParseNewPodcastData(feedUrl: String, podcastExo: String, feedData: String) extends ParserMessage
-  case class ParseUpdateEpisodeData(feedUrl: String, podcastExo: String, episodeFeedData: String) extends ParserMessage
-  case class ParseWebsiteData(exo: String, html: String) extends ParserMessage
-  case class ParseFyydEpisodes(podcastExo: String, episodesData: String) extends ParserMessage
+  case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
+  case class ParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String) extends ParserMessage
+  case class ParseWebsiteData(id: String, html: String) extends ParserMessage
+  case class ParseFyydEpisodes(podcastId: String, episodesData: String) extends ParserMessage
 }
 
 class Parser (config: ParserConfig)

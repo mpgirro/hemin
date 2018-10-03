@@ -84,8 +84,8 @@ class CrawlerWorker (config: CrawlerConfig)
       supervisor = ref
       supervisor ! ReportWorkerStartupComplete
 
-    case DownloadWithHeadCheck(exo, url, job) =>
-      log.debug("Received Download({},'{}',{},_)", exo, url, job.getClass.getSimpleName)
+    case DownloadWithHeadCheck(id, url, job) =>
+      log.debug("Received Download({},'{}',{},_)", id, url, job.getClass.getSimpleName)
 
       this.currUrl = url
       this.currJob = job
@@ -93,22 +93,22 @@ class CrawlerWorker (config: CrawlerConfig)
       job match {
         case WebsiteFetchJob() =>
           if (config.fetchWebsites) {
-            log.info("Received DownloadWithHeadCheck({}, '{}', {})", exo, url, job.getClass.getSimpleName)
-            headCheck(exo, url, job)
+            log.info("Received DownloadWithHeadCheck({}, '{}', {})", id, url, job.getClass.getSimpleName)
+            headCheck(id, url, job)
           }
         case _ =>
-          log.info("Received DownloadWithHeadCheck({}, '{}', {})", exo, url, job.getClass.getSimpleName)
-          headCheck(exo, url, job)
+          log.info("Received DownloadWithHeadCheck({}, '{}', {})", id, url, job.getClass.getSimpleName)
+          headCheck(id, url, job)
       }
 
 
-    case DownloadContent(exo, url, job, encoding) =>
-      log.debug("Received Download({},'{}',{},{},_)", exo, url, job.getClass.getSimpleName, encoding)
+    case DownloadContent(id, url, job, encoding) =>
+      log.debug("Received Download({},'{}',{},{},_)", id, url, job.getClass.getSimpleName, encoding)
 
       this.currUrl = url
       this.currJob = job
 
-      fetchContent(exo, url, job, encoding) // TODO send encoding via message
+      fetchContent(id, url, job, encoding) // TODO send encoding via message
 
     case CrawlFyyd(count) =>
       onCrawlFyyd(count)
@@ -157,17 +157,17 @@ class CrawlerWorker (config: CrawlerConfig)
     parser ! ParseFyydEpisodes(podcastId, json)
   }
 
-  private def sendErrorNotificationIfFeasable(exo: String, url: String, job: FetchJob): Unit = {
+  private def sendErrorNotificationIfFeasable(id: String, url: String, job: FetchJob): Unit = {
     job match {
       case WebsiteFetchJob() => // do nothing...
       case _ =>
-        val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_ERROR)
+        val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_ERROR)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }
   }
 
-  private def headCheck(exo: String, url: String, job: FetchJob): Unit = {
+  private def headCheck(id: String, url: String, job: FetchJob): Unit = {
     blocking {
       val headResult = httpClient.headCheck(url)
 
@@ -188,17 +188,17 @@ class CrawlerWorker (config: CrawlerConfig)
               // to some feed analytic tools, we set our records to the new location
               if (!url.equals(href)) {
                 //directoryStore ! UpdateLinkByExo(exo, href)
-                val catalogEvent = UpdateLinkByExo(exo, href)
+                val catalogEvent = UpdateLinkById(id, href)
                 //emitCatalogEvent(catalogEvent)
                 catalog ! catalogEvent
 
-                val indexEvent = UpdateDocLinkIndexEvent(exo, href)
+                val indexEvent = UpdateDocLinkIndexEvent(id, href)
                 //emitIndexEvent(indexEvent)
                 index ! indexEvent
               }
 
               // we always download websites, because we only do it once anyway
-              self ! DownloadContent(exo, href, job, encoding) // TODO
+              self ! DownloadContent(id, href, job, encoding) // TODO
             //fetchContent(exo, href, job, encoding)
 
             case _ =>
@@ -215,11 +215,11 @@ class CrawlerWorker (config: CrawlerConfig)
                * here I have to do some voodoo with etag/lastMod to
                * determine weither the feed changed and I really need to redownload
                */
-              self ! DownloadContent(exo, href, job, encoding) // TODO
+              self ! DownloadContent(id, href, job, encoding) // TODO
           }
         case None =>
           log.error("We did not get any location-url after evaluating response --> cannot proceed download without one")
-          sendErrorNotificationIfFeasable(exo, url, job)
+          sendErrorNotificationIfFeasable(id, url, job)
       }
     }
   }
@@ -228,28 +228,28 @@ class CrawlerWorker (config: CrawlerConfig)
     *
     * Docs for STTP: http://sttp.readthedocs.io/en/latest/
     *
-    * @param exo
+    * @param id
     * @param url
     * @param job
     */
-  private def fetchContent(exo: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
+  private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
       val data = httpClient.fetchContent(url, encoding.asJava)
       job match {
         case NewPodcastFetchJob() =>
-          parser ! ParseNewPodcastData(url, exo, data)
-          val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+          parser ! ParseNewPodcastData(url, id, data)
+          val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
           //emitCatalogEvent(catalogEvent)
           catalog ! catalogEvent
 
         case UpdateEpisodesFetchJob(etag, lastMod) =>
-          parser ! ParseUpdateEpisodeData(url, exo, data)
-          val catalogEvent = FeedStatusUpdate(exo, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+          parser ! ParseUpdateEpisodeData(url, id, data)
+          val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
           //emitCatalogEvent(catalogEvent)
           catalog ! catalogEvent
 
         case WebsiteFetchJob() =>
-          parser ! ParseWebsiteData(exo, data)
+          parser ! ParseWebsiteData(id, data)
       }
     }
   }

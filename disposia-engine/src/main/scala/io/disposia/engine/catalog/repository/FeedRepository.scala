@@ -23,10 +23,10 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(feed: Feed): Future[Feed] = {
-    val query = BSONDocument("exo" -> feed.getExo)
+    val query = BSONDocument("id" -> feed.getId)
     collection
       .update(query, feed, upsert = true)
-      .flatMap { _ => findOne(feed.getExo)
+      .flatMap { _ => findOne(feed.getId)
         .map {
           case Some(f) => f
           case None    => throw new RuntimeException("Saving Feed to database was unsuccessful : " + feed)
@@ -34,23 +34,23 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
       }
   }
 
-  def findOne(exo: String): Future[Option[Feed]] = {
-    log.debug("Request to get Feed (EXO) : {}", exo)
-    val query = toDocument(Map("exo" -> toBson(exo)))
+  def findOne(id: String): Future[Option[Feed]] = {
+    log.debug("Request to get Feed (ID) : {}", id)
+    val query = toDocument(Map("id" -> toBson(id)))
     findOne(query)
   }
 
-  def findOneByUrlAndPodcastExo(url: String, podcastExo: String): Future[Option[Feed]] = {
-    log.debug("Request to get all Feeds by URL : {} and Podcast (EXO) : {}", url, podcastExo)
+  def findOneByUrlAndPodcastId(url: String, podcastId: String): Future[Option[Feed]] = {
+    log.debug("Request to get all Feeds by URL : {} and Podcast (ID) : {}", url, podcastId)
     val query = toDocument(Map(
       "url" -> toBson(url),
-      "podcastExo" -> toBson(podcastExo))
+      "podcastId" -> toBson(podcastId))
     )
     findOne(query)
   }
 
-  def findAllByPodcast(podcastExo: String): Future[List[Feed]] = {
-    val query = toDocument(Map("podcastExo" -> toBson(podcastExo)))
+  def findAllByPodcast(podcastId: String): Future[List[Feed]] = {
+    val query = toDocument(Map("podcastId" -> toBson(podcastId)))
     findAll(query)
   }
 

@@ -21,7 +21,7 @@ object SolrMapper {
         val d = new org.apache.lucene.document.Document
         Option(s.getDocType).foreach        { x => d.add(new StringField(IndexField.DOC_TYPE, x, Field.Store.YES)) }
         Option(s.getId).foreach             { x => d.add(new StringField(IndexField.ID, x, Field.Store.YES)) }
-        Option(s.getExo).foreach            { x => d.add(new StringField(IndexField.EXO, x, Field.Store.YES)) }
+        //Option(s.getExo).foreach            { x => d.add(new StringField(IndexField.EXO, x, Field.Store.YES)) }
         Option(s.getTitle).foreach          { x => d.add(new TextField(IndexField.TITLE, x, Field.Store.YES)) }
         Option(s.getLink).foreach           { x => d.add(new TextField(IndexField.LINK, x, Field.Store.YES)) }
         Option(s.getDescription).foreach    { x => d.add(new TextField(IndexField.DESCRIPTION, x, Field.Store.YES)) }
@@ -48,7 +48,7 @@ object SolrMapper {
         val d = new SolrInputDocument
         Option(s.getDocType).foreach        { x => d.addField(IndexField.DOC_TYPE, x) }
         Option(s.getId).foreach             { x => d.addField(IndexField.ID, x) }
-        Option(s.getExo).foreach            { x => d.addField(IndexField.EXO, x) }
+        //Option(s.getExo).foreach            { x => d.addField(IndexField.EXO, x) }
         Option(s.getTitle).foreach          { x => d.addField(IndexField.TITLE, x) }
         Option(s.getLink).foreach           { x => d.addField(IndexField.LINK, x) }
         Option(s.getDescription).foreach    { x => d.addField(IndexField.DESCRIPTION, x) }

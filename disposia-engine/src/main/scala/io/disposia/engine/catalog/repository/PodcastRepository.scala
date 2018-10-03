@@ -23,10 +23,10 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
   override protected[this] def log: Logger = Logger(getClass)
 
   def save(podcast: Podcast): Future[Podcast] = {
-    val query = BSONDocument("exo" -> podcast.getExo)
+    val query = BSONDocument("id" -> podcast.getId)
     collection
       .update(query, podcast, upsert = true)
-      .flatMap { _ => findOne(podcast.getExo)
+      .flatMap { _ => findOne(podcast.getId)
           .map {
             case Some(p) => p
             case None => throw new RuntimeException("Saving Podcast to database was unsuccessful : " + podcast)
@@ -34,9 +34,9 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
       }
   }
 
-  def findOne(exo: String): Future[Option[Podcast]] = {
-    log.debug("Request to get Podcast (EXO) : {}", exo)
-    val query = toDocument(Map("exo" -> toBson(exo)))
+  def findOne(id: String): Future[Option[Podcast]] = {
+    log.debug("Request to get Podcast (ID) : {}", id)
+    val query = toDocument(Map("id" -> toBson(id)))
     findOne(query)
   }
 

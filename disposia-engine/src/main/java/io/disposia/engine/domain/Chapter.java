@@ -38,7 +38,9 @@ public interface Chapter {
     @Nullable
     String getImage();
 
+    /*
     @Nullable
     String getEpisodeExo();
+    */
 
 }
