@@ -5,7 +5,7 @@
 
     <div class="d-flex w-100">
       <div class="mr-auto">
-        <a [routerLink]="['/e', episode.exo]">{{episode.title}}</a>
+        <a [routerLink]="['/e', episode.id]">{{episode.title}}</a>
       </div>
       <div>
         <small class="text-muted">
@@ -21,7 +21,7 @@
         <small class="text-muted">
           <a aria-expanded="true" data-toggle="collapse"
              (click)="isCollapsed[i] = !isCollapsed[i]"
-             [attr.href]="'#listTableItem-'+ episode.exo" >
+             [attr.href]="'#listTableItem-'+ episode.id" >
             <span class="oi"
                   [ngClass]="{'oi-chevron-right': !isCollapsed[i], 'oi-chevron-bottom': isCollapsed[i]}"
                   style="width: 11px;"></span>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div aria-expanded="true" class="collapse" [attr.id]="'listTableItem-'+ episode.exo">
+    <div aria-expanded="true" class="collapse" [attr.id]="'listTableItem-'+ episode.id">
       <div class="mt-4">
         <app-episode-teaser [episode]="episode"></app-episode-teaser>
       </div>

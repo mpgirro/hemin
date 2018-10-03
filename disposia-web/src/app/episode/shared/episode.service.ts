@@ -14,20 +14,20 @@ export class EpisodeService {
 
   constructor(private http: HttpClient) { }
 
-  get(exo: string): Observable<Episode> {
-    const request = this.baseUrl + '/' + exo;
+  get(id: string): Observable<Episode> {
+    const request = this.baseUrl + '/' + id;
     console.log('GET ' + request);
     return this.http.get<Episode>(request).pipe(
-      tap(_ => console.log(`episode : "${exo}"`)),
+      tap(_ => console.log(`episode : "${id}"`)),
       catchError(this.handleError<Episode>('get episode', new Episode()))
     );
   }
 
-  getChapters(exo: string): Observable<ArrayWrapper<Chapter>> {
-    const request = this.baseUrl + '/' + exo + '/chapters';
+  getChapters(id: string): Observable<ArrayWrapper<Chapter>> {
+    const request = this.baseUrl + '/' + id + '/chapters';
     console.log('GET ' + request);
     return this.http.get<ArrayWrapper<Chapter>>(request).pipe(
-      tap(_ => console.log(`found chapters for episode : "${exo}"`)),
+      tap(_ => console.log(`found chapters for episode : "${id}"`)),
       catchError(this.handleError<ArrayWrapper<Chapter>>('getChaptersByEpisode', new ArrayWrapper<Chapter>()))
     );
   }

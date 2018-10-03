@@ -17,7 +17,7 @@
 
     <tbody>
       <tr *ngFor="let podcast of podcasts">
-        <td><a routerLink="/p/{{podcast.exo}}">{{podcast.title}}</a></td>
+        <td><a routerLink="/p/{{podcast.id}}">{{podcast.title}}</a></td>
         <td>{{podcast.language}}</td>
         <td>
           <span *ngIf="podcast.itunesExplicit" class="badge badge-success">T</span>

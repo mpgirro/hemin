@@ -4,7 +4,7 @@
   <div class="row no-gutters" *ngIf="i%6===0">
 
     <div class="mx-auto">
-      <a [routerLink]="['/p', podcasts[i].exo]" class="podcast-cell">
+      <a [routerLink]="['/p', podcasts[i].id]" class="podcast-cell">
         <img class="podcast-thumb"
              src="{{podcasts[i].image}}"
              alt="cover image">
@@ -13,7 +13,7 @@
 
     <div class="mx-auto">
       <div *ngIf="podcasts[i + 1]">
-        <a [routerLink]="['/p', podcasts[i + 1].exo]" class="podcast-cell">
+        <a [routerLink]="['/p', podcasts[i + 1].id]" class="podcast-cell">
           <img class="podcast-thumb"
                src="{{podcasts[i + 1].image}}"
                alt="cover image">
@@ -23,7 +23,7 @@
 
     <div class="mx-auto">
       <div *ngIf="podcasts[i + 2]">
-        <a [routerLink]="['/p', podcasts[i + 2].exo]" class="podcast-cell">
+        <a [routerLink]="['/p', podcasts[i + 2].id]" class="podcast-cell">
           <img class="podcast-thumb"
                src="{{podcasts[i + 2].image}}"
                alt="cover image">
@@ -33,7 +33,7 @@
 
     <div class="mx-auto">
       <div *ngIf="podcasts[i + 3]">
-        <a [routerLink]="['/p', podcasts[i + 3].exo]" class="podcast-cell">
+        <a [routerLink]="['/p', podcasts[i + 3].id]" class="podcast-cell">
           <img class="podcast-thumb"
                src="{{podcasts[i + 3].image}}"
                alt="cover image">
@@ -43,7 +43,7 @@
 
     <div class="mx-auto">
       <div *ngIf="podcasts[i + 4]">
-        <a [routerLink]="['/p', podcasts[i + 4].exo]" class="podcast-cell">
+        <a [routerLink]="['/p', podcasts[i + 4].id]" class="podcast-cell">
           <img class="podcast-thumb"
                src="{{podcasts[i + 4].image}}"
                alt="cover image">
@@ -53,7 +53,7 @@
 
     <div class="mx-auto">
       <div *ngIf="podcasts[i + 5]">
-        <a [routerLink]="['/p', podcasts[i + 5].exo]" class="podcast-cell">
+        <a [routerLink]="['/p', podcasts[i + 5].id]" class="podcast-cell">
           <img class="podcast-thumb"
                src="{{podcasts[i + 5].image}}"
                alt="cover image">

@@ -5,7 +5,7 @@
     <div class="list-group-item list-group-item-action px-0">
 
       <div data-toggle="collapse"
-           [attr.data-target]="'#collapseGroupListItem-'+ episode.exo"
+           [attr.data-target]="'#collapseGroupListItem-'+ episode.id"
            data-parent="#episode-table">
 
         <div class="media my-2">
@@ -16,7 +16,7 @@
 
           <div class="media-body">
             <h6 class="mb-1">
-              <a [routerLink]="['/e', episode.exo]" class="text-dark">{{episode.title}}</a>
+              <a [routerLink]="['/e', episode.id]" class="text-dark">{{episode.title}}</a>
             </h6>
             <small class="text-muted">
                 <span *ngIf="episode.pubDate">
@@ -33,7 +33,7 @@
       </div>
 
       <div class="collapse pt-2"
-           [attr.id]="'collapseGroupListItem-'+ episode.exo">
+           [attr.id]="'collapseGroupListItem-'+ episode.id">
         <p class="mb-1 text-justify"
            [innerHTML]="episode.description"></p>
       </div>

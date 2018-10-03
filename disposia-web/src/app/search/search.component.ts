@@ -74,7 +74,7 @@ export class SearchComponent implements OnInit {
     } else {
       console.log('Unknown docType : ' + result.docType);
     }
-    this.router.navigate([pre,  result.exo]);
+    this.router.navigate([pre,  result.id]);
   }
 
 }

@@ -1,6 +1,6 @@
 export class Podcast {
   docType: string;
-  exo: string;
+  id: string;
   title: string;
   link: string;
   description: string;

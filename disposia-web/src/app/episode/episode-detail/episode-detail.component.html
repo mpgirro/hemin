@@ -2,9 +2,9 @@
 <div class="row justify-content-center">
   <div class="col-sm-12 col-xs-12 px-0">
 
-    <div *ngIf="episode.podcastExo && episode.podcastTitle" class="text-center mb-2">
+    <div *ngIf="episode.podcastId && episode.podcastTitle" class="text-center mb-2">
 
-      <a class="text-dark" [routerLink]="['/p', episode.podcastExo]">
+      <a class="text-dark" [routerLink]="['/p', episode.podcastId]">
         <h6 class=" mb-0">{{episode.podcastTitle}}</h6>
       </a>
 
