@@ -5,6 +5,7 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.domain._
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
+import io.disposia.engine.index.committer.SolrCommitter
 import io.disposia.engine.util.ExecutorServiceWrapper
 
 import scala.collection.JavaConverters._
@@ -43,8 +44,8 @@ class IndexStore (config: IndexConfig)
 
   private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
 
-  private val indexCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
-  private val indexSearcher: IndexSearcher = new LuceneSearcher(indexCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
+  private val luceneCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
+  private val luceneSearcher: IndexSearcher = new LuceneSearcher(luceneCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var indexChanged = false
@@ -72,8 +73,8 @@ class IndexStore (config: IndexConfig)
   }
 
   override def postStop: Unit = {
-    Option(indexCommitter).foreach(_.destroy())
-    Option(indexSearcher).foreach(_.destroy())
+    Option(luceneCommitter).foreach(_.destroy())
+    Option(luceneSearcher).foreach(_.destroy())
 
     log.info("shutting down")
   }
@@ -91,7 +92,7 @@ class IndexStore (config: IndexConfig)
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.getExo)
       cache.enqueue(doc)
-      solrCommiter.add(doc)
+      solrCommiter.save(doc)
 
     case UpdateDocWebsiteDataIndexEvent(exo, html) =>
       log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", exo)
@@ -115,7 +116,7 @@ class IndexStore (config: IndexConfig)
       Future {
         var results: ResultWrapper = null
         blocking {
-          results = indexSearcher.search(query, page, size)
+          results = luceneSearcher.search(query, page, size)
         }
 
         if (results.getTotalHits > 0){
@@ -140,9 +141,9 @@ class IndexStore (config: IndexConfig)
       log.debug("Committing Index due to pending changes")
 
       for (doc <- cache) {
-        indexCommitter.add(doc)
+        luceneCommitter.add(doc)
       }
-      indexCommitter.commit()
+      luceneCommitter.commit()
       //indexChanged = false
       cache.clear()
 
@@ -152,42 +153,42 @@ class IndexStore (config: IndexConfig)
 
     if (updateWebsiteQueue.nonEmpty) {
       log.debug("Processing pending entries in website queue")
-      indexSearcher.refresh()
+      luceneSearcher.refresh()
       processWebsiteQueue(updateWebsiteQueue)
-      indexCommitter.commit()
+      luceneCommitter.commit()
       committed = true
       log.debug("Finished pending entries in website queue")
     }
 
     if (updateImageQueue.nonEmpty) {
       log.debug("Processing pending entries in image queue")
-      indexSearcher.refresh()
+      luceneSearcher.refresh()
       processImageQueue(updateImageQueue)
-      indexCommitter.commit()
+      luceneCommitter.commit()
       committed = true
       log.debug("Finished pending entries in image queue")
     }
 
     if (updateLinkQueue.nonEmpty) {
       log.debug("Processing pending entries in link queue")
-      indexSearcher.refresh()
+      luceneSearcher.refresh()
       processLinkQueue(updateLinkQueue)
-      indexCommitter.commit()
+      luceneCommitter.commit()
       committed = true
       log.debug("Finished pending entries in link queue")
     }
 
     if (committed) {
-      indexSearcher.refresh()
+      luceneSearcher.refresh()
     }
   }
 
   private def processWebsiteQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
       val (exo,html) = queue.dequeue()
-      val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
-        case Some(doc) => indexCommitter.update(doc.withWebsiteData(html))
+        case Some(doc) => luceneCommitter.update(doc.withWebsiteData(html))
         case None      => log.error("Could not retrieve from index for update website (EXO) : {}", exo)
       }
 
@@ -198,9 +199,9 @@ class IndexStore (config: IndexConfig)
   private def processImageQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
       val (exo,image) = queue.dequeue()
-      val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
-        case Some(doc) => indexCommitter.update(doc.withImage(image))
+        case Some(doc) => luceneCommitter.update(doc.withImage(image))
         case None      => log.error("Could not retrieve from index for update image (EXO) : {}", exo)
       }
 
@@ -211,9 +212,9 @@ class IndexStore (config: IndexConfig)
   private def processLinkQueue(queue: mutable.Queue[(String,String)]): Unit = {
     if (queue.nonEmpty) {
       val (exo,link) = queue.dequeue()
-      val entry = indexSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
+      val entry = luceneSearcher.findByExo(exo).asScala.map(_.asInstanceOf[ImmutableIndexDoc])
       entry match {
-        case Some(doc) => indexCommitter.update(doc.withLink(link))
+        case Some(doc) => luceneCommitter.update(doc.withLink(link))
         case None      => log.error("Could not retrieve from index for update link (EXO) : {}", exo)
       }
 
