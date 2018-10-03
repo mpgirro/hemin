@@ -22,6 +22,9 @@ import java.time.LocalDateTime;
 public interface IndexDoc {
 
     @Nullable
+    String getId();
+
+    @Nullable
     String getDocType();
 
     @Nullable

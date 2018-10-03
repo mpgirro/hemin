@@ -20,6 +20,7 @@ object SolrMapper {
       .map { s =>
         val d = new org.apache.lucene.document.Document
         Option(s.getDocType).foreach        { x => d.add(new StringField(IndexField.DOC_TYPE, x, Field.Store.YES)) }
+        Option(s.getId).foreach             { x => d.add(new StringField(IndexField.ID, x, Field.Store.YES)) }
         Option(s.getExo).foreach            { x => d.add(new StringField(IndexField.EXO, x, Field.Store.YES)) }
         Option(s.getTitle).foreach          { x => d.add(new TextField(IndexField.TITLE, x, Field.Store.YES)) }
         Option(s.getLink).foreach           { x => d.add(new TextField(IndexField.LINK, x, Field.Store.YES)) }
@@ -46,19 +47,20 @@ object SolrMapper {
       .map { s =>
         val d = new SolrInputDocument
         Option(s.getDocType).foreach        { x => d.addField(IndexField.DOC_TYPE, x) }
-        Option(s.getExo).foreach            { x => d.addField(IndexField.EXO, x)  }
-        Option(s.getTitle).foreach          { x => d.addField(IndexField.TITLE, x)  }
-        Option(s.getLink).foreach           { x => d.addField(IndexField.LINK, x)  }
-        Option(s.getDescription).foreach    { x => d.addField(IndexField.DESCRIPTION, x)  }
-        Option(s.getPodcastTitle).foreach   { x => d.addField(IndexField.PODCAST_TITLE, x)  }
-        Option(s.getPubDate).foreach        { x => d.addField(IndexField.PUB_DATE, dateMapper.asString(x))  }
-        Option(s.getImage).foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x)  }
-        Option(s.getItunesAuthor).foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x)  }
-        Option(s.getItunesSummary).foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x)  }
-        Option(s.getChapterMarks).foreach   { x => d.addField(IndexField.CHAPTER_MARKS, x)  }
-        Option(s.getContentEncoded).foreach { x => d.addField(IndexField.CONTENT_ENCODED, x)  }
-        Option(s.getTranscript).foreach     { x => d.addField(IndexField.TRANSCRIPT, x)  }
-        Option(s.getWebsiteData).foreach    { x => d.addField(IndexField.WEBSITE_DATA, x)  }
+        Option(s.getId).foreach             { x => d.addField(IndexField.ID, x) }
+        Option(s.getExo).foreach            { x => d.addField(IndexField.EXO, x) }
+        Option(s.getTitle).foreach          { x => d.addField(IndexField.TITLE, x) }
+        Option(s.getLink).foreach           { x => d.addField(IndexField.LINK, x) }
+        Option(s.getDescription).foreach    { x => d.addField(IndexField.DESCRIPTION, x) }
+        Option(s.getPodcastTitle).foreach   { x => d.addField(IndexField.PODCAST_TITLE, x) }
+        Option(s.getPubDate).foreach        { x => d.addField(IndexField.PUB_DATE, dateMapper.asString(x)) }
+        Option(s.getImage).foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x) }
+        Option(s.getItunesAuthor).foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x) }
+        Option(s.getItunesSummary).foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x) }
+        Option(s.getChapterMarks).foreach   { x => d.addField(IndexField.CHAPTER_MARKS, x) }
+        Option(s.getContentEncoded).foreach { x => d.addField(IndexField.CONTENT_ENCODED, x) }
+        Option(s.getTranscript).foreach     { x => d.addField(IndexField.TRANSCRIPT, x) }
+        Option(s.getWebsiteData).foreach    { x => d.addField(IndexField.WEBSITE_DATA, x) }
         d
       }
       .orNull

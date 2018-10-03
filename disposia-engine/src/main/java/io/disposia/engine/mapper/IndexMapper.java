@@ -129,6 +129,9 @@ public interface IndexMapper {
             .ofNullable(doc.getDocType())
             .ifPresent(x -> lucene.add(new StringField(IndexField.DOC_TYPE, x, Field.Store.YES)));
         Optional
+            .ofNullable(doc.getId())
+            .ifPresent(x -> lucene.add(new StringField(IndexField.ID, x, Field.Store.YES)));
+        Optional
             .ofNullable(doc.getExo())
             .ifPresent(x -> lucene.add(new StringField(IndexField.EXO, x, Field.Store.YES)));
         Optional

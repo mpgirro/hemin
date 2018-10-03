@@ -11,6 +11,11 @@ public class SolrFieldMapper {
 
     public static final SolrFieldMapper INSTANCE = new SolrFieldMapper();
 
+    public String stringOrNull(SolrDocument doc, String fieldName) {
+        final Object o = firstOrNull(doc, fieldName);
+        return o==null ? null : (String) o;
+    }
+
     public String firstStringOrNull(SolrDocument doc, String fieldName) {
         /*
         final Collection<Object> os = doc.getFieldValues(fieldName);
