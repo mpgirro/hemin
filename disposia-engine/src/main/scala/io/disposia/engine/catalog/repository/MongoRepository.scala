@@ -25,7 +25,7 @@ trait MongoRepository[T] {
   /**
     * Find one by example
     *
-    * @param example
+    * @param example The example object
     * @return The object matching the given example
     */
   def findOne(example: T): Future[Option[T]] = findOne(bsonWriter.write(example))
@@ -33,7 +33,7 @@ trait MongoRepository[T] {
   /**
     * Find many by example
     *
-    * @param example
+    * @param example The example object
     * @return List of objects matching the given example
     */
   def findAll(example: T): Future[List[T]] = findAll(bsonWriter.write(example))
