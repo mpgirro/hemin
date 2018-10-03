@@ -56,7 +56,7 @@ object JsonWrites {
     implicit val implicitIndexDocWrites: Writes[IndexDoc] =
         (d: IndexDoc) => JsObject(List(
             "docType"      -> toNullJson(d.getDocType),
-            "exo"          -> toNullJson(d.getExo),
+            "id"           -> toNullJson(d.getId),
             "title"        -> toNullJson(d.getTitle),
             "link"         -> toNullJson(d.getLink),
             "pubDate"      -> toNullJson(d.getPubDate),
@@ -67,7 +67,7 @@ object JsonWrites {
 
     implicit val implicitPodcastWrites: Writes[Podcast] =
         (p: Podcast) => JsObject(List(
-            "exo"                   -> toNullJson(p.getExo),
+            "id"                    -> toNullJson(p.getId),
             "title"                 -> toNullJson(p.getTitle),
             "link"                  -> toNullJson(p.getLink),
             "pubDate"               -> toNullJson(p.getPubDate),
@@ -90,8 +90,8 @@ object JsonWrites {
 
     implicit val implicitEpisodeWrites: Writes[Episode] =
         (e: Episode) => JsObject(List(
-            "exo"                   -> toNullJson(e.getExo),
-            "podcastExo"            -> toNullJson(e.getPodcastExo),
+            "id"                    -> toNullJson(e.getId),
+            "podcastId"             -> toNullJson(e.getPodcastId),
             "podcastTitle"          -> toNullJson(e.getPodcastTitle),
             "title"                 -> toNullJson(e.getTitle),
             "link"                  -> toNullJson(e.getLink),
@@ -114,8 +114,8 @@ object JsonWrites {
 
     implicit val implicitFeedWrites: Writes[Feed] =
         (f: Feed) => JsObject(List(
-            "exo"                   -> toNullJson(f.getExo),
-            "podcastExo"            -> toNullJson(f.getPodcastExo),
+            "id"                    -> toNullJson(f.getId),
+            "podcastId"             -> toNullJson(f.getPodcastId),
             "url"                   -> toNullJson(f.getUrl),
             "lastChecked"           -> toNullJson(f.getLastChecked),
             "lastStatus"            -> toNullJson(f.getLastStatus),
@@ -124,11 +124,11 @@ object JsonWrites {
 
     implicit val implicitChapterWrites: Writes[Chapter] =
         (c: Chapter) => JsObject(List(
-            "start"      -> toNullJson(c.getStart),
-            "title"      -> toNullJson(c.getTitle),
-            "href"       -> toNullJson(c.getHref),
-            "image"      -> toNullJson(c.getImage),
-            "episodeExo" -> toNullJson(c.getEpisodeExo)
+            "start"     -> toNullJson(c.getStart),
+            "title"     -> toNullJson(c.getTitle),
+            "href"      -> toNullJson(c.getHref),
+            "image"     -> toNullJson(c.getImage),
+            "episodeId" -> toNullJson(c.getEpisodeId)
         ))
 
 }
