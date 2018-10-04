@@ -1,7 +1,7 @@
 package io.disposia.engine.index
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.domain.ResultWrapper
+import io.disposia.engine.olddomain.OldResultWrapper
 import org.apache.solr.client.solrj.SolrClient
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 
@@ -16,9 +16,9 @@ class SolrSearcher (solrUri: String)(implicit executionContext: ExecutionContext
     .allowCompression(false) // TODO
     .build()
 
-  def search(query: String): Future[ResultWrapper] = Future {
+  def search(query: String): Future[OldResultWrapper] = Future {
     // TODO
-    ResultWrapper.empty()
+    OldResultWrapper.empty()
   }
 
 }

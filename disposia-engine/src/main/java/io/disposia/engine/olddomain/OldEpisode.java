@@ -1,8 +1,7 @@
-package io.disposia.engine.domain;
+package io.disposia.engine.olddomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.disposia.engine.domain.ImmutableEpisode;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -18,9 +17,9 @@ import java.util.List;
     create  = "new",             // generates public no args constructor
     build   = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableEpisode.class)
-@JsonDeserialize(as = ImmutableEpisode.class)
-public interface Episode {
+@JsonSerialize(as = ImmutableOldEpisode.class)
+@JsonDeserialize(as = ImmutableOldEpisode.class)
+public interface OldEpisode {
 
     @Nullable
     String getId();
@@ -97,6 +96,6 @@ public interface Episode {
     LocalDateTime getRegistrationTimestamp();
 
     @Nullable
-    List<Chapter> getChapters();
+    List<OldChapter> getChapters();
 
 }

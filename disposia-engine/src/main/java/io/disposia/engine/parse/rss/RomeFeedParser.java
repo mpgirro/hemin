@@ -13,9 +13,9 @@ import com.rometools.rome.feed.synd.SyndFeed;
 import com.rometools.rome.feed.synd.SyndImage;
 import com.rometools.rome.io.FeedException;
 import com.rometools.rome.io.SyndFeedInput;
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.Podcast;
-import io.disposia.engine.domain.*;
+import io.disposia.engine.olddomain.OldEpisode;
+import io.disposia.engine.olddomain.OldPodcast;
+import io.disposia.engine.olddomain.*;
 import io.disposia.engine.exception.FeedParsingException;
 import io.disposia.engine.parse.rss.rome.PodloveSimpleChapterModule;
 import io.disposia.engine.util.UrlUtil;
@@ -39,8 +39,8 @@ public class RomeFeedParser implements FeedParser {
 
     private static final Logger log = LoggerFactory.getLogger(RomeFeedParser.class);
 
-    private final Podcast thePodcast;
-    private final List<Episode> theEpisodes;
+    private final OldPodcast thePodcast;
+    private final List<OldEpisode> theEpisodes;
 
     private RomeFeedParser(String xmlData) throws FeedParsingException {
         try {
@@ -60,17 +60,17 @@ public class RomeFeedParser implements FeedParser {
     }
 
     @Override
-    public Podcast getPodcast() {
+    public OldPodcast getPodcast() {
         return this.thePodcast;
     }
 
     @Override
-    public List<Episode> getEpisodes() {
+    public List<OldEpisode> getEpisodes() {
         return this.theEpisodes;
     }
 
-    private Podcast parseFeed(SyndFeed feed) {
-        final ImmutablePodcast.Builder builder = ImmutablePodcast.builder();
+    private OldPodcast parseFeed(SyndFeed feed) {
+        final ImmutableOldPodcast.Builder builder = ImmutableOldPodcast.builder();
         String link = UrlUtil.sanitize(feed.getLink());
 
         builder
@@ -136,7 +136,7 @@ public class RomeFeedParser implements FeedParser {
                 .setItunesOwnerEmail(itunes.getOwnerEmailAddress());
             //builder.setItunesCategory(String.join(" | ", itunesFeedInfo.getCategories().stream().toImmutable(c->c.getName()).collect(Collectors.toCollection(LinkedList::new))));
         } else {
-            log.debug("No iTunes Namespace elements found in Podcast");
+            log.debug("No iTunes Namespace elements found in OldPodcast");
         }
 
         // here I process the feed specific atom Links
@@ -173,10 +173,10 @@ public class RomeFeedParser implements FeedParser {
         return builder.create();
     }
 
-    private List<Episode> extractEpisodes(SyndFeed feed) {
-        final List<Episode> results = new LinkedList<>();
+    private List<OldEpisode> extractEpisodes(SyndFeed feed) {
+        final List<OldEpisode> results = new LinkedList<>();
         for (SyndEntry e : feed.getEntries()) {
-            final ImmutableEpisode.Builder builder = ImmutableEpisode.builder();
+            final ImmutableOldEpisode.Builder builder = ImmutableOldEpisode.builder();
 
             builder
                 .setTitle(e.getTitle())
@@ -235,7 +235,7 @@ public class RomeFeedParser implements FeedParser {
                     .setItunesEpisode(itunes.getEpisode())
                     .setItunesEpisodeType(itunes.getEpisodeType());
             } else {
-                log.debug("No iTunes Namespace elements found in Episode");
+                log.debug("No iTunes Namespace elements found in OldEpisode");
             }
 
             // access the <psc:chapter> entries
@@ -245,7 +245,7 @@ public class RomeFeedParser implements FeedParser {
                 if (simpleChapters.getChapters() != null && simpleChapters.getChapters().size() > 0) {
                     builder.setChapters(
                         simpleChapters.getChapters().stream()
-                            .map(sc -> ImmutableChapter.builder()
+                            .map(sc -> ImmutableOldChapter.builder()
                                 .setStart(sc.getStart())
                                 .setTitle(sc.getTitle())
                                 .setHref(sc.getHref())
@@ -253,7 +253,7 @@ public class RomeFeedParser implements FeedParser {
                             .collect(Collectors.toList()));
                 }
             } else {
-                log.debug("No Podlove Simple Chapter marks found in Episode");
+                log.debug("No Podlove Simple OldChapter marks found in OldEpisode");
             }
 
             results.add(builder.create());

@@ -1,12 +1,10 @@
-package io.disposia.engine.domain;
+package io.disposia.engine.olddomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.disposia.engine.domain.ImmutableIndexDoc;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
-import java.time.LocalDateTime;
 
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers
@@ -17,55 +15,31 @@ import java.time.LocalDateTime;
     create  = "new",             // generates public no args constructor
     build   = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableIndexDoc.class)
-@JsonDeserialize(as = ImmutableIndexDoc.class)
-public interface IndexDoc {
+@JsonSerialize(as = ImmutableOldChapter.class)
+@JsonDeserialize(as = ImmutableOldChapter.class)
+public interface OldChapter {
 
     @Nullable
     String getId();
 
     @Nullable
-    String getDocType();
+    String getEpisodeId();
 
-    /*
     @Nullable
-    String getExo();
-    */
+    String getStart();
 
     @Nullable
     String getTitle();
 
     @Nullable
-    String getLink();
-
-    @Nullable
-    String getDescription();
-
-    @Nullable
-    LocalDateTime getPubDate();
+    String getHref();
 
     @Nullable
     String getImage();
 
+    /*
     @Nullable
-    String getItunesAuthor();
-
-    @Nullable
-    String getItunesSummary();
-
-    @Nullable
-    String getPodcastTitle(); // will be the same as the title if marshalled from a Podcast
-
-    @Nullable
-    String getChapterMarks();
-
-    @Nullable
-    String getContentEncoded();
-
-    @Nullable
-    String getTranscript();
-
-    @Nullable
-    String getWebsiteData();
+    String getEpisodeExo();
+    */
 
 }

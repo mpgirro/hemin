@@ -1,9 +1,8 @@
-package io.disposia.engine.domain;
+package io.disposia.engine.olddomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.disposia.engine.domain.FeedStatus;
-import io.disposia.engine.domain.ImmutableFeed;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -18,9 +17,9 @@ import java.time.LocalDateTime;
     create  = "new",             // generates public no args constructor
     build   = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableFeed.class)
-@JsonDeserialize(as = ImmutableFeed.class)
-public interface Feed {
+@JsonSerialize(as = ImmutableOldFeed.class)
+@JsonDeserialize(as = ImmutableOldFeed.class)
+public interface OldFeed {
 
     @Nullable
     String getId();

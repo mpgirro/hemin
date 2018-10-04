@@ -1,9 +1,9 @@
 package io.disposia.engine.index;
 
 
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.IndexDoc;
-import io.disposia.engine.domain.Podcast;
+import io.disposia.engine.olddomain.OldEpisode;
+import io.disposia.engine.olddomain.OldIndexDoc;
+import io.disposia.engine.olddomain.OldPodcast;
 import io.disposia.engine.mapper.IndexMapper;
 
 /**
@@ -13,23 +13,23 @@ import io.disposia.engine.mapper.IndexMapper;
  */
 public interface IndexCommitter {
 
-    void add(IndexDoc doc);
+    void add(OldIndexDoc doc);
 
-    default void add(Podcast podcast) {
+    default void add(OldPodcast podcast) {
         add(IndexMapper.INSTANCE.toModifiable(podcast));
     }
 
-    default void add(Episode episode) {
+    default void add(OldEpisode episode) {
         add(IndexMapper.INSTANCE.toModifiable(episode));
     }
 
-    void update(IndexDoc doc);
+    void update(OldIndexDoc doc);
 
-    default void update(Podcast podcast) {
+    default void update(OldPodcast podcast) {
         update(IndexMapper.INSTANCE.toModifiable(podcast));
     }
 
-    default void update(Episode episode) {
+    default void update(OldEpisode episode) {
         update(IndexMapper.INSTANCE.toModifiable(episode));
     }
 

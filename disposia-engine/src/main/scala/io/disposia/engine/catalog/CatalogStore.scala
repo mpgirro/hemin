@@ -7,14 +7,17 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.catalog.repository.{EpisodeRepository, FeedRepository, PodcastRepository}
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
-import io.disposia.engine.domain._
+import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.mapper._
+import io.disposia.engine.newdomain.episode.EpisodeRegistrationInfo
+import io.disposia.engine.newdomain.podcast.PodcastRegistrationInfo
+import io.disposia.engine.newdomain.{NewChapter, NewEpisode, NewFeed, NewPodcast}
 import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.IdGenerator
+import io.disposia.engine.util.mapper.{NewIndexMapper, reduce}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext}
 import scala.util.{Failure, Success}
@@ -32,16 +35,16 @@ object CatalogStore {
     trait CatalogQueryResult extends CatalogMessage
     // CatalogCommands
     case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
-    case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
+    case class RegisterEpisodeIfNew(podcastId: String, episode: NewEpisode) extends CatalogCommand // Questions: Parser -> CatalogStore
     // CatalogEvents
-    //case class AddPodcastAndFeedIfUnknown(podcast: Podcast, feed: Feed) extends CatalogEvent
+    //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
     case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
     case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
     case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
-    case class SaveChapter(chapter: Chapter) extends CatalogEvent
-    case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
-    case class UpdateEpisode(episode: Episode) extends CatalogEvent
-    case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
+    case class SaveChapter(chapter: NewChapter) extends CatalogEvent
+    case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: NewPodcast) extends CatalogEvent
+    case class UpdateEpisode(episode: NewEpisode) extends CatalogEvent
+    case class UpdateEpisodeWithChapters(podcastId: String, episode: NewEpisode, chapter: List[NewChapter]) extends CatalogEvent
     // CatalogQueries
     case class GetPodcast(id: String) extends CatalogQuery
     case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
@@ -57,14 +60,14 @@ object CatalogStore {
     //case class CheckAllPodcasts() extends CatalogQuery
     case class CheckAllFeeds() extends CatalogQuery
     // CatalogQueryResults
-    case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
-    case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
-    case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
-    case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
-    case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
-    case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
-    case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
-    case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
+    case class PodcastResult(podcast: Option[NewPodcast]) extends CatalogQueryResult
+    case class AllPodcastsResult(results: List[NewPodcast]) extends CatalogQueryResult
+    case class AllFeedsResult(results: List[NewFeed]) extends CatalogQueryResult
+    case class EpisodeResult(episode: Option[NewEpisode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
+    case class EpisodesByPodcastResult(episodes: List[NewEpisode]) extends CatalogQueryResult
+    case class FeedsByPodcastResult(feeds: List[NewFeed]) extends CatalogQueryResult
+    case class ChaptersByEpisodeResult(chapters: List[NewChapter]) extends CatalogQueryResult
+    case class FeedResult(feed: Option[NewFeed]) extends CatalogQueryResult
     //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -254,8 +257,20 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty) {
+            val now = LocalDateTime.now()
+
             val podcastId = idGenerator.newId
-            var podcast = ImmutablePodcast.builder()
+            val podcast = NewPodcast(
+              id          = Some(podcastId),
+              title       = Some(podcastId),
+              description = Some(url),
+              registration = PodcastRegistrationInfo(
+                complete  = Some(false),
+                timestamp = Some(now)
+              )
+            )
+            /*
+            var podcast = ImmutableOldPodcast.builder()
               .setId(podcastId)
               //.setExo(podcastId)
               .setTitle(podcastId)
@@ -263,8 +278,18 @@ class CatalogStore(config: CatalogConfig)
               .setRegistrationComplete(false)
               .setRegistrationTimestamp(LocalDateTime.now())
               .create()
+              */
             val feedId = idGenerator.newId
-            val feed = ImmutableFeed.builder()
+            val feed = NewFeed(
+              id                    = Some(feedId),
+              podcastId             = Some(podcastId),
+              url                   = Some(url),
+              lastChecked           = Some(now),
+              lastStatus            = Some(FeedStatus.NEVER_CHECKED),
+              registrationTimestamp = Some(now),
+            )
+            /*
+            val feed = ImmutableOldFeed.builder()
               .setId(feedId)
               .setPodcastId(podcastId)
               //.setExo(feedId)
@@ -274,6 +299,7 @@ class CatalogStore(config: CatalogConfig)
               .setLastStatus(FeedStatus.NEVER_CHECKED)
               .setRegistrationTimestamp(LocalDateTime.now())
               .create()
+              */
 
             // Note: we chain the create calls to ensure that the
             // message to the Updater is only dispatched once we can
@@ -309,17 +335,20 @@ class CatalogStore(config: CatalogConfig)
       .findOneByUrlAndPodcastId(url, podcastId)
       .foreach {
         case Some(f) =>
+          feeds.save(f.copy(lastChecked = Option(timestamp), lastStatus = Option(status)))
+          /*
           feeds.save(feedMapper
             .toImmutable(f)
             .withLastChecked(timestamp)
             .withLastStatus(status))
+            */
         case None => log.warning("No Feed found for Podcast (ID:{}) and URL : {}", podcastId, url)
       }
   }
 
   @Deprecated
-  private def onUpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast): Unit = {
-    log.debug("Received UpdatePodcast({},{},{})", podcastId, feedUrl, podcast.getId)
+  private def onUpdatePodcast(podcastId: String, feedUrl: String, podcast: NewPodcast): Unit = {
+    log.debug("Received UpdatePodcast({},{},{})", podcastId, feedUrl, podcast.id)
 
     /* TODO
      * hier empfange ich die feedUrl die mir der Parser zurückgib, um anschließend die episode laden zu können
@@ -330,31 +359,33 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(podcastId)
       .map {
-        case Some(p) => podcastMapper.update(podcast, p)
+        case Some(p) => podcast.update(p)  //podcastMapper.update(podcast, p)
         case None =>
-          log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.getId)
-          podcastMapper.toModifiable(podcast)
+          log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
+          //podcastMapper.toModifiable(podcast)
+          podcast
       }
       .foreach(p => {
-        p.setRegistrationComplete(true)
+        //p.setRegistrationComplete(true)
         //podcastService.save(p)
-        podcasts.save(p)
+        podcasts.save(p.copy(registration = PodcastRegistrationInfo(complete = Some(true))))
 
         // TODO we will fetch feeds for checking new episodes, but not because we updated podcast metadata
         // crawler ! FetchFeedForUpdateEpisodes(feedUrl, podcastId)
       })
   }
 
-  private def onUpdateEpisode(episode: Episode): Unit = {
-    log.debug("Received UpdateEpisode({})", episode.getId)
+  private def onUpdateEpisode(episode: NewEpisode): Unit = {
+    log.debug("Received UpdateEpisode({})", episode.id)
 
     episodes
-      .findOne(episode.getId)
+      .findOne(episode.id)
       .map {
-        case Some(e) => episodeMapper.update(episode, e)
+        case Some(e) => episode.update(e) // episodeMapper.update(episode, e)
         case None =>
-          log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.getId)
-          episodeMapper.toModifiable(episode)
+          log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
+          //episodeMapper.toModifiable(episode)
+        episode
       }
       .foreach(e => {
         episodes.save(e)
@@ -371,9 +402,12 @@ class CatalogStore(config: CatalogConfig)
         case Success(fs) =>
           if (fs.nonEmpty) {
             fs.foreach(f => {
+              feeds.save(f.copy(url = Option(newUrl)))
+              /*
               feeds.save(feedMapper
                 .toImmutable(f)
                 .withUrl(newUrl))
+                */
             })
           } else {
             log.error("No Feed found in database with url='{}'", oldUrl)
@@ -388,12 +422,16 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(id)
       .foreach {
-        case Some(p) => podcasts.save(podcastMapper.toImmutable(p).withLink(newUrl))
+        case Some(p) =>
+          podcasts.save(p.copy(link = Option(newUrl)))
+          //podcasts.save(podcastMapper.toImmutable(p).withLink(newUrl))
         case None =>
           episodes
             .findOne(id)
             .foreach {
-              case Some(e) => episodes.save(episodeMapper.toImmutable(e).withLink(newUrl))
+              case Some(e) =>
+                episodes.save(e.copy(link = Option(newUrl)))
+                //episodes.save(episodeMapper.toImmutable(e).withLink(newUrl))
               case None    => log.error("Cannot update Link URL - no Podcast or Episode found by ID : {}", id)
             }
       }
@@ -525,11 +563,13 @@ class CatalogStore(config: CatalogConfig)
     episodes
       .findOne(episodeId)
       .map {
-        case Some(e) =>
+        case Some(e) => e.chapters
+          /*
           Option(e.getChapters) match {
             case Some(cs) => cs.asScala.toList
             case None     => List()
           }
+          */
         case None =>
           log.warning("Database does not contain Episode (ID) : {}", episodeId)
           List()
@@ -591,14 +631,14 @@ class CatalogStore(config: CatalogConfig)
     throw new UnsupportedOperationException("Currently not implemented")
   }
 
-  private def onRegisterEpisodeIfNew(podcastId: String, episode: Episode): Unit = {
-    log.debug("Received RegisterEpisodeIfNew({}, '{}')", podcastId, episode.getTitle)
+  private def onRegisterEpisodeIfNew(podcastId: String, episode: NewEpisode): Unit = {
+    log.debug("Received RegisterEpisodeIfNew({}, '{}')", podcastId, episode.title)
 
     podcasts
       .findOne(podcastId)
       .foreach {
         case Some(p) =>
-          Option(episode.getGuid)
+          episode.guid
             .map(guid => {
               episodes
                 .findAllByPodcastAndGuid(podcastId, guid)
@@ -606,15 +646,30 @@ class CatalogStore(config: CatalogConfig)
             })
             .getOrElse({
               episodes
-                .findOneByEnclosure(episode.getEnclosureUrl, episode.getEnclosureLength, episode.getEnclosureType)
+                .findOneByEnclosure(episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
             })
             .map {
-              case Some(e) => log.debug("Episode is already registered : ('{}', {}, '{}')",episode.getEnclosureUrl, episode.getEnclosureLength, episode.getEnclosureType)
+              case Some(e) => log.debug("Episode is already registered : ('{}', {}, '{}')",episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
               case None =>
-                val e = episodeMapper.toModifiable(episode)
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
+
+                val patch = NewEpisode(
+                  id = Some(episodeId),
+                  podcastId = Option(podcastId),
+                  podcastTitle = p.title,
+                  image = reduce(episode.image, p.image),
+                  registration = EpisodeRegistrationInfo(
+                    timestamp = Some(LocalDateTime.now())
+                  )
+                )
+
+                val e = episode.update(patch)
+
+                /*
+                val e = episodeMapper.toModifiable(episode)
+
                 e.setId(episodeId)
                 e.setPodcastId(podcastId)
                 //e.setExo(episodeId)
@@ -626,15 +681,16 @@ class CatalogStore(config: CatalogConfig)
                 Option(e.getImage).getOrElse({
                   e.setImage(p.getImage)
                 })
+                */
 
                 // save asynchronously
                 episodes
                   .save(e)
                   .onComplete {
                     case Success(_) =>
-                      log.info("episode registered : '{}' [p:{},e:{}]", e.getTitle, podcastId, e.getId)
+                      log.info("episode registered : '{}' [p:{},e:{}]", e.title, podcastId, e.id)
 
-                      val indexEvent = AddDocIndexEvent(indexMapper.toImmutable(e))
+                      val indexEvent = AddDocIndexEvent(NewIndexMapper.toIndexDoc(e))// AddDocIndexEvent(indexMapper.toImmutable(e))
                       //emitIndexEvent(indexEvent)
                       indexStore ! indexEvent
 
@@ -681,7 +737,7 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findAll(0, config.maxPageSize)
       .onComplete {
-        case Success(ps) => ps.foreach(p => println(s"${p.getId} : ${p.getTitle}"))
+        case Success(ps) => ps.foreach(p => println(s"${p.id} : ${p.title}"))
         case Failure(ex) => log.error("Could not retrieve and print all Podcasts : {}", ex)
       }
   }
@@ -693,7 +749,7 @@ class CatalogStore(config: CatalogConfig)
     episodes
       .findAll(0, config.maxPageSize)
       .onComplete {
-        case Success(es) => es.foreach(e => println(s"${e.getId} : ${e.getTitle}"))
+        case Success(es) => es.foreach(e => println(s"${e.id} : ${e.title}"))
         case Failure(ex) => log.error("Could not retrieve and print all Episodes : {}", ex)
       }
   }
@@ -705,7 +761,7 @@ class CatalogStore(config: CatalogConfig)
     feeds
       .findAll(0, config.maxPageSize)
       .onComplete {
-        case Success(fs) => fs.foreach(f => println(s"${f.getId} : ${f.getUrl}"))
+        case Success(fs) => fs.foreach(f => println(s"${f.id} : ${f.url}"))
         case Failure(ex) => log.error("Could not retrieve and print all Feeds : {}", ex)
       }
   }

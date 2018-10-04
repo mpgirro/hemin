@@ -7,7 +7,7 @@ import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeA
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
-import io.disposia.engine.domain.ResultWrapper
+import io.disposia.engine.olddomain.OldResultWrapper
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
 

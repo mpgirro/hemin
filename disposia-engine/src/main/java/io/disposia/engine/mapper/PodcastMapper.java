@@ -1,9 +1,9 @@
 package io.disposia.engine.mapper;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.ImmutablePodcast;
-import io.disposia.engine.domain.ModifiablePodcast;
-import io.disposia.engine.domain.Podcast;
+import io.disposia.engine.olddomain.*;
+import io.disposia.engine.olddomain.ModifiableOldPodcast;
+import io.disposia.engine.olddomain.OldPodcast;
 import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -22,63 +22,63 @@ public interface PodcastMapper {
 
     PodcastMapper INSTANCE = Mappers.getMapper( PodcastMapper.class );
 
-    default ModifiablePodcast toModifiable(Podcast podcast) {
+    default ModifiableOldPodcast toModifiable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
             .map(p -> {
-                if (p instanceof ModifiablePodcast) {
-                    return (ModifiablePodcast) p;
+                if (p instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) p;
                 } else {
-                    return new ModifiablePodcast().from(p);
+                    return new ModifiableOldPodcast().from(p);
                 }})
             .orElse(null);
     }
 
-    default ImmutablePodcast toImmutable(Podcast podcast) {
+    default ImmutableOldPodcast toImmutable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
             .map(p -> {
-                if (p instanceof ImmutablePodcast) {
-                    return (ImmutablePodcast) p;
+                if (p instanceof ImmutableOldPodcast) {
+                    return (ImmutableOldPodcast) p;
                 } else {
-                    return ((ModifiablePodcast) p).toImmutable();
+                    return ((ModifiableOldPodcast) p).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiablePodcast update(Podcast src, @MappingTarget ModifiablePodcast target);
+    ModifiableOldPodcast update(OldPodcast src, @MappingTarget ModifiableOldPodcast target);
 
-    default ModifiablePodcast update(Podcast src, @MappingTarget Podcast target) {
+    default ModifiableOldPodcast update(OldPodcast src, @MappingTarget OldPodcast target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiablePodcast) {
-                    return (ModifiablePodcast) t;
+                if (t instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) t;
                 } else {
-                    return new ModifiablePodcast().from(t);
+                    return new ModifiableOldPodcast().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutablePodcast updateImmutable(Podcast src, @MappingTarget Podcast target) {
+    default ImmutableOldPodcast updateImmutable(OldPodcast src, @MappingTarget OldPodcast target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiablePodcast) {
-                    return (ModifiablePodcast) t;
+                if (t instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) t;
                 } else {
-                    return new ModifiablePodcast().from(t);
+                    return new ModifiableOldPodcast().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiablePodcast::toImmutable)
+            .map(ModifiableOldPodcast::toImmutable)
             .orElse(null);
     }
 
-    default ImmutablePodcast toImmutable(org.apache.lucene.document.Document doc) {
+    default ImmutableOldPodcast toImmutable(org.apache.lucene.document.Document doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutablePodcast.builder()
+            .map(d -> ImmutableOldPodcast.builder()
                 .setId(d.get(IndexField.ID))
                 //.setExo(d.get(IndexField.EXO))
                 .setTitle(d.get(IndexField.TITLE))
@@ -97,10 +97,10 @@ public interface PodcastMapper {
             .orElse(null);
     }
 
-    default ImmutablePodcast toImmutable(SolrDocument doc) {
+    default ImmutableOldPodcast toImmutable(SolrDocument doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutablePodcast.builder()
+            .map(d -> ImmutableOldPodcast.builder()
                 .setId(SolrFieldMapper.INSTANCE.stringOrNull(d, IndexField.ID))
                 //.setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
                 .setTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.TITLE))

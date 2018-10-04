@@ -1,9 +1,8 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.ImmutableEpisode;
-import io.disposia.engine.domain.ImmutablePodcast;
-import io.disposia.engine.domain.Podcast;
+import io.disposia.engine.olddomain.*;
+import io.disposia.engine.olddomain.ImmutableOldEpisode;
+import io.disposia.engine.olddomain.OldEpisode;
 import org.mapstruct.Mapper;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.ReportingPolicy;
@@ -18,10 +17,10 @@ public interface TeaserMapper {
 
     TeaserMapper INSTANCE = Mappers.getMapper( TeaserMapper.class );
 
-    default Podcast asTeaser(Podcast podcast) {
+    default OldPodcast asTeaser(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
-            .map(p -> ImmutablePodcast.builder()
+            .map(p -> ImmutableOldPodcast.builder()
                 //.setExo(p.getExo())
                 .setTitle(p.getTitle())
                 .setImage(p.getImage())
@@ -38,10 +37,10 @@ public interface TeaserMapper {
             .orElse(null);
     }
 
-    default Episode asTeaser(Episode episode) {
+    default OldEpisode asTeaser(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
-            .map(e -> ImmutableEpisode.builder()
+            .map(e -> ImmutableOldEpisode.builder()
                 //.setExo(e.getExo())
                 .setTitle(e.getTitle())
                 .setPubDate(e.getPubDate())

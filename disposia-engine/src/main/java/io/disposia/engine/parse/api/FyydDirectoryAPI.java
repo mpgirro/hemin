@@ -1,7 +1,7 @@
 package io.disposia.engine.parse.api;
 
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.ImmutableEpisode;
+import io.disposia.engine.olddomain.ImmutableOldEpisode;
+import io.disposia.engine.olddomain.OldEpisode;
 import io.disposia.engine.mapper.DateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ public class FyydDirectoryAPI extends DirectoryAPI {
         return get(endpoint);
     }
 
-    public List<Episode> getEpisodes(String json) {
+    public List<OldEpisode> getEpisodes(String json) {
         final Map<String,Object> apiData = jsonToMap(json);
         if (apiData.containsKey("data")) {
             final Map<String,Object> data = (Map<String,Object>) apiData.get("data");
@@ -84,9 +84,9 @@ public class FyydDirectoryAPI extends DirectoryAPI {
                 final List<Map<String,Object>> episodesObj = (List<Map<String,Object>>) data.get("episodes");
                 if (episodesObj != null) {
                     log.info("JSON contains {} episode JSON objects", episodesObj.size());
-                    final List<Episode> episodes =  episodesObj.stream()
+                    final List<OldEpisode> episodes =  episodesObj.stream()
                         .map(d -> {
-                            final ImmutableEpisode.Builder e = ImmutableEpisode.builder();
+                            final ImmutableOldEpisode.Builder e = ImmutableOldEpisode.builder();
                             e.setTitle((String) d.get("title"));
                             e.setLink((String) d.get("url"));
                             e.setDescription((String) d.get("description"));
@@ -109,8 +109,8 @@ public class FyydDirectoryAPI extends DirectoryAPI {
                     // fyyd has a duplicate entry problem, therefore we only take on DTO per occuring title
                     // this way we could loose some episode entries that are actually different but have bad
                     // quality titles, but this is still better then to import us lots of triple episode
-                    final Map<String, Episode> map = new HashMap<>();
-                    for (Episode e : episodes) {
+                    final Map<String, OldEpisode> map = new HashMap<>();
+                    for (OldEpisode e : episodes) {
                        map.put(e.getTitle(), e);
                     }
                     return new LinkedList<>(map.values());

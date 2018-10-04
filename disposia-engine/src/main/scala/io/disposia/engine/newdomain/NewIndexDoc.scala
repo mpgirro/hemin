@@ -28,7 +28,7 @@ case class NewIndexDoc(
   websiteData: Option[String]    = None
 ) {
 
-  def copy(patch: NewIndexDoc): NewIndexDoc = {
+  def update(patch: NewIndexDoc): NewIndexDoc = {
     Option(patch) match {
       case None => this
       case Some(p) =>

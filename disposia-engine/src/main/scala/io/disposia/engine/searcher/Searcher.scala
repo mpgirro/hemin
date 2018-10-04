@@ -2,8 +2,8 @@ package io.disposia.engine.searcher
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol.{ActorRefSupervisor, ReportSearcherStartupComplete}
-import io.disposia.engine.domain.ResultWrapper
 import io.disposia.engine.index.IndexConfig
+import io.disposia.engine.newdomain.NewResults
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.disposia.engine.searcher.retriever.SolrRetriever
 
@@ -21,7 +21,7 @@ object Searcher {
   // SearchQueries
   case class SearcherRequest(query: String, page: Int, size: Int) extends SearcherQuery
   // SearchQueryResults
-  case class SearcherResults(results: ResultWrapper) extends SearcherQueryResult
+  case class SearcherResults(results: NewResults) extends SearcherQueryResult
 }
 
 class Searcher (config: IndexConfig)

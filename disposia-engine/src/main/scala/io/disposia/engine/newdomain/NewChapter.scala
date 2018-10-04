@@ -10,7 +10,7 @@ case class NewChapter(
                        image: Option[String]     = None
                      ) {
 
-  def copy(patch: NewChapter): NewChapter = {
+  def update(patch: NewChapter): NewChapter = {
     Option(patch) match {
       case None => this
       case Some(p) =>

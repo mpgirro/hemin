@@ -1,7 +1,7 @@
 package io.disposia.engine.index;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.IndexDoc;
+import io.disposia.engine.olddomain.OldIndexDoc;
 import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -52,7 +52,7 @@ public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter 
     }
 
     @Override
-    public void add(IndexDoc indexDoc) {
+    public void add(OldIndexDoc indexDoc) {
         log.debug("Appending document to index : {}", indexDoc);
 
         final Document luceneDoc = indexMapper.toLucene(indexDoc);
@@ -64,7 +64,7 @@ public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter 
     }
 
     @Override
-    public void update(IndexDoc indexDoc) {
+    public void update(OldIndexDoc indexDoc) {
         log.debug("Updating document in index : {}", indexDoc);
 
         final Document luceneDoc = indexMapper.toLucene(indexDoc);

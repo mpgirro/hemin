@@ -1,10 +1,10 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.Chapter;
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.Feed;
-import io.disposia.engine.domain.Podcast;
-import io.disposia.engine.domain.*;
+import io.disposia.engine.olddomain.OldChapter;
+import io.disposia.engine.olddomain.OldEpisode;
+import io.disposia.engine.olddomain.OldFeed;
+import io.disposia.engine.olddomain.OldPodcast;
+import io.disposia.engine.olddomain.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.NullValueCheckStrategy;
@@ -26,49 +26,49 @@ public interface IdMapper {
     IdMapper INSTANCE = Mappers.getMapper( IdMapper.class );
 
     @Mapping(target = "id", ignore = true)
-    ModifiablePodcast clearModifiable(Podcast podcast);
+    ModifiableOldPodcast clearModifiable(OldPodcast podcast);
 
-    default ImmutablePodcast clearImmutable(Podcast podcast) {
+    default ImmutableOldPodcast clearImmutable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
             .map(this::clearModifiable)
-            .map(ModifiablePodcast::toImmutable)
+            .map(ModifiableOldPodcast::toImmutable)
             .orElse(null);
     }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "podcastId", ignore = true)
-    ModifiableEpisode clearModifiable(Episode episode);
+    ModifiableOldEpisode clearModifiable(OldEpisode episode);
 
-    default ImmutableEpisode clearImmutable(Episode episode) {
+    default ImmutableOldEpisode clearImmutable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
             .map(this::clearModifiable)
-            .map(ModifiableEpisode::toImmutable)
+            .map(ModifiableOldEpisode::toImmutable)
             .orElse(null);
     }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "podcastId", ignore = true)
-    ModifiableFeed clearModifiable(Feed feed);
+    ModifiableOldFeed clearModifiable(OldFeed feed);
 
-    default ImmutableFeed clearImmutable(Feed feed) {
+    default ImmutableOldFeed clearImmutable(OldFeed feed) {
         return Optional
             .ofNullable(feed)
             .map(this::clearModifiable)
-            .map(ModifiableFeed::toImmutable)
+            .map(ModifiableOldFeed::toImmutable)
             .orElse(null);
     }
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "episodeId", ignore = true)
-    ModifiableChapter clearModifiable(Chapter chapter);
+    ModifiableOldChapter clearModifiable(OldChapter chapter);
 
-    default ImmutableChapter clearImmutable(Chapter chapter) {
+    default ImmutableOldChapter clearImmutable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)
             .map(this::clearModifiable)
-            .map(ModifiableChapter::toImmutable)
+            .map(ModifiableOldChapter::toImmutable)
             .orElse(null);
     }
 

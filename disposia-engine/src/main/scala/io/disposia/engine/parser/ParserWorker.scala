@@ -3,17 +3,14 @@ package io.disposia.engine.parser
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import akka.cluster.pubsub.DistributedPubSub
-import akka.cluster.pubsub.DistributedPubSubMediator.{Publish, Send}
-import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
-import io.disposia.engine.catalog.CatalogBroker
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
-import io.disposia.engine.domain.{Episode, FeedStatus}
+import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.exception.FeedParsingException
-import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, IndexEvent, UpdateDocWebsiteDataIndexEvent}
+import io.disposia.engine.index.IndexStore.UpdateDocWebsiteDataIndexEvent
 import io.disposia.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
+import io.disposia.engine.olddomain.OldEpisode
 import io.disposia.engine.parse.api.FyydDirectoryAPI
 import io.disposia.engine.parse.rss.RomeFeedParser
 import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
@@ -138,7 +135,7 @@ class ParserWorker (config: ParserConfig)
   private def onParseFyydEpisodes(podcastId: String, json: String): Unit = {
     log.debug("Received ParseFyydEpisodes({},_)", podcastId)
 
-    val episodes: List[Episode] = fyydAPI.getEpisodes(json).asScala.toList
+    val episodes: List[OldEpisode] = fyydAPI.getEpisodes(json).asScala.toList
     log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastId)
     for(episode <- episodes){
       registerEpisode(podcastId, episode)
@@ -200,19 +197,19 @@ class ParserWorker (config: ParserConfig)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
 
-        // check for "new" episodes: because this is a new Podcast, all episodes will be new and registered
+        // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
         Option(parser.getEpisodes) match {
           case Some(es) =>
             for(e <- es.asScala){
               registerEpisode(podcastId, e)
             }
-          case None => log.warning("Parsing generated a NULL-List[Episode] for feed: {}", feedUrl)
+          case None => log.warning("Parsing generated a NULL-List[OldEpisode] for feed: {}", feedUrl)
         }
       case None => log.warning("Parsing generated a NULL-PodcastDocument for feed: {}", feedUrl)
     }
   }
 
-  private def registerEpisode(podcastId: String, episode: Episode): Unit = {
+  private def registerEpisode(podcastId: String, episode: OldEpisode): Unit = {
 
     val e = episodeMapper.toModifiable(episode)
 

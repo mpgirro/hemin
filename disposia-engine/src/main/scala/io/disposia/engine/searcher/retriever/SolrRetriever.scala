@@ -1,7 +1,9 @@
 package io.disposia.engine.searcher.retriever
-import io.disposia.engine.domain.{ImmutableResultWrapper, IndexDoc, IndexField, ResultWrapper}
+import io.disposia.engine.domain.IndexField
+import io.disposia.engine.olddomain._
 import io.disposia.engine.index.IndexConfig
 import io.disposia.engine.mapper.IndexMapper
+import io.disposia.engine.newdomain.NewResults
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 import org.apache.solr.client.solrj.response.QueryResponse
@@ -15,7 +17,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultWrapper =
+  override protected[this] def searchIndex(q: String, p: Int, s: Int): NewResults =
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)
 
   private val solr: SolrClient = new HttpSolrClient.Builder(config.solrUri)
@@ -42,7 +44,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
       .mkString(" ")
   }
 
-  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultWrapper = {
+  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): NewResults = {
 
     val offset = (p-1) * s
 
@@ -67,7 +69,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     val response: QueryResponse = solr.query(query)
     val docList: SolrDocumentList = response.getResults
 
-    val resultWrapper = ImmutableResultWrapper.builder
+    val resultWrapper = ImmutableOldResultWrapper.builder
 
     // set some sane values, we'll overwrite these if all goes well
     resultWrapper.setCurrPage(0)
@@ -77,7 +79,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     if (docList.getNumFound <= 0) {
       resultWrapper.setResults(List().asJava)
     } else {
-      val resultDocs: Array[IndexDoc] = new Array[IndexDoc](docList.getNumFound.toInt)
+      val resultDocs: Array[OldIndexDoc] = new Array[OldIndexDoc](docList.getNumFound.toInt)
       for ((d,i) <- docList.asScala.zipWithIndex) {
         resultDocs(i) = indexMapper.toImmutable(d)
       }

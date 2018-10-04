@@ -1,10 +1,9 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.ImmutableChapter;
-import io.disposia.engine.domain.ModifiableChapter;
-import io.disposia.engine.domain.Chapter;
+import io.disposia.engine.olddomain.ImmutableOldChapter;
+import io.disposia.engine.olddomain.ModifiableOldChapter;
+import io.disposia.engine.olddomain.OldChapter;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
@@ -17,56 +16,56 @@ public interface ChapterMapper {
 
     ChapterMapper INSTANCE = Mappers.getMapper( ChapterMapper.class );
 
-    default ModifiableChapter toModifiable(Chapter chapter) {
+    default ModifiableOldChapter toModifiable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)
             .map(c -> {
-                if (c instanceof ModifiableChapter) {
-                    return (ModifiableChapter) c;
+                if (c instanceof ModifiableOldChapter) {
+                    return (ModifiableOldChapter) c;
                 } else {
-                    return new ModifiableChapter().from(c);
+                    return new ModifiableOldChapter().from(c);
                 }})
             .orElse(null);
     }
 
-    default ImmutableChapter toImmutable(Chapter chapter) {
+    default ImmutableOldChapter toImmutable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)
             .map(c -> {
-                if (c instanceof ImmutableChapter) {
-                    return (ImmutableChapter) c;
+                if (c instanceof ImmutableOldChapter) {
+                    return (ImmutableOldChapter) c;
                 } else {
-                    return ((ModifiableChapter) c).toImmutable();
+                    return ((ModifiableOldChapter) c).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableChapter update(Chapter src, @MappingTarget ModifiableChapter target);
+    ModifiableOldChapter update(OldChapter src, @MappingTarget ModifiableOldChapter target);
 
-    default ModifiableChapter update(Chapter src, @MappingTarget Chapter target) {
+    default ModifiableOldChapter update(OldChapter src, @MappingTarget OldChapter target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableChapter) {
-                    return (ModifiableChapter) t;
+                if (t instanceof ModifiableOldChapter) {
+                    return (ModifiableOldChapter) t;
                 } else {
-                    return new ModifiableChapter().from(t);
+                    return new ModifiableOldChapter().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableChapter updateImmutable(Chapter src, @MappingTarget Chapter target) {
+    default ImmutableOldChapter updateImmutable(OldChapter src, @MappingTarget OldChapter target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableChapter) {
-                    return (ModifiableChapter) t;
+                if (t instanceof ModifiableOldChapter) {
+                    return (ModifiableOldChapter) t;
                 } else {
-                    return new ModifiableChapter().from(t);
+                    return new ModifiableOldChapter().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableChapter::toImmutable)
+            .map(ModifiableOldChapter::toImmutable)
             .orElse(null);
     }
 

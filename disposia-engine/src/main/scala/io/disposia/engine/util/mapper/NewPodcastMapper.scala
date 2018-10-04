@@ -1,6 +1,7 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.{IndexField, Podcast}
+import io.disposia.engine.domain.IndexField
+import io.disposia.engine.olddomain.OldPodcast
 import io.disposia.engine.mapper.{DateMapper, SolrFieldMapper}
 import io.disposia.engine.newdomain.podcast._
 import io.disposia.engine.newdomain.{NewIndexDoc, NewPodcast}
@@ -10,7 +11,7 @@ import scala.collection.JavaConverters._
 
 object NewPodcastMapper {
 
-  def toPodcast(podcast: Podcast): NewPodcast = Option(podcast)
+  def toPodcast(podcast: OldPodcast): NewPodcast = Option(podcast)
     .map { p =>
       NewPodcast(
         id          = Option(p.getId),

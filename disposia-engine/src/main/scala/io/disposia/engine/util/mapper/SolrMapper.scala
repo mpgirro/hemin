@@ -2,11 +2,10 @@ package io.disposia.engine.util.mapper
 
 import java.util
 
-import com.google.common.base.Strings.isNullOrEmpty
-import io.disposia.engine.domain._
-import io.disposia.engine.newdomain.NewIndexDoc
+import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper._
-import org.apache.lucene.document.{Field, StringField, TextField}
+import io.disposia.engine.newdomain.NewIndexDoc
+import io.disposia.engine.olddomain._
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 import scala.collection.JavaConverters._
@@ -17,13 +16,13 @@ object SolrMapper {
   private val indexMapper = IndexMapper.INSTANCE
 
   @deprecated
-  def toSolr(src: Podcast): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
+  def toSolr(src: OldPodcast): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
 
   @deprecated
-  def toSolr(src: Episode): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
+  def toSolr(src: OldEpisode): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
 
   @deprecated
-  def toSolr(src: IndexDoc): SolrInputDocument =
+  def toSolr(src: OldIndexDoc): SolrInputDocument =
     Option(src)
       .map { s =>
         val d = new SolrInputDocument

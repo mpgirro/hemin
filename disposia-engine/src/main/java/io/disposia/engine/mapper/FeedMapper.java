@@ -1,10 +1,9 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.Feed;
-import io.disposia.engine.domain.ImmutableFeed;
-import io.disposia.engine.domain.ModifiableFeed;
+import io.disposia.engine.olddomain.ImmutableOldFeed;
+import io.disposia.engine.olddomain.ModifiableOldFeed;
+import io.disposia.engine.olddomain.OldFeed;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValueCheckStrategy;
 import org.mapstruct.factory.Mappers;
@@ -17,56 +16,56 @@ public interface FeedMapper {
 
     FeedMapper INSTANCE = Mappers.getMapper( FeedMapper.class );
 
-    default ModifiableFeed toModifiable(Feed feed) {
+    default ModifiableOldFeed toModifiable(OldFeed feed) {
         return Optional
             .ofNullable(feed)
             .map(f -> {
-                if (f instanceof ModifiableFeed) {
-                    return (ModifiableFeed) f;
+                if (f instanceof ModifiableOldFeed) {
+                    return (ModifiableOldFeed) f;
                 } else {
-                    return new ModifiableFeed().from(f);
+                    return new ModifiableOldFeed().from(f);
                 }})
             .orElse(null);
     }
 
-    default ImmutableFeed toImmutable(Feed feed) {
+    default ImmutableOldFeed toImmutable(OldFeed feed) {
         return Optional
             .ofNullable(feed)
             .map(f -> {
-                if (f instanceof ImmutableFeed) {
-                    return (ImmutableFeed) f;
+                if (f instanceof ImmutableOldFeed) {
+                    return (ImmutableOldFeed) f;
                 } else {
-                    return ((ModifiableFeed) f).toImmutable();
+                    return ((ModifiableOldFeed) f).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableFeed update(Feed src, @MappingTarget ModifiableFeed target);
+    ModifiableOldFeed update(OldFeed src, @MappingTarget ModifiableOldFeed target);
 
-    default ModifiableFeed update(Feed src, @MappingTarget Feed target) {
+    default ModifiableOldFeed update(OldFeed src, @MappingTarget OldFeed target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableFeed) {
-                    return (ModifiableFeed) t;
+                if (t instanceof ModifiableOldFeed) {
+                    return (ModifiableOldFeed) t;
                 } else {
-                    return new ModifiableFeed().from(t);
+                    return new ModifiableOldFeed().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableFeed updateImmutable(Feed src, @MappingTarget Feed target) {
+    default ImmutableOldFeed updateImmutable(OldFeed src, @MappingTarget OldFeed target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableFeed) {
-                    return (ModifiableFeed) t;
+                if (t instanceof ModifiableOldFeed) {
+                    return (ModifiableOldFeed) t;
                 } else {
-                    return new ModifiableFeed().from(t);
+                    return new ModifiableOldFeed().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableFeed::toImmutable)
+            .map(ModifiableOldFeed::toImmutable)
             .orElse(null);
     }
 

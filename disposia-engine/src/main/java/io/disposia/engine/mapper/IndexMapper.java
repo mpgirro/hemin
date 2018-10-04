@@ -1,6 +1,7 @@
 package io.disposia.engine.mapper;
 
-import io.disposia.engine.domain.*;
+import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.olddomain.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
@@ -29,65 +30,65 @@ public interface IndexMapper {
     @Mapping(target = "contentEncoded", ignore = true)
     @Mapping(target = "transcript", ignore = true)
     @Mapping(target = "websiteData", ignore = true)
-    ModifiableIndexDoc toModifiable(Podcast podcast);
+    ModifiableOldIndexDoc toModifiable(OldPodcast podcast);
 
     @Mapping(target = "docType", constant = "episode")
     @Mapping(source = "chapters", target = "chapterMarks")
     @Mapping(target = "itunesSummary", ignore = true)
     @Mapping(target = "transcript", ignore = true)
     @Mapping(target = "websiteData", ignore = true)
-    ModifiableIndexDoc toModifiable(Episode episode);
+    ModifiableOldIndexDoc toModifiable(OldEpisode episode);
 
-    default ImmutableIndexDoc toImmutable(Podcast podcast) {
+    default ImmutableOldIndexDoc toImmutable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
             .map(this::toModifiable)
-            .map(ModifiableIndexDoc::toImmutable)
+            .map(ModifiableOldIndexDoc::toImmutable)
             .orElse(null);
     }
 
-    default ImmutableIndexDoc toImmutable(Episode episode) {
+    default ImmutableOldIndexDoc toImmutable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
             .map(this::toModifiable)
-            .map(ModifiableIndexDoc::toImmutable)
+            .map(ModifiableOldIndexDoc::toImmutable)
             .orElse(null);
     }
 
-    default String map(List<Chapter> chapters){
+    default String map(List<OldChapter> chapters){
         return Optional
             .ofNullable(chapters)
             .map(cs -> String.join("\n", cs.stream()
-                .map(Chapter::getTitle)
+                .map(OldChapter::getTitle)
                 .collect(Collectors.toList())))
             .orElse(null);
     }
 
-    default ModifiableIndexDoc toModifiable(IndexDoc doc) {
+    default ModifiableOldIndexDoc toModifiable(OldIndexDoc doc) {
         return Optional
             .ofNullable(doc)
             .map(d -> {
-                if (doc instanceof ModifiableIndexDoc) {
-                    return (ModifiableIndexDoc) d;
+                if (doc instanceof ModifiableOldIndexDoc) {
+                    return (ModifiableOldIndexDoc) d;
                 } else {
-                    return new ModifiableIndexDoc().from(d);
+                    return new ModifiableOldIndexDoc().from(d);
                 }})
             .orElse(null);
     }
 
-    default ImmutableIndexDoc toImmutable(IndexDoc doc) {
+    default ImmutableOldIndexDoc toImmutable(OldIndexDoc doc) {
         return Optional
             .ofNullable(doc)
             .map(d -> {
-                if (d instanceof ImmutableIndexDoc) {
-                    return (ImmutableIndexDoc) d;
+                if (d instanceof ImmutableOldIndexDoc) {
+                    return (ImmutableOldIndexDoc) d;
                 } else {
-                    return ((ModifiableIndexDoc) d).toImmutable();
+                    return ((ModifiableOldIndexDoc) d).toImmutable();
                 }})
             .orElse(null);
     }
 
-    default ImmutableIndexDoc toImmutable(org.apache.lucene.document.Document doc) {
+    default ImmutableOldIndexDoc toImmutable(org.apache.lucene.document.Document doc) {
 
         if (doc == null) return null;
 
@@ -103,7 +104,7 @@ public interface IndexMapper {
         }
     }
 
-    default ImmutableIndexDoc toImmutable(SolrDocument doc) {
+    default ImmutableOldIndexDoc toImmutable(SolrDocument doc) {
 
         if (doc == null) return null;
 
@@ -119,7 +120,7 @@ public interface IndexMapper {
         }
     }
 
-    default org.apache.lucene.document.Document toLucene(IndexDoc doc) {
+    default org.apache.lucene.document.Document toLucene(OldIndexDoc doc) {
 
         if (doc == null) return null;
 
@@ -178,7 +179,7 @@ public interface IndexMapper {
     }
 
     /*
-    default SolrInputDocument toSolr(IndexDoc doc ) {
+    default SolrInputDocument toSolr(OldIndexDoc doc ) {
 
         if (doc == null) return null;
 

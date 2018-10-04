@@ -1,20 +1,20 @@
 package io.disposia.engine.util;
 
-import io.disposia.engine.domain.IndexDoc;
+import io.disposia.engine.olddomain.OldIndexDoc;
 import org.jsoup.Jsoup;
 
 public class DocumentFormatter {
 
     private static final String NEWLINE = System.getProperty("line.separator");
 
-    public static String cliFormat(IndexDoc doc){
+    public static String cliFormat(OldIndexDoc doc){
         final StringBuilder builder = new StringBuilder();
         switch (doc.getDocType()) {
             case "podcast":
                 builder
                     .append(doc.getTitle())
                     .append(NEWLINE)
-                    .append("[Podcast] ")
+                    .append("[OldPodcast] ")
                     .append(NEWLINE);
                 if (doc.getPubDate() != null) builder.append(doc.getPubDate());
                 builder
@@ -30,7 +30,7 @@ public class DocumentFormatter {
                     .append(NEWLINE)
                     .append(doc.getPodcastTitle())
                     .append(NEWLINE)
-                    .append("[Episode] ");
+                    .append("[OldEpisode] ");
                 if (doc.getPubDate() != null) builder.append(doc.getPubDate());
                 builder
                     .append(NEWLINE)

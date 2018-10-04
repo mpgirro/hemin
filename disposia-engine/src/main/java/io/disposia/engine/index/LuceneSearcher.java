@@ -1,9 +1,9 @@
 package io.disposia.engine.index;
 
+import io.disposia.engine.olddomain.ImmutableOldResultWrapper;
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.ImmutableResultWrapper;
-import io.disposia.engine.domain.IndexDoc;
-import io.disposia.engine.domain.ResultWrapper;
+import io.disposia.engine.olddomain.OldIndexDoc;
+import io.disposia.engine.olddomain.OldResultWrapper;
 import io.disposia.engine.exception.SearchException;
 import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
@@ -73,7 +73,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
      *                         documents, or if it exceeds the size of the found documents
      */
     @Override
-    public synchronized ResultWrapper search(String q, int p, int s) throws SearchException {
+    public synchronized OldResultWrapper search(String q, int p, int s) throws SearchException {
 
         if ( p < 1 ) {
             throw new SearchException("Requested page number (p) required to be >1, got: " + p);
@@ -93,7 +93,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
             throw new SearchException("Request search range (p x s) exceeds maximum search window s of " + MAX_RESULT_COUNT);
         }
 
-        final ImmutableResultWrapper.Builder resultWrapper = ImmutableResultWrapper.builder();
+        final ImmutableOldResultWrapper.Builder resultWrapper = ImmutableOldResultWrapper.builder();
 
         // set some sane values, we'll overwrite these if all goes well
         resultWrapper.setCurrPage(0);
@@ -141,7 +141,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
             }
 
             int windowSize = Math.max(0, windowEnd - windowStart);
-            final IndexDoc[] results = new IndexDoc[windowSize];
+            final OldIndexDoc[] results = new OldIndexDoc[windowSize];
 
             int j = 0;
             for (int i = windowStart; i < windowEnd; i++) {
@@ -167,7 +167,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
     }
 
     @Override
-    public synchronized Optional<IndexDoc> findById(String id) throws SearchException {
+    public synchronized Optional<OldIndexDoc> findById(String id) throws SearchException {
         IndexSearcher indexSearcher = null;
         try {
 

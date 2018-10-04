@@ -39,11 +39,11 @@ trait MongoRepository[T] {
     * @param optId the ID of the entity wrapped in a Future
     * @return the entity eventually, or None if not found
     */
-  def findOne(optId: Option[String]): Future[Option[T]] =
-    optId match {
-      case Some(id) => findOne(id)
-      case None     => Future { None }
-    }
+  def findOne(optId: Option[String]): Future[Option[T]] = optId match {
+    case Some(id) => findOne(id)
+    case None     => Future { None }
+  }
+
 
   /**
     * Drops the collection of this repository

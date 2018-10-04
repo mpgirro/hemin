@@ -1,9 +1,9 @@
 package io.disposia.engine.mapper;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.domain.Episode;
-import io.disposia.engine.domain.ImmutableEpisode;
-import io.disposia.engine.domain.ModifiableEpisode;
+import io.disposia.engine.olddomain.*;
+import io.disposia.engine.olddomain.ImmutableOldEpisode;
+import io.disposia.engine.olddomain.OldEpisode;
 import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -20,63 +20,63 @@ public interface EpisodeMapper {
 
     EpisodeMapper INSTANCE = Mappers.getMapper( EpisodeMapper.class );
 
-    default ModifiableEpisode toModifiable(Episode episode) {
+    default ModifiableOldEpisode toModifiable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
             .map(e -> {
-                if (e instanceof ModifiableEpisode) {
-                    return (ModifiableEpisode) e;
+                if (e instanceof ModifiableOldEpisode) {
+                    return (ModifiableOldEpisode) e;
                 } else {
-                    return new ModifiableEpisode().from(e);
+                    return new ModifiableOldEpisode().from(e);
                 }})
             .orElse(null);
     }
 
-    default ImmutableEpisode toImmutable(Episode episode) {
+    default ImmutableOldEpisode toImmutable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
             .map(e -> {
-                if (e instanceof ImmutableEpisode) {
-                    return (ImmutableEpisode) e;
+                if (e instanceof ImmutableOldEpisode) {
+                    return (ImmutableOldEpisode) e;
                 } else {
-                    return ((ModifiableEpisode) e).toImmutable();
+                    return ((ModifiableOldEpisode) e).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableEpisode update(Episode src, @MappingTarget ModifiableEpisode target);
+    ModifiableOldEpisode update(OldEpisode src, @MappingTarget ModifiableOldEpisode target);
 
-    default ModifiableEpisode update(Episode src, @MappingTarget Episode target) {
+    default ModifiableOldEpisode update(OldEpisode src, @MappingTarget OldEpisode target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableEpisode) {
-                    return (ModifiableEpisode) t;
+                if (t instanceof ModifiableOldEpisode) {
+                    return (ModifiableOldEpisode) t;
                 } else {
-                    return new ModifiableEpisode().from(t);
+                    return new ModifiableOldEpisode().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableEpisode updateImmutable(Episode src, @MappingTarget Episode target) {
+    default ImmutableOldEpisode updateImmutable(OldEpisode src, @MappingTarget OldEpisode target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableEpisode) {
-                    return (ModifiableEpisode) t;
+                if (t instanceof ModifiableOldEpisode) {
+                    return (ModifiableOldEpisode) t;
                 } else {
-                    return new ModifiableEpisode().from(t);
+                    return new ModifiableOldEpisode().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableEpisode::toImmutable)
+            .map(ModifiableOldEpisode::toImmutable)
             .orElse(null);
     }
 
-    default ImmutableEpisode toImmutable(org.apache.lucene.document.Document doc) {
+    default ImmutableOldEpisode toImmutable(org.apache.lucene.document.Document doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutableEpisode.builder()
+            .map(d -> ImmutableOldEpisode.builder()
                 .setId(d.get(IndexField.ID))
                 //.setExo(d.get(IndexField.EXO))
                 .setTitle(d.get(IndexField.TITLE))
@@ -97,10 +97,10 @@ public interface EpisodeMapper {
             .orElse(null);
     }
 
-    default ImmutableEpisode toImmutable(SolrDocument doc) {
+    default ImmutableOldEpisode toImmutable(SolrDocument doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutableEpisode.builder()
+            .map(d -> ImmutableOldEpisode.builder()
                 .setId(SolrFieldMapper.INSTANCE.stringOrNull(d, IndexField.ID))
                 //.setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
                 .setTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.TITLE))

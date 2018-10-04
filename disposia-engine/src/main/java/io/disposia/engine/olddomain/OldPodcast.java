@@ -1,8 +1,7 @@
-package io.disposia.engine.domain;
+package io.disposia.engine.olddomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.disposia.engine.domain.ImmutablePodcast;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
@@ -17,8 +16,8 @@ import java.util.Set;
  * be included in the generated implementation.
  *
  * From this class two implementations will be generated:
- *  - ImmutablePodcast
- *  - ModifiablePodcast
+ *  - ImmutableOldPodcast
+ *  - ModifiableOldPodcast
  *
  * <s>Note</s>: This class is abstract instead of an interface to be able to overwrite
  * the java.lang.Object equals(), hashCode() and toString() methods, because Java 8
@@ -33,9 +32,9 @@ import java.util.Set;
     create  = "new",             // generates public no args constructor
     build   = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutablePodcast.class)
-@JsonDeserialize(as = ImmutablePodcast.class)
-public interface Podcast {
+@JsonSerialize(as = ImmutableOldPodcast.class)
+@JsonDeserialize(as = ImmutableOldPodcast.class)
+public interface OldPodcast {
 
     @Nullable
     String getId();

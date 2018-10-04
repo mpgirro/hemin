@@ -23,7 +23,7 @@ case class NewEpisode(
   registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo()
 ) {
 
-  def copy(patch: NewEpisode): NewEpisode = {
+  def update(patch: NewEpisode): NewEpisode = {
     Option(patch) match {
       case None => this
       case Some(p) =>

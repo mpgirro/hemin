@@ -1,11 +1,12 @@
-package io.disposia.engine.domain;
+package io.disposia.engine.olddomain;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.disposia.engine.domain.ImmutableChapter;
 import org.immutables.value.Value;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 @Value.Immutable
 @Value.Modifiable                   // generates implementation with setters, required by mappers
@@ -16,31 +17,29 @@ import javax.annotation.Nullable;
     create  = "new",             // generates public no args constructor
     build   = "create"           // rename 'build' method on builder to 'create'
 )
-@JsonSerialize(as = ImmutableChapter.class)
-@JsonDeserialize(as = ImmutableChapter.class)
-public interface Chapter {
+@JsonSerialize(as = ImmutableOldResultWrapper.class)
+@JsonDeserialize(as = ImmutableOldResultWrapper.class)
+public interface OldResultWrapper {
 
     @Nullable
-    String getId();
+    Integer getCurrPage();
 
     @Nullable
-    String getEpisodeId();
+    Integer getMaxPage();
 
     @Nullable
-    String getStart();
+    Integer getTotalHits();
 
     @Nullable
-    String getTitle();
+    List<OldIndexDoc> getResults();
 
-    @Nullable
-    String getHref();
-
-    @Nullable
-    String getImage();
-
-    /*
-    @Nullable
-    String getEpisodeExo();
-    */
+    static OldResultWrapper empty() {
+        return ImmutableOldResultWrapper.builder()
+            .setCurrPage(0)
+            .setMaxPage(0)
+            .setTotalHits(0)
+            .setResults(Collections.emptyList()) // this list is immutable
+            .create();
+    }
 
 }

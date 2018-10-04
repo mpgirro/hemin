@@ -1,14 +1,15 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.{Episode, IndexField}
+import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.{DateMapper, SolrFieldMapper}
 import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc}
+import io.disposia.engine.olddomain.OldEpisode
 import org.apache.solr.common.SolrDocument
 
 object NewEpisodeMapper {
 
-  def toEpisode(epsiode: Episode): NewEpisode = Option(epsiode)
+  def toEpisode(epsiode: OldEpisode): NewEpisode = Option(epsiode)
     .map { e =>
       NewEpisode(
         id              = Option(e.getId),

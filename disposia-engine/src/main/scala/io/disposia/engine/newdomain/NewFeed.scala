@@ -15,7 +15,13 @@ case class NewFeed(
   registrationTimestamp: Option[LocalDateTime] = None
 ) {
 
-  def copy(patch: NewFeed): NewFeed = {
+  /**
+    * Updates the current instance's fields by all non-None fields of the patch
+    *
+    * @param patch the instance with set fields that need updating
+    * @return the updated instance
+    */
+  def update(patch: NewFeed): NewFeed = {
     Option(patch) match {
       case None => this
       case Some(p) =>
