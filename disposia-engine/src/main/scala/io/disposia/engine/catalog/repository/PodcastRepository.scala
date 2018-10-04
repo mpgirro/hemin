@@ -1,7 +1,7 @@
 package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion._
 import io.disposia.engine.domain.Podcast
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
@@ -16,9 +16,9 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = BsonConversion.PodcastWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = BsonConversion.OldPodcastWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = BsonConversion.PodcastReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = BsonConversion.OldPodcastReader
 
   override protected[this] def collection: BSONCollection = db.apply("podcasts")
 
@@ -36,7 +36,7 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Podcast]] = {
     log.debug("Request to get Podcast (ID) : {}", id)
-    val query = toDocument(Map("id" -> toBson(id)))
+    val query = toDocument(Map("id" -> toBsonS(id)))
     findOne(query)
   }
 
@@ -48,7 +48,7 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
 
   def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
-    val query = toDocument(Map("registrationComplete" -> toBson(true)))
+    val query = toDocument(Map("registrationComplete" -> toBsonB(true)))
     findAll(query, page, size)
   }
 

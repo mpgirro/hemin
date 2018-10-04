@@ -1,7 +1,7 @@
 package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion._
 import io.disposia.engine.newdomain.Image
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
@@ -17,9 +17,9 @@ class ImageRepository (db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Image] = BsonConversion.ImageWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Image] = BsonConversion.OldImageWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = BsonConversion.ImageReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = BsonConversion.OldImageReader
 
   override protected[this] def collection: BSONCollection = db.apply("images")
 
@@ -37,13 +37,13 @@ class ImageRepository (db: DefaultDB, ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    val query = toDocument(Map("id" -> toBson(id)))
+    val query = toDocument(Map("id" -> toBsonS(id)))
     findOne(query)
   }
 
   def findOneByAssociate(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    val query = toDocument(Map("associateId" -> toBson(id)))
+    val query = toDocument(Map("associateId" -> toBsonS(id)))
     findOne(query)
   }
 

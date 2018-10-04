@@ -23,41 +23,41 @@ object NewEpisodeMapper {
       }
       .orNull
 
-  def update(orig: NewEpisode, diff: NewEpisode): NewEpisode =
-    (Option(orig), Option(diff)) match {
-      case (Some(o), None)    => o
+  def update(current: NewEpisode, diff: NewEpisode): NewEpisode =
+    (Option(current), Option(diff)) match {
+      case (Some(c), None)    => c
       case (None, Some(d))    => d
       case (None, None)       => null
-      case (Some(o), Some(d)) =>
+      case (Some(c), Some(d)) =>
         NewEpisode(
-          id              = reduce(o.id, d.id),
-          podcastId       = reduce(o.podcastId, d.podcastId),
-          podcastTitle    = reduce(o.podcastTitle, d.podcastTitle),
-          title           = reduce(o.title, d.title),
-          link            = reduce(o.link, d.link),
-          pubDate         = reduce(o.pubDate, d.pubDate),
-          guid            = reduce(o.guid, d.guid),
-          guidIsPermalink = reduce(o.guidIsPermalink, d.guidIsPermalink),
-          description     = reduce(o.description, d.description),
-          image           = reduce(o.image, d.image),
-          contentEncoded  = reduce(o.contentEncoded, d.contentEncoded),
-          chapters        = reduce(o.chapters, d.chapters),
+          id              = reduce(c.id, d.id),
+          podcastId       = reduce(c.podcastId, d.podcastId),
+          podcastTitle    = reduce(c.podcastTitle, d.podcastTitle),
+          title           = reduce(c.title, d.title),
+          link            = reduce(c.link, d.link),
+          pubDate         = reduce(c.pubDate, d.pubDate),
+          guid            = reduce(c.guid, d.guid),
+          guidIsPermalink = reduce(c.guidIsPermalink, d.guidIsPermalink),
+          description     = reduce(c.description, d.description),
+          image           = reduce(c.image, d.image),
+          contentEncoded  = reduce(c.contentEncoded, d.contentEncoded),
+          chapters        = reduce(c.chapters, d.chapters),
           itunes = EpisodeItunesInfo(
-            duration    = reduce(o.itunes.duration, d.itunes.duration),
-            subtitle    = reduce(o.itunes.subtitle, d.itunes.subtitle),
-            author      = reduce(o.itunes.author, d.itunes.author),
-            summary     = reduce(o.itunes.summary, d.itunes.summary),
-            season      = reduce(o.itunes.season, d.itunes.season),
-            episode     = reduce(o.itunes.episode, d.itunes.episode),
-            episodeType = reduce(o.itunes.episodeType, d.itunes.episodeType),
+            duration    = reduce(c.itunes.duration, d.itunes.duration),
+            subtitle    = reduce(c.itunes.subtitle, d.itunes.subtitle),
+            author      = reduce(c.itunes.author, d.itunes.author),
+            summary     = reduce(c.itunes.summary, d.itunes.summary),
+            season      = reduce(c.itunes.season, d.itunes.season),
+            episode     = reduce(c.itunes.episode, d.itunes.episode),
+            episodeType = reduce(c.itunes.episodeType, d.itunes.episodeType),
           ),
           enclosure = EpisodeEnclosureInfo(
-            url    = reduce(o.enclosure.url, d.enclosure.url),
-            length = reduce(o.enclosure.length, d.enclosure.length),
-            typ    = reduce(o.enclosure.typ, d.enclosure.typ),
+            url    = reduce(c.enclosure.url, d.enclosure.url),
+            length = reduce(c.enclosure.length, d.enclosure.length),
+            typ    = reduce(c.enclosure.typ, d.enclosure.typ),
           ),
           registration = EpisodeRegistrationInfo(
-            timestamp = reduce(o.registration.timestamp, d.registration.timestamp)
+            timestamp = reduce(c.registration.timestamp, d.registration.timestamp)
           )
         )
     }

@@ -3,8 +3,9 @@ package io.disposia.engine.catalog.repository
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain._
-import io.disposia.engine.newdomain.Image
+import io.disposia.engine.newdomain.{Image, NewPodcast}
 import io.disposia.engine.mapper.DateMapper
+import io.disposia.engine.newdomain.podcast._
 import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONString, BSONValue}
 
 import scala.collection.JavaConverters._
@@ -12,20 +13,23 @@ import scala.collection.JavaConverters._
 
 object BsonConversion {
 
-  def toBson(value: Int): Option[BSONInteger] = Option(value).flatMap(i => Option(BSONInteger(i)))
-  def toBson(value: Long): Option[BSONLong] = Option(value).flatMap(l => Option(BSONLong(l)))
-  def toBson(value: String): Option[BSONString] = Option(value).flatMap(s => Option(BSONString(s)))
-  def toBson(value: Boolean): Option[BSONBoolean] = Option(value).flatMap(b => Option(BSONBoolean(b)))
-  def toBson(value: LocalDateTime): Option[BSONDateTime] =
+  def toBsonI(value: Option[Int]): Option[BSONInteger] = value.flatMap(toBsonI)
+  def toBsonI(value: Int): Option[BSONInteger] = Option(value).flatMap(i => Option(BSONInteger(i)))
+
+  def toBsonL(value: Option[Long]): Option[BSONLong] = value.flatMap(toBsonL)
+  def toBsonL(value: Long): Option[BSONLong] = Option(value).flatMap(l => Option(BSONLong(l)))
+
+  def toBsonS(value: Option[String]): Option[BSONString] = value.flatMap(toBsonS)
+  def toBsonS(value: String): Option[BSONString] = Option(value).flatMap(s => Option(BSONString(s)))
+
+  def toBsonB(value: Option[Boolean]): Option[BSONBoolean] = value.flatMap(toBsonB)
+  def toBsonB(value: Boolean): Option[BSONBoolean] = Option(value).flatMap(b => Option(BSONBoolean(b)))
+
+  def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBsonD)
+  def toBsonD(value: LocalDateTime): Option[BSONDateTime] =
     Option(value).flatMap(d => Option(BSONDateTime(DateMapper.INSTANCE.asMilliseconds(d))))
 
   //def toBson(values: Iterable[Chapter]): BSONArray = BSONArray.apply(values.map(c => ChapterWriter.write(c)))
-
-  def toBsonI(value: Option[Int]): Option[BSONInteger] = value.flatMap(toBson)
-  def toBsonL(value: Option[Long]): Option[BSONLong] = value.flatMap(toBson)
-  def toBsonS(value: Option[String]): Option[BSONString] = value.flatMap(toBson)
-  def toBsonB(value: Option[Boolean]): Option[BSONBoolean] = value.flatMap(toBson)
-  def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBson)
 
   def toDocument(map: Map[String, Option[BSONValue]]): BSONDocument =
     BSONDocument.apply(map.collect { case (key, Some(value)) => key -> value })
@@ -39,18 +43,20 @@ object BsonConversion {
 
   def asChapterList(key: String)(implicit bson: BSONDocument): Option[List[Chapter]] = bson.getAs[List[Chapter]](key)
 
-  private implicit val podcastWriter: BSONDocumentWriter[Podcast] = PodcastWriter
-  private implicit val podcastReader: BSONDocumentReader[Podcast] = PodcastReader
-  private implicit val episodeWriter: BSONDocumentWriter[Episode] = EpisodeWriter
-  private implicit val episodeReader: BSONDocumentReader[Episode] = EpisodeReader
-  private implicit val feedWriter: BSONDocumentWriter[Feed] = FeedWriter
-  private implicit val feedReader: BSONDocumentReader[Feed] = FeedReader
-  private implicit val chapterWriter: BSONDocumentWriter[Chapter] = ChapterWriter
-  private implicit val chapterReader: BSONDocumentReader[Chapter] = ChapterReader
-  private implicit val imageWriter: BSONDocumentWriter[Image] = ImageWriter
-  private implicit val imageReader: BSONDocumentReader[Image] = ImageReader
+  def asStringSet(key: String)(implicit bson: BSONDocument): Option[Set[String]] = bson.getAs[Set[String]](key)
 
-  object PodcastReader extends BSONDocumentReader[Podcast] {
+  private implicit val oldPodcastWriter: BSONDocumentWriter[Podcast] = OldPodcastWriter
+  private implicit val oldPodcastReader: BSONDocumentReader[Podcast] = OldPodcastReader
+  private implicit val oldEpisodeWriter: BSONDocumentWriter[Episode] = OldEpisodeWriter
+  private implicit val oldEpisodeReader: BSONDocumentReader[Episode] = OldEpisodeReader
+  private implicit val oldFeedWriter: BSONDocumentWriter[Feed] = OldFeedWriter
+  private implicit val oldFeedReader: BSONDocumentReader[Feed] = OldFeedReader
+  private implicit val oldChapterWriter: BSONDocumentWriter[Chapter] = OldChapterWriter
+  private implicit val oldChapterReader: BSONDocumentReader[Chapter] = OldChapterReader
+  private implicit val oldImageWriter: BSONDocumentWriter[Image] = OldImageWriter
+  private implicit val oldImageReader: BSONDocumentReader[Image] = OldImageReader
+
+  object OldPodcastReader extends BSONDocumentReader[Podcast] {
     override def read(bson: BSONDocument): Podcast = {
       implicit val implicitBson: BSONDocument = bson
       val p = ImmutablePodcast.builder()
@@ -87,40 +93,40 @@ object BsonConversion {
     }
   }
 
-  object PodcastWriter extends BSONDocumentWriter[Podcast] {
+  object OldPodcastWriter extends BSONDocumentWriter[Podcast] {
     override def write(p: Podcast): BSONDocument =
       toDocument(Map(
-        "id"                    -> toBson(p.getId), // TODO remove; no rel. DB
+        "id"                    -> toBsonS(p.getId), // TODO remove; no rel. DB
         //"exo"                   -> toBson(p.getExo),
-        "title"                 -> toBson(p.getTitle),
-        "link"                  -> toBson(p.getLink),
-        "description"           -> toBson(p.getDescription),
-        "pubDate"               -> toBson(p.getPubDate),
-        "lastBuildDate"         -> toBson(p.getLastBuildDate),
-        "language"              -> toBson(p.getLanguage),
-        "generator"             -> toBson(p.getGenerator),
-        "copyright"             -> toBson(p.getCopyright),
-        "docs"                  -> toBson(p.getDocs),
-        "managingEditor"        -> toBson(p.getManagingEditor),
-        "image"                 -> toBson(p.getImage),
-        "itunesSummary"         -> toBson(p.getItunesSummary),
-        "itunesAuthor"          -> toBson(p.getItunesAuthor),
-        "itunesKeywords"        -> toBson(p.getItunesKeywords),
+        "title"                 -> toBsonS(p.getTitle),
+        "link"                  -> toBsonS(p.getLink),
+        "description"           -> toBsonS(p.getDescription),
+        "pubDate"               -> toBsonD(p.getPubDate),
+        "lastBuildDate"         -> toBsonD(p.getLastBuildDate),
+        "language"              -> toBsonS(p.getLanguage),
+        "generator"             -> toBsonS(p.getGenerator),
+        "copyright"             -> toBsonS(p.getCopyright),
+        "docs"                  -> toBsonS(p.getDocs),
+        "managingEditor"        -> toBsonS(p.getManagingEditor),
+        "image"                 -> toBsonS(p.getImage),
+        "itunesSummary"         -> toBsonS(p.getItunesSummary),
+        "itunesAuthor"          -> toBsonS(p.getItunesAuthor),
+        "itunesKeywords"        -> toBsonS(p.getItunesKeywords),
         //"itunesCategorie"       -> p.getItunesCategories.asScala.mkString("|"), // TODO collection!
-        "itunesExplicit"        -> toBson(p.getItunesExplicit),
-        "itunesBlock"           -> toBson(p.getItunesBlock),
-        "itunesType"            -> toBson(p.getItunesType),
-        "itunesOwnerName"       -> toBson(p.getItunesOwnerName),
-        "itunesOwnerEmail"      -> toBson(p.getItunesOwnerEmail),
-        "feedpressLocale"       -> toBson(p.getFeedpressLocale),
-        "fyydVerify"            -> toBson(p.getFyydVerify),
-        "episodeCount"          -> toBson(p.getEpisodeCount), // TODO will ich das feld hier ausbauen?
-        "registrationTimestamp" -> toBson(p.getRegistrationTimestamp),
-        "registrationComplete"  -> toBson(p.getRegistrationComplete)
+        "itunesExplicit"        -> toBsonB(p.getItunesExplicit),
+        "itunesBlock"           -> toBsonB(p.getItunesBlock),
+        "itunesType"            -> toBsonS(p.getItunesType),
+        "itunesOwnerName"       -> toBsonS(p.getItunesOwnerName),
+        "itunesOwnerEmail"      -> toBsonS(p.getItunesOwnerEmail),
+        "feedpressLocale"       -> toBsonS(p.getFeedpressLocale),
+        "fyydVerify"            -> toBsonS(p.getFyydVerify),
+        "episodeCount"          -> toBsonI(p.getEpisodeCount), // TODO will ich das feld hier ausbauen?
+        "registrationTimestamp" -> toBsonD(p.getRegistrationTimestamp),
+        "registrationComplete"  -> toBsonB(p.getRegistrationComplete)
       ))
   }
 
-  object EpisodeReader extends BSONDocumentReader[Episode] {
+  object OldEpisodeReader extends BSONDocumentReader[Episode] {
     override def read(bson: BSONDocument): Episode = {
       implicit val implicitBson: BSONDocument = bson
       val e = ImmutableEpisode.builder()
@@ -155,33 +161,33 @@ object BsonConversion {
     }
   }
 
-  object EpisodeWriter extends BSONDocumentWriter[Episode] {
+  object OldEpisodeWriter extends BSONDocumentWriter[Episode] {
     override def write(e: Episode): BSONDocument = {
       val doc: BSONDocument = toDocument(Map(
-        "id"                    -> toBson(e.getId),        // TODO remove; no rel. DB
-        "podcastId"             -> toBson(e.getPodcastId), // TODO remove; no rel. DB
+        "id"                    -> toBsonS(e.getId),        // TODO remove; no rel. DB
+        "podcastId"             -> toBsonS(e.getPodcastId), // TODO remove; no rel. DB
         //"exo"                   -> toBson(e.getExo),
         //"podcastExo"            -> toBson(e.getPodcastExo),
-        "podcastTitle"          -> toBson(e.getPodcastTitle),
-        "title"                 -> toBson(e.getTitle),
-        "link"                  -> toBson(e.getLink),
-        "pubDate"               -> toBson(e.getPubDate),
-        "guid"                  -> toBson(e.getGuid),
-        "guidIsPermalink"       -> toBson(e.getGuidIsPermaLink),
-        "description"           -> toBson(e.getDescription),
-        "image"                 -> toBson(e.getImage),
-        "itunesDuration"        -> toBson(e.getItunesDuration),
-        "itunesSubtitle"        -> toBson(e.getItunesSubtitle),
-        "itunesAuthor"          -> toBson(e.getItunesAuthor),
-        "itunesSummary"         -> toBson(e.getItunesSummary),
-        "itunesSeason"          -> toBson(e.getItunesSeason),
-        "itunesEpisode"         -> toBson(e.getItunesEpisode),
-        "itunesEpisodeType"     -> toBson(e.getItunesEpisodeType),
-        "enclosureUrl"          -> toBson(e.getEnclosureUrl),
-        "enclosureLength"       -> toBson(e.getEnclosureLength),
-        "enclosureType"         -> toBson(e.getEnclosureType),
-        "contentEncoded"        -> toBson(e.getContentEncoded),
-        "registrationTimestamp" -> toBson(e.getRegistrationTimestamp),
+        "podcastTitle"          -> toBsonS(e.getPodcastTitle),
+        "title"                 -> toBsonS(e.getTitle),
+        "link"                  -> toBsonS(e.getLink),
+        "pubDate"               -> toBsonD(e.getPubDate),
+        "guid"                  -> toBsonS(e.getGuid),
+        "guidIsPermalink"       -> toBsonB(e.getGuidIsPermaLink),
+        "description"           -> toBsonS(e.getDescription),
+        "image"                 -> toBsonS(e.getImage),
+        "itunesDuration"        -> toBsonS(e.getItunesDuration),
+        "itunesSubtitle"        -> toBsonS(e.getItunesSubtitle),
+        "itunesAuthor"          -> toBsonS(e.getItunesAuthor),
+        "itunesSummary"         -> toBsonS(e.getItunesSummary),
+        "itunesSeason"          -> toBsonI(e.getItunesSeason),
+        "itunesEpisode"         -> toBsonI(e.getItunesEpisode),
+        "itunesEpisodeType"     -> toBsonS(e.getItunesEpisodeType),
+        "enclosureUrl"          -> toBsonS(e.getEnclosureUrl),
+        "enclosureLength"       -> toBsonL(e.getEnclosureLength),
+        "enclosureType"         -> toBsonS(e.getEnclosureType),
+        "contentEncoded"        -> toBsonS(e.getContentEncoded),
+        "registrationTimestamp" -> toBsonD(e.getRegistrationTimestamp),
         /*
         "chapters" -> BSONArray(e.getChapters.asScala.map {
           c => ChapterWriter.write(c)
@@ -203,7 +209,7 @@ object BsonConversion {
     }
   }
 
-  object FeedReader extends BSONDocumentReader[Feed] {
+  object OldFeedReader extends BSONDocumentReader[Feed] {
     override def read(bson: BSONDocument): Feed = {
       implicit val implicitBson: BSONDocument = bson
       val f = ImmutableFeed.builder()
@@ -221,21 +227,21 @@ object BsonConversion {
     }
   }
 
-  object FeedWriter extends BSONDocumentWriter[Feed] {
+  object OldFeedWriter extends BSONDocumentWriter[Feed] {
     override def write(f: Feed): BSONDocument =
       toDocument(Map(
-        "id"                    -> toBson(f.getId),
-        "podcastId"             -> toBson(f.getPodcastId),
+        "id"                    -> toBsonS(f.getId),
+        "podcastId"             -> toBsonS(f.getPodcastId),
         //"exo"                   -> toBson(f.getExo),
         //"podcastExo"            -> toBson(f.getPodcastExo),
-        "url"                   -> toBson(f.getUrl),
-        "lastChecked"           -> toBson(f.getLastChecked),
-        "lastStatus"            -> toBson(f.getLastStatus.getName),
-        "registrationTimestamp" -> toBson(f.getRegistrationTimestamp)
+        "url"                   -> toBsonS(f.getUrl),
+        "lastChecked"           -> toBsonD(f.getLastChecked),
+        "lastStatus"            -> toBsonS(f.getLastStatus.getName),
+        "registrationTimestamp" -> toBsonD(f.getRegistrationTimestamp)
       ))
   }
 
-  object ChapterReader extends BSONDocumentReader[Chapter] {
+  object OldChapterReader extends BSONDocumentReader[Chapter] {
     override def read(bson: BSONDocument): Chapter = {
       implicit val implicitBson: BSONDocument = bson
       val c = ImmutableChapter.builder()
@@ -252,20 +258,22 @@ object BsonConversion {
     }
   }
 
-  object ChapterWriter extends BSONDocumentWriter[Chapter] {
+  object OldChapterWriter extends BSONDocumentWriter[Chapter] {
     override def write(c: Chapter): BSONDocument =
       toDocument(Map(
-        "id"         -> toBson(c.getId),        // TODO remove; no rel. DB
-        "episodeId"  -> toBson(c.getEpisodeId), // TODO remove; no rel. DB
-        "start"      -> toBson(c.getStart),
-        "title"      -> toBson(c.getTitle),
-        "href"       -> toBson(c.getHref),
-        "image"      -> toBson(c.getImage),
+        "id"         -> toBsonS(c.getId),        // TODO remove; no rel. DB
+        "episodeId"  -> toBsonS(c.getEpisodeId), // TODO remove; no rel. DB
+        "start"      -> toBsonS(c.getStart),
+        "title"      -> toBsonS(c.getTitle),
+        "href"       -> toBsonS(c.getHref),
+        "image"      -> toBsonS(c.getImage),
         //"episodeExo" -> toBson(c.getEpisodeExo)
       ))
   }
 
-  object ImageReader extends BSONDocumentReader[Image] {
+
+
+  object OldImageReader extends BSONDocumentReader[Image] {
     override def read(bson: BSONDocument): Image = {
       implicit val implicitBson: BSONDocument = bson
       Image(
@@ -281,7 +289,7 @@ object BsonConversion {
     }
   }
 
-  object ImageWriter extends BSONDocumentWriter[Image] {
+  object OldImageWriter extends BSONDocumentWriter[Image] {
     override def write(i: Image): BSONDocument =
       toDocument(Map(
         "id"          -> toBsonS(i.id),
@@ -292,6 +300,83 @@ object BsonConversion {
         "contentType" -> toBsonS(i.contentType),
         "size"        -> toBsonL(i.size),
         "createdAt"   -> toBsonD(i.createdAt)
+      ))
+  }
+
+  // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  //  # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
+  object PodcastReader extends BSONDocumentReader[NewPodcast] {
+    override def read(bson: BSONDocument): NewPodcast = {
+      implicit val implicitBson: BSONDocument = bson
+      NewPodcast(
+        id          = asString("id"),
+        title       = asString("title"),
+        link        = asString("link"),
+        description = asString("description"),
+        pubDate     = asLocalDateTime("pubDate"),
+        meta = PodcastMetadata(
+          lastBuildDate  = asLocalDateTime("lastBuildDate"),
+          language       = asString("language"),
+          generator      = asString("generator"),
+          copyright      = asString("copyright"),
+          docs           = asString("docs"),
+          managingEditor = asString("managingEditor"),
+        ),
+        registration = PodcastRegistrationInfo(
+          timestamp  = asLocalDateTime("registrationTimestamp"),
+          complete   = asBoolean("registrationComplete"),
+        ),
+        itunes = PodcastItunesInfo(
+          summary     = asString("itunesSummary"),
+          author      = asString("itunesAuthor"),
+          keywords    = asString("itunesKeywords"),
+          categories  = asStringSet("itunesCategories"),
+          explicit    = asBoolean("itunesExplicit"),
+          block       = asBoolean("itunesBlock"),
+          podcastType = asString("itunesType"),
+          ownerName   = asString("itunesOwnerName"),
+          ownerEmail  = asString("itunesOwnerEmail"),
+        ),
+        feedpress = PodcastFeedpressInfo(
+          locale = asString("feedpressLocale")
+        ),
+        fyyd = PodcastFyydInfo(
+          verify = asString("fyydVerify")
+        )
+      )
+    }
+  }
+
+  object PodcastWriter extends BSONDocumentWriter[NewPodcast] {
+    override def write(p: NewPodcast): BSONDocument =
+      toDocument(Map(
+        "id"                    -> toBsonS(p.id),
+        //"exo"                   -> toBson(p.getExo),
+        "title"                 -> toBsonS(p.title),
+        "link"                  -> toBsonS(p.link),
+        "description"           -> toBsonS(p.description),
+        "pubDate"               -> toBsonD(p.pubDate),
+        "lastBuildDate"         -> toBsonD(p.meta.lastBuildDate),
+        "language"              -> toBsonS(p.meta.language),
+        "generator"             -> toBsonS(p.meta.generator),
+        "copyright"             -> toBsonS(p.meta.copyright),
+        "docs"                  -> toBsonS(p.meta.docs),
+        "managingEditor"        -> toBsonS(p.meta.managingEditor),
+        "image"                 -> toBsonS(p.image),
+        "itunesSummary"         -> toBsonS(p.itunes.summary),
+        "itunesAuthor"          -> toBsonS(p.itunes.author),
+        "itunesKeywords"        -> toBsonS(p.itunes.keywords),
+        //"itunesCategorie"       -> p.getItunesCategories.asScala.mkString("|"), // TODO collection!
+        "itunesExplicit"        -> toBsonB(p.itunes.explicit),
+        "itunesBlock"           -> toBsonB(p.itunes.block),
+        "itunesType"            -> toBsonS(p.itunes.podcastType),
+        "itunesOwnerName"       -> toBsonS(p.itunes.ownerName),
+        "itunesOwnerEmail"      -> toBsonS(p.itunes.ownerEmail),
+        "feedpressLocale"       -> toBsonS(p.feedpress.locale),
+        "fyydVerify"            -> toBsonS(p.fyyd.verify),
+        "registrationTimestamp" -> toBsonD(p.registration.timestamp),
+        "registrationComplete"  -> toBsonB(p.registration.complete)
       ))
   }
 

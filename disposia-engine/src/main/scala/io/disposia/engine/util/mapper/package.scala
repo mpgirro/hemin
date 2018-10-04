@@ -9,11 +9,11 @@ package object mapper {
       case (None,  None)   => None
     }
 
-  def reduce[A](x: List[A], y: List[A]): List[A] = {
-    (x, y) match {
+  def reduce[A](xs: List[A], ys: List[A]): List[A] = {
+    (xs, ys) match {
       case (List(), List())   => List()
-      case (List(xs), List()) => x
-      case (_, List(ys))      => y
+      case (List(as), List()) => xs
+      case (_, List(bs))      => ys
     }
   }
 

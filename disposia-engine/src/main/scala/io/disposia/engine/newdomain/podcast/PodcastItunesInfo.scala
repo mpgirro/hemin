@@ -8,8 +8,8 @@ case class PodcastItunesInfo (
                                author: Option[String] = None,
                                keywords: Option[String] = None,
                                categories: Option[Set[String]] = None,
-                               explicit: Option[String] = None,
-                               block: Option[String] = None,
+                               explicit: Option[Boolean] = None,
+                               block: Option[Boolean] = None,
                                podcastType: Option[String] = None,
                                ownerName: Option[String] = None,
                                ownerEmail: Option[String] = None

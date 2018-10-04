@@ -1,7 +1,7 @@
 package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.catalog.repository.BsonConversion.{toBson, toDocument}
+import io.disposia.engine.catalog.repository.BsonConversion._
 import io.disposia.engine.domain.Feed
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, DefaultDB}
@@ -16,9 +16,9 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.FeedWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.OldFeedWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.FeedReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.OldFeedReader
 
   override protected[this] def collection: BSONCollection = db.apply("feeds")
 
@@ -36,21 +36,21 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Feed]] = {
     log.debug("Request to get Feed (ID) : {}", id)
-    val query = toDocument(Map("id" -> toBson(id)))
+    val query = toDocument(Map("id" -> toBsonS(id)))
     findOne(query)
   }
 
   def findOneByUrlAndPodcastId(url: String, podcastId: String): Future[Option[Feed]] = {
     log.debug("Request to get all Feeds by URL : {} and Podcast (ID) : {}", url, podcastId)
     val query = toDocument(Map(
-      "url" -> toBson(url),
-      "podcastId" -> toBson(podcastId))
+      "url"       -> toBsonS(url),
+      "podcastId" -> toBsonS(podcastId))
     )
     findOne(query)
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Feed]] = {
-    val query = toDocument(Map("podcastId" -> toBson(podcastId)))
+    val query = toDocument(Map("podcastId" -> toBsonS(podcastId)))
     findAll(query)
   }
 
@@ -62,7 +62,7 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   def findAllByUrl(url: String): Future[List[Feed]] = {
     log.debug("Request to get all Feeds by URL : {}", url)
-    val query = toDocument(Map("url" -> toBson(url)))
+    val query = toDocument(Map("url" -> toBsonS(url)))
     findAll(query)
   }
 

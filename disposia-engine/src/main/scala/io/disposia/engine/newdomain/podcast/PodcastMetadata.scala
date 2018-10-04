@@ -1,10 +1,10 @@
 package io.disposia.engine.newdomain.podcast
 
-/**
-  * @author max
-  */
+import java.time.LocalDateTime
+
+
 case class PodcastMetadata (
-                             lastBuildDate: Option[String] = None,
+                             lastBuildDate: Option[LocalDateTime] = None,
                              language: Option[String] = None,
                              generator: Option[String] = None,
                              copyright: Option[String] = None,
