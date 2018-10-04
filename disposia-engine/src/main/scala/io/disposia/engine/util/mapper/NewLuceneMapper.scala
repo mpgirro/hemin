@@ -32,6 +32,7 @@ object NewLuceneMapper {
       }
       .orNull
 
+  @Deprecated
   def toLucene(src: NewIndexDoc): org.apache.lucene.document.Document =
     Option(src)
       .map { s =>

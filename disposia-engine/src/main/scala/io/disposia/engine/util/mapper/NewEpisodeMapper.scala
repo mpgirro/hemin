@@ -23,6 +23,7 @@ object NewEpisodeMapper {
       }
       .orNull
 
+  @Deprecated
   def update(current: NewEpisode, diff: NewEpisode): NewEpisode =
     (Option(current), Option(diff)) match {
       case (Some(c), None)    => c

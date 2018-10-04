@@ -43,6 +43,7 @@ object SolrMapper {
       }
       .orNull
 
+  @Deprecated
   def toSolr(src: NewIndexDoc): SolrInputDocument =
     Option(src)
       .map { s =>
