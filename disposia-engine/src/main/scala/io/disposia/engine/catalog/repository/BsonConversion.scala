@@ -3,10 +3,11 @@ package io.disposia.engine.catalog.repository
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain._
-import io.disposia.engine.newdomain.{Image, NewPodcast}
+import io.disposia.engine.newdomain._
 import io.disposia.engine.mapper.DateMapper
+import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.newdomain.podcast._
-import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONString, BSONValue}
+import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONString, BSONValue, Macros}
 
 import scala.collection.JavaConverters._
 
@@ -41,7 +42,14 @@ object BsonConversion {
   def asLocalDateTime(key: String)(implicit bson: BSONDocument): Option[LocalDateTime] =
     bson.getAs[BSONDateTime](key).map(dt => DateMapper.INSTANCE.asLocalDateTime(dt.value))
 
+  @deprecated
   def asChapterList(key: String)(implicit bson: BSONDocument): Option[List[Chapter]] = bson.getAs[List[Chapter]](key)
+
+  def asNewChapterList(key: String)(implicit bson: BSONDocument): List[NewChapter] =
+    bson.getAs[List[NewChapter]](key) match {
+      case Some(cs) => cs
+      case None     => List()
+    }
 
   def asStringSet(key: String)(implicit bson: BSONDocument): Option[Set[String]] = bson.getAs[Set[String]](key)
 
@@ -53,9 +61,28 @@ object BsonConversion {
   private implicit val oldFeedReader: BSONDocumentReader[Feed] = OldFeedReader
   private implicit val oldChapterWriter: BSONDocumentWriter[Chapter] = OldChapterWriter
   private implicit val oldChapterReader: BSONDocumentReader[Chapter] = OldChapterReader
-  private implicit val oldImageWriter: BSONDocumentWriter[Image] = OldImageWriter
-  private implicit val oldImageReader: BSONDocumentReader[Image] = OldImageReader
 
+  /*
+  private implicit val imageWriter: BSONDocumentWriter[Image] = ImageWriter
+  private implicit val imageReader: BSONDocumentReader[Image] = ImageReader
+  */
+
+  implicit val podcastWriter: BSONDocumentWriter[NewPodcast] = Macros.writer[NewPodcast]
+  implicit val podcastReader: BSONDocumentReader[NewPodcast] = Macros.reader[NewPodcast]
+
+  implicit val episodeWriter: BSONDocumentWriter[NewEpisode] = Macros.writer[NewEpisode]
+  implicit val episodeReader: BSONDocumentReader[NewEpisode] = Macros.reader[NewEpisode]
+
+  implicit val feedWriter: BSONDocumentWriter[NewFeed] = Macros.writer[NewFeed]
+  implicit val feedReader: BSONDocumentReader[NewFeed] = Macros.reader[NewFeed]
+
+  implicit val chapterWriter: BSONDocumentWriter[NewChapter] = Macros.writer[NewChapter]
+  implicit val chapterReader: BSONDocumentReader[NewChapter] = Macros.reader[NewChapter]
+
+  implicit val imageWriter: BSONDocumentWriter[Image] = Macros.writer[Image]
+  implicit val imageReader: BSONDocumentReader[Image] = Macros.reader[Image]
+
+  @deprecated
   object OldPodcastReader extends BSONDocumentReader[Podcast] {
     override def read(bson: BSONDocument): Podcast = {
       implicit val implicitBson: BSONDocument = bson
@@ -93,6 +120,7 @@ object BsonConversion {
     }
   }
 
+  @deprecated
   object OldPodcastWriter extends BSONDocumentWriter[Podcast] {
     override def write(p: Podcast): BSONDocument =
       toDocument(Map(
@@ -126,6 +154,7 @@ object BsonConversion {
       ))
   }
 
+  @deprecated
   object OldEpisodeReader extends BSONDocumentReader[Episode] {
     override def read(bson: BSONDocument): Episode = {
       implicit val implicitBson: BSONDocument = bson
@@ -161,6 +190,7 @@ object BsonConversion {
     }
   }
 
+  @deprecated
   object OldEpisodeWriter extends BSONDocumentWriter[Episode] {
     override def write(e: Episode): BSONDocument = {
       val doc: BSONDocument = toDocument(Map(
@@ -209,6 +239,7 @@ object BsonConversion {
     }
   }
 
+  @deprecated
   object OldFeedReader extends BSONDocumentReader[Feed] {
     override def read(bson: BSONDocument): Feed = {
       implicit val implicitBson: BSONDocument = bson
@@ -227,6 +258,7 @@ object BsonConversion {
     }
   }
 
+  @deprecated
   object OldFeedWriter extends BSONDocumentWriter[Feed] {
     override def write(f: Feed): BSONDocument =
       toDocument(Map(
@@ -241,6 +273,7 @@ object BsonConversion {
       ))
   }
 
+  @deprecated
   object OldChapterReader extends BSONDocumentReader[Chapter] {
     override def read(bson: BSONDocument): Chapter = {
       implicit val implicitBson: BSONDocument = bson
@@ -258,6 +291,7 @@ object BsonConversion {
     }
   }
 
+  @deprecated
   object OldChapterWriter extends BSONDocumentWriter[Chapter] {
     override def write(c: Chapter): BSONDocument =
       toDocument(Map(
@@ -271,9 +305,12 @@ object BsonConversion {
       ))
   }
 
+  // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+  //  # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-  object OldImageReader extends BSONDocumentReader[Image] {
+  /*
+  object ImageReader extends BSONDocumentReader[Image] {
     override def read(bson: BSONDocument): Image = {
       implicit val implicitBson: BSONDocument = bson
       Image(
@@ -289,7 +326,7 @@ object BsonConversion {
     }
   }
 
-  object OldImageWriter extends BSONDocumentWriter[Image] {
+  object ImageWriter extends BSONDocumentWriter[Image] {
     override def write(i: Image): BSONDocument =
       toDocument(Map(
         "id"          -> toBsonS(i.id),
@@ -302,9 +339,6 @@ object BsonConversion {
         "createdAt"   -> toBsonD(i.createdAt)
       ))
   }
-
-  // # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-  //  # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
   object PodcastReader extends BSONDocumentReader[NewPodcast] {
     override def read(bson: BSONDocument): NewPodcast = {
@@ -379,5 +413,137 @@ object BsonConversion {
         "registrationComplete"  -> toBsonB(p.registration.complete)
       ))
   }
+
+  object EpisodeReader extends BSONDocumentReader[NewEpisode] {
+    override def read(bson: BSONDocument): NewEpisode = {
+      implicit val implicitBson: BSONDocument = bson
+      NewEpisode(
+        id              = asString("id"),
+        podcastId       = asString("podcastId"),
+        podcastTitle    = asString("podcastTitle"),
+        title           = asString("title"),
+        link            = asString("link"),
+        pubDate         = asLocalDateTime("pubDate"),
+        description     = asString("description"),
+        image           = asString("image"),
+        guid            = asString("guid"),
+        guidIsPermalink = asBoolean("guidIsPermalink"),
+        itunes = EpisodeItunesInfo(
+          duration    = asString("itunesDuration"),
+          subtitle    = asString("itunesSubtitle"),
+          author      = asString("itunesAuthor"),
+          summary     = asString("itunesSummary"),
+          season      = asInt("itunesSeason"),
+          episode     = asInt("itunesEpisode"),
+          episodeType = asString("itunesEpisodeType"),
+        ),
+        enclosure = EpisodeEnclosureInfo(
+          url    = asString("enclosureUrl"),
+          length = asLong("enclosureLength"),
+          typ    = asString("enclosureType"),
+        ),
+        contentEncoded = asString("contentEncoded"),
+        registration = EpisodeRegistrationInfo(
+          timestamp  = asLocalDateTime("registrationTimestamp"),
+        ),
+        chapters = asNewChapterList("chapters") // TODO
+      )
+    }
+  }
+
+  object EpisodeWriter extends BSONDocumentWriter[NewEpisode] {
+    override def write(e: NewEpisode): BSONDocument = {
+      val doc: BSONDocument = toDocument(Map(
+        "id"                    -> toBsonS(e.id),        // TODO remove; no rel. DB
+        "podcastId"             -> toBsonS(e.podcastId), // TODO remove; no rel. DB
+        //"exo"                   -> toBson(e.getExo),
+        //"podcastExo"            -> toBson(e.getPodcastExo),
+        "podcastTitle"          -> toBsonS(e.podcastTitle),
+        "title"                 -> toBsonS(e.title),
+        "link"                  -> toBsonS(e.link),
+        "pubDate"               -> toBsonD(e.pubDate),
+        "guid"                  -> toBsonS(e.guid),
+        "guidIsPermalink"       -> toBsonB(e.guidIsPermalink),
+        "description"           -> toBsonS(e.description),
+        "image"                 -> toBsonS(e.image),
+        "itunesDuration"        -> toBsonS(e.itunes.duration),
+        "itunesSubtitle"        -> toBsonS(e.itunes.subtitle),
+        "itunesAuthor"          -> toBsonS(e.itunes.author),
+        "itunesSummary"         -> toBsonS(e.itunes.summary),
+        "itunesSeason"          -> toBsonI(e.itunes.season),
+        "itunesEpisode"         -> toBsonI(e.itunes.episode),
+        "itunesEpisodeType"     -> toBsonS(e.itunes.episodeType),
+        "enclosureUrl"          -> toBsonS(e.enclosure.url),
+        "enclosureLength"       -> toBsonL(e.enclosure.length),
+        "enclosureType"         -> toBsonS(e.enclosure.typ),
+        "contentEncoded"        -> toBsonS(e.contentEncoded),
+        "registrationTimestamp" -> toBsonD(e.registration.timestamp),
+
+      ))
+    }
+  }
+
+  object FeedReader extends BSONDocumentReader[NewFeed] {
+    override def read(bson: BSONDocument): NewFeed = {
+      implicit val implicitBson: BSONDocument = bson
+      val f = ImmutableFeed.builder()
+
+      asString("id").map(f.setId)
+      asString("podcastId").map(f.setPodcastId)
+      //asString("exo").map(f.setExo)
+      //asString("podcastExo").map(f.setPodcastExo)
+      asString("url").map(f.setUrl)
+      asLocalDateTime("lastChecked").map(f.setLastChecked)
+      asString("lastStatus").map(status => f.setLastStatus(FeedStatus.getByName(status)))
+      asLocalDateTime("registrationTimestamp").map(f.setRegistrationTimestamp)
+
+      f.create()
+    }
+  }
+
+  object FeedWriter extends BSONDocumentWriter[NewFeed] {
+    override def write(f: NewFeed): BSONDocument =
+      toDocument(Map(
+        "id"                    -> toBsonS(f.getId),
+        "podcastId"             -> toBsonS(f.getPodcastId),
+        //"exo"                   -> toBson(f.getExo),
+        //"podcastExo"            -> toBson(f.getPodcastExo),
+        "url"                   -> toBsonS(f.getUrl),
+        "lastChecked"           -> toBsonD(f.getLastChecked),
+        "lastStatus"            -> toBsonS(f.getLastStatus.getName),
+        "registrationTimestamp" -> toBsonD(f.getRegistrationTimestamp)
+      ))
+  }
+
+  object ChapterReader extends BSONDocumentReader[NewChapter] {
+    override def read(bson: BSONDocument): NewChapter = {
+      implicit val implicitBson: BSONDocument = bson
+      val c = ImmutableChapter.builder()
+
+      asString("id").map(c.setId)
+      asString("episodeId").map(c.setEpisodeId)
+      asString("start").map(c.setStart)
+      asString("title").map(c.setTitle)
+      asString("href").map(c.setHref)
+      asString("image").map(c.setImage)
+      // asString("episodeExo").map(c.setEpisodeExo)
+
+      c.create()
+    }
+  }
+
+  object ChapterWriter extends BSONDocumentWriter[NewChapter] {
+    override def write(c: NewChapter): BSONDocument =
+      toDocument(Map(
+        "id"         -> toBsonS(c.getId),        // TODO remove; no rel. DB
+        "episodeId"  -> toBsonS(c.getEpisodeId), // TODO remove; no rel. DB
+        "start"      -> toBsonS(c.getStart),
+        "title"      -> toBsonS(c.getTitle),
+        "href"       -> toBsonS(c.getHref),
+        "image"      -> toBsonS(c.getImage),
+        //"episodeExo" -> toBson(c.getEpisodeExo)
+      ))
+  }
+  */
 
 }

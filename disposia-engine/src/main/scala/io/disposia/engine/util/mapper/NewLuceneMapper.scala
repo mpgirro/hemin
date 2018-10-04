@@ -9,6 +9,7 @@ import org.apache.lucene.document.{Field, StringField, TextField}
 
 object NewLuceneMapper {
 
+  @deprecated
   def toLucene(src: IndexDoc): org.apache.lucene.document.Document =
     Option(src)
       .map { s =>
@@ -32,7 +33,7 @@ object NewLuceneMapper {
       }
       .orNull
 
-  @Deprecated
+
   def toLucene(src: NewIndexDoc): org.apache.lucene.document.Document =
     Option(src)
       .map { s =>

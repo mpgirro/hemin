@@ -13,7 +13,7 @@ case class NewEpisode(
   link: Option[String]                  = None,
   pubDate: Option[LocalDateTime]        = None,
   guid: Option[String]                  = None,
-  guidIsPermalink: Option[String]       = None,
+  guidIsPermalink: Option[Boolean]      = None,
   description: Option[String]           = None,
   image: Option[String]                 = None,
   contentEncoded: Option[String]        = None,
@@ -23,7 +23,7 @@ case class NewEpisode(
   registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo()
 ) {
 
-  def update(patch: NewEpisode): NewEpisode = {
+  def copy(patch: NewEpisode): NewEpisode = {
     Option(patch) match {
       case None => this
       case Some(p) =>

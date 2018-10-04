@@ -6,6 +6,7 @@ import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.DateMapper
 import io.disposia.engine.newdomain.episode.EpisodeItunesInfo
 import io.disposia.engine.newdomain.podcast.PodcastItunesInfo
+import io.disposia.engine.util.mapper.reduce
 import org.apache.lucene.document.{Field, StringField, TextField}
 import org.apache.solr.common.SolrInputDocument
 
@@ -27,6 +28,30 @@ case class NewIndexDoc(
   websiteData: Option[String]    = None
 ) {
 
+  def copy(patch: NewIndexDoc): NewIndexDoc = {
+    Option(patch) match {
+      case None => this
+      case Some(p) =>
+        NewIndexDoc(
+          docType        = reduce(this.docType, p.docType),
+          id             = reduce(this.id, p.id),
+          title          = reduce(this.title, p.title),
+          link           = reduce(this.link, p.link),
+          description    = reduce(this.description, p.description),
+          pubDate        = reduce(this.pubDate, p.pubDate),
+          image          = reduce(this.image, p.image),
+          itunesAuthor   = reduce(this.itunesAuthor, p.itunesAuthor),
+          itunesSummary  = reduce(this.itunesSummary, p.itunesSummary),
+          podcastTitle   = reduce(this.podcastTitle, p.podcastTitle),
+          chapterMarks   = reduce(this.chapterMarks, p.chapterMarks),
+          contentEncoded = reduce(this.contentEncoded, p.contentEncoded),
+          transcript     = reduce(this.transcript, p.transcript),
+          websiteData    = reduce(this.websiteData, p.websiteData),
+        )
+    }
+  }
+
+  /*
   def asPodcast: NewPodcast = docType.map {
     case "podcast" =>
       NewPodcast(
@@ -43,6 +68,7 @@ case class NewIndexDoc(
       )
     case other => throw new UnsupportedOperationException(s"Required docType='podcast', actual docType='$other'")
   }.orNull
+  */
 
   /* TODO delete
   def asPodcast: NewPodcast = docType match {
@@ -66,6 +92,7 @@ case class NewIndexDoc(
   }
   */
 
+  /*
   def asEpisode: NewEpisode = docType.map {
     case "episode" =>
       NewEpisode(
@@ -82,6 +109,7 @@ case class NewIndexDoc(
       )
     case other => throw new UnsupportedOperationException(s"Required docType='episode', actual docType='$other'")
   }.orNull
+  */
 
   /* TODO delete
   def asEpisode: NewEpisode = docType match {
@@ -105,6 +133,7 @@ case class NewIndexDoc(
   }
   */
 
+  /*
   def asLucene: org.apache.lucene.document.Document = {
     val d = new org.apache.lucene.document.Document
     docType.foreach        { x => d.add(new StringField(IndexField.DOC_TYPE, x, Field.Store.YES)) }
@@ -123,7 +152,9 @@ case class NewIndexDoc(
     websiteData.foreach    { x => d.add(new TextField(IndexField.WEBSITE_DATA, x, Field.Store.NO)) }
     d
   }
+  */
 
+  /*
   def asSolr: SolrInputDocument = {
     val d = new SolrInputDocument
     docType.foreach        { x => d.addField(IndexField.DOC_TYPE, x) }
@@ -142,5 +173,6 @@ case class NewIndexDoc(
     websiteData.foreach    { x => d.addField(IndexField.WEBSITE_DATA, x) }
     d
   }
+  */
 
 }

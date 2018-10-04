@@ -2,14 +2,15 @@ package io.disposia.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.disposia.engine.domain.{Episode, IndexField, Podcast}
-import io.disposia.engine.newdomain.NewIndexDoc
-import io.disposia.engine.mapper.{EpisodeMapper, PodcastMapper, SolrFieldMapper}
+import io.disposia.engine.mapper.SolrFieldMapper
+import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc, NewPodcast}
 import org.apache.solr.common.SolrDocument
 
 import scala.collection.JavaConverters._
 
 object NewIndexMapper {
 
+  @deprecated
   def toIndexDoc(src: Podcast): NewIndexDoc =
     Option(src)
       .map { s =>
@@ -32,6 +33,7 @@ object NewIndexMapper {
       }
       .orNull
 
+  @deprecated
   def toIndexDoc(src: Episode): NewIndexDoc =
     Option(src)
       .map { s =>
@@ -54,6 +56,49 @@ object NewIndexMapper {
       }
       .orNull
 
+  def toIndexDoc(src: NewPodcast): NewIndexDoc =
+    Option(src)
+    .map { s =>
+      NewIndexDoc(
+        docType        = Some("podcast"),
+        id             = s.id,
+        title          = s.title,
+        link           = s.link,
+        description    = s.description,
+        pubDate        = s.pubDate,
+        image          = s.image,
+        itunesAuthor   = s.itunes.author,
+        itunesSummary  = s.itunes.summary,
+        podcastTitle   = None,
+        chapterMarks   = None,
+        contentEncoded = None,
+        transcript     = None,
+        websiteData    = None
+      )
+    }.orNull
+
+  def toIndexDoc(src: NewEpisode): NewIndexDoc =
+    Option(src)
+      .map { s =>
+        NewIndexDoc(
+          docType        = Some("episode"),
+          id             = s.id,
+          title          = s.title,
+          link           = s.link,
+          description    = s.description,
+          pubDate        = s.pubDate,
+          image          = s.image,
+          itunesAuthor   = s.itunes.author,
+          itunesSummary  = s.itunes.summary,
+          podcastTitle   = s.podcastTitle,
+          chapterMarks   = Some(s.chapters.mkString("\n")),
+          contentEncoded = s.contentEncoded,
+          transcript     = None,
+          websiteData    = None
+        )
+      }.orNull
+
+
   def toIndexDoc(src: org.apache.lucene.document.Document): NewIndexDoc =
     Option(src)
       .map { s =>
@@ -63,8 +108,12 @@ object NewIndexMapper {
           throw new RuntimeException("Document type is required but found NULL")
 
         docType match {
+          /* TODO delete
           case "podcast" => toIndexDoc(PodcastMapper.INSTANCE.toImmutable(s))
           case "episode" => toIndexDoc(EpisodeMapper.INSTANCE.toImmutable(s))
+          */
+          case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
+          case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))
           case _         => throw new RuntimeException("Unsupported document type : " + docType)
         }
       }
@@ -79,8 +128,12 @@ object NewIndexMapper {
           throw new RuntimeException("Document type is required but found NULL")
 
         docType match {
+          /* TODO delete
           case "podcast" => toIndexDoc(PodcastMapper.INSTANCE.toImmutable(s))
           case "episode" => toIndexDoc(EpisodeMapper.INSTANCE.toImmutable(s))
+          */
+          case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
+          case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))
           case _         => throw new RuntimeException("Unsupported document type : " + docType)
         }
       }

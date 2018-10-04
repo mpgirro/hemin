@@ -16,10 +16,13 @@ object SolrMapper {
   private val dateMapper = io.disposia.engine.mapper.DateMapper.INSTANCE
   private val indexMapper = IndexMapper.INSTANCE
 
+  @deprecated
   def toSolr(src: Podcast): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
 
+  @deprecated
   def toSolr(src: Episode): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
 
+  @deprecated
   def toSolr(src: IndexDoc): SolrInputDocument =
     Option(src)
       .map { s =>
@@ -43,7 +46,7 @@ object SolrMapper {
       }
       .orNull
 
-  @Deprecated
+
   def toSolr(src: NewIndexDoc): SolrInputDocument =
     Option(src)
       .map { s =>

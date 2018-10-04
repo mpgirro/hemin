@@ -6,7 +6,7 @@ package io.disposia.engine.newdomain.podcast
 case class PodcastItunesInfo (
                                summary: Option[String] = None,
                                author: Option[String] = None,
-                               keywords: Option[String] = None,
+                               keywords: Option[Array[String]] = None,
                                categories: Option[Set[String]] = None,
                                explicit: Option[Boolean] = None,
                                block: Option[Boolean] = None,

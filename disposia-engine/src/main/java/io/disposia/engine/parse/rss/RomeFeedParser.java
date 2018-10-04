@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+@Deprecated
 public class RomeFeedParser implements FeedParser {
 
     private static final Logger log = LoggerFactory.getLogger(RomeFeedParser.class);

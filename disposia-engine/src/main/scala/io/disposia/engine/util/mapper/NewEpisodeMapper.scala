@@ -1,9 +1,47 @@
 package io.disposia.engine.util.mapper
 
+import io.disposia.engine.domain.{Episode, IndexField}
+import io.disposia.engine.mapper.{DateMapper, SolrFieldMapper}
 import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc}
+import org.apache.solr.common.SolrDocument
 
 object NewEpisodeMapper {
+
+  def toEpisode(epsiode: Episode): NewEpisode = Option(epsiode)
+    .map { e =>
+      NewEpisode(
+        id              = Option(e.getId),
+        title           = Option(e.getTitle),
+        podcastId       = Option(e.getPodcastId),
+        podcastTitle    = Option(e.getPodcastTitle),
+        link            = Option(e.getLink),
+        pubDate         = Option(e.getPubDate),
+        guid            = Option(e.getGuid),
+        guidIsPermalink = Option(e.getGuidIsPermaLink),
+        description     = Option(e.getDescription),
+        image           = Option(e.getImage),
+        contentEncoded  = Option(e.getContentEncoded),
+        itunes = EpisodeItunesInfo(
+          duration    = Option(e.getItunesDuration),
+          subtitle    = Option(e.getItunesSubtitle),
+          author      = Option(e.getItunesAuthor),
+          summary     = Option(e.getItunesSummary),
+          season      = Option(e.getItunesSeason),
+          episode     = Option(e.getItunesEpisode),
+          episodeType = Option(e.getItunesEpisodeType),
+        ),
+        enclosure = EpisodeEnclosureInfo(
+          url    = Option(e.getEnclosureUrl),
+          length = Option(e.getEnclosureLength),
+          typ    = Option(e.getEnclosureType),
+        ),
+        registration = EpisodeRegistrationInfo(
+          timestamp = Option(e.getRegistrationTimestamp),
+        )
+      )
+    }.orNull
+
 
   def toEpisode(src: NewIndexDoc): NewEpisode =
     Option(src)
@@ -15,52 +53,53 @@ object NewEpisodeMapper {
           description = s.description,
           pubDate     = s.pubDate,
           image       = s.image,
-          itunes      = EpisodeItunesInfo(
+          itunes = EpisodeItunesInfo(
             author  = s.itunesAuthor,
-            summary = s.itunesSummary
+            summary = s.itunesSummary,
+            //duration = s.itunesDuration,
           )
         )
       }
       .orNull
 
-  @Deprecated
-  def update(current: NewEpisode, diff: NewEpisode): NewEpisode =
-    (Option(current), Option(diff)) match {
-      case (Some(c), None)    => c
-      case (None, Some(d))    => d
-      case (None, None)       => null
-      case (Some(c), Some(d)) =>
+  def toEpisode(src: org.apache.lucene.document.Document): NewEpisode =
+    Option(src)
+      .map { s =>
         NewEpisode(
-          id              = reduce(c.id, d.id),
-          podcastId       = reduce(c.podcastId, d.podcastId),
-          podcastTitle    = reduce(c.podcastTitle, d.podcastTitle),
-          title           = reduce(c.title, d.title),
-          link            = reduce(c.link, d.link),
-          pubDate         = reduce(c.pubDate, d.pubDate),
-          guid            = reduce(c.guid, d.guid),
-          guidIsPermalink = reduce(c.guidIsPermalink, d.guidIsPermalink),
-          description     = reduce(c.description, d.description),
-          image           = reduce(c.image, d.image),
-          contentEncoded  = reduce(c.contentEncoded, d.contentEncoded),
-          chapters        = reduce(c.chapters, d.chapters),
+          id           = Option(s.get(IndexField.ID)),
+          title        = Option(s.get(IndexField.TITLE)),
+          podcastTitle = Option(s.get(IndexField.PODCAST_TITLE)),
+          link         = Option(s.get(IndexField.LINK)),
+          pubDate      = Option(DateMapper.INSTANCE
+            .asLocalDateTime(s.get(IndexField.PUB_DATE))),
+          description  = Option(s.get(IndexField.DESCRIPTION)),
+          image        = Option(s.get(IndexField.ITUNES_IMAGE)),
           itunes = EpisodeItunesInfo(
-            duration    = reduce(c.itunes.duration, d.itunes.duration),
-            subtitle    = reduce(c.itunes.subtitle, d.itunes.subtitle),
-            author      = reduce(c.itunes.author, d.itunes.author),
-            summary     = reduce(c.itunes.summary, d.itunes.summary),
-            season      = reduce(c.itunes.season, d.itunes.season),
-            episode     = reduce(c.itunes.episode, d.itunes.episode),
-            episodeType = reduce(c.itunes.episodeType, d.itunes.episodeType),
-          ),
-          enclosure = EpisodeEnclosureInfo(
-            url    = reduce(c.enclosure.url, d.enclosure.url),
-            length = reduce(c.enclosure.length, d.enclosure.length),
-            typ    = reduce(c.enclosure.typ, d.enclosure.typ),
-          ),
-          registration = EpisodeRegistrationInfo(
-            timestamp = reduce(c.registration.timestamp, d.registration.timestamp)
+            author   = Option(s.get(IndexField.ITUNES_AUTHOR)),
+            summary  = Option(s.get(IndexField.ITUNES_SUMMARY)),
+            duration = Option(s.get(IndexField.ITUNES_DURATION)),
           )
         )
-    }
+      }.orNull
+
+  def toEpisode(src: SolrDocument): NewEpisode =
+    Option(src)
+      .map { s =>
+        NewEpisode(
+          id           = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
+          title        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
+          podcastTitle = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PODCAST_TITLE)),
+          link         = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
+          pubDate      = Option(DateMapper.INSTANCE
+            .asLocalDateTime(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PUB_DATE))),
+          description  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
+          image        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),
+          itunes = EpisodeItunesInfo(
+            author   = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_AUTHOR)),
+            summary  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_SUMMARY)),
+            duration = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_DURATION)),
+          )
+        )
+      }.orNull
 
 }
