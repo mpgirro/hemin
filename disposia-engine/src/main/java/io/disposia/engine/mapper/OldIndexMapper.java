@@ -18,12 +18,14 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-@Mapper(uses = {PodcastMapper.class, EpisodeMapper.class},
+@Deprecated
+@Mapper(uses = {OldPodcastMapper.class, OldEpisodeMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface IndexMapper {
+public interface OldIndexMapper {
 
-    IndexMapper INSTANCE = Mappers.getMapper( IndexMapper.class );
+    OldIndexMapper INSTANCE = Mappers.getMapper( OldIndexMapper.class );
 
+    @Deprecated
     @Mapping(target = "docType", constant = "podcast")
     @Mapping(target = "podcastTitle", ignore = true)
     @Mapping(target = "chapterMarks", ignore = true)
@@ -32,6 +34,7 @@ public interface IndexMapper {
     @Mapping(target = "websiteData", ignore = true)
     ModifiableOldIndexDoc toModifiable(OldPodcast podcast);
 
+    @Deprecated
     @Mapping(target = "docType", constant = "episode")
     @Mapping(source = "chapters", target = "chapterMarks")
     @Mapping(target = "itunesSummary", ignore = true)
@@ -39,6 +42,7 @@ public interface IndexMapper {
     @Mapping(target = "websiteData", ignore = true)
     ModifiableOldIndexDoc toModifiable(OldEpisode episode);
 
+    @Deprecated
     default ImmutableOldIndexDoc toImmutable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
@@ -47,6 +51,7 @@ public interface IndexMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldIndexDoc toImmutable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
@@ -55,6 +60,7 @@ public interface IndexMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default String map(List<OldChapter> chapters){
         return Optional
             .ofNullable(chapters)
@@ -64,6 +70,7 @@ public interface IndexMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ModifiableOldIndexDoc toModifiable(OldIndexDoc doc) {
         return Optional
             .ofNullable(doc)
@@ -76,6 +83,7 @@ public interface IndexMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldIndexDoc toImmutable(OldIndexDoc doc) {
         return Optional
             .ofNullable(doc)
@@ -88,6 +96,7 @@ public interface IndexMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldIndexDoc toImmutable(org.apache.lucene.document.Document doc) {
 
         if (doc == null) return null;
@@ -98,12 +107,13 @@ public interface IndexMapper {
         }
 
         switch (docType) {
-            case "podcast": return toImmutable(PodcastMapper.INSTANCE.toImmutable(doc));
-            case "episode": return toImmutable(EpisodeMapper.INSTANCE.toImmutable(doc));
+            case "podcast": return toImmutable(OldPodcastMapper.INSTANCE.toImmutable(doc));
+            case "episode": return toImmutable(OldEpisodeMapper.INSTANCE.toImmutable(doc));
             default: throw new RuntimeException("Unsupported document type : " + docType);
         }
     }
 
+    @Deprecated
     default ImmutableOldIndexDoc toImmutable(SolrDocument doc) {
 
         if (doc == null) return null;
@@ -114,12 +124,13 @@ public interface IndexMapper {
         }
 
         switch (docType) {
-            case "podcast": return toImmutable(PodcastMapper.INSTANCE.toImmutable(doc));
-            case "episode": return toImmutable(EpisodeMapper.INSTANCE.toImmutable(doc));
+            case "podcast": return toImmutable(OldPodcastMapper.INSTANCE.toImmutable(doc));
+            case "episode": return toImmutable(OldEpisodeMapper.INSTANCE.toImmutable(doc));
             default: throw new RuntimeException("Unsupported document type : " + docType);
         }
     }
 
+    @Deprecated
     default org.apache.lucene.document.Document toLucene(OldIndexDoc doc) {
 
         if (doc == null) return null;

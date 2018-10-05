@@ -1,8 +1,8 @@
 package io.disposia.engine.index;
 
 import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.mapper.OldIndexMapper;
 import io.disposia.engine.olddomain.OldIndexDoc;
-import io.disposia.engine.mapper.IndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -23,7 +23,7 @@ public class LuceneCommitter implements io.disposia.engine.index.IndexCommitter 
 
     private final IndexWriter writer;
 
-    private final IndexMapper indexMapper = IndexMapper.INSTANCE;
+    private final OldIndexMapper indexMapper = OldIndexMapper.INSTANCE;
 
     public LuceneCommitter(String indexPath, boolean create) throws IOException {
 

@@ -133,12 +133,12 @@ class CatalogStore(config: CatalogConfig)
       }
    */
 
-  private val podcastMapper = PodcastMapper.INSTANCE
-  private val episodeMapper = EpisodeMapper.INSTANCE
-  private val feedMapper = FeedMapper.INSTANCE
-  private val chapterMapper = ChapterMapper.INSTANCE
-  private val indexMapper = IndexMapper.INSTANCE
-  private val idMapper = IdMapper.INSTANCE
+  private val podcastMapper = OldPodcastMapper.INSTANCE
+  private val episodeMapper = OldEpisodeMapper.INSTANCE
+  private val feedMapper = OldFeedMapper.INSTANCE
+  private val chapterMapper = OldChapterMapper.INSTANCE
+  private val indexMapper = OldIndexMapper.INSTANCE
+  private val idMapper = OldIdMapper.INSTANCE
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)

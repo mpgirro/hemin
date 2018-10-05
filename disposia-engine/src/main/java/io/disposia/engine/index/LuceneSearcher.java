@@ -5,7 +5,7 @@ import io.disposia.engine.domain.IndexField;
 import io.disposia.engine.olddomain.OldIndexDoc;
 import io.disposia.engine.olddomain.OldResultWrapper;
 import io.disposia.engine.exception.SearchException;
-import io.disposia.engine.mapper.IndexMapper;
+import io.disposia.engine.mapper.OldIndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
@@ -30,7 +30,7 @@ public class LuceneSearcher implements io.disposia.engine.index.IndexSearcher {
 
     private static final Logger log = LoggerFactory.getLogger(LuceneSearcher.class);
 
-    private final IndexMapper indexMapper = IndexMapper.INSTANCE;
+    private final OldIndexMapper indexMapper = OldIndexMapper.INSTANCE;
 
     private static final int MAX_RESULT_COUNT = 1000;
 

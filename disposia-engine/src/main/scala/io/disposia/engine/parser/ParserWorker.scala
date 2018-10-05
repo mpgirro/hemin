@@ -9,7 +9,7 @@ import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJo
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
-import io.disposia.engine.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
+import io.disposia.engine.mapper.{OldEpisodeMapper, OldIndexMapper, OldPodcastMapper}
 import io.disposia.engine.olddomain.OldEpisode
 import io.disposia.engine.parse.api.FyydDirectoryAPI
 import io.disposia.engine.parse.rss.RomeFeedParser
@@ -31,9 +31,9 @@ class ParserWorker (config: ParserConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private val podcastMapper = PodcastMapper.INSTANCE
-  private val episodeMapper = EpisodeMapper.INSTANCE
-  private val indexMapper = IndexMapper.INSTANCE
+  private val podcastMapper = OldPodcastMapper.INSTANCE
+  private val episodeMapper = OldEpisodeMapper.INSTANCE
+  private val indexMapper = OldIndexMapper.INSTANCE
 
   private var catalog: ActorRef = _
   private var index: ActorRef = _

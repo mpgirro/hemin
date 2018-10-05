@@ -2,8 +2,8 @@ package io.disposia.engine.mapper;
 
 import io.disposia.engine.domain.IndexField;
 import io.disposia.engine.olddomain.*;
-import io.disposia.engine.olddomain.ImmutableOldEpisode;
-import io.disposia.engine.olddomain.OldEpisode;
+import io.disposia.engine.olddomain.ModifiableOldPodcast;
+import io.disposia.engine.olddomain.OldPodcast;
 import org.apache.solr.common.SolrDocument;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
@@ -14,69 +14,78 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-@Mapper(uses = {PodcastMapper.class, ChapterMapper.class, DateMapper.class},
-        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface EpisodeMapper {
+@Deprecated
+@Mapper(
+    uses = {UrlMapper.class, DateMapper.class},
+    nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS
+)
+public interface OldPodcastMapper {
 
-    EpisodeMapper INSTANCE = Mappers.getMapper( EpisodeMapper.class );
+    OldPodcastMapper INSTANCE = Mappers.getMapper( OldPodcastMapper.class );
 
-    default ModifiableOldEpisode toModifiable(OldEpisode episode) {
+    @Deprecated
+    default ModifiableOldPodcast toModifiable(OldPodcast podcast) {
         return Optional
-            .ofNullable(episode)
-            .map(e -> {
-                if (e instanceof ModifiableOldEpisode) {
-                    return (ModifiableOldEpisode) e;
+            .ofNullable(podcast)
+            .map(p -> {
+                if (p instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) p;
                 } else {
-                    return new ModifiableOldEpisode().from(e);
+                    return new ModifiableOldPodcast().from(p);
                 }})
             .orElse(null);
     }
 
-    default ImmutableOldEpisode toImmutable(OldEpisode episode) {
+    @Deprecated
+    default ImmutableOldPodcast toImmutable(OldPodcast podcast) {
         return Optional
-            .ofNullable(episode)
-            .map(e -> {
-                if (e instanceof ImmutableOldEpisode) {
-                    return (ImmutableOldEpisode) e;
+            .ofNullable(podcast)
+            .map(p -> {
+                if (p instanceof ImmutableOldPodcast) {
+                    return (ImmutableOldPodcast) p;
                 } else {
-                    return ((ModifiableOldEpisode) e).toImmutable();
+                    return ((ModifiableOldPodcast) p).toImmutable();
                 }})
             .orElse(null);
     }
 
-    ModifiableOldEpisode update(OldEpisode src, @MappingTarget ModifiableOldEpisode target);
+    @Deprecated
+    ModifiableOldPodcast update(OldPodcast src, @MappingTarget ModifiableOldPodcast target);
 
-    default ModifiableOldEpisode update(OldEpisode src, @MappingTarget OldEpisode target) {
+    @Deprecated
+    default ModifiableOldPodcast update(OldPodcast src, @MappingTarget OldPodcast target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableOldEpisode) {
-                    return (ModifiableOldEpisode) t;
+                if (t instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) t;
                 } else {
-                    return new ModifiableOldEpisode().from(t);
+                    return new ModifiableOldPodcast().from(t);
                 }})
             .map(t -> update(src, t))
             .orElse(null);
     }
 
-    default ImmutableOldEpisode updateImmutable(OldEpisode src, @MappingTarget OldEpisode target) {
+    @Deprecated
+    default ImmutableOldPodcast updateImmutable(OldPodcast src, @MappingTarget OldPodcast target) {
         return Optional
             .ofNullable(target)
             .map(t -> {
-                if (t instanceof ModifiableOldEpisode) {
-                    return (ModifiableOldEpisode) t;
+                if (t instanceof ModifiableOldPodcast) {
+                    return (ModifiableOldPodcast) t;
                 } else {
-                    return new ModifiableOldEpisode().from(t);
+                    return new ModifiableOldPodcast().from(t);
                 }})
             .map(t -> update(src, t))
-            .map(ModifiableOldEpisode::toImmutable)
+            .map(ModifiableOldPodcast::toImmutable)
             .orElse(null);
     }
 
-    default ImmutableOldEpisode toImmutable(org.apache.lucene.document.Document doc) {
+    @Deprecated
+    default ImmutableOldPodcast toImmutable(org.apache.lucene.document.Document doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutableOldEpisode.builder()
+            .map(d -> ImmutableOldPodcast.builder()
                 .setId(d.get(IndexField.ID))
                 //.setExo(d.get(IndexField.EXO))
                 .setTitle(d.get(IndexField.TITLE))
@@ -91,16 +100,15 @@ public interface EpisodeMapper {
                     .findFirst()
                     .orElse(null))
                 .setImage(d.get(IndexField.ITUNES_IMAGE))
-                .setItunesDuration(d.get(IndexField.ITUNES_DURATION))
-                .setPodcastTitle(d.get(IndexField.PODCAST_TITLE))
                 .create())
             .orElse(null);
     }
 
-    default ImmutableOldEpisode toImmutable(SolrDocument doc) {
+    @Deprecated
+    default ImmutableOldPodcast toImmutable(SolrDocument doc) {
         return Optional
             .ofNullable(doc)
-            .map(d -> ImmutableOldEpisode.builder()
+            .map(d -> ImmutableOldPodcast.builder()
                 .setId(SolrFieldMapper.INSTANCE.stringOrNull(d, IndexField.ID))
                 //.setExo(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.EXO))
                 .setTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.TITLE))
@@ -115,8 +123,6 @@ public interface EpisodeMapper {
                     .findFirst()
                     .orElse(null))
                 .setImage(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_IMAGE))
-                .setItunesDuration(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_DURATION))
-                .setPodcastTitle(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.PODCAST_TITLE))
                 .create())
             .orElse(null);
     }

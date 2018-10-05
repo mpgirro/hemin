@@ -20,14 +20,17 @@ import java.util.Optional;
  * Identification in a global scope is done by using the EXO (= external ID) value,
  * which this mapper leaves untouched.
  */
+@Deprecated
 @Mapper(nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface IdMapper {
+public interface OldIdMapper {
 
-    IdMapper INSTANCE = Mappers.getMapper( IdMapper.class );
+    OldIdMapper INSTANCE = Mappers.getMapper( OldIdMapper.class );
 
+    @Deprecated
     @Mapping(target = "id", ignore = true)
     ModifiableOldPodcast clearModifiable(OldPodcast podcast);
 
+    @Deprecated
     default ImmutableOldPodcast clearImmutable(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
@@ -36,10 +39,12 @@ public interface IdMapper {
             .orElse(null);
     }
 
+    @Deprecated
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "podcastId", ignore = true)
     ModifiableOldEpisode clearModifiable(OldEpisode episode);
 
+    @Deprecated
     default ImmutableOldEpisode clearImmutable(OldEpisode episode) {
         return Optional
             .ofNullable(episode)
@@ -48,6 +53,7 @@ public interface IdMapper {
             .orElse(null);
     }
 
+    @Deprecated
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "podcastId", ignore = true)
     ModifiableOldFeed clearModifiable(OldFeed feed);
@@ -60,10 +66,12 @@ public interface IdMapper {
             .orElse(null);
     }
 
+    @Deprecated
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "episodeId", ignore = true)
     ModifiableOldChapter clearModifiable(OldChapter chapter);
 
+    @Deprecated
     default ImmutableOldChapter clearImmutable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)

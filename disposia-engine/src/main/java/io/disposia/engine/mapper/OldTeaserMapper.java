@@ -10,13 +10,15 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 
+@Deprecated
 @Mapper(uses = {UrlMapper.class, DateMapper.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface TeaserMapper {
+public interface OldTeaserMapper {
 
-    TeaserMapper INSTANCE = Mappers.getMapper( TeaserMapper.class );
+    OldTeaserMapper INSTANCE = Mappers.getMapper( OldTeaserMapper.class );
 
+    @Deprecated
     default OldPodcast asTeaser(OldPodcast podcast) {
         return Optional
             .ofNullable(podcast)
@@ -37,6 +39,7 @@ public interface TeaserMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default OldEpisode asTeaser(OldEpisode episode) {
         return Optional
             .ofNullable(episode)

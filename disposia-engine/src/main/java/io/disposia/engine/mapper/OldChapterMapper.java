@@ -10,12 +10,14 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 
-@Mapper(uses = {EpisodeMapper.class},
+@Deprecated
+@Mapper(uses = {OldEpisodeMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface ChapterMapper {
+public interface OldChapterMapper {
 
-    ChapterMapper INSTANCE = Mappers.getMapper( ChapterMapper.class );
+    OldChapterMapper INSTANCE = Mappers.getMapper( OldChapterMapper.class );
 
+    @Deprecated
     default ModifiableOldChapter toModifiable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)
@@ -28,6 +30,7 @@ public interface ChapterMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldChapter toImmutable(OldChapter chapter) {
         return Optional
             .ofNullable(chapter)
@@ -40,8 +43,10 @@ public interface ChapterMapper {
             .orElse(null);
     }
 
+    @Deprecated
     ModifiableOldChapter update(OldChapter src, @MappingTarget ModifiableOldChapter target);
 
+    @Deprecated
     default ModifiableOldChapter update(OldChapter src, @MappingTarget OldChapter target) {
         return Optional
             .ofNullable(target)
@@ -55,6 +60,7 @@ public interface ChapterMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldChapter updateImmutable(OldChapter src, @MappingTarget OldChapter target) {
         return Optional
             .ofNullable(target)

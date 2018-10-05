@@ -171,8 +171,8 @@ object NewIndexMapper {
 
         docType match {
           /* TODO delete
-          case "podcast" => toIndexDoc(PodcastMapper.INSTANCE.toImmutable(s))
-          case "episode" => toIndexDoc(EpisodeMapper.INSTANCE.toImmutable(s))
+          case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
+          case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
           */
           case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
           case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))
@@ -191,8 +191,8 @@ object NewIndexMapper {
 
         docType match {
           /* TODO delete
-          case "podcast" => toIndexDoc(PodcastMapper.INSTANCE.toImmutable(s))
-          case "episode" => toIndexDoc(EpisodeMapper.INSTANCE.toImmutable(s))
+          case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
+          case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
           */
           case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
           case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))

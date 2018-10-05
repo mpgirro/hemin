@@ -10,12 +10,14 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Optional;
 
-@Mapper(uses = {PodcastMapper.class, DateMapper.class},
+@Deprecated
+@Mapper(uses = {OldPodcastMapper.class, DateMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
-public interface FeedMapper {
+public interface OldFeedMapper {
 
-    FeedMapper INSTANCE = Mappers.getMapper( FeedMapper.class );
+    OldFeedMapper INSTANCE = Mappers.getMapper( OldFeedMapper.class );
 
+    @Deprecated
     default ModifiableOldFeed toModifiable(OldFeed feed) {
         return Optional
             .ofNullable(feed)
@@ -28,6 +30,7 @@ public interface FeedMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldFeed toImmutable(OldFeed feed) {
         return Optional
             .ofNullable(feed)
@@ -40,8 +43,10 @@ public interface FeedMapper {
             .orElse(null);
     }
 
+    @Deprecated
     ModifiableOldFeed update(OldFeed src, @MappingTarget ModifiableOldFeed target);
 
+    @Deprecated
     default ModifiableOldFeed update(OldFeed src, @MappingTarget OldFeed target) {
         return Optional
             .ofNullable(target)
@@ -55,6 +60,7 @@ public interface FeedMapper {
             .orElse(null);
     }
 
+    @Deprecated
     default ImmutableOldFeed updateImmutable(OldFeed src, @MappingTarget OldFeed target) {
         return Optional
             .ofNullable(target)

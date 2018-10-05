@@ -13,7 +13,7 @@ import scala.collection.JavaConverters._
 object SolrMapper {
 
   private val dateMapper = io.disposia.engine.mapper.DateMapper.INSTANCE
-  private val indexMapper = IndexMapper.INSTANCE
+  private val indexMapper = OldIndexMapper.INSTANCE
 
   @deprecated("do not use old DTOs anymore","0.1")
   def toSolr(src: OldPodcast): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
