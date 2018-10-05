@@ -24,29 +24,44 @@ class EpisodeController @Inject()(cc: EpisodeControllerComponents,
                                   langs: Langs,
                                   fileMimeTypes: FileMimeTypes)
                                  (implicit ec: ExecutionContext)
-    extends EpisodeBaseController(cc) {
+  extends EpisodeBaseController(cc) {
 
-    private val log = Logger(getClass).logger
+  private val log = Logger(getClass).logger
 
-    private implicit val episodeWriter: Writes[Episode] = JsonWrites.implicitEpisodeWrites
-    private implicit val chapterWriter: Writes[Chapter] = JsonWrites.implicitChapterWrites
-    private implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
-    private implicit val chapterArrayWriter: Writes[ArrayWrapper[Chapter]] = JsonWrites.implicitArrayWrites[Chapter]
+  private implicit val episodeWriter: Writes[Episode] = JsonWrites.implicitEpisodeWrites
+  private implicit val chapterWriter: Writes[Chapter] = JsonWrites.implicitChapterWrites
+  private implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
+  private implicit val chapterArrayWriter: Writes[ArrayWrapper[Chapter]] = JsonWrites.implicitArrayWrites[Chapter]
 
-    def find(id: String): Action[AnyContent] =
-        EpisodeAction.async { implicit request =>
-            log.trace(s"GET episode: id = $id")
-            episodeService.find(id).map { episode =>
-                Ok(Json.toJson(episode))
-            }
+  def find(id: String): Action[AnyContent] =
+    EpisodeAction.async { implicit request =>
+      log.trace(s"GET episode: id = $id")
+      episodeService
+        .find(id)
+        .map { e =>
+          Ok(Json.toJson(e))
         }
+    }
 
-    def chapters(id: String): Action[AnyContent] =
-        EpisodeAction.async { implicit request =>
-            log.trace(s"GET chapters by episode: id = $id")
-            episodeService.chapters(id).map { chapters =>
-                Ok(Json.toJson(ArrayWrapper(chapters)))
-            }
+  def chapters(id: String): Action[AnyContent] =
+    EpisodeAction.async { implicit request =>
+      log.trace(s"GET chapters by episode: id = $id")
+      episodeService
+        .chapters(id)
+        .map { cs =>
+          Ok(Json.toJson(ArrayWrapper(cs)))
         }
+    }
+
+  def image(id: String): Action[AnyContent] =
+    EpisodeAction.async { implicit request =>
+      log.trace(s"GET image by episode: id = $id")
+      /*
+      podcastService.image(id).map { image =>
+        Ok(Json.toJson(image))
+      }
+      */
+      throw new UnsupportedOperationException("not yet implemented")
+    }
 
 }

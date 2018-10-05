@@ -4,15 +4,35 @@ import java.time.LocalDateTime
 
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.domain._
-import io.disposia.engine.mapper.DateMapper
+import io.disposia.engine.oldmapper.OldDateMapper
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._
 
 object JsonWrites {
 
+  private def toNullB(b: Option[Boolean]): JsValue = b.map(toJson).getOrElse(JsNull)
+  private def toNullI(i: Option[Int]): JsValue = i.map(toJson).getOrElse(JsNull)
+  private def toNullL(l: Option[Long]): JsValue = l.map(toJson).getOrElse(JsNull)
+  private def toNullS(s: Option[String]): JsValue = s.map(toJson).getOrElse(JsNull)
+  private def toNullD(d: Option[LocalDateTime]): JsValue = d.map(toJson).getOrElse(JsNull)
+  private def toNullF(f: Option[FeedStatus]): JsValue =f.map(toJson).getOrElse(JsNull)
+
+  private def toNullA(opt: Option[Iterable[String]]): JsArray = opt match {
+    case Some(as) => jsonFromStringIterable(as)
+    case None => JsArray()
+  }
+
+  /*
+  private def toNullA(opt: Option[Array[String]]): JsArray = opt match {
+    case Some(as) => jsonFromStringIterable(as)
+    case None => JsArray()
+  }
+
+  */
+
     private def toNullJson(b: Boolean): JsValue = Option(b).map(toJson).getOrElse(JsNull)
-    private def toNullJson(i: Integer): JsValue = Option(i).map(toJson).getOrElse(JsNull)
+    private def toNullJson(i: Int): JsValue = Option(i).map(toJson).getOrElse(JsNull)
     private def toNullJson(l: Long): JsValue = Option(l).map(toJson).getOrElse(JsNull)
     private def toNullJson(s: String): JsValue = Option(s).map(toJson).getOrElse(JsNull)
     private def toNullJson(d: LocalDateTime): JsValue = Option(d).map(toJson).getOrElse(JsNull)
@@ -22,10 +42,10 @@ object JsonWrites {
     private def toNullJson(is: Iterable[IndexDoc]): JsValue = Option(is).map(jsonFromDocumentIterable).getOrElse(JsNull)
 
     private def toJson(b: Boolean): JsBoolean = JsBoolean(b)
-    private def toJson(i: Integer): JsNumber = JsNumber(i.toInt)
+    private def toJson(i: Int): JsNumber = JsNumber(i.toInt)
     private def toJson(l: Long): JsNumber = JsNumber(l)
     private def toJson(s: String): JsString = JsString(s)
-    private def toJson(d: LocalDateTime): JsString = toJson(DateMapper.INSTANCE.asString(d))
+    private def toJson(d: LocalDateTime): JsString = toJson(OldDateMapper.INSTANCE.asString(d))
     private def toJson(f: FeedStatus): JsString = JsString(f.getName)
     private def toJson(ss: java.util.Set[String]): JsArray = jsonFromStringIterable(ss.asScala)
     private def toJson(is: java.util.List[IndexDoc]): JsArray = jsonFromDocumentIterable(is.asScala)
@@ -42,12 +62,12 @@ object JsonWrites {
     /**
       * Mapping to write a ResultWrapper out as a JSON value.
       */
-    implicit val implicitWrapperWrites: Writes[ResultWrapper] =
-        (w: ResultWrapper) => JsObject(List(
-            "currPage"  -> toNullJson(w.getCurrPage),
-            "maxPage"   -> toNullJson(w.getMaxPage),
-            "totalHits" -> toNullJson(w.getTotalHits),
-            "results"   -> toNullJson(w.getResults)
+    implicit val implicitWrapperWrites: Writes[ResultsWrapper] =
+        (w: ResultsWrapper) => JsObject(List(
+            "currPage"  -> toNullJson(w.currPage),
+            "maxPage"   -> toNullJson(w.maxPage),
+            "totalHits" -> toNullJson(w.totalHits),
+            "results"   -> toNullJson(w.results)
         ))
 
     /**
@@ -55,80 +75,80 @@ object JsonWrites {
       */
     implicit val implicitIndexDocWrites: Writes[IndexDoc] =
         (d: IndexDoc) => JsObject(List(
-            "docType"      -> toNullJson(d.getDocType),
-            "id"           -> toNullJson(d.getId),
-            "title"        -> toNullJson(d.getTitle),
-            "link"         -> toNullJson(d.getLink),
-            "pubDate"      -> toNullJson(d.getPubDate),
-            "description"  -> toNullJson(d.getDescription),
-            "podcastTitle" -> toNullJson(d.getPodcastTitle),
-            "image"        -> toNullJson(d.getImage)
+            "docType"      -> toNullS(d.docType),
+            "id"           -> toNullS(d.id),
+            "title"        -> toNullS(d.title),
+            "link"         -> toNullS(d.link),
+            "pubDate"      -> toNullD(d.pubDate),
+            "description"  -> toNullS(d.description),
+            "podcastTitle" -> toNullS(d.podcastTitle),
+            "image"        -> toNullS(d.image)
         ))
 
     implicit val implicitPodcastWrites: Writes[Podcast] =
         (p: Podcast) => JsObject(List(
-            "id"                    -> toNullJson(p.getId),
-            "title"                 -> toNullJson(p.getTitle),
-            "link"                  -> toNullJson(p.getLink),
-            "pubDate"               -> toNullJson(p.getPubDate),
-            "description"           -> toNullJson(p.getDescription),
-            "image"                 -> toNullJson(p.getImage),
-            "itunesCategories"      -> toNullJson(p.getItunesCategories),
-            "itunesSummary"         -> toNullJson(p.getItunesSummary),
-            "itunesAuthor"          -> toNullJson(p.getItunesAuthor),
-            "itunesKeywords"        -> toNullJson(p.getItunesKeywords),
-            "itunesExplicit"        -> toNullJson(p.getItunesExplicit),
-            "itunesBlock"           -> toNullJson(p.getItunesBlock),
-            "itunesType"            -> toNullJson(p.getItunesType),
-            "language"              -> toNullJson(p.getLanguage),
-            "generator"             -> toNullJson(p.getGenerator),
-            "copyright"             -> toNullJson(p.getGenerator),
-            "episodeCount"          -> toNullJson(p.getEpisodeCount),
-            "registrationTimestamp" -> toNullJson(p.getRegistrationTimestamp),
-            "registrationComplete"  -> toNullJson(p.getRegistrationComplete)
+            "id"                    -> toNullS(p.id),
+            "title"                 -> toNullS(p.title),
+            "link"                  -> toNullS(p.link),
+            "pubDate"               -> toNullD(p.pubDate),
+            "description"           -> toNullS(p.description),
+            "image"                 -> toNullS(p.image),
+            "itunesCategories"      -> toNullA(p.itunes.categories),
+            "itunesSummary"         -> toNullS(p.itunes.summary),
+            "itunesAuthor"          -> toNullS(p.itunes.author),
+            "itunesKeywords"        -> toNullA(p.itunes.keywords.map(ks => ks.toIterable)),
+            "itunesExplicit"        -> toNullB(p.itunes.explicit),
+            "itunesBlock"           -> toNullB(p.itunes.block),
+            "itunesType"            -> toNullS(p.itunes.podcastType),
+            "language"              -> toNullS(p.meta.language),
+            "generator"             -> toNullS(p.meta.generator),
+            "copyright"             -> toNullS(p.meta.copyright),
+            //"episodeCount"          -> toNullJson(p.getEpisodeCount),
+            "registrationTimestamp" -> toNullD(p.registration.timestamp),
+            "registrationComplete"  -> toNullB(p.registration.complete)
         ))
 
     implicit val implicitEpisodeWrites: Writes[Episode] =
         (e: Episode) => JsObject(List(
-            "id"                    -> toNullJson(e.getId),
-            "podcastId"             -> toNullJson(e.getPodcastId),
-            "podcastTitle"          -> toNullJson(e.getPodcastTitle),
-            "title"                 -> toNullJson(e.getTitle),
-            "link"                  -> toNullJson(e.getLink),
-            "pubDate"               -> toNullJson(e.getPubDate),
-            "description"           -> toNullJson(e.getDescription),
-            "image"                 -> toNullJson(e.getImage),
-            "guid"                  -> toNullJson(e.getGuid),
-            "guidIsPermalink"       -> toNullJson(e.getGuidIsPermaLink),
-            "itunesDuration"        -> toNullJson(e.getItunesDuration),
-            "itunesSubtitle"        -> toNullJson(e.getItunesSubtitle),
-            "itunesSeason"          -> toNullJson(e.getItunesSeason),
-            "itunesEpisode"         -> toNullJson(e.getItunesEpisode),
-            "itunesEpisodeType"     -> toNullJson(e.getItunesEpisodeType),
-            "enclosureUrl"          -> toNullJson(e.getEnclosureUrl),
-            "enclosureLength"       -> toNullJson(e.getEnclosureLength),
-            "enclosureType"         -> toNullJson(e.getEnclosureType),
-            "contentEncoded"        -> toNullJson(e.getContentEncoded),
-            "registrationTimestamp" -> toNullJson(e.getRegistrationTimestamp)
+            "id"                    -> toNullS(e.id),
+            "podcastId"             -> toNullS(e.podcastId),
+            "podcastTitle"          -> toNullS(e.podcastTitle),
+            "title"                 -> toNullS(e.title),
+            "link"                  -> toNullS(e.link),
+            "pubDate"               -> toNullD(e.pubDate),
+            "description"           -> toNullS(e.description),
+            "image"                 -> toNullS(e.image),
+            "guid"                  -> toNullS(e.guid),
+            "guidIsPermalink"       -> toNullB(e.guidIsPermalink),
+            "itunesDuration"        -> toNullS(e.itunes.duration),
+            "itunesSubtitle"        -> toNullS(e.itunes.subtitle),
+            "itunesSeason"          -> toNullI(e.itunes.season),
+            "itunesEpisode"         -> toNullI(e.itunes.episode),
+            "itunesEpisodeType"     -> toNullS(e.itunes.episodeType),
+            "enclosureUrl"          -> toNullS(e.enclosure.url),
+            "enclosureLength"       -> toNullL(e.enclosure.length),
+            "enclosureType"         -> toNullS(e.enclosure.typ),
+            "contentEncoded"        -> toNullS(e.contentEncoded),
+            "registrationTimestamp" -> toNullD(e.registration.timestamp)
         ))
 
     implicit val implicitFeedWrites: Writes[Feed] =
         (f: Feed) => JsObject(List(
-            "id"                    -> toNullJson(f.getId),
-            "podcastId"             -> toNullJson(f.getPodcastId),
-            "url"                   -> toNullJson(f.getUrl),
-            "lastChecked"           -> toNullJson(f.getLastChecked),
-            "lastStatus"            -> toNullJson(f.getLastStatus),
-            "registrationTimestamp" -> toNullJson(f.getRegistrationTimestamp)
+            "id"                    -> toNullS(f.id),
+            "podcastId"             -> toNullS(f.podcastId),
+            "url"                   -> toNullS(f.url),
+            "lastChecked"           -> toNullD(f.lastChecked),
+            "lastStatus"            -> toNullF(f.lastStatus),
+            "registrationTimestamp" -> toNullD(f.registrationTimestamp)
         ))
 
     implicit val implicitChapterWrites: Writes[Chapter] =
         (c: Chapter) => JsObject(List(
-            "start"     -> toNullJson(c.getStart),
-            "title"     -> toNullJson(c.getTitle),
-            "href"      -> toNullJson(c.getHref),
-            "image"     -> toNullJson(c.getImage),
-            "episodeId" -> toNullJson(c.getEpisodeId)
+            "start"     -> toNullS(c.start),
+            "title"     -> toNullS(c.title),
+            "href"      -> toNullS(c.href),
+            "image"     -> toNullS(c.image),
+            "episodeId" -> toNullS(c.episodeId)
         ))
 
 }

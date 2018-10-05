@@ -34,9 +34,11 @@ class FeedController @Inject()(cc: FeedControllerComponents,
     def find(id: String): Action[AnyContent] =
         FeedAction.async { implicit request =>
             log.trace(s"GET feed: id = $id")
-            feedService.find(id).map { feed =>
-                Ok(Json.toJson(feed))
-            }
+            feedService
+              .find(id)
+              .map { f =>
+                Ok(Json.toJson(f))
+              }
         }
 
     def propose = Action { implicit request =>
