@@ -11,16 +11,16 @@ case class Chapter(
   image: Option[String]     = None
 ) {
 
-  def update(patch: Chapter): Chapter = Option(patch) match {
+  def patch(diff: Chapter): Chapter = Option(diff) match {
     case None => this
-    case Some(p) =>
+    case Some(x) =>
       Chapter(
-        id        = reduce(this.id, p.id),
-        episodeId = reduce(this.episodeId, p.episodeId),
-        start     = reduce(this.start, p.start),
-        title     = reduce(this.title, p.title),
-        href      = reduce(this.href, p.href),
-        image     = reduce(this.image, p.image),
+        id        = reduce(this.id, x.id),
+        episodeId = reduce(this.episodeId, x.episodeId),
+        start     = reduce(this.start, x.start),
+        title     = reduce(this.title, x.title),
+        href      = reduce(this.href, x.href),
+        image     = reduce(this.image, x.image),
       )
   }
 

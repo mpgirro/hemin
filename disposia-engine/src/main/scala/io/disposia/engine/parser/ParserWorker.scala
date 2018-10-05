@@ -161,12 +161,11 @@ class ParserWorker (config: ParserConfig)
   private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
     val parser = new RomeFeedParser(feedData)
-    val p = parser.podcast.update(
+    val p = parser.podcast.patch(
       Podcast(
         id          = Some(podcastId),
         title       = parser.podcast.title.map(_.trim),
-        description = parser.podcast.description.map(d => Jsoup.clean(d, Whitelist.basic())),
-
+        description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
       )
     )
 
@@ -261,11 +260,11 @@ class ParserWorker (config: ParserConfig)
     */
 
     // cleanup some potentially markuped texts
-    val e = episode.update(
+    val e = episode.patch(
       Episode(
         title       = episode.title.map(_.trim),
-        description = episode.description.map(d => Jsoup.clean(d, Whitelist.basic())),
-        contentEncoded = episode.contentEncoded.map(c =>  Jsoup.clean(c, Whitelist.basic()))
+        description = episode.description.map(Jsoup.clean(_, Whitelist.basic())),
+        contentEncoded = episode.contentEncoded.map(Jsoup.clean(_, Whitelist.basic()))
       )
     )
 

@@ -359,7 +359,7 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(podcastId)
       .map {
-        case Some(p) => podcast.update(p)  //podcastMapper.update(podcast, p)
+        case Some(p) => podcast.patch(p)  //podcastMapper.update(podcast, p)
         case None =>
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           //podcastMapper.toModifiable(podcast)
@@ -381,7 +381,7 @@ class CatalogStore(config: CatalogConfig)
     episodes
       .findOne(episode.id)
       .map {
-        case Some(e) => episode.update(e) // episodeMapper.update(episode, e)
+        case Some(e) => episode.patch(e) // episodeMapper.update(episode, e)
         case None =>
           log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
           //episodeMapper.toModifiable(episode)
@@ -676,7 +676,7 @@ class CatalogStore(config: CatalogConfig)
                   )
                 )
 
-                val e = episode.update(patch)
+                val e = episode.patch(patch)
 
                 /*
                 val e = episodeMapper.toModifiable(episode)

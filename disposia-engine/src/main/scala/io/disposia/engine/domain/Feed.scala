@@ -17,19 +17,19 @@ case class Feed(
   /**
     * Updates the current instance's fields by all non-None fields of the patch
     *
-    * @param patch the instance with set fields that need updating
+    * @param diff the instance with set fields that need updating
     * @return the updated instance
     */
-  def update(patch: Feed): Feed = Option(patch) match {
+  def patch(diff: Feed): Feed = Option(diff) match {
     case None => this
-    case Some(p) =>
+    case Some(x) =>
       Feed(
-        id                    = reduce(this.id, p.id),
-        podcastId             = reduce(this.podcastId, p.podcastId),
-        url                   = reduce(this.url, p.url),
-        lastChecked           = reduce(this.lastChecked, p.lastChecked),
-        lastStatus            = reduce(this.lastStatus, p.lastStatus),
-        registrationTimestamp = reduce(this.registrationTimestamp, p.registrationTimestamp),
+        id                    = reduce(this.id, x.id),
+        podcastId             = reduce(this.podcastId, x.podcastId),
+        url                   = reduce(this.url, x.url),
+        lastChecked           = reduce(this.lastChecked, x.lastChecked),
+        lastStatus            = reduce(this.lastStatus, x.lastStatus),
+        registrationTimestamp = reduce(this.registrationTimestamp, x.registrationTimestamp),
       )
   }
 

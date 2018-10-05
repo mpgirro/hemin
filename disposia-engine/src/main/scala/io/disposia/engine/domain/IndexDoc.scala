@@ -22,24 +22,24 @@ case class IndexDoc(
   websiteData: Option[String]    = None
 ) {
 
-  def update(patch: IndexDoc): IndexDoc = Option(patch) match {
+  def patch(diff: IndexDoc): IndexDoc = Option(diff) match {
     case None => this
-    case Some(p) =>
+    case Some(x) =>
       IndexDoc(
-        docType        = reduce(this.docType, p.docType),
-        id             = reduce(this.id, p.id),
-        title          = reduce(this.title, p.title),
-        link           = reduce(this.link, p.link),
-        description    = reduce(this.description, p.description),
-        pubDate        = reduce(this.pubDate, p.pubDate),
-        image          = reduce(this.image, p.image),
-        itunesAuthor   = reduce(this.itunesAuthor, p.itunesAuthor),
-        itunesSummary  = reduce(this.itunesSummary, p.itunesSummary),
-        podcastTitle   = reduce(this.podcastTitle, p.podcastTitle),
-        chapterMarks   = reduce(this.chapterMarks, p.chapterMarks),
-        contentEncoded = reduce(this.contentEncoded, p.contentEncoded),
-        transcript     = reduce(this.transcript, p.transcript),
-        websiteData    = reduce(this.websiteData, p.websiteData),
+        docType        = reduce(this.docType, x.docType),
+        id             = reduce(this.id, x.id),
+        title          = reduce(this.title, x.title),
+        link           = reduce(this.link, x.link),
+        description    = reduce(this.description, x.description),
+        pubDate        = reduce(this.pubDate, x.pubDate),
+        image          = reduce(this.image, x.image),
+        itunesAuthor   = reduce(this.itunesAuthor, x.itunesAuthor),
+        itunesSummary  = reduce(this.itunesSummary, x.itunesSummary),
+        podcastTitle   = reduce(this.podcastTitle, x.podcastTitle),
+        chapterMarks   = reduce(this.chapterMarks, x.chapterMarks),
+        contentEncoded = reduce(this.contentEncoded, x.contentEncoded),
+        transcript     = reduce(this.transcript, x.transcript),
+        websiteData    = reduce(this.websiteData, x.websiteData),
       )
   }
 
