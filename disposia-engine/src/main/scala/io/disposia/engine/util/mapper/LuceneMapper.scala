@@ -1,7 +1,6 @@
 package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.{IndexDoc, IndexField}
-import io.disposia.engine.mapper.OldDateMapper
 import org.apache.lucene.document.{Field, StringField, TextField}
 
 

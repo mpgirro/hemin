@@ -9,9 +9,8 @@ import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.domain.{Chapter, Episode, Podcast}
-import io.disposia.engine.mapper.OldDateMapper
 import io.disposia.engine.parse.rss.RomeModuleExtractor
-import io.disposia.engine.util.UrlUtil
+import io.disposia.engine.util.mapper.{DateMapper, UrlMapper}
 import org.xml.sax.InputSource
 
 import scala.collection.JavaConverters._
@@ -58,7 +57,7 @@ class RomeFeedParser(private val xmlData: String) {
   // TODO unused
   private def withLinkFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.link.isEmpty && !isNullOrEmpty(i.getLink)) {
-      p.copy(link = Option(UrlUtil.sanitize(i.getLink)))
+      p.copy(link = UrlMapper.sanitize(i.getLink))
     } else {
       p
     }
@@ -122,9 +121,9 @@ class RomeFeedParser(private val xmlData: String) {
     Podcast(
       id              = None,
       title           = Option(feed.getTitle),
-      link            = Option(UrlUtil.sanitize(feed.getLink)),
+      link            = UrlMapper.sanitize(feed.getLink),
       description     = Option(feed.getDescription),
-      pubDate         = Option(OldDateMapper.INSTANCE.asLocalDateTime(feed.getPublishedDate)),
+      pubDate         = DateMapper.asLocalDateTime(feed.getPublishedDate),
       image           = fromSyndImage(feed.getImage),
       meta = PodcastMetadata(
         lastBuildDate  = None,  // TODO the parser does not yet produces this
@@ -154,8 +153,8 @@ class RomeFeedParser(private val xmlData: String) {
     podcastId       = None,
     podcastTitle    = podcast.title,
     title           = Option(e.getTitle),
-    link            = Option(UrlUtil.sanitize(e.getLink)),
-    pubDate         = Option(OldDateMapper.INSTANCE.asLocalDateTime(e.getPublishedDate)),
+    link            = UrlMapper.sanitize(e.getLink),
+    pubDate         = DateMapper.asLocalDateTime(e.getPublishedDate),
     guid            = Option(e.getUri),
     guidIsPermalink = None, // TODO welches feld von ROME korrespondiert zu diesem Boolean?
     description     = Option(e.getDescription).map(_.getValue),

@@ -2,7 +2,6 @@ package io.disposia.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.disposia.engine.domain.{Episode, IndexDoc, IndexField, Podcast}
-import io.disposia.engine.mapper.SolrFieldMapper
 import org.apache.solr.common.SolrDocument
 
 object IndexMapper {
@@ -169,16 +168,12 @@ object IndexMapper {
   def toIndexDoc(src: org.apache.lucene.document.Document): IndexDoc =
     Option(src)
       .map { s =>
-        val docType: String = s.get(IndexField.DOC_TYPE)
+        val docType = s.get(IndexField.DOC_TYPE)
 
         if (isNullOrEmpty(docType))
           throw new RuntimeException("Document type is required but found NULL")
 
         docType match {
-          /* TODO delete
-          case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
-          case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
-          */
           case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
           case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
           case _         => throw new RuntimeException("Unsupported document type : " + docType)
@@ -189,21 +184,19 @@ object IndexMapper {
   def toIndexDoc(src: SolrDocument): IndexDoc =
     Option(src)
       .map { s=>
-        val docType: String = SolrFieldMapper.INSTANCE.firstStringOrNull(s, IndexField.DOC_TYPE)
-
-        if (isNullOrEmpty(docType))
-          throw new RuntimeException("Document type is required but found NULL")
-
+        val docType = SolrMapper.firstStringMatch(s, IndexField.DOC_TYPE)
         docType match {
-          /* TODO delete
-          case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
-          case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
-          */
-          case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
-          case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
-          case _         => throw new RuntimeException("Unsupported document type : " + docType)
+          case Some(dt) =>
+            if (isNullOrEmpty(dt))
+              throw new RuntimeException("Document type is required but found NULL")
+
+            dt match {
+              case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
+              case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
+              case _         => throw new RuntimeException("Unsupported document type : " + docType)
+            }
+          case None => throw new RuntimeException("Field '" + IndexField.DOC_TYPE + " could not be extracted")
         }
-      }
-      .orNull
+      }.orNull
 
 }

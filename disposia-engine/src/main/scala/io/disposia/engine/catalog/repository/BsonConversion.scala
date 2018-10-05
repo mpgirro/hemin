@@ -2,14 +2,11 @@ package io.disposia.engine.catalog.repository
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.domain.FeedStatus
-import io.disposia.engine.domain._
+import io.disposia.engine.domain.{FeedStatus, _}
 import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.domain.podcast._
-import io.disposia.engine.mapper.OldDateMapper
-import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
-
-import scala.collection.JavaConverters._
+import io.disposia.engine.util.mapper.DateMapper
+import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
 
 
 object BsonConversion {
@@ -27,8 +24,8 @@ object BsonConversion {
   def toBsonB(value: Boolean): Option[BSONBoolean] = Option(value).flatMap(b => Option(BSONBoolean(b)))
 
   def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBsonD)
-  def toBsonD(value: LocalDateTime): Option[BSONDateTime] =
-    Option(value).flatMap(d => Option(BSONDateTime(OldDateMapper.INSTANCE.asMilliseconds(d))))
+  def toBsonD(value: LocalDateTime): Option[BSONDateTime] = Option(value).flatMap(DateMapper.asMilliseconds).map(BSONDateTime)
+
 
   //def toBson(values: Iterable[OldChapter]): BSONArray = BSONArray.apply(values.map(c => ChapterWriter.write(c)))
 
@@ -40,7 +37,7 @@ object BsonConversion {
   def asString(key: String)(implicit bson: BSONDocument): Option[String] = bson.getAs[String](key)
   def asBoolean(key: String)(implicit bson: BSONDocument): Option[Boolean] = bson.getAs[Boolean](key)
   def asLocalDateTime(key: String)(implicit bson: BSONDocument): Option[LocalDateTime] =
-    bson.getAs[BSONDateTime](key).map(dt => OldDateMapper.INSTANCE.asLocalDateTime(dt.value))
+    bson.getAs[BSONDateTime](key).flatMap(dt => DateMapper.asLocalDateTime(dt.value))
 
   /*
   @deprecated("use implicit case class conversion","0.1")
@@ -69,11 +66,11 @@ object BsonConversion {
 
 
   implicit object DateWriter extends BSONWriter[LocalDateTime,BSONDateTime] {
-    def write(value: LocalDateTime): BSONDateTime = BSONDateTime(OldDateMapper.INSTANCE.asMilliseconds(value))
+    def write(value: LocalDateTime): BSONDateTime = BSONDateTime(DateMapper.asMilliseconds(value).get)
   }
 
   implicit object DateReader extends BSONReader[BSONDateTime,LocalDateTime] {
-    def read(dt: BSONDateTime): LocalDateTime = OldDateMapper.INSTANCE.asLocalDateTime(dt.value)
+    def read(dt: BSONDateTime): LocalDateTime = DateMapper.asLocalDateTime(dt.value).get
   }
 
   implicit object FeedStatusWriter extends BSONWriter[FeedStatus,BSONString] {
