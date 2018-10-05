@@ -660,17 +660,17 @@ class CatalogStore(config: CatalogConfig)
                 .findOneByEnclosure(episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
             })
             .map {
-              case Some(e) => log.debug("Episode is already registered : ('{}', {}, '{}')",episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
+              case Some(e) => log.debug("Episode is already registered : ('{}', {}, '{}')", episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
               case None =>
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
 
                 val patch = Episode(
-                  id = Some(episodeId),
-                  podcastId = Option(podcastId),
+                  id           = Some(episodeId),
+                  podcastId    = Option(podcastId),
                   podcastTitle = p.title,
-                  image = reduce(episode.image, p.image),
+                  image        = reduce(episode.image, p.image),
                   registration = EpisodeRegistrationInfo(
                     timestamp = Some(LocalDateTime.now())
                   )

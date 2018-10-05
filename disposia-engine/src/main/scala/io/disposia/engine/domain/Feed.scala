@@ -2,9 +2,7 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.catalog.repository.BsonConversion
 import io.disposia.engine.util.mapper.reduce
-import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
 
 case class Feed(
@@ -22,19 +20,17 @@ case class Feed(
     * @param patch the instance with set fields that need updating
     * @return the updated instance
     */
-  def update(patch: Feed): Feed = {
-    Option(patch) match {
-      case None => this
-      case Some(p) =>
-        Feed(
-          id                    = reduce(this.id, p.id),
-          podcastId             = reduce(this.podcastId, p.podcastId),
-          url                   = reduce(this.url, p.url),
-          lastChecked           = reduce(this.lastChecked, p.lastChecked),
-          lastStatus            = reduce(this.lastStatus, p.lastStatus),
-          registrationTimestamp = reduce(this.registrationTimestamp, p.registrationTimestamp),
-        )
-    }
+  def update(patch: Feed): Feed = Option(patch) match {
+    case None => this
+    case Some(p) =>
+      Feed(
+        id                    = reduce(this.id, p.id),
+        podcastId             = reduce(this.podcastId, p.podcastId),
+        url                   = reduce(this.url, p.url),
+        lastChecked           = reduce(this.lastChecked, p.lastChecked),
+        lastStatus            = reduce(this.lastStatus, p.lastStatus),
+        registrationTimestamp = reduce(this.registrationTimestamp, p.registrationTimestamp),
+      )
   }
 
 }
