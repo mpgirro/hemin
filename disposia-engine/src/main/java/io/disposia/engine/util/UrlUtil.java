@@ -1,5 +1,6 @@
 package io.disposia.engine.util;
 
+@Deprecated
 public class UrlUtil {
 
     public static String sanitize(String url){

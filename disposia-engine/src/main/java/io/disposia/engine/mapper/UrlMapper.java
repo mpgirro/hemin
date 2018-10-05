@@ -3,6 +3,7 @@ package io.disposia.engine.mapper;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+@Deprecated
 public class UrlMapper {
 
     public static UrlMapper INSTANCE = new UrlMapper();

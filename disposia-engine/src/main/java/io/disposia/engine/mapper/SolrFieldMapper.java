@@ -7,6 +7,7 @@ import org.apache.solr.common.SolrDocument;
 import java.util.Collection;
 import java.util.Date;
 
+@Deprecated
 public class SolrFieldMapper {
 
     public static final SolrFieldMapper INSTANCE = new SolrFieldMapper();

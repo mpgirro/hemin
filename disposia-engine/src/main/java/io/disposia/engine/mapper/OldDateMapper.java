@@ -6,6 +6,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Optional;
 
+@Deprecated
 public class OldDateMapper {
 
     public static OldDateMapper INSTANCE = new OldDateMapper();

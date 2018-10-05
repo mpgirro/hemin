@@ -1,6 +1,7 @@
 package io.disposia.engine.util.mapper
 
 import java.util
+import java.util.Date
 
 import io.disposia.engine.domain.{IndexDoc, IndexField}
 import io.disposia.engine.mapper.OldDateMapper
@@ -71,11 +72,13 @@ object SolrMapper {
       }
       .orNull
 
-  def firstOrNull(doc: SolrDocument, fieldName: String): String = doc
+  def firstStringMatch(doc: SolrDocument, fieldName: String): Option[String] = doc
     .getFieldValue(fieldName)
     .asInstanceOf[util.List[String]]
     .asScala
     .headOption
-    .orNull
+
+  def firstDateMatch(doc: SolrDocument, fieldName: String): Option[Date] =
+    firstStringMatch(doc, fieldName).map(_.asInstanceOf[Date])
 
 }
