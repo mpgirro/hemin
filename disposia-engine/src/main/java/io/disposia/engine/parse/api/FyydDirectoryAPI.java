@@ -2,7 +2,7 @@ package io.disposia.engine.parse.api;
 
 import io.disposia.engine.olddomain.ImmutableOldEpisode;
 import io.disposia.engine.olddomain.OldEpisode;
-import io.disposia.engine.mapper.DateMapper;
+import io.disposia.engine.oldmapper.OldDateMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +92,7 @@ public class FyydDirectoryAPI extends DirectoryAPI {
                             e.setDescription((String) d.get("description"));
                             try {
                                 // Fyyd produces ZonedDateTime timestamps, therefore I do String -> ZonedDateTime -> LocalDateTime
-                                e.setPubDate(DateMapper.INSTANCE.asLocalDateTime(DateMapper.INSTANCE.asZonedDateTime((String) d.get("pubdate"))));
+                                e.setPubDate(OldDateMapper.INSTANCE.asLocalDateTime(OldDateMapper.INSTANCE.asZonedDateTime((String) d.get("pubdate"))));
                             } catch (RuntimeException ex) {
                                 log.warn("Error parsing pubDate : '{}' [reason : {}]", (String) d.get("pubdate"), ex.getMessage());
                             }

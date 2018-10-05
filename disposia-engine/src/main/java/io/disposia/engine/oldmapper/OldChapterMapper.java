@@ -1,4 +1,4 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
 import io.disposia.engine.olddomain.ImmutableOldChapter;
 import io.disposia.engine.olddomain.ModifiableOldChapter;

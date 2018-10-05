@@ -3,7 +3,7 @@ package io.disposia.engine.util.mapper
 import java.util
 
 import io.disposia.engine.domain.IndexField
-import io.disposia.engine.mapper._
+import io.disposia.engine.oldmapper._
 import io.disposia.engine.newdomain.NewIndexDoc
 import io.disposia.engine.olddomain._
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 
 object SolrMapper {
 
-  private val dateMapper = io.disposia.engine.mapper.DateMapper.INSTANCE
+  private val dateMapper = io.disposia.engine.oldmapper.OldDateMapper.INSTANCE
   private val indexMapper = OldIndexMapper.INSTANCE
 
   @deprecated("do not use old DTOs anymore","0.1")

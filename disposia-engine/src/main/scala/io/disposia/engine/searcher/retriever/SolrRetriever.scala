@@ -2,7 +2,7 @@ package io.disposia.engine.searcher.retriever
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.olddomain._
 import io.disposia.engine.index.IndexConfig
-import io.disposia.engine.mapper.OldIndexMapper
+import io.disposia.engine.oldmapper.OldIndexMapper
 import io.disposia.engine.newdomain.{NewIndexDoc, NewResults}
 import io.disposia.engine.util.mapper.NewIndexMapper
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}

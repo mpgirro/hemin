@@ -1,7 +1,8 @@
 package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.IndexField
-import io.disposia.engine.mapper.{DateMapper, SolrFieldMapper}
+import io.disposia.engine.mapper.SolrFieldMapper
+import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc}
 import io.disposia.engine.olddomain.OldEpisode
@@ -72,7 +73,7 @@ object NewEpisodeMapper {
           title        = Option(s.get(IndexField.TITLE)),
           podcastTitle = Option(s.get(IndexField.PODCAST_TITLE)),
           link         = Option(s.get(IndexField.LINK)),
-          pubDate      = Option(DateMapper.INSTANCE
+          pubDate      = Option(OldDateMapper.INSTANCE
             .asLocalDateTime(s.get(IndexField.PUB_DATE))),
           description  = Option(s.get(IndexField.DESCRIPTION)),
           image        = Option(s.get(IndexField.ITUNES_IMAGE)),
@@ -92,7 +93,7 @@ object NewEpisodeMapper {
           title        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
           podcastTitle = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PODCAST_TITLE)),
           link         = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
-          pubDate      = Option(DateMapper.INSTANCE
+          pubDate      = Option(OldDateMapper.INSTANCE
             .asLocalDateTime(SolrFieldMapper.INSTANCE.firstDateOrNull(s, IndexField.PUB_DATE))),
           description  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
           image        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),

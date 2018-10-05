@@ -1,6 +1,7 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
 import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.mapper.SolrFieldMapper;
 import io.disposia.engine.olddomain.*;
 import io.disposia.engine.olddomain.ImmutableOldEpisode;
 import io.disposia.engine.olddomain.OldEpisode;
@@ -15,7 +16,7 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @Deprecated
-@Mapper(uses = {OldPodcastMapper.class, OldChapterMapper.class, DateMapper.class},
+@Mapper(uses = {OldPodcastMapper.class, OldChapterMapper.class, OldDateMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface OldEpisodeMapper {
 
@@ -90,7 +91,7 @@ public interface OldEpisodeMapper {
                 .setLink(d.get(IndexField.LINK))
                 .setPubDate(Optional
                     .ofNullable(d.get(IndexField.PUB_DATE))
-                    .map(DateMapper.INSTANCE::asLocalDateTime)
+                    .map(OldDateMapper.INSTANCE::asLocalDateTime)
                     .orElse(null))
                 .setDescription(Stream
                     .of(d.get(IndexField.ITUNES_SUMMARY), d.get(IndexField.DESCRIPTION))
@@ -115,7 +116,7 @@ public interface OldEpisodeMapper {
                 .setLink(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.LINK))
                 .setPubDate(Optional
                     .ofNullable(SolrFieldMapper.INSTANCE.firstDateOrNull(d, IndexField.PUB_DATE))
-                    .map(DateMapper.INSTANCE::asLocalDateTime)
+                    .map(OldDateMapper.INSTANCE::asLocalDateTime)
                     .orElse(null))
                 .setDescription(Stream
                     .of(SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.ITUNES_SUMMARY), SolrFieldMapper.INSTANCE.firstStringOrNull(d, IndexField.DESCRIPTION))

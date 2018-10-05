@@ -1,4 +1,4 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
 import java.sql.Timestamp;
 import java.time.*;
@@ -6,9 +6,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Optional;
 
-public class DateMapper {
+public class OldDateMapper {
 
-    public static DateMapper INSTANCE = new DateMapper();
+    public static OldDateMapper INSTANCE = new OldDateMapper();
     public static ZoneId ZONE = ZoneId.of("Europe/Vienna");
 
     public String asString(LocalDateTime localDateTime) {

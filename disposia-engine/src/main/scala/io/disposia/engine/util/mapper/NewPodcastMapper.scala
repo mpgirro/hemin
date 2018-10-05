@@ -1,8 +1,9 @@
 package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.IndexField
+import io.disposia.engine.mapper.SolrFieldMapper
 import io.disposia.engine.olddomain.OldPodcast
-import io.disposia.engine.mapper.{DateMapper, SolrFieldMapper}
+import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.newdomain.podcast._
 import io.disposia.engine.newdomain.{NewIndexDoc, NewPodcast}
 import org.apache.solr.common.SolrDocument
@@ -78,7 +79,7 @@ object NewPodcastMapper {
           id = Option(s.get(IndexField.ID)),
           title = Option(s.get(IndexField.TITLE)),
           link = Option(s.get(IndexField.LINK)),
-          pubDate = Option(DateMapper.INSTANCE
+          pubDate = Option(OldDateMapper.INSTANCE
             .asLocalDateTime(s.get(IndexField.PUB_DATE))),
           description = Option(s.get(IndexField.DESCRIPTION)),
           image = Option(s.get(IndexField.ITUNES_IMAGE)),
@@ -92,7 +93,7 @@ object NewPodcastMapper {
           id = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
           title = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
           link = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
-          pubDate = Option(DateMapper.INSTANCE
+          pubDate = Option(OldDateMapper.INSTANCE
             .asLocalDateTime(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PUB_DATE))),
           description = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
           image = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),

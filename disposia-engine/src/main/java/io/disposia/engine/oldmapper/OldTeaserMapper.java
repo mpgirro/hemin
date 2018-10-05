@@ -1,5 +1,6 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
+import io.disposia.engine.mapper.UrlMapper;
 import io.disposia.engine.olddomain.*;
 import io.disposia.engine.olddomain.ImmutableOldEpisode;
 import io.disposia.engine.olddomain.OldEpisode;
@@ -11,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.Optional;
 
 @Deprecated
-@Mapper(uses = {UrlMapper.class, DateMapper.class},
+@Mapper(uses = {UrlMapper.class, OldDateMapper.class},
         unmappedTargetPolicy = ReportingPolicy.IGNORE,
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface OldTeaserMapper {

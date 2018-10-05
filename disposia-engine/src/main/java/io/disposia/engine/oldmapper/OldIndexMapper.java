@@ -1,6 +1,7 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
 import io.disposia.engine.domain.IndexField;
+import io.disposia.engine.mapper.SolrFieldMapper;
 import io.disposia.engine.olddomain.*;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -162,7 +163,7 @@ public interface OldIndexMapper {
             .ifPresent(x -> lucene.add(new TextField(IndexField.PODCAST_TITLE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getPubDate())
-            .map(DateMapper.INSTANCE::asString)
+            .map(OldDateMapper.INSTANCE::asString)
             .ifPresent(x -> lucene.add(new StringField(IndexField.PUB_DATE, x, Field.Store.YES)));
         Optional
             .ofNullable(doc.getImage())
@@ -216,7 +217,7 @@ public interface OldIndexMapper {
             .ifPresent(value -> solr.addField(IndexField.PODCAST_TITLE, value));
         Optional
             .ofNullable(doc.getPubDate())
-            .map(DateMapper.INSTANCE::asString)
+            .map(OldDateMapper.INSTANCE::asString)
             .ifPresent(value -> solr.addField(IndexField.PUB_DATE, value));
         Optional
             .ofNullable(doc.getImage())

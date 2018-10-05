@@ -1,7 +1,7 @@
 package io.disposia.engine.index;
 
 
-import io.disposia.engine.mapper.OldIndexMapper;
+import io.disposia.engine.oldmapper.OldIndexMapper;
 import io.disposia.engine.olddomain.OldEpisode;
 import io.disposia.engine.olddomain.OldIndexDoc;
 import io.disposia.engine.olddomain.OldPodcast;

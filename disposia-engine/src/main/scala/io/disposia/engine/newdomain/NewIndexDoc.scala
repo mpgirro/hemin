@@ -3,9 +3,9 @@ package io.disposia.engine.newdomain
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.IndexField
-import io.disposia.engine.mapper.DateMapper
 import io.disposia.engine.newdomain.episode.EpisodeItunesInfo
 import io.disposia.engine.newdomain.podcast.PodcastItunesInfo
+import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.mapper.reduce
 import org.apache.lucene.document.{Field, StringField, TextField}
 import org.apache.solr.common.SolrInputDocument
@@ -142,7 +142,7 @@ case class NewIndexDoc(
     link.foreach           { x => d.add(new TextField(IndexField.LINK, x, Field.Store.YES)) }
     description.foreach    { x => d.add(new TextField(IndexField.DESCRIPTION, x, Field.Store.YES)) }
     podcastTitle.foreach   { x => d.add(new TextField(IndexField.PODCAST_TITLE, x, Field.Store.YES)) }
-    pubDate.foreach        { x => d.add(new StringField(IndexField.PUB_DATE, DateMapper.INSTANCE.asString(x), Field.Store.YES)) }
+    pubDate.foreach        { x => d.add(new StringField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x), Field.Store.YES)) }
     image.foreach          { x => d.add(new TextField(IndexField.ITUNES_IMAGE, x, Field.Store.YES)) }
     itunesAuthor.foreach   { x => d.add(new TextField(IndexField.ITUNES_AUTHOR, x, Field.Store.NO)) }
     itunesSummary.foreach  { x => d.add(new TextField(IndexField.ITUNES_SUMMARY, x, Field.Store.YES)) }
@@ -163,7 +163,7 @@ case class NewIndexDoc(
     link.foreach           { x => d.addField(IndexField.LINK, x) }
     description.foreach    { x => d.addField(IndexField.DESCRIPTION, x) }
     podcastTitle.foreach   { x => d.addField(IndexField.PODCAST_TITLE, x) }
-    pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, DateMapper.INSTANCE.asString(x)) }
+    pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x)) }
     image.foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x) }
     itunesAuthor.foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x) }
     itunesSummary.foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x) }

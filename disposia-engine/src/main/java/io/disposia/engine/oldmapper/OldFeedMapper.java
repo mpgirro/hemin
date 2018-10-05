@@ -1,4 +1,4 @@
-package io.disposia.engine.mapper;
+package io.disposia.engine.oldmapper;
 
 import io.disposia.engine.olddomain.ImmutableOldFeed;
 import io.disposia.engine.olddomain.ModifiableOldFeed;
@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.Optional;
 
 @Deprecated
-@Mapper(uses = {OldPodcastMapper.class, DateMapper.class},
+@Mapper(uses = {OldPodcastMapper.class, OldDateMapper.class},
         nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
 public interface OldFeedMapper {
 

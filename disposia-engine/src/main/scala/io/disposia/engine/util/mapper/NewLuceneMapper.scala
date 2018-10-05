@@ -2,8 +2,8 @@ package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.olddomain.OldIndexDoc
-import io.disposia.engine.mapper.DateMapper
 import io.disposia.engine.newdomain.NewIndexDoc
+import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.mapper.SolrMapper.dateMapper
 import org.apache.lucene.document.{Field, StringField, TextField}
 
@@ -22,7 +22,7 @@ object NewLuceneMapper {
         Option(s.getLink).foreach           { x => d.add(new TextField(IndexField.LINK, x, Field.Store.YES)) }
         Option(s.getDescription).foreach    { x => d.add(new TextField(IndexField.DESCRIPTION, x, Field.Store.YES)) }
         Option(s.getPodcastTitle).foreach   { x => d.add(new TextField(IndexField.PODCAST_TITLE, x, Field.Store.YES)) }
-        Option(s.getPubDate).foreach        { x => d.add(new StringField(IndexField.PUB_DATE, DateMapper.INSTANCE.asString(x), Field.Store.YES)) }
+        Option(s.getPubDate).foreach        { x => d.add(new StringField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x), Field.Store.YES)) }
         Option(s.getImage).foreach          { x => d.add(new TextField(IndexField.ITUNES_IMAGE, x, Field.Store.YES)) }
         Option(s.getItunesAuthor).foreach   { x => d.add(new TextField(IndexField.ITUNES_AUTHOR, x, Field.Store.NO)) }
         Option(s.getItunesSummary).foreach  { x => d.add(new TextField(IndexField.ITUNES_SUMMARY, x, Field.Store.YES)) }
@@ -46,7 +46,7 @@ object NewLuceneMapper {
         s.link.foreach           { x => d.add(new TextField(IndexField.LINK, x, Field.Store.YES)) }
         s.description.foreach    { x => d.add(new TextField(IndexField.DESCRIPTION, x, Field.Store.YES)) }
         s.podcastTitle.foreach   { x => d.add(new TextField(IndexField.PODCAST_TITLE, x, Field.Store.YES)) }
-        s.pubDate.foreach        { x => d.add(new StringField(IndexField.PUB_DATE, DateMapper.INSTANCE.asString(x), Field.Store.YES)) }
+        s.pubDate.foreach        { x => d.add(new StringField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x), Field.Store.YES)) }
         s.image.foreach          { x => d.add(new TextField(IndexField.ITUNES_IMAGE, x, Field.Store.YES)) }
         s.itunesAuthor.foreach   { x => d.add(new TextField(IndexField.ITUNES_AUTHOR, x, Field.Store.NO)) }
         s.itunesSummary.foreach  { x => d.add(new TextField(IndexField.ITUNES_SUMMARY, x, Field.Store.YES)) }

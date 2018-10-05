@@ -9,7 +9,7 @@ import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJo
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
-import io.disposia.engine.mapper.{OldEpisodeMapper, OldIndexMapper, OldPodcastMapper}
+import io.disposia.engine.oldmapper.{OldEpisodeMapper, OldIndexMapper, OldPodcastMapper}
 import io.disposia.engine.olddomain.OldEpisode
 import io.disposia.engine.parse.api.FyydDirectoryAPI
 import io.disposia.engine.parse.rss.RomeFeedParser

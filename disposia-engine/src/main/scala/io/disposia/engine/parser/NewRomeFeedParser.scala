@@ -9,9 +9,9 @@ import com.rometools.rome.feed.synd.{SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.modules.itunes.FeedInformation
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.mapper.DateMapper
 import io.disposia.engine.newdomain.podcast.{PodcastFeedpressInfo, PodcastItunesInfo, PodcastMetadata}
 import io.disposia.engine.newdomain.{NewEpisode, NewPodcast}
+import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.UrlUtil
 import org.xml.sax.InputSource
 
@@ -89,7 +89,7 @@ class NewRomeFeedParser (private val xmlData: String) {
       link = Option(UrlUtil.sanitize(feed.getLink)),
       description = Option(feed.getDescription),
       image = fromSyndImage(feed.getImage), // TODO or use itunesImage
-      pubDate = Option(DateMapper.INSTANCE.asLocalDateTime(feed.getPublishedDate)),
+      pubDate = Option(OldDateMapper.INSTANCE.asLocalDateTime(feed.getPublishedDate)),
       meta = PodcastMetadata(
         language = Option(feed.getLanguage),
         generator = Option(feed.getGenerator),

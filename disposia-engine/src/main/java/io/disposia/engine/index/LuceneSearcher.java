@@ -5,7 +5,7 @@ import io.disposia.engine.domain.IndexField;
 import io.disposia.engine.olddomain.OldIndexDoc;
 import io.disposia.engine.olddomain.OldResultWrapper;
 import io.disposia.engine.exception.SearchException;
-import io.disposia.engine.mapper.OldIndexMapper;
+import io.disposia.engine.oldmapper.OldIndexMapper;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;

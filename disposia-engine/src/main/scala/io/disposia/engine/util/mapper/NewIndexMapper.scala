@@ -2,8 +2,8 @@ package io.disposia.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.disposia.engine.domain.IndexField
-import io.disposia.engine.olddomain._
 import io.disposia.engine.mapper.SolrFieldMapper
+import io.disposia.engine.olddomain._
 import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc, NewPodcast, NewResults}
 import org.apache.solr.common.SolrDocument
 

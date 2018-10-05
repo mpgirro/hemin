@@ -9,7 +9,7 @@ import io.disposia.engine.catalog.repository.{EpisodeRepository, FeedRepository,
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
-import io.disposia.engine.mapper._
+import io.disposia.engine.oldmapper._
 import io.disposia.engine.newdomain.episode.EpisodeRegistrationInfo
 import io.disposia.engine.newdomain.podcast.PodcastRegistrationInfo
 import io.disposia.engine.newdomain.{NewChapter, NewEpisode, NewFeed, NewPodcast}

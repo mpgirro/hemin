@@ -1,7 +1,7 @@
 package io.disposia.engine.index;
 
 import io.disposia.engine.domain.IndexField;
-import io.disposia.engine.mapper.OldIndexMapper;
+import io.disposia.engine.oldmapper.OldIndexMapper;
 import io.disposia.engine.olddomain.OldIndexDoc;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
