@@ -2,13 +2,7 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.domain.episode.EpisodeItunesInfo
-import io.disposia.engine.domain.podcast.PodcastItunesInfo
-import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.mapper.reduce
-import org.apache.lucene.document.{Field, StringField, TextField}
-import org.apache.solr.common.SolrInputDocument
 
 
 case class IndexDoc(

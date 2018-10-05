@@ -17,9 +17,9 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = Podcast.bsonWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = BsonConversion.podcastWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = Podcast.bsonReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = BsonConversion.podcastReader
 
   override protected[this] def collection: BSONCollection = db.apply("podcasts")
 

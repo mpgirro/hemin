@@ -7,14 +7,6 @@ import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInf
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object Episode {
-  implicit val bsonWriter: BSONDocumentWriter[Episode] = Macros.writer[Episode]
-  implicit val bsonReader: BSONDocumentReader[Episode] = Macros.reader[Episode]
-
-  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
-  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
-}
-
 case class Episode(
                        id: Option[String]                    = None,
                        podcastId: Option[String]             = None,

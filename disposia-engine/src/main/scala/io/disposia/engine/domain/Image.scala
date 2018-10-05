@@ -5,14 +5,6 @@ import java.time.LocalDateTime
 import io.disposia.engine.catalog.repository.BsonConversion
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object Image {
-  implicit val bsonWriter: BSONDocumentWriter[Image] = Macros.writer[Image]
-  implicit val bsonReader: BSONDocumentReader[Image] = Macros.reader[Image]
-
-  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
-  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
-}
-
 case class Image (
   id: Option[String]               = None,
   associateId: Option[String]      = None,

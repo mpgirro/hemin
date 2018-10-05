@@ -3,20 +3,9 @@ package io.disposia.engine.domain
 import java.time.LocalDateTime
 
 import io.disposia.engine.catalog.repository.BsonConversion
-import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object Feed {
-  implicit val bsonWriter: BSONDocumentWriter[Feed] = Macros.writer[Feed]
-  implicit val bsonReader: BSONDocumentReader[Feed] = Macros.reader[Feed]
-
-  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
-  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
-
-  private implicit val bsonFeedStatusWriter: BsonConversion.FeedStatusReader.type = BsonConversion.FeedStatusReader
-  private implicit val bsonFeedStatusReader: BsonConversion.FeedStatusWriter.type = BsonConversion.FeedStatusWriter
-}
 
 case class Feed(
   id: Option[String]                           = None,

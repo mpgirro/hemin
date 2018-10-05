@@ -3,14 +3,6 @@ import io.disposia.engine.catalog.repository.BsonConversion
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object Chapter {
-  implicit val bsonWriter: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
-  implicit val bsonReader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
-
-  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
-  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
-}
-
 case class Chapter(
                        id: Option[String]        = None,
                        episodeId: Option[String] = None,

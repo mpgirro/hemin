@@ -17,9 +17,9 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = Feed.bsonWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.feedWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = Feed.bsonReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.feedReader
 
   override protected[this] def collection: BSONCollection = db.apply("feeds")
 
