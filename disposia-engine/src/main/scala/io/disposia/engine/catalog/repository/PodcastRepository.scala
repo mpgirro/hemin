@@ -2,7 +2,7 @@ package io.disposia.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion._
-import io.disposia.engine.newdomain.NewPodcast
+import io.disposia.engine.domain.Podcast
 import io.disposia.engine.olddomain.OldPodcast
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
@@ -11,19 +11,19 @@ import reactivemongo.bson._
 import scala.concurrent.{ExecutionContext, Future}
 
 class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
-  extends MongoRepository[NewPodcast] {
+  extends MongoRepository[Podcast] {
 
   override protected[this] def log: Logger = Logger(getClass)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[NewPodcast] = NewPodcast.bsonWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Podcast] = Podcast.bsonWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[NewPodcast] = NewPodcast.bsonReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Podcast] = Podcast.bsonReader
 
   override protected[this] def collection: BSONCollection = db.apply("podcasts")
 
-  override def save(podcast: NewPodcast): Future[NewPodcast] = {
+  override def save(podcast: Podcast): Future[Podcast] = {
     val query = BSONDocument("id" -> podcast.id)
     collection
       .update(query, podcast, upsert = true)
@@ -35,19 +35,19 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
       }
   }
 
-  override def findOne(id: String): Future[Option[NewPodcast]] = {
+  override def findOne(id: String): Future[Option[Podcast]] = {
     log.debug("Request to get Podcast (ID) : {}", id)
     val query = toDocument(Map("id" -> toBsonS(id)))
     findOne(query)
   }
 
-  def findAll(page: Int, size: Int): Future[List[NewPodcast]] = {
+  def findAll(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts by page : {} and size : {}", page, size)
     val query = BSONDocument()
     findAll(query, page, size)
   }
 
-  def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[NewPodcast]] = {
+  def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
     val query = toDocument(Map("registrationComplete" -> toBsonB(true)))
     findAll(query, page, size)

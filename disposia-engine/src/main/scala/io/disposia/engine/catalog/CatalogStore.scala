@@ -10,12 +10,12 @@ import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFet
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.oldmapper._
-import io.disposia.engine.newdomain.episode.EpisodeRegistrationInfo
-import io.disposia.engine.newdomain.podcast.PodcastRegistrationInfo
-import io.disposia.engine.newdomain.{NewChapter, NewEpisode, NewFeed, NewPodcast}
+import io.disposia.engine.domain.episode.EpisodeRegistrationInfo
+import io.disposia.engine.domain.podcast.PodcastRegistrationInfo
+import io.disposia.engine.domain.{Chapter, Episode, Feed, Podcast}
 import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.IdGenerator
-import io.disposia.engine.util.mapper.{NewIndexMapper, reduce}
+import io.disposia.engine.util.mapper.{IndexMapper, reduce}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.concurrent.duration._
@@ -35,16 +35,16 @@ object CatalogStore {
     trait CatalogQueryResult extends CatalogMessage
     // CatalogCommands
     case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
-    case class RegisterEpisodeIfNew(podcastId: String, episode: NewEpisode) extends CatalogCommand // Questions: Parser -> CatalogStore
+    case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
     // CatalogEvents
     //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
     case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
     case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
     case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
-    case class SaveChapter(chapter: NewChapter) extends CatalogEvent
-    case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: NewPodcast) extends CatalogEvent
-    case class UpdateEpisode(episode: NewEpisode) extends CatalogEvent
-    case class UpdateEpisodeWithChapters(podcastId: String, episode: NewEpisode, chapter: List[NewChapter]) extends CatalogEvent
+    case class SaveChapter(chapter: Chapter) extends CatalogEvent
+    case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
+    case class UpdateEpisode(episode: Episode) extends CatalogEvent
+    case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
     // CatalogQueries
     case class GetPodcast(id: String) extends CatalogQuery
     case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
@@ -60,14 +60,14 @@ object CatalogStore {
     //case class CheckAllPodcasts() extends CatalogQuery
     case class CheckAllFeeds() extends CatalogQuery
     // CatalogQueryResults
-    case class PodcastResult(podcast: Option[NewPodcast]) extends CatalogQueryResult
-    case class AllPodcastsResult(results: List[NewPodcast]) extends CatalogQueryResult
-    case class AllFeedsResult(results: List[NewFeed]) extends CatalogQueryResult
-    case class EpisodeResult(episode: Option[NewEpisode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
-    case class EpisodesByPodcastResult(episodes: List[NewEpisode]) extends CatalogQueryResult
-    case class FeedsByPodcastResult(feeds: List[NewFeed]) extends CatalogQueryResult
-    case class ChaptersByEpisodeResult(chapters: List[NewChapter]) extends CatalogQueryResult
-    case class FeedResult(feed: Option[NewFeed]) extends CatalogQueryResult
+    case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
+    case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
+    case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
+    case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
+    case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
+    case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
+    case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
+    case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
     //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -260,7 +260,7 @@ class CatalogStore(config: CatalogConfig)
             val now = LocalDateTime.now()
 
             val podcastId = idGenerator.newId
-            val podcast = NewPodcast(
+            val podcast = Podcast(
               id          = Some(podcastId),
               title       = Some(podcastId),
               description = Some(url),
@@ -280,7 +280,7 @@ class CatalogStore(config: CatalogConfig)
               .create()
               */
             val feedId = idGenerator.newId
-            val feed = NewFeed(
+            val feed = Feed(
               id                    = Some(feedId),
               podcastId             = Some(podcastId),
               url                   = Some(url),
@@ -347,7 +347,7 @@ class CatalogStore(config: CatalogConfig)
   }
 
   @Deprecated
-  private def onUpdatePodcast(podcastId: String, feedUrl: String, podcast: NewPodcast): Unit = {
+  private def onUpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast): Unit = {
     log.debug("Received UpdatePodcast({},{},{})", podcastId, feedUrl, podcast.id)
 
     /* TODO
@@ -375,7 +375,7 @@ class CatalogStore(config: CatalogConfig)
       })
   }
 
-  private def onUpdateEpisode(episode: NewEpisode): Unit = {
+  private def onUpdateEpisode(episode: Episode): Unit = {
     log.debug("Received UpdateEpisode({})", episode.id)
 
     episodes
@@ -642,7 +642,7 @@ class CatalogStore(config: CatalogConfig)
     throw new UnsupportedOperationException("Currently not implemented")
   }
 
-  private def onRegisterEpisodeIfNew(podcastId: String, episode: NewEpisode): Unit = {
+  private def onRegisterEpisodeIfNew(podcastId: String, episode: Episode): Unit = {
     log.debug("Received RegisterEpisodeIfNew({}, '{}')", podcastId, episode.title)
 
     podcasts
@@ -666,7 +666,7 @@ class CatalogStore(config: CatalogConfig)
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
 
-                val patch = NewEpisode(
+                val patch = Episode(
                   id = Some(episodeId),
                   podcastId = Option(podcastId),
                   podcastTitle = p.title,
@@ -701,7 +701,7 @@ class CatalogStore(config: CatalogConfig)
                     case Success(_) =>
                       log.info("episode registered : '{}' [p:{},e:{}]", e.title, podcastId, e.id)
 
-                      val indexEvent = AddDocIndexEvent(NewIndexMapper.toIndexDoc(e))// AddDocIndexEvent(indexMapper.toImmutable(e))
+                      val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(e))// AddDocIndexEvent(indexMapper.toImmutable(e))
                       //emitIndexEvent(indexEvent)
                       indexStore ! indexEvent
 

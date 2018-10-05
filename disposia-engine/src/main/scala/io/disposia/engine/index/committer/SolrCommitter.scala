@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService
 
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.index.IndexConfig
-import io.disposia.engine.newdomain.NewIndexDoc
+import io.disposia.engine.domain.IndexDoc
 import io.disposia.engine.util.mapper.SolrMapper.toSolr
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient
 import org.apache.solr.client.solrj.{SolrClient, SolrServerException}
@@ -31,7 +31,7 @@ class SolrCommitter(config: IndexConfig, executorService: ExecutorService) exten
       ex.printStackTrace()
   }
 
-  override def save(doc: NewIndexDoc): Unit = {
+  override def save(doc: IndexDoc): Unit = {
 
     // TODO do not always solr.add (produces duplicates), but update by EXO instead
 

@@ -3,8 +3,8 @@ import io.disposia.engine.domain.IndexField
 import io.disposia.engine.olddomain._
 import io.disposia.engine.index.IndexConfig
 import io.disposia.engine.oldmapper.OldIndexMapper
-import io.disposia.engine.newdomain.{NewIndexDoc, NewResults}
-import io.disposia.engine.util.mapper.NewIndexMapper
+import io.disposia.engine.domain.{IndexDoc, Results}
+import io.disposia.engine.util.mapper.IndexMapper
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 import org.apache.solr.client.solrj.response.QueryResponse
@@ -18,7 +18,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] def searchIndex(q: String, p: Int, s: Int): NewResults =
+  override protected[this] def searchIndex(q: String, p: Int, s: Int): Results =
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)
 
   private val solr: SolrClient = new HttpSolrClient.Builder(config.solrUri)
@@ -45,7 +45,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
       .mkString(" ")
   }
 
-  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): NewResults = {
+  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): Results = {
 
     val offset = (p-1) * s
 
@@ -71,19 +71,19 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     val docList: SolrDocumentList = response.getResults
 
     if (docList.getNumFound <= 0) {
-      NewResults() // default parameters relate to nothing found
+      Results() // default parameters relate to nothing found
     } else {
 
-      val resultDocs: Array[NewIndexDoc] = new Array[NewIndexDoc](docList.getNumFound.toInt)
+      val resultDocs: Array[IndexDoc] = new Array[IndexDoc](docList.getNumFound.toInt)
       for ((d,i) <- docList.asScala.zipWithIndex) {
-        resultDocs(i) = NewIndexMapper.toIndexDoc(d)
+        resultDocs(i) = IndexMapper.toIndexDoc(d)
       }
 
       val dMaxPage = docList.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
-      NewResults(
+      Results(
         currPage = p,
         maxPage = maxPage, // TODO
         totalHits = docList.getNumFound.toInt,

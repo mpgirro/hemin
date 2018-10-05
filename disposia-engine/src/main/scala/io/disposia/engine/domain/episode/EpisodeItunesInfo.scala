@@ -1,4 +1,4 @@
-package io.disposia.engine.newdomain.episode
+package io.disposia.engine.domain.episode
 
 import io.disposia.engine.catalog.repository.BsonConversion
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}

@@ -6,7 +6,7 @@ import java.util.Date
 /**
   * @author max
   */
-object NewDateMapper {
+object DateMapper {
 
     val ZONE: ZoneId = ZoneId.of("Europe/Vienna")
 

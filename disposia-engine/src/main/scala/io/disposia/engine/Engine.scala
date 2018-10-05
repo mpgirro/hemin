@@ -7,7 +7,7 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.newdomain._
+import io.disposia.engine.domain._
 import io.disposia.engine.olddomain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 
@@ -69,34 +69,34 @@ class Engine {
 
   def propose(url: String): Unit = bus ! ProposeNewFeed(url)
 
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[NewResults] = {
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[Results] = {
     val p: Int = page.getOrElse(config.indexConfig.defaultPage)
     val s: Int = size.getOrElse(config.indexConfig.defaultSize)
 
     search(query, p, s)
   }
 
-  def search(query: String, page: Int, size: Int): Future[NewResults] =
+  def search(query: String, page: Int, size: Int): Future[Results] =
     (bus ? SearcherRequest(query, page, size)).map {
       case SearcherResults(rs) => rs
     }
 
-  def findPodcast(id: String): Future[Option[NewPodcast]] =
+  def findPodcast(id: String): Future[Option[Podcast]] =
     (bus ? GetPodcast(id)).map {
       case PodcastResult(p) => p
     }
 
-  def findEpisode(id: String): Future[Option[NewEpisode]] =
+  def findEpisode(id: String): Future[Option[Episode]] =
     (bus ? GetEpisode(id)).map {
       case EpisodeResult(e) => e
     }
 
-  def findFeed(id: String): Future[Option[NewFeed]] =
+  def findFeed(id: String): Future[Option[Feed]] =
     (bus ? GetFeed(id)).map {
       case FeedResult(f) => f
     }
 
-  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[NewPodcast]] = {
+  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
     val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
     val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
 
@@ -105,17 +105,17 @@ class Engine {
     }
   }
 
-  def findEpisodesByPodcast(id: String): Future[List[NewEpisode]] =
+  def findEpisodesByPodcast(id: String): Future[List[Episode]] =
     (bus ? GetEpisodesByPodcast(id)).map {
       case EpisodesByPodcastResult(es) => es
     }
 
-  def findFeedsByPodcast(id: String): Future[List[NewFeed]] =
+  def findFeedsByPodcast(id: String): Future[List[Feed]] =
     (bus ? GetFeedsByPodcast(id)).map {
       case FeedsByPodcastResult(fs) => fs
     }
 
-  def findChaptersByEpisode(id: String): Future[List[NewChapter]] =
+  def findChaptersByEpisode(id: String): Future[List[Chapter]] =
     (bus ? GetChaptersByEpisode(id)).map {
       case ChaptersByEpisodeResult(cs) => cs
     }

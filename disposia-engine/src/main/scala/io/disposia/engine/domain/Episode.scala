@@ -1,43 +1,43 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
 import io.disposia.engine.catalog.repository.BsonConversion
-import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object NewEpisode {
-  implicit val bsonWriter: BSONDocumentWriter[NewEpisode] = Macros.writer[NewEpisode]
-  implicit val bsonReader: BSONDocumentReader[NewEpisode] = Macros.reader[NewEpisode]
+object Episode {
+  implicit val bsonWriter: BSONDocumentWriter[Episode] = Macros.writer[Episode]
+  implicit val bsonReader: BSONDocumentReader[Episode] = Macros.reader[Episode]
 
   private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
   private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
 }
 
-case class NewEpisode(
-  id: Option[String]                    = None,
-  podcastId: Option[String]             = None,
-  podcastTitle: Option[String]          = None,
-  title: Option[String]                 = None,
-  link: Option[String]                  = None,
-  pubDate: Option[LocalDateTime]        = None,
-  guid: Option[String]                  = None,
-  guidIsPermalink: Option[Boolean]      = None,
-  description: Option[String]           = None,
-  image: Option[String]                 = None,
-  contentEncoded: Option[String]        = None,
-  chapters: List[NewChapter]            = List(),
-  itunes: EpisodeItunesInfo             = EpisodeItunesInfo(),
-  enclosure: EpisodeEnclosureInfo       = EpisodeEnclosureInfo(),
-  registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo()
+case class Episode(
+                       id: Option[String]                    = None,
+                       podcastId: Option[String]             = None,
+                       podcastTitle: Option[String]          = None,
+                       title: Option[String]                 = None,
+                       link: Option[String]                  = None,
+                       pubDate: Option[LocalDateTime]        = None,
+                       guid: Option[String]                  = None,
+                       guidIsPermalink: Option[Boolean]      = None,
+                       description: Option[String]           = None,
+                       image: Option[String]                 = None,
+                       contentEncoded: Option[String]        = None,
+                       chapters: List[Chapter]            = List(),
+                       itunes: EpisodeItunesInfo             = EpisodeItunesInfo(),
+                       enclosure: EpisodeEnclosureInfo       = EpisodeEnclosureInfo(),
+                       registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo()
 ) {
 
-  def update(patch: NewEpisode): NewEpisode = {
+  def update(patch: Episode): Episode = {
     Option(patch) match {
       case None => this
       case Some(p) =>
-        NewEpisode(
+        Episode(
           id              = reduce(this.id, p.id),
           podcastId       = reduce(this.podcastId, p.podcastId),
           podcastTitle    = reduce(this.podcastTitle, p.podcastTitle),

@@ -1,4 +1,4 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 

@@ -4,9 +4,9 @@ import java.time.LocalDateTime
 
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.olddomain._
-import io.disposia.engine.newdomain._
-import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
-import io.disposia.engine.newdomain.podcast._
+import io.disposia.engine.domain._
+import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.disposia.engine.domain.podcast._
 import io.disposia.engine.oldmapper.OldDateMapper
 import reactivemongo.bson.{BSONArray, BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
 
@@ -46,8 +46,8 @@ object BsonConversion {
   @deprecated("use implicit case class conversion","0.1")
   def asChapterList(key: String)(implicit bson: BSONDocument): Option[List[OldChapter]] = bson.getAs[List[OldChapter]](key)
 
-  def asNewChapterList(key: String)(implicit bson: BSONDocument): List[NewChapter] =
-    bson.getAs[List[NewChapter]](key) match {
+  def asNewChapterList(key: String)(implicit bson: BSONDocument): List[Chapter] =
+    bson.getAs[List[Chapter]](key) match {
       case Some(cs) => cs
       case None     => List()
     }
@@ -66,14 +66,14 @@ object BsonConversion {
   /**
     * All these implicit writers/readers are for internal usage of the public methods
     */
-  private implicit val podcastWriter: BSONDocumentWriter[NewPodcast] = NewPodcast.bsonWriter
-  private implicit val podcastReader: BSONDocumentReader[NewPodcast] = NewPodcast.bsonReader
-  private implicit val episodeWriter: BSONDocumentWriter[NewEpisode] = NewEpisode.bsonWriter
-  private implicit val episodeReader: BSONDocumentReader[NewEpisode] = NewEpisode.bsonReader
-  private implicit val feedWriter: BSONDocumentWriter[NewFeed] = NewFeed.bsonWriter
-  private implicit val feedReader: BSONDocumentReader[NewFeed] = NewFeed.bsonReader
-  private implicit val chapterWriter: BSONDocumentWriter[NewChapter] = NewChapter.bsonWriter
-  private implicit val chapterReader: BSONDocumentReader[NewChapter] = NewChapter.bsonReader
+  private implicit val podcastWriter: BSONDocumentWriter[Podcast] = Podcast.bsonWriter
+  private implicit val podcastReader: BSONDocumentReader[Podcast] = Podcast.bsonReader
+  private implicit val episodeWriter: BSONDocumentWriter[Episode] = Episode.bsonWriter
+  private implicit val episodeReader: BSONDocumentReader[Episode] = Episode.bsonReader
+  private implicit val feedWriter: BSONDocumentWriter[Feed] = Feed.bsonWriter
+  private implicit val feedReader: BSONDocumentReader[Feed] = Feed.bsonReader
+  private implicit val chapterWriter: BSONDocumentWriter[Chapter] = Chapter.bsonWriter
+  private implicit val chapterReader: BSONDocumentReader[Chapter] = Chapter.bsonReader
   private implicit val imageWriter: BSONDocumentWriter[Image] = Image.bsonWriter
   private implicit val imageReader: BSONDocumentReader[Image] = Image.bsonReader
 

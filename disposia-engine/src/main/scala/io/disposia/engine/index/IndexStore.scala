@@ -6,9 +6,9 @@ import io.disposia.engine.olddomain._
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
 import io.disposia.engine.index.committer.SolrCommitter
-import io.disposia.engine.newdomain.{NewIndexDoc, NewResults}
+import io.disposia.engine.domain.{IndexDoc, Results}
 import io.disposia.engine.util.ExecutorServiceWrapper
-import io.disposia.engine.util.mapper.NewIndexMapper
+import io.disposia.engine.util.mapper.IndexMapper
 
 import scala.collection.JavaConverters._
 import scala.collection.mutable
@@ -27,7 +27,7 @@ object IndexStore {
   trait IndexQuery extends IndexMessage
   trait IndexQueryResult extends IndexMessage
   // IndexEvents
-  case class AddDocIndexEvent(doc: NewIndexDoc) extends IndexEvent
+  case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
   case class UpdateDocWebsiteDataIndexEvent(id: String, html: String) extends IndexEvent
   case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
   case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent
@@ -36,7 +36,7 @@ object IndexStore {
   // IndexQueries
   case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
-  case class IndexSearchResults(results: NewResults) extends IndexQueryResult
+  case class IndexSearchResults(results: Results) extends IndexQueryResult
 }
 
 class IndexStore (config: IndexConfig)
@@ -51,7 +51,7 @@ class IndexStore (config: IndexConfig)
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var indexChanged = false
-  private val cache: mutable.Queue[NewIndexDoc] = new mutable.Queue
+  private val cache: mutable.Queue[IndexDoc] = new mutable.Queue
   private val updateWebsiteQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateImageQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
@@ -68,7 +68,7 @@ class IndexStore (config: IndexConfig)
         log.error("Error trying to search the index; reason: {}", e.getMessage)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
-        sender ! IndexSearchResults(NewResults()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+        sender ! IndexSearchResults(Results()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
       //currQuery = ""
     }
     super.postRestart(cause)
@@ -116,11 +116,11 @@ class IndexStore (config: IndexConfig)
       val origSender = sender()
 
       Future {
-        var results: NewResults = null
+        var results: Results = null
         blocking {
           val rs = luceneSearcher.search(query, page, size)
           //results = luceneSearcher.search(query, page, size)
-          results = NewIndexMapper.toResults(rs)
+          results = IndexMapper.toResults(rs)
         }
 
         if (results.totalHits > 0){
@@ -128,7 +128,7 @@ class IndexStore (config: IndexConfig)
         } else {
           log.warning("No Podcast matching query: '{}' found in the index", query)
           //sender ! NoIndexResultsFound(query)
-          origSender ! IndexSearchResults(NewResults())
+          origSender ! IndexSearchResults(Results())
         }
 
         //currQuery = "" // wipe the copy
@@ -145,7 +145,7 @@ class IndexStore (config: IndexConfig)
       log.debug("Committing Index due to pending changes")
 
       for (doc <- cache) {
-        luceneCommitter.add(NewIndexMapper.toIndexDoc(doc))
+        luceneCommitter.add(IndexMapper.toIndexDoc(doc))
       }
       luceneCommitter.commit()
       //indexChanged = false

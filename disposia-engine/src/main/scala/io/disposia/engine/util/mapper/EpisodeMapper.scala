@@ -3,17 +3,17 @@ package io.disposia.engine.util.mapper
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.SolrFieldMapper
 import io.disposia.engine.oldmapper.OldDateMapper
-import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
-import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc}
+import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.disposia.engine.domain.{Episode, IndexDoc}
 import io.disposia.engine.olddomain.OldEpisode
 import org.apache.solr.common.SolrDocument
 
-object NewEpisodeMapper {
+object EpisodeMapper {
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toEpisode(epsiode: OldEpisode): NewEpisode = Option(epsiode)
+  def toEpisode(epsiode: OldEpisode): Episode = Option(epsiode)
     .map { e =>
-      NewEpisode(
+      Episode(
         id              = Option(e.getId),
         title           = Option(e.getTitle),
         podcastId       = Option(e.getPodcastId),
@@ -46,10 +46,10 @@ object NewEpisodeMapper {
     }.orNull
 
 
-  def toEpisode(src: NewIndexDoc): NewEpisode =
+  def toEpisode(src: IndexDoc): Episode =
     Option(src)
       .map{ s =>
-        NewEpisode(
+        Episode(
           id          = s.id,
           title       = s.title,
           link        = s.link,
@@ -65,10 +65,10 @@ object NewEpisodeMapper {
       }
       .orNull
 
-  def toEpisode(src: org.apache.lucene.document.Document): NewEpisode =
+  def toEpisode(src: org.apache.lucene.document.Document): Episode =
     Option(src)
       .map { s =>
-        NewEpisode(
+        Episode(
           id           = Option(s.get(IndexField.ID)),
           title        = Option(s.get(IndexField.TITLE)),
           podcastTitle = Option(s.get(IndexField.PODCAST_TITLE)),
@@ -85,10 +85,10 @@ object NewEpisodeMapper {
         )
       }.orNull
 
-  def toEpisode(src: SolrDocument): NewEpisode =
+  def toEpisode(src: SolrDocument): Episode =
     Option(src)
       .map { s =>
-        NewEpisode(
+        Episode(
           id           = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
           title        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
           podcastTitle = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PODCAST_TITLE)),

@@ -4,14 +4,14 @@ import com.google.common.base.Strings.isNullOrEmpty
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.SolrFieldMapper
 import io.disposia.engine.olddomain._
-import io.disposia.engine.newdomain.{NewEpisode, NewIndexDoc, NewPodcast, NewResults}
+import io.disposia.engine.domain.{Episode, IndexDoc, Podcast, Results}
 import org.apache.solr.common.SolrDocument
 
 import scala.collection.JavaConverters._
 
-object NewIndexMapper {
+object IndexMapper {
 
-  def toIndexDoc(src: NewIndexDoc): OldIndexDoc = {
+  def toIndexDoc(src: IndexDoc): OldIndexDoc = {
     Option(src)
       .map { s =>
         val b = ImmutableOldIndexDoc.builder()
@@ -34,10 +34,10 @@ object NewIndexMapper {
   }
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toIndexDoc(src: OldIndexDoc): NewIndexDoc = {
+  def toIndexDoc(src: OldIndexDoc): IndexDoc = {
     Option(src)
       .map { s =>
-        NewIndexDoc(
+        IndexDoc(
           docType = Option(s.getDocType),
           id = Option(s.getId),
           title = Option(s.getTitle),
@@ -56,13 +56,13 @@ object NewIndexMapper {
       }.orNull
   }
 
-  def toIndexDoc(is: java.util.List[OldIndexDoc]): List[NewIndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
+  def toIndexDoc(is: java.util.List[OldIndexDoc]): List[IndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toResults(src: OldResultWrapper): NewResults = {
+  def toResults(src: OldResultWrapper): Results = {
     Option(src)
         .map { s =>
-          NewResults(
+          Results(
             currPage  = s.getCurrPage,
             maxPage   = s.getMaxPage,
             totalHits = s.getTotalHits,
@@ -73,10 +73,10 @@ object NewIndexMapper {
   }
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toIndexDoc(src: OldPodcast): NewIndexDoc =
+  def toIndexDoc(src: OldPodcast): IndexDoc =
     Option(src)
       .map { s =>
-        NewIndexDoc(
+        IndexDoc(
           docType = Some("podcast"),
           id = Option(s.getId),
           title = Option(s.getTitle),
@@ -96,10 +96,10 @@ object NewIndexMapper {
       .orNull
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toIndexDoc(src: OldEpisode): NewIndexDoc =
+  def toIndexDoc(src: OldEpisode): IndexDoc =
     Option(src)
       .map { s =>
-        NewIndexDoc(
+        IndexDoc(
           docType = Some("episode"),
           id = Option(s.getId),
           title = Option(s.getTitle),
@@ -118,10 +118,10 @@ object NewIndexMapper {
       }
       .orNull
 
-  def toIndexDoc(src: NewPodcast): NewIndexDoc =
+  def toIndexDoc(src: Podcast): IndexDoc =
     Option(src)
     .map { s =>
-      NewIndexDoc(
+      IndexDoc(
         docType        = Some("podcast"),
         id             = s.id,
         title          = s.title,
@@ -139,10 +139,10 @@ object NewIndexMapper {
       )
     }.orNull
 
-  def toIndexDoc(src: NewEpisode): NewIndexDoc =
+  def toIndexDoc(src: Episode): IndexDoc =
     Option(src)
       .map { s =>
-        NewIndexDoc(
+        IndexDoc(
           docType        = Some("episode"),
           id             = s.id,
           title          = s.title,
@@ -161,7 +161,7 @@ object NewIndexMapper {
       }.orNull
 
 
-  def toIndexDoc(src: org.apache.lucene.document.Document): NewIndexDoc =
+  def toIndexDoc(src: org.apache.lucene.document.Document): IndexDoc =
     Option(src)
       .map { s =>
         val docType: String = s.get(IndexField.DOC_TYPE)
@@ -174,14 +174,14 @@ object NewIndexMapper {
           case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
           case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
           */
-          case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
-          case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))
+          case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
+          case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
           case _         => throw new RuntimeException("Unsupported document type : " + docType)
         }
       }
       .orNull
 
-  def toIndexDoc(src: SolrDocument): NewIndexDoc =
+  def toIndexDoc(src: SolrDocument): IndexDoc =
     Option(src)
       .map { s=>
         val docType: String = SolrFieldMapper.INSTANCE.firstStringOrNull(s, IndexField.DOC_TYPE)
@@ -194,8 +194,8 @@ object NewIndexMapper {
           case "podcast" => toIndexDoc(OldPodcastMapper.INSTANCE.toImmutable(s))
           case "episode" => toIndexDoc(OldEpisodeMapper.INSTANCE.toImmutable(s))
           */
-          case "podcast" => toIndexDoc(NewPodcastMapper.toPodcast(src))
-          case "episode" => toIndexDoc(NewEpisodeMapper.toEpisode(src))
+          case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
+          case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
           case _         => throw new RuntimeException("Unsupported document type : " + docType)
         }
       }

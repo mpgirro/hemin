@@ -1,17 +1,17 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 import io.disposia.engine.catalog.repository.BsonConversion
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object NewChapter {
-  implicit val bsonWriter: BSONDocumentWriter[NewChapter] = Macros.writer[NewChapter]
-  implicit val bsonReader: BSONDocumentReader[NewChapter] = Macros.reader[NewChapter]
+object Chapter {
+  implicit val bsonWriter: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
+  implicit val bsonReader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
 
   private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
   private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
 }
 
-case class NewChapter(
+case class Chapter(
                        id: Option[String]        = None,
                        episodeId: Option[String] = None,
                        start: Option[String]     = None,
@@ -20,11 +20,11 @@ case class NewChapter(
                        image: Option[String]     = None
                      ) {
 
-  def update(patch: NewChapter): NewChapter = {
+  def update(patch: Chapter): Chapter = {
     Option(patch) match {
       case None => this
       case Some(p) =>
-        NewChapter(
+        Chapter(
           id        = reduce(this.id, p.id),
           episodeId = reduce(this.episodeId, p.episodeId),
           start     = reduce(this.start, p.start),

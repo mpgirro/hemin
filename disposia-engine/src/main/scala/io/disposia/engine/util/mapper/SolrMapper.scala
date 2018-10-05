@@ -4,7 +4,7 @@ import java.util
 
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.oldmapper._
-import io.disposia.engine.newdomain.NewIndexDoc
+import io.disposia.engine.domain.IndexDoc
 import io.disposia.engine.olddomain._
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
@@ -46,7 +46,7 @@ object SolrMapper {
       .orNull
 
 
-  def toSolr(src: NewIndexDoc): SolrInputDocument =
+  def toSolr(src: IndexDoc): SolrInputDocument =
     Option(src)
       .map { s =>
         val d = new SolrInputDocument

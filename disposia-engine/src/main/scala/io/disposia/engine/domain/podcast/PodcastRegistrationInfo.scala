@@ -1,4 +1,4 @@
-package io.disposia.engine.newdomain.podcast
+package io.disposia.engine.domain.podcast
 
 import java.time.LocalDateTime
 

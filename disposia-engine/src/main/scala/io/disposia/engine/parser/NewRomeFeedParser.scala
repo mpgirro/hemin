@@ -9,8 +9,8 @@ import com.rometools.rome.feed.synd.{SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.rometools.modules.itunes.FeedInformation
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.newdomain.podcast.{PodcastFeedpressInfo, PodcastItunesInfo, PodcastMetadata}
-import io.disposia.engine.newdomain.{NewEpisode, NewPodcast}
+import io.disposia.engine.domain.podcast.{PodcastFeedpressInfo, PodcastItunesInfo, PodcastMetadata}
+import io.disposia.engine.domain.{Episode, Podcast}
 import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.UrlUtil
 import org.xml.sax.InputSource
@@ -26,8 +26,8 @@ class NewRomeFeedParser (private val xmlData: String) {
   private val input: SyndFeedInput = new SyndFeedInput
   private val feed: SyndFeed = input.build(inputSource)
 
-  val podcast: NewPodcast = parseFeed(feed)
-  val episodes: List[NewEpisode] = extractEpisodes(feed)
+  val podcast: Podcast = parseFeed(feed)
+  val episodes: List[Episode] = extractEpisodes(feed)
 
   /*
   try {
@@ -44,7 +44,7 @@ class NewRomeFeedParser (private val xmlData: String) {
   private def fromSyndImage(src: SyndImage): Option[String] = Option(src)
     .flatMap { img: SyndImage => if (isNullOrEmpty(img.getUrl)) None else Some(img.getUrl) }
 
-  private def withTitleFallback(p: NewPodcast, i: SyndImage): NewPodcast = {
+  private def withTitleFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.title.isEmpty && !isNullOrEmpty(i.getTitle)) {
       p.copy(title = Option(i.getTitle))
     } else {
@@ -52,7 +52,7 @@ class NewRomeFeedParser (private val xmlData: String) {
     }
   }
 
-  private def withLinkFallback(p: NewPodcast, i: SyndImage): NewPodcast = {
+  private def withLinkFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.link.isEmpty && !isNullOrEmpty(i.getLink)) {
       p.copy(link = Option(UrlUtil.sanitize(i.getLink)))
     } else {
@@ -60,7 +60,7 @@ class NewRomeFeedParser (private val xmlData: String) {
     }
   }
 
-  private def withDescriptionFallback(p: NewPodcast, i: SyndImage): NewPodcast = {
+  private def withDescriptionFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.description.isEmpty && !isNullOrEmpty(i.getDescription)) {
       p.copy(description = Option(i.getDescription))
     } else {
@@ -83,8 +83,8 @@ class NewRomeFeedParser (private val xmlData: String) {
     ) else PodcastItunesInfo()
   }
 
-  private def parseFeed(feed: SyndFeed): NewPodcast = {
-    NewPodcast(
+  private def parseFeed(feed: SyndFeed): Podcast = {
+    Podcast(
       title = Option(feed.getTitle),
       link = Option(UrlUtil.sanitize(feed.getLink)),
       description = Option(feed.getDescription),
@@ -101,7 +101,7 @@ class NewRomeFeedParser (private val xmlData: String) {
     )
   }
 
-  private def extractEpisodes(feed: SyndFeed): List[NewEpisode] = {
+  private def extractEpisodes(feed: SyndFeed): List[Episode] = {
     // TODO
     List()
   }

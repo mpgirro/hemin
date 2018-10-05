@@ -1,8 +1,8 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
-case class NewResults(
+case class Results(
   currPage: Int              = 0,
   maxPage: Int               = 0,
   totalHits: Int             = 0,
-  results: List[NewIndexDoc] = List()
+  results: List[IndexDoc] = List()
 )

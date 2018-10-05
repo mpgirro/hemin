@@ -14,7 +14,7 @@ import io.disposia.engine.olddomain.OldEpisode
 import io.disposia.engine.parse.api.FyydDirectoryAPI
 import io.disposia.engine.parse.rss.RomeFeedParser
 import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
-import io.disposia.engine.util.mapper.{NewEpisodeMapper, NewIndexMapper, NewPodcastMapper}
+import io.disposia.engine.util.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
@@ -181,7 +181,7 @@ class ParserWorker (config: ParserConfig)
           })
           */
 
-          val indexEvent = AddDocIndexEvent(NewIndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
+          val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
           //emitIndexEvent(indexEvent)
           index ! indexEvent
 
@@ -194,7 +194,7 @@ class ParserWorker (config: ParserConfig)
         }
 
         // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
-        val catalogEvent = UpdatePodcast(podcastId, feedUrl, NewPodcastMapper.toPodcast(p))
+        val catalogEvent = UpdatePodcast(podcastId, feedUrl, PodcastMapper.toPodcast(p))
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
 
@@ -226,7 +226,7 @@ class ParserWorker (config: ParserConfig)
     })
     */
 
-    val catalogCommand = RegisterEpisodeIfNew(podcastId, NewEpisodeMapper.toEpisode(e))
+    val catalogCommand = RegisterEpisodeIfNew(podcastId, EpisodeMapper.toEpisode(e))
     //sendCatalogCommand(catalogCommand)
     catalog ! catalogCommand
   }

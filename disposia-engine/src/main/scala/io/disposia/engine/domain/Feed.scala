@@ -1,4 +1,4 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
@@ -7,9 +7,9 @@ import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object NewFeed {
-  implicit val bsonWriter: BSONDocumentWriter[NewFeed] = Macros.writer[NewFeed]
-  implicit val bsonReader: BSONDocumentReader[NewFeed] = Macros.reader[NewFeed]
+object Feed {
+  implicit val bsonWriter: BSONDocumentWriter[Feed] = Macros.writer[Feed]
+  implicit val bsonReader: BSONDocumentReader[Feed] = Macros.reader[Feed]
 
   private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
   private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
@@ -18,7 +18,7 @@ object NewFeed {
   private implicit val bsonFeedStatusReader: BsonConversion.FeedStatusWriter.type = BsonConversion.FeedStatusWriter
 }
 
-case class NewFeed(
+case class Feed(
   id: Option[String]                           = None,
   podcastId: Option[String]                    = None,
   url: Option[String]                          = None,
@@ -33,11 +33,11 @@ case class NewFeed(
     * @param patch the instance with set fields that need updating
     * @return the updated instance
     */
-  def update(patch: NewFeed): NewFeed = {
+  def update(patch: Feed): Feed = {
     Option(patch) match {
       case None => this
       case Some(p) =>
-        NewFeed(
+        Feed(
           id                    = reduce(this.id, p.id),
           podcastId             = reduce(this.podcastId, p.podcastId),
           url                   = reduce(this.url, p.url),

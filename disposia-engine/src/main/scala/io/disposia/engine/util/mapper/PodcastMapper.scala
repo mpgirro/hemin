@@ -4,18 +4,18 @@ import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.SolrFieldMapper
 import io.disposia.engine.olddomain.OldPodcast
 import io.disposia.engine.oldmapper.OldDateMapper
-import io.disposia.engine.newdomain.podcast._
-import io.disposia.engine.newdomain.{NewIndexDoc, NewPodcast}
+import io.disposia.engine.domain.podcast._
+import io.disposia.engine.domain.{IndexDoc, Podcast}
 import org.apache.solr.common.SolrDocument
 
 import scala.collection.JavaConverters._
 
-object NewPodcastMapper {
+object PodcastMapper {
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toPodcast(podcast: OldPodcast): NewPodcast = Option(podcast)
+  def toPodcast(podcast: OldPodcast): Podcast = Option(podcast)
     .map { p =>
-      NewPodcast(
+      Podcast(
         id          = Option(p.getId),
         title       = Option(p.getTitle),
         link        = Option(p.getLink),
@@ -54,10 +54,10 @@ object NewPodcastMapper {
       )
     }.orNull
 
-  def toPodcast(src: NewIndexDoc): NewPodcast =
+  def toPodcast(src: IndexDoc): Podcast =
     Option(src)
       .map{ s =>
-        NewPodcast(
+        Podcast(
           id          = s.id,
           title       = s.title,
           link        = s.link,
@@ -72,10 +72,10 @@ object NewPodcastMapper {
       }
       .orNull
 
-  def toPodcast(src: org.apache.lucene.document.Document): NewPodcast =
+  def toPodcast(src: org.apache.lucene.document.Document): Podcast =
     Option(src)
       .map { s =>
-        NewPodcast(
+        Podcast(
           id = Option(s.get(IndexField.ID)),
           title = Option(s.get(IndexField.TITLE)),
           link = Option(s.get(IndexField.LINK)),
@@ -86,10 +86,10 @@ object NewPodcastMapper {
         )
       }.orNull
 
-  def toPodcast(src: SolrDocument): NewPodcast =
+  def toPodcast(src: SolrDocument): Podcast =
     Option(src)
       .map { s =>
-        NewPodcast(
+        Podcast(
           id = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
           title = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
           link = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),

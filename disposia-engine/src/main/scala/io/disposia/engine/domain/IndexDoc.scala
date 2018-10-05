@@ -1,17 +1,17 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.IndexField
-import io.disposia.engine.newdomain.episode.EpisodeItunesInfo
-import io.disposia.engine.newdomain.podcast.PodcastItunesInfo
+import io.disposia.engine.domain.episode.EpisodeItunesInfo
+import io.disposia.engine.domain.podcast.PodcastItunesInfo
 import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.util.mapper.reduce
 import org.apache.lucene.document.{Field, StringField, TextField}
 import org.apache.solr.common.SolrInputDocument
 
 
-case class NewIndexDoc(
+case class IndexDoc(
   docType: Option[String]        = None,
   id: Option[String]             = None,
   title: Option[String]          = None,
@@ -28,11 +28,11 @@ case class NewIndexDoc(
   websiteData: Option[String]    = None
 ) {
 
-  def update(patch: NewIndexDoc): NewIndexDoc = {
+  def update(patch: IndexDoc): IndexDoc = {
     Option(patch) match {
       case None => this
       case Some(p) =>
-        NewIndexDoc(
+        IndexDoc(
           docType        = reduce(this.docType, p.docType),
           id             = reduce(this.id, p.id),
           title          = reduce(this.title, p.title),

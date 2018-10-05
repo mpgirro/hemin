@@ -1,21 +1,21 @@
-package io.disposia.engine.newdomain
+package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
 import io.disposia.engine.catalog.repository.BsonConversion
-import io.disposia.engine.newdomain.podcast._
+import io.disposia.engine.domain.podcast._
 import io.disposia.engine.util.mapper.reduce
 import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
 
-object NewPodcast {
-  implicit val bsonWriter: BSONDocumentWriter[NewPodcast] = Macros.writer[NewPodcast]
-  implicit val bsonReader: BSONDocumentReader[NewPodcast] = Macros.reader[NewPodcast]
+object Podcast {
+  implicit val bsonWriter: BSONDocumentWriter[Podcast] = Macros.writer[Podcast]
+  implicit val bsonReader: BSONDocumentReader[Podcast] = Macros.reader[Podcast]
 
   private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
   private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
 }
 
-case class NewPodcast(
+case class Podcast(
   id: Option[String]                    = None,
   title: Option[String]                 = None,
   link: Option[String]                  = None,
@@ -29,11 +29,11 @@ case class NewPodcast(
   fyyd: PodcastFyydInfo                 = PodcastFyydInfo()
 ) {
 
-  def update(patch: NewPodcast): NewPodcast = {
+  def update(patch: Podcast): Podcast = {
     Option(patch) match {
       case None => this
       case Some(p) =>
-        NewPodcast(
+        Podcast(
           id              = reduce(this.id, p.id),
           title           = reduce(this.title, p.title),
           link            = reduce(this.link, p.link),
