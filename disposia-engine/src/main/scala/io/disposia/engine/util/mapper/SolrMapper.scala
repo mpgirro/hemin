@@ -1,12 +1,10 @@
 package io.disposia.engine.util.mapper
 
-import java.util
 import java.util.Date
 
+import com.google.common.collect.Lists
 import io.disposia.engine.domain.{IndexDoc, IndexField}
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
-
-import scala.collection.JavaConverters._
 
 object SolrMapper {
 
@@ -71,13 +69,19 @@ object SolrMapper {
       }
       .orNull
 
-  def firstStringMatch(doc: SolrDocument, fieldName: String): Option[String] = doc
-    .getFieldValue(fieldName)
-    .asInstanceOf[util.List[String]]
-    .asScala
-    .headOption
+  def firstMatch(doc: SolrDocument, fieldName: String): Option[Any] = {
+    val os = doc.getFieldValues(fieldName)
+    if (os == null || os.isEmpty) {
+      None
+    } else {
+      Option(Lists.newArrayList(os).get(0))
+    }
+  }
+
+  def firstStringMatch(doc: SolrDocument, fieldName: String): Option[String] =
+    firstMatch(doc, fieldName).map(_.asInstanceOf[String])
 
   def firstDateMatch(doc: SolrDocument, fieldName: String): Option[Date] =
-    firstStringMatch(doc, fieldName).map(_.asInstanceOf[Date])
+    firstMatch(doc, fieldName).map(_.asInstanceOf[Date])
 
 }

@@ -56,4 +56,6 @@ object LuceneMapper {
       }
       .orNull
 
+  def get(doc: org.apache.lucene.document.Document, fieldName: String): Option[String] = Option(doc.get(fieldName))
+
 }
