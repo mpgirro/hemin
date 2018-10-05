@@ -8,7 +8,6 @@ import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
-import io.disposia.engine.olddomain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 
 import scala.concurrent.duration._

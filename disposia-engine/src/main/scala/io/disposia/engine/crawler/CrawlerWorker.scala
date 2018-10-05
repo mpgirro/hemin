@@ -9,9 +9,8 @@ import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.crawler.Crawler._
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.exception.EchoException
-import io.disposia.engine.index.IndexStore.{IndexEvent, UpdateDocLinkIndexEvent}
-import io.disposia.engine.parse.api.FyydDirectoryAPI
-import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.index.IndexStore.UpdateDocLinkIndexEvent
+import io.disposia.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}
@@ -38,7 +37,7 @@ class CrawlerWorker (config: CrawlerConfig)
   private var parser: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
+  //private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
   private var httpClient: HttpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
 
   private var currUrl: String = _
@@ -111,10 +110,10 @@ class CrawlerWorker (config: CrawlerConfig)
       fetchContent(id, url, job, encoding) // TODO send encoding via message
 
     case CrawlFyyd(count) =>
-      onCrawlFyyd(count)
+      //onCrawlFyyd(count)
 
     case LoadFyydEpisodes(podcastId, fyydId) =>
-      onLoadFyydEpisodes(podcastId, fyydId)
+      //onLoadFyydEpisodes(podcastId, fyydId)
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
@@ -134,6 +133,7 @@ class CrawlerWorker (config: CrawlerConfig)
   }
   */
 
+  /*
   private def onCrawlFyyd(count: Int) = {
     log.debug("Received CrawlFyyd({})", count)
 
@@ -156,6 +156,7 @@ class CrawlerWorker (config: CrawlerConfig)
     val json = fyydAPI.getEpisodesByPodcastIdJSON(fyydId)
     parser ! ParseFyydEpisodes(podcastId, json)
   }
+  */
 
   private def sendErrorNotificationIfFeasable(id: String, url: String, job: FetchJob): Unit = {
     job match {

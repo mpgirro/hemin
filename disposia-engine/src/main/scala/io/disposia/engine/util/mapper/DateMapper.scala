@@ -3,9 +3,7 @@ package io.disposia.engine.util.mapper
 import java.time._
 import java.util.Date
 
-/**
-  * @author max
-  */
+
 object DateMapper {
 
     val ZONE: ZoneId = ZoneId.of("Europe/Vienna")

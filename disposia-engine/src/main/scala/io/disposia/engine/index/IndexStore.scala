@@ -2,18 +2,14 @@ package io.disposia.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
-import io.disposia.engine.olddomain._
+import io.disposia.engine.domain.{IndexDoc, ResultsWrapper}
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
 import io.disposia.engine.index.committer.SolrCommitter
-import io.disposia.engine.domain.{IndexDoc, ResultsWrapper}
 import io.disposia.engine.util.ExecutorServiceWrapper
-import io.disposia.engine.util.mapper.IndexMapper
 
-import scala.collection.JavaConverters._
 import scala.collection.mutable
-import scala.compat.java8.OptionConverters._
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutorService, Future, blocking}
+import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
 
 object IndexStore {
@@ -32,7 +28,7 @@ object IndexStore {
   case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
   case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent
   // IndexCommands
-  case class CommitIndex() extends IndexCommand
+  //case class CommitIndex() extends IndexCommand
   // IndexQueries
   case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
@@ -46,8 +42,8 @@ class IndexStore (config: IndexConfig)
 
   private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
 
-  private val luceneCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
-  private val luceneSearcher: IndexSearcher = new LuceneSearcher(luceneCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
+  //private val luceneCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
+  //private val luceneSearcher: IndexSearcher = new LuceneSearcher(luceneCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var indexChanged = false
@@ -59,7 +55,7 @@ class IndexStore (config: IndexConfig)
   private var supervisor: ActorRef = _
 
   // kickoff the committing play
-  context.system.scheduler.schedule(config.commitInterval, config.commitInterval, self, CommitIndex)
+  //context.system.scheduler.schedule(config.commitInterval, config.commitInterval, self, CommitIndex)
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
@@ -75,8 +71,8 @@ class IndexStore (config: IndexConfig)
   }
 
   override def postStop: Unit = {
-    Option(luceneCommitter).foreach(_.destroy())
-    Option(luceneSearcher).foreach(_.destroy())
+    //Option(luceneCommitter).foreach(_.destroy())
+    //Option(luceneSearcher).foreach(_.destroy())
 
     log.info("shutting down")
   }
@@ -88,8 +84,10 @@ class IndexStore (config: IndexConfig)
       supervisor = ref
       supervisor ! ReportIndexStoreStartupComplete
 
+      /*
     case CommitIndex =>
       commitIndexIfChanged()
+      */
 
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.id)
@@ -109,6 +107,7 @@ class IndexStore (config: IndexConfig)
       log.debug("Received IndexStoreUpdateDocLink({},'{}')", id, link)
       updateLinkQueue.enqueue((id, link))
 
+      /*
     case IndexSearch(query, page, size) =>
       log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
 
@@ -133,11 +132,13 @@ class IndexStore (config: IndexConfig)
 
         //currQuery = "" // wipe the copy
       }
+      */
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
 
+  /*
   private def commitIndexIfChanged(): Unit = {
     var committed = false
     //if (indexChanged) {
@@ -225,5 +226,6 @@ class IndexStore (config: IndexConfig)
       processLinkQueue(queue)
     }
   }
+  */
 
 }

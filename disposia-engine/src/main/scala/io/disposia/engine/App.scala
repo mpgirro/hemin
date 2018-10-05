@@ -2,9 +2,7 @@ package io.disposia.engine
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.util.DocumentFormatter
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn

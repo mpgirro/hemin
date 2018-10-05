@@ -1,15 +1,13 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.olddomain.OldIndexDoc
-import io.disposia.engine.domain.IndexDoc
-import io.disposia.engine.oldmapper.OldDateMapper
-import io.disposia.engine.util.mapper.SolrMapper.dateMapper
+import io.disposia.engine.domain.{IndexDoc, IndexField}
+import io.disposia.engine.mapper.OldDateMapper
 import org.apache.lucene.document.{Field, StringField, TextField}
 
 
 object LuceneMapper {
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toLucene(src: OldIndexDoc): org.apache.lucene.document.Document =
     Option(src)
@@ -33,6 +31,7 @@ object LuceneMapper {
         d
       }
       .orNull
+      */
 
 
   def toLucene(src: IndexDoc): org.apache.lucene.document.Document =

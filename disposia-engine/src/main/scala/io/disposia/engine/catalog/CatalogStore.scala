@@ -7,12 +7,10 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.catalog.repository.{EpisodeRepository, FeedRepository, PodcastRepository}
 import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
-import io.disposia.engine.domain.FeedStatus
-import io.disposia.engine.index.IndexStore.AddDocIndexEvent
-import io.disposia.engine.oldmapper._
 import io.disposia.engine.domain.episode.EpisodeRegistrationInfo
 import io.disposia.engine.domain.podcast.PodcastRegistrationInfo
-import io.disposia.engine.domain.{Chapter, Episode, Feed, Podcast}
+import io.disposia.engine.domain._
+import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.IdGenerator
 import io.disposia.engine.util.mapper.{IndexMapper, reduce}
@@ -133,12 +131,14 @@ class CatalogStore(config: CatalogConfig)
       }
    */
 
+  /*
   private val podcastMapper = OldPodcastMapper.INSTANCE
   private val episodeMapper = OldEpisodeMapper.INSTANCE
   private val feedMapper = OldFeedMapper.INSTANCE
   private val chapterMapper = OldChapterMapper.INSTANCE
   private val indexMapper = OldIndexMapper.INSTANCE
   private val idMapper = OldIdMapper.INSTANCE
+  */
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
@@ -699,7 +699,7 @@ class CatalogStore(config: CatalogConfig)
                   .save(e)
                   .onComplete {
                     case Success(_) =>
-                      log.info("episode registered : '{}' [p:{},e:{}]", e.title, podcastId, e.id)
+                      log.info("episode registered : '{}' [p:{},e:{}]", e.title.get, podcastId, e.id.get)
 
                       val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(e))// AddDocIndexEvent(indexMapper.toImmutable(e))
                       //emitIndexEvent(indexEvent)

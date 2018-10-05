@@ -3,8 +3,7 @@ package io.disposia.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.catalog.repository.BsonConversion._
 import io.disposia.engine.domain.Episode
-import io.disposia.engine.olddomain.OldEpisode
-import reactivemongo.api.{Cursor, DefaultDB}
+import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 

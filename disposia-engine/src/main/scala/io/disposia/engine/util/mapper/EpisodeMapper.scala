@@ -1,15 +1,13 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.mapper.SolrFieldMapper
-import io.disposia.engine.oldmapper.OldDateMapper
-import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
-import io.disposia.engine.domain.{Episode, IndexDoc}
-import io.disposia.engine.olddomain.OldEpisode
+import io.disposia.engine.domain.episode.EpisodeItunesInfo
+import io.disposia.engine.domain.{Episode, IndexDoc, IndexField}
+import io.disposia.engine.mapper.{OldDateMapper, SolrFieldMapper}
 import org.apache.solr.common.SolrDocument
 
 object EpisodeMapper {
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toEpisode(epsiode: OldEpisode): Episode = Option(epsiode)
     .map { e =>
@@ -44,6 +42,7 @@ object EpisodeMapper {
         )
       )
     }.orNull
+    */
 
 
   def toEpisode(src: IndexDoc): Episode =

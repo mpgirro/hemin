@@ -2,19 +2,20 @@ package io.disposia.engine.util.mapper
 
 import java.util
 
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.oldmapper._
-import io.disposia.engine.domain.IndexDoc
-import io.disposia.engine.olddomain._
+import io.disposia.engine.domain.{IndexDoc, IndexField}
+import io.disposia.engine.mapper.OldDateMapper
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 import scala.collection.JavaConverters._
 
 object SolrMapper {
 
+  /*
   private val dateMapper = io.disposia.engine.oldmapper.OldDateMapper.INSTANCE
   private val indexMapper = OldIndexMapper.INSTANCE
+  */
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toSolr(src: OldPodcast): SolrInputDocument = toSolr(indexMapper.toImmutable(src))
 
@@ -44,6 +45,7 @@ object SolrMapper {
         d
       }
       .orNull
+      */
 
 
   def toSolr(src: IndexDoc): SolrInputDocument =
@@ -57,7 +59,7 @@ object SolrMapper {
         s.link.foreach           { x => d.addField(IndexField.LINK, x) }
         s.description.foreach    { x => d.addField(IndexField.DESCRIPTION, x) }
         s.podcastTitle.foreach   { x => d.addField(IndexField.PODCAST_TITLE, x) }
-        s.pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, dateMapper.asString(x)) }
+        s.pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x)) }
         s.image.foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x) }
         s.itunesAuthor.foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x) }
         s.itunesSummary.foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x) }

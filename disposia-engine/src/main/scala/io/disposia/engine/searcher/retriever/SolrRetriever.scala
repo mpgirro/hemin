@@ -1,13 +1,10 @@
 package io.disposia.engine.searcher.retriever
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.olddomain._
+import io.disposia.engine.domain.{IndexDoc, IndexField, ResultsWrapper}
 import io.disposia.engine.index.IndexConfig
-import io.disposia.engine.oldmapper.OldIndexMapper
-import io.disposia.engine.domain.{IndexDoc, ResultsWrapper}
 import io.disposia.engine.util.mapper.IndexMapper
-import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 import org.apache.solr.client.solrj.response.QueryResponse
+import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.common.SolrDocumentList
 
 import scala.collection.JavaConverters._
@@ -25,7 +22,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     .allowCompression(false) // TODO
     .build()
 
-  private val indexMapper = OldIndexMapper.INSTANCE
+  //private val indexMapper = OldIndexMapper.INSTANCE
 
   private val searchFields = List(
     IndexField.TITLE,

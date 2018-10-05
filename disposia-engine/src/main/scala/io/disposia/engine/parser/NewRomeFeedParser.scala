@@ -9,7 +9,7 @@ import com.typesafe.scalalogging.Logger
 import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.domain.{Chapter, Episode, Podcast}
-import io.disposia.engine.oldmapper.OldDateMapper
+import io.disposia.engine.mapper.OldDateMapper
 import io.disposia.engine.parse.rss.RomeModuleExtractor
 import io.disposia.engine.util.UrlUtil
 import org.xml.sax.InputSource
@@ -72,7 +72,7 @@ class NewRomeFeedParser (private val xmlData: String) {
       p
     }
   }
-  
+
   private def parseFeed(feed: SyndFeed): Podcast = {
 
     // # # # # # # # # # # # # # # # # # # # # # # #

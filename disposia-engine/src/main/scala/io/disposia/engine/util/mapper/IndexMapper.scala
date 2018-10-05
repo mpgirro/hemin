@@ -1,16 +1,13 @@
 package io.disposia.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
-import io.disposia.engine.domain.IndexField
+import io.disposia.engine.domain.{Episode, IndexDoc, IndexField, Podcast}
 import io.disposia.engine.mapper.SolrFieldMapper
-import io.disposia.engine.olddomain._
-import io.disposia.engine.domain.{Episode, IndexDoc, Podcast, ResultsWrapper}
 import org.apache.solr.common.SolrDocument
-
-import scala.collection.JavaConverters._
 
 object IndexMapper {
 
+  /*
   def toIndexDoc(src: IndexDoc): OldIndexDoc = {
     Option(src)
       .map { s =>
@@ -32,7 +29,9 @@ object IndexMapper {
         b.create()
       }.orNull
   }
+  */
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldIndexDoc): IndexDoc = {
     Option(src)
@@ -55,9 +54,11 @@ object IndexMapper {
         )
       }.orNull
   }
+  */
 
-  def toIndexDoc(is: java.util.List[OldIndexDoc]): List[IndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
+  //def toIndexDoc(is: java.util.List[OldIndexDoc]): List[IndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toResults(src: OldResultWrapper): ResultsWrapper = {
     Option(src)
@@ -69,9 +70,10 @@ object IndexMapper {
             results   = toIndexDoc(s.getResults)
           )
         }.orNull
-
   }
+  */
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldPodcast): IndexDoc =
     Option(src)
@@ -94,7 +96,9 @@ object IndexMapper {
         )
       }
       .orNull
+      */
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldEpisode): IndexDoc =
     Option(src)
@@ -117,6 +121,7 @@ object IndexMapper {
         )
       }
       .orNull
+      */
 
   def toIndexDoc(src: Podcast): IndexDoc =
     Option(src)

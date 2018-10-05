@@ -1,17 +1,13 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.IndexField
-import io.disposia.engine.mapper.SolrFieldMapper
-import io.disposia.engine.olddomain.OldPodcast
-import io.disposia.engine.oldmapper.OldDateMapper
 import io.disposia.engine.domain.podcast._
-import io.disposia.engine.domain.{IndexDoc, Podcast}
+import io.disposia.engine.domain.{IndexDoc, IndexField, Podcast}
+import io.disposia.engine.mapper.{OldDateMapper, SolrFieldMapper}
 import org.apache.solr.common.SolrDocument
-
-import scala.collection.JavaConverters._
 
 object PodcastMapper {
 
+  /*
   @deprecated("do not use old DTOs anymore","0.1")
   def toPodcast(podcast: OldPodcast): Podcast = Option(podcast)
     .map { p =>
@@ -53,6 +49,7 @@ object PodcastMapper {
         )
       )
     }.orNull
+    */
 
   def toPodcast(src: IndexDoc): Podcast =
     Option(src)

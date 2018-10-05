@@ -1,4 +1,4 @@
-package io.disposia.engine.oldmapper;
+package io.disposia.engine.mapper;
 
 import java.sql.Timestamp;
 import java.time.*;
