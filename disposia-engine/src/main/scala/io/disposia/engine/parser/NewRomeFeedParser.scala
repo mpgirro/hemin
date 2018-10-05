@@ -42,9 +42,11 @@ class NewRomeFeedParser (private val xmlData: String) {
   }
   */
 
+  // TODO unused
   private def fromSyndImage(src: SyndImage): Option[String] = Option(src)
     .flatMap { img: SyndImage => if (isNullOrEmpty(img.getUrl)) None else Some(img.getUrl) }
 
+  // TODO unused
   private def withTitleFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.title.isEmpty && !isNullOrEmpty(i.getTitle)) {
       p.copy(title = Option(i.getTitle))
@@ -53,6 +55,7 @@ class NewRomeFeedParser (private val xmlData: String) {
     }
   }
 
+  // TODO unused
   private def withLinkFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.link.isEmpty && !isNullOrEmpty(i.getLink)) {
       p.copy(link = Option(UrlUtil.sanitize(i.getLink)))
@@ -61,6 +64,7 @@ class NewRomeFeedParser (private val xmlData: String) {
     }
   }
 
+  // TODO unused
   private def withDescriptionFallback(p: Podcast, i: SyndImage): Podcast = {
     if (p.description.isEmpty && !isNullOrEmpty(i.getDescription)) {
       p.copy(description = Option(i.getDescription))
@@ -68,9 +72,7 @@ class NewRomeFeedParser (private val xmlData: String) {
       p
     }
   }
-
-
-
+  
   private def parseFeed(feed: SyndFeed): Podcast = {
 
     // # # # # # # # # # # # # # # # # # # # # # # #
