@@ -16,6 +16,7 @@ public class SolrFieldMapper {
         return o==null ? null : (String) o;
     }
 
+    // TODO was ist der unterschied zu oben?
     public String firstStringOrNull(SolrDocument doc, String fieldName) {
         /*
         final Collection<Object> os = doc.getFieldValues(fieldName);

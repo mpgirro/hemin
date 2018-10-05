@@ -93,7 +93,7 @@ object NewEpisodeMapper {
           podcastTitle = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PODCAST_TITLE)),
           link         = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
           pubDate      = Option(DateMapper.INSTANCE
-            .asLocalDateTime(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PUB_DATE))),
+            .asLocalDateTime(SolrFieldMapper.INSTANCE.firstDateOrNull(s, IndexField.PUB_DATE))),
           description  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
           image        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),
           itunes = EpisodeItunesInfo(
