@@ -33,6 +33,7 @@ object NewIndexMapper {
       }.orNull
   }
 
+  @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldIndexDoc): NewIndexDoc = {
     Option(src)
       .map { s =>
@@ -57,6 +58,7 @@ object NewIndexMapper {
 
   def toIndexDoc(is: java.util.List[OldIndexDoc]): List[NewIndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
 
+  @deprecated("do not use old DTOs anymore","0.1")
   def toResults(src: OldResultWrapper): NewResults = {
     Option(src)
         .map { s =>
@@ -70,7 +72,7 @@ object NewIndexMapper {
 
   }
 
-  @deprecated
+  @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldPodcast): NewIndexDoc =
     Option(src)
       .map { s =>
@@ -93,7 +95,7 @@ object NewIndexMapper {
       }
       .orNull
 
-  @deprecated
+  @deprecated("do not use old DTOs anymore","0.1")
   def toIndexDoc(src: OldEpisode): NewIndexDoc =
     Option(src)
       .map { s =>

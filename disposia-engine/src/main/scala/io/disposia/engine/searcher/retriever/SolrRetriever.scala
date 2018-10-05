@@ -3,7 +3,8 @@ import io.disposia.engine.domain.IndexField
 import io.disposia.engine.olddomain._
 import io.disposia.engine.index.IndexConfig
 import io.disposia.engine.mapper.IndexMapper
-import io.disposia.engine.newdomain.NewResults
+import io.disposia.engine.newdomain.{NewIndexDoc, NewResults}
+import io.disposia.engine.util.mapper.NewIndexMapper
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 import org.apache.solr.client.solrj.response.QueryResponse
@@ -69,6 +70,28 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     val response: QueryResponse = solr.query(query)
     val docList: SolrDocumentList = response.getResults
 
+    if (docList.getNumFound <= 0) {
+      NewResults() // default parameters relate to nothing found
+    } else {
+
+      val resultDocs: Array[NewIndexDoc] = new Array[NewIndexDoc](docList.getNumFound.toInt)
+      for ((d,i) <- docList.asScala.zipWithIndex) {
+        resultDocs(i) = NewIndexMapper.toIndexDoc(d)
+      }
+
+      val dMaxPage = docList.getNumFound.toDouble / s.toDouble
+      val mp = Math.ceil(dMaxPage).toInt
+      val maxPage = if (mp == 0 && p == 1) 1 else mp
+
+      NewResults(
+        currPage = p,
+        maxPage = maxPage, // TODO
+        totalHits = docList.getNumFound.toInt,
+        results = resultDocs.toList,
+      )
+    }
+
+    /*
     val resultWrapper = ImmutableOldResultWrapper.builder
 
     // set some sane values, we'll overwrite these if all goes well
@@ -90,6 +113,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     }
 
     resultWrapper.create
+    */
 
     /*
     val qOp = queryOperator.getOrElse("AND")

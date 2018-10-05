@@ -17,9 +17,9 @@ class ImageRepository (db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Image] = BsonConversion.bsonImageWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Image] = Image.bsonWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = BsonConversion.bsonImageReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = Image.bsonReader
 
   override protected[this] def collection: BSONCollection = db.apply("images")
 

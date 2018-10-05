@@ -1,5 +1,15 @@
 package io.disposia.engine.newdomain
+import io.disposia.engine.catalog.repository.BsonConversion
 import io.disposia.engine.util.mapper.reduce
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
+
+object NewChapter {
+  implicit val bsonWriter: BSONDocumentWriter[NewChapter] = Macros.writer[NewChapter]
+  implicit val bsonReader: BSONDocumentReader[NewChapter] = Macros.reader[NewChapter]
+
+  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
+  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
+}
 
 case class NewChapter(
                        id: Option[String]        = None,

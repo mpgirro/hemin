@@ -11,6 +11,7 @@ import scala.collection.JavaConverters._
 
 object NewPodcastMapper {
 
+  @deprecated("do not use old DTOs anymore","0.1")
   def toPodcast(podcast: OldPodcast): NewPodcast = Option(podcast)
     .map { p =>
       NewPodcast(

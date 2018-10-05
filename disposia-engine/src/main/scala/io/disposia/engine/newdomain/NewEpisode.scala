@@ -2,8 +2,18 @@ package io.disposia.engine.newdomain
 
 import java.time.LocalDateTime
 
+import io.disposia.engine.catalog.repository.BsonConversion
 import io.disposia.engine.newdomain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.util.mapper.reduce
+import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
+
+object NewEpisode {
+  implicit val bsonWriter: BSONDocumentWriter[NewEpisode] = Macros.writer[NewEpisode]
+  implicit val bsonReader: BSONDocumentReader[NewEpisode] = Macros.reader[NewEpisode]
+
+  private implicit val bsonDateTimeWriter: BsonConversion.DateReader.type = BsonConversion.DateReader
+  private implicit val bsonDateTimeReader: BsonConversion.DateWriter.type = BsonConversion.DateWriter
+}
 
 case class NewEpisode(
   id: Option[String]                    = None,

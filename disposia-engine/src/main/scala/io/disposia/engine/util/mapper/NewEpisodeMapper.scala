@@ -9,6 +9,7 @@ import org.apache.solr.common.SolrDocument
 
 object NewEpisodeMapper {
 
+  @deprecated("do not use old DTOs anymore","0.1")
   def toEpisode(epsiode: OldEpisode): NewEpisode = Option(epsiode)
     .map { e =>
       NewEpisode(

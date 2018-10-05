@@ -17,9 +17,9 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[NewEpisode] = BsonConversion.bsonEpisodeWriter
+  override protected[this] implicit def bsonWriter: BSONDocumentWriter[NewEpisode] = NewEpisode.bsonWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[NewEpisode] = BsonConversion.bsonEpisodesReader
+  override protected[this] implicit def bsonReader: BSONDocumentReader[NewEpisode] = NewEpisode.bsonReader
 
   override protected[this] def collection: BSONCollection = db.apply("episodes")
 

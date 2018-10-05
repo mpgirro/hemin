@@ -127,10 +127,11 @@ object App {
       .search(query, 1, 20)
       .onComplete {
         case Success(results) =>
-          println("Found "+results.getResults.size()+" results for query '" + query.mkString(" ") + "'")
+          println("Found "+results.results.length+" results for query '" + query.mkString(" ") + "'")
           println("Results:")
-          for (result <- results.getResults.asScala) {
-            println(s"\n${DocumentFormatter.cliFormat(result)}\n")
+          for (result <- results.results) {
+            //println(s"\n${DocumentFormatter.cliFormat(result)}\n") // TODO port the cliFormatter to new Format
+            println(s"\n${result}\n")
           }
           println()
         case Failure(reason)  => println("ERROR: " + reason.getMessage)
@@ -171,7 +172,7 @@ object App {
           if (cs.isEmpty)
             println("No chapters found")
           else
-            for (c <- cs) println(c.getTitle)
+            for (c <- cs) println(c.title)
         case Failure(reason) => println("ERROR: " + reason.getMessage)
       }
   }
@@ -184,7 +185,7 @@ object App {
           if (fs.isEmpty)
             println("No feeds found")
           else
-            for (f <- fs) println(f.getUrl)
+            for (f <- fs) println(f.url)
         case Failure(reason) => println("ERROR: " + reason.getMessage)
       }
   }

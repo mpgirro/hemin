@@ -603,7 +603,12 @@ class CatalogStore(config: CatalogConfig)
         case Success(fs) =>
           if (fs.nonEmpty) {
             val f = fs.head
-            updater ! ProcessFeed(f.getPodcastId, f.getUrl, UpdateEpisodesFetchJob(null, null))
+            (f.podcastId, f.url) match {
+              case (Some(id), Some(url)) => updater ! ProcessFeed(id, url, UpdateEpisodesFetchJob(null, null))
+              case (Some(_), None)       => log.error("Cannot check Feed -- Feed.url is None")
+              case (None, Some(_))       => log.error("Cannot check Feed -- Feed.podcastId is None")
+              case (None, None)          => log.error("Cannot check Feed -- Feed.podcastId and Feed.url are both None")
+            }
           } else {
             log.error(s"Chould not update Podcast (ID = $podcastId) -- No feed found")
           }
@@ -617,7 +622,13 @@ class CatalogStore(config: CatalogConfig)
     feeds
       .findOne(feedId)
       .foreach {
-        case Some(f) => updater ! ProcessFeed(f.getPodcastId, f.getUrl, UpdateEpisodesFetchJob(null, null))
+        case Some(f) =>
+          (f.podcastId, f.url) match {
+            case (Some(id), Some(url)) => updater ! ProcessFeed(id, url, UpdateEpisodesFetchJob(null, null))
+            case (Some(_), None)       => log.error("Cannot check Feed -- Feed.url is None")
+            case (None, Some(_))       => log.error("Cannot check Feed -- Feed.podcastId is None")
+            case (None, None)          => log.error("Cannot check Feed -- Feed.podcastId and Feed.url are both None")
+          }
         case None    => log.error("No Feed in Database (ID) : {}", feedId)
       }
   }
@@ -702,10 +713,21 @@ class CatalogStore(config: CatalogConfig)
                       //self ! catalogEvent
 
                       // request that the website will get added to the episodes index entry as well
+                      /*
                       Option(e.getLink) match {
                         case Some(url) => updater ! ProcessFeed(e.getId, url, WebsiteFetchJob())
                         case None      => log.debug("No link set for episode {} --> no website data will be added to the index", episode.getId)
                       }
+                      */
+                      e.link match {
+                        case Some(url) =>
+                          e.id match {
+                            case Some(id) => updater ! ProcessFeed(id, url, WebsiteFetchJob())
+                            case None     => log.error(s"Cannot send ProcessFeed (_,$url,WebsiteFetchJob) message -- Episode.id is None")
+                          }
+                        case None      => log.debug("No link set for episode {} --> no website data will be added to the index", episode.id)
+                      }
+
                     case Failure(ex) => onError("Could not save new Episode", ex)
                   }
 

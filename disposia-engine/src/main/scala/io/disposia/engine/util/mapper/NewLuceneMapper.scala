@@ -10,7 +10,7 @@ import org.apache.lucene.document.{Field, StringField, TextField}
 
 object NewLuceneMapper {
 
-  @deprecated
+  @deprecated("do not use old DTOs anymore","0.1")
   def toLucene(src: OldIndexDoc): org.apache.lucene.document.Document =
     Option(src)
       .map { s =>
