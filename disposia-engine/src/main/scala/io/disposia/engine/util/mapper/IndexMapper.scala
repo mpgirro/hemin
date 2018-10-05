@@ -4,7 +4,7 @@ import com.google.common.base.Strings.isNullOrEmpty
 import io.disposia.engine.domain.IndexField
 import io.disposia.engine.mapper.SolrFieldMapper
 import io.disposia.engine.olddomain._
-import io.disposia.engine.domain.{Episode, IndexDoc, Podcast, Results}
+import io.disposia.engine.domain.{Episode, IndexDoc, Podcast, ResultsWrapper}
 import org.apache.solr.common.SolrDocument
 
 import scala.collection.JavaConverters._
@@ -59,10 +59,10 @@ object IndexMapper {
   def toIndexDoc(is: java.util.List[OldIndexDoc]): List[IndexDoc] = is.asScala.map(i => toIndexDoc(i)).toList
 
   @deprecated("do not use old DTOs anymore","0.1")
-  def toResults(src: OldResultWrapper): Results = {
+  def toResults(src: OldResultWrapper): ResultsWrapper = {
     Option(src)
         .map { s =>
-          Results(
+          ResultsWrapper(
             currPage  = s.getCurrPage,
             maxPage   = s.getMaxPage,
             totalHits = s.getTotalHits,

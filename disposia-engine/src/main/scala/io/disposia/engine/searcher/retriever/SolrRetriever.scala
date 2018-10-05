@@ -3,7 +3,7 @@ import io.disposia.engine.domain.IndexField
 import io.disposia.engine.olddomain._
 import io.disposia.engine.index.IndexConfig
 import io.disposia.engine.oldmapper.OldIndexMapper
-import io.disposia.engine.domain.{IndexDoc, Results}
+import io.disposia.engine.domain.{IndexDoc, ResultsWrapper}
 import io.disposia.engine.util.mapper.IndexMapper
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.client.solrj.impl.HttpSolrClient
@@ -18,7 +18,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
-  override protected[this] def searchIndex(q: String, p: Int, s: Int): Results =
+  override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultsWrapper =
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)
 
   private val solr: SolrClient = new HttpSolrClient.Builder(config.solrUri)
@@ -45,7 +45,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
       .mkString(" ")
   }
 
-  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): Results = {
+  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultsWrapper = {
 
     val offset = (p-1) * s
 
@@ -71,7 +71,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     val docList: SolrDocumentList = response.getResults
 
     if (docList.getNumFound <= 0) {
-      Results() // default parameters relate to nothing found
+      ResultsWrapper() // default parameters relate to nothing found
     } else {
 
       val resultDocs: Array[IndexDoc] = new Array[IndexDoc](docList.getNumFound.toInt)
@@ -83,7 +83,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
-      Results(
+      ResultsWrapper(
         currPage = p,
         maxPage = maxPage, // TODO
         totalHits = docList.getNumFound.toInt,

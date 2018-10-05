@@ -1,6 +1,6 @@
 package io.disposia.engine.domain
 
-case class Results(
+case class ResultsWrapper(
   currPage: Int              = 0,
   maxPage: Int               = 0,
   totalHits: Int             = 0,

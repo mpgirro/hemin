@@ -6,7 +6,7 @@ import io.disposia.engine.olddomain._
 import io.disposia.engine.exception.SearchException
 import io.disposia.engine.index.IndexStore._
 import io.disposia.engine.index.committer.SolrCommitter
-import io.disposia.engine.domain.{IndexDoc, Results}
+import io.disposia.engine.domain.{IndexDoc, ResultsWrapper}
 import io.disposia.engine.util.ExecutorServiceWrapper
 import io.disposia.engine.util.mapper.IndexMapper
 
@@ -36,7 +36,7 @@ object IndexStore {
   // IndexQueries
   case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
-  case class IndexSearchResults(results: Results) extends IndexQueryResult
+  case class IndexSearchResults(results: ResultsWrapper) extends IndexQueryResult
 }
 
 class IndexStore (config: IndexConfig)
@@ -68,7 +68,7 @@ class IndexStore (config: IndexConfig)
         log.error("Error trying to search the index; reason: {}", e.getMessage)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
-        sender ! IndexSearchResults(Results()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+        sender ! IndexSearchResults(ResultsWrapper()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
       //currQuery = ""
     }
     super.postRestart(cause)
@@ -116,7 +116,7 @@ class IndexStore (config: IndexConfig)
       val origSender = sender()
 
       Future {
-        var results: Results = null
+        var results: ResultsWrapper = null
         blocking {
           val rs = luceneSearcher.search(query, page, size)
           //results = luceneSearcher.search(query, page, size)
@@ -128,7 +128,7 @@ class IndexStore (config: IndexConfig)
         } else {
           log.warning("No Podcast matching query: '{}' found in the index", query)
           //sender ! NoIndexResultsFound(query)
-          origSender ! IndexSearchResults(Results())
+          origSender ! IndexSearchResults(ResultsWrapper())
         }
 
         //currQuery = "" // wipe the copy
