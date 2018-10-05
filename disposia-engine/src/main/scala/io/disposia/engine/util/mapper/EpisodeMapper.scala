@@ -2,7 +2,6 @@ package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.episode.EpisodeItunesInfo
 import io.disposia.engine.domain.{Episode, IndexDoc, IndexField}
-import io.disposia.engine.mapper.{OldDateMapper, SolrFieldMapper}
 import org.apache.solr.common.SolrDocument
 
 object EpisodeMapper {
@@ -72,8 +71,7 @@ object EpisodeMapper {
           title        = Option(s.get(IndexField.TITLE)),
           podcastTitle = Option(s.get(IndexField.PODCAST_TITLE)),
           link         = Option(s.get(IndexField.LINK)),
-          pubDate      = Option(OldDateMapper.INSTANCE
-            .asLocalDateTime(s.get(IndexField.PUB_DATE))),
+          pubDate      = DateMapper.asLocalDateTime(s.get(IndexField.PUB_DATE)),
           description  = Option(s.get(IndexField.DESCRIPTION)),
           image        = Option(s.get(IndexField.ITUNES_IMAGE)),
           itunes = EpisodeItunesInfo(
@@ -88,18 +86,17 @@ object EpisodeMapper {
     Option(src)
       .map { s =>
         Episode(
-          id           = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
-          title        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
-          podcastTitle = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PODCAST_TITLE)),
-          link         = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
-          pubDate      = Option(OldDateMapper.INSTANCE
-            .asLocalDateTime(SolrFieldMapper.INSTANCE.firstDateOrNull(s, IndexField.PUB_DATE))),
-          description  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
-          image        = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),
+          id           = SolrMapper.firstStringMatch(s, IndexField.ID),
+          title        = SolrMapper.firstStringMatch(s, IndexField.TITLE),
+          podcastTitle = SolrMapper.firstStringMatch(s, IndexField.PODCAST_TITLE),
+          link         = SolrMapper.firstStringMatch(s, IndexField.LINK),
+          pubDate      = SolrMapper.firstDateMatch(s, IndexField.PUB_DATE).flatMap(x => DateMapper.asLocalDateTime(x)),
+          description  = SolrMapper.firstStringMatch(s, IndexField.DESCRIPTION),
+          image        = SolrMapper.firstStringMatch(s, IndexField.ITUNES_IMAGE),
           itunes = EpisodeItunesInfo(
-            author   = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_AUTHOR)),
-            summary  = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_SUMMARY)),
-            duration = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_DURATION)),
+            author   = SolrMapper.firstStringMatch(s, IndexField.ITUNES_AUTHOR),
+            summary  = SolrMapper.firstStringMatch(s, IndexField.ITUNES_SUMMARY),
+            duration = SolrMapper.firstStringMatch(s, IndexField.ITUNES_DURATION),
           )
         )
       }.orNull

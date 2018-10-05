@@ -2,7 +2,6 @@ package io.disposia.engine.util.mapper
 
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.domain.{IndexDoc, IndexField, Podcast}
-import io.disposia.engine.mapper.{OldDateMapper, SolrFieldMapper}
 import org.apache.solr.common.SolrDocument
 
 object PodcastMapper {
@@ -73,13 +72,12 @@ object PodcastMapper {
     Option(src)
       .map { s =>
         Podcast(
-          id = Option(s.get(IndexField.ID)),
-          title = Option(s.get(IndexField.TITLE)),
-          link = Option(s.get(IndexField.LINK)),
-          pubDate = Option(OldDateMapper.INSTANCE
-            .asLocalDateTime(s.get(IndexField.PUB_DATE))),
+          id          = Option(s.get(IndexField.ID)),
+          title       = Option(s.get(IndexField.TITLE)),
+          link        = Option(s.get(IndexField.LINK)),
+          pubDate     = DateMapper.asLocalDateTime(s.get(IndexField.PUB_DATE)),
           description = Option(s.get(IndexField.DESCRIPTION)),
-          image = Option(s.get(IndexField.ITUNES_IMAGE)),
+          image       = Option(s.get(IndexField.ITUNES_IMAGE)),
         )
       }.orNull
 
@@ -87,13 +85,12 @@ object PodcastMapper {
     Option(src)
       .map { s =>
         Podcast(
-          id = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ID)),
-          title = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.TITLE)),
-          link = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.LINK)),
-          pubDate = Option(OldDateMapper.INSTANCE
-            .asLocalDateTime(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.PUB_DATE))),
-          description = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.DESCRIPTION)),
-          image = Option(SolrFieldMapper.INSTANCE.stringOrNull(s, IndexField.ITUNES_IMAGE)),
+          id          = SolrMapper.firstStringMatch(s, IndexField.ID),
+          title       = SolrMapper.firstStringMatch(s, IndexField.TITLE),
+          link        = SolrMapper.firstStringMatch(s, IndexField.LINK),
+          pubDate     = SolrMapper.firstDateMatch(s, IndexField.PUB_DATE).flatMap(x => DateMapper.asLocalDateTime(x)),
+          description = SolrMapper.firstStringMatch(s, IndexField.DESCRIPTION),
+          image       = SolrMapper.firstStringMatch(s, IndexField.ITUNES_IMAGE),
         )
       }.orNull
 

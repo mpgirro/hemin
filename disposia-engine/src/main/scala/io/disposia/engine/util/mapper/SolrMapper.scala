@@ -4,7 +4,6 @@ import java.util
 import java.util.Date
 
 import io.disposia.engine.domain.{IndexDoc, IndexField}
-import io.disposia.engine.mapper.OldDateMapper
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 import scala.collection.JavaConverters._
@@ -60,7 +59,7 @@ object SolrMapper {
         s.link.foreach           { x => d.addField(IndexField.LINK, x) }
         s.description.foreach    { x => d.addField(IndexField.DESCRIPTION, x) }
         s.podcastTitle.foreach   { x => d.addField(IndexField.PODCAST_TITLE, x) }
-        s.pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, OldDateMapper.INSTANCE.asString(x)) }
+        s.pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, DateMapper.asString(x).get) }
         s.image.foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x) }
         s.itunesAuthor.foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x) }
         s.itunesSummary.foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x) }

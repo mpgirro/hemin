@@ -1,4 +1,4 @@
-package io.disposia.engine.parser
+package io.disposia.engine.parser.feed
 
 import java.io.StringReader
 
@@ -19,7 +19,7 @@ import scala.compat.java8.OptionConverters._
 
 
 // TODO rewrite this class in idiomatic Scala
-class NewRomeFeedParser (private val xmlData: String) {
+class RomeFeedParser(private val xmlData: String) {
 
   private val log: Logger = Logger(getClass)
 

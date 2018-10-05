@@ -10,6 +10,7 @@ import io.disposia.engine.domain.{Episode, FeedStatus, Podcast}
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
 import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.parser.feed.RomeFeedParser
 import io.disposia.engine.util.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
@@ -159,7 +160,7 @@ class ParserWorker (config: ParserConfig)
 
   private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
-    val parser = new NewRomeFeedParser(feedData)
+    val parser = new RomeFeedParser(feedData)
     val p = parser.podcast.update(
       Podcast(
         id          = Some(podcastId),
