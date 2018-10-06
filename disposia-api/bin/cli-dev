@@ -41,6 +41,10 @@ function feed() {
     curl "http://localhost:9000/api/v1/feed/${1}"
 }
 
+function all_podcasts() {
+    curl "http://localhost:9000/api/v1/podcast?p=${1}&s=${2}"
+}
+
 COMMAND=$@
 
 case $1 in
@@ -70,6 +74,9 @@ case $1 in
         ;;
     "feed")
         feed $2
+        ;;
+    "all-podcasts")
+        all_podcasts $2 $3
         ;;
     *)
         # unknown option
