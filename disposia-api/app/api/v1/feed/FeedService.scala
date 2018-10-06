@@ -17,10 +17,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class FeedService @Inject()(engineService: EngineService)
                            (implicit ec: ExecutionContext) {
 
-    private val engine = engineService.engine
+  private val engine = engineService.engine
 
-    def find(id: String)(implicit mc: MarkerContext): Future[Option[Feed]] = engine.findFeed(id)
+  def find(id: String)(implicit mc: MarkerContext): Future[Option[Feed]] = engine.findFeed(id)
 
-    def propose(url: String)(implicit mc: MarkerContext): Unit = engine.propose(url)
+  def propose(url: String)(implicit mc: MarkerContext): Unit = engine.propose(url)
 
 }

@@ -10,15 +10,15 @@ import scala.concurrent.Future
 @Singleton
 class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
 
-    private val log = Logger(getClass).logger
+  private val log = Logger(getClass).logger
 
-    log.info("Starting engine")
-    val engine: Engine = new Engine()
-    engine.start()
+  log.info("Starting engine")
+  val engine: Engine = new Engine()
+  engine.start()
 
-    lifecycle.addStopHook { () =>
-        log.info("Shutting down engine")
-        Future.successful(engine.shutdown())
-    }
+  lifecycle.addStopHook { () =>
+    log.info("Shutting down engine")
+    Future.successful(engine.shutdown())
+  }
 
 }

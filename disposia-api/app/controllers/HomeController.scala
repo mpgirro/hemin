@@ -10,12 +10,12 @@ import services.EngineService
   */
 class HomeController @Inject()(cc: ControllerComponents,
                                engineService: EngineService)
-    extends AbstractController(cc) {
+  extends AbstractController(cc) {
 
-    private val log = Logger(getClass).logger
+  private val log = Logger(getClass).logger
 
-    def index = Action { implicit request =>
-        Ok(views.html.index())
-    }
+  def index = Action { implicit request =>
+    Ok(views.html.index())
+  }
 
 }

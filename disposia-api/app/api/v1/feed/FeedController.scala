@@ -12,9 +12,6 @@ import util.{ArrayWrapper, JsonWrites}
 import scala.concurrent.ExecutionContext
 
 
-/**
-  * @author max
-  */
 class FeedController @Inject()(cc: FeedControllerComponents,
                                feedActionBuilder: FeedActionBuilder,
                                feedService: FeedService,
@@ -24,32 +21,32 @@ class FeedController @Inject()(cc: FeedControllerComponents,
                                langs: Langs,
                                fileMimeTypes: FileMimeTypes)
                               (implicit ec: ExecutionContext)
-    extends FeedBaseController(cc) {
+  extends FeedBaseController(cc) {
 
-    private val log = Logger(getClass).logger
+  private val log = Logger(getClass).logger
 
-    private implicit val feedWriter: Writes[Feed] = JsonWrites.implicitFeedWrites
-    private implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
+  private implicit val feedWriter: Writes[Feed] = JsonWrites.implicitFeedWrites
+  private implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
 
-    def find(id: String): Action[AnyContent] =
-        FeedAction.async { implicit request =>
-            log.trace(s"GET feed: id = $id")
-            feedService
-              .find(id)
-              .map { f =>
-                Ok(Json.toJson(f))
-              }
+  def find(id: String): Action[AnyContent] =
+    FeedAction.async { implicit request =>
+      log.trace(s"GET feed: id = $id")
+      feedService
+        .find(id)
+        .map { f =>
+          Ok(Json.toJson(f))
         }
-
-    def propose = Action { implicit request =>
-        request.body.asText.map(url => {
-            log.trace(s"propose feed: $url")
-            feedService.propose(url)
-            Ok
-        }).getOrElse({
-            log.warn(s"propose feed: No URL in body [BadRequest]")
-            BadRequest
-        })
     }
+
+  def propose = Action { implicit request =>
+    request.body.asText.map(url => {
+      log.trace(s"propose feed: $url")
+      feedService.propose(url)
+      Ok
+    }).getOrElse({
+      log.warn(s"propose feed: No URL in body [BadRequest]")
+      BadRequest
+    })
+  }
 
 }

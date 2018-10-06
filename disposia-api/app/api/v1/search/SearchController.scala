@@ -20,19 +20,19 @@ class SearchController @Inject() (cc: SearchControllerComponents,
                                   langs: Langs,
                                   fileMimeTypes: FileMimeTypes)
                                  (implicit ec: ExecutionContext)
-    extends SearchBaseController(cc) {
+  extends SearchBaseController(cc) {
 
-    private val log = Logger(getClass).logger
+  private val log = Logger(getClass).logger
 
-    private implicit val searchWriter: Writes[ResultsWrapper] = JsonWrites.implicitWrapperWrites
+  private implicit val searchWriter: Writes[ResultsWrapper] = JsonWrites.implicitWrapperWrites
 
-    def search(q: String, p: Option[Int], s: Option[Int]): Action[AnyContent] =
-      SearchAction.async { implicit request =>
-        log.trace(s"search: q = $q & p = $p & s = $s")
-        searchService
-          .search(q,p,s)
-          .map { rs =>
-            Ok(Json.toJson(rs))
-          }
+  def search(q: String, p: Option[Int], s: Option[Int]): Action[AnyContent] =
+    SearchAction.async { implicit request =>
+      log.trace(s"search: q = $q & p = $p & s = $s")
+      searchService
+        .search(q,p,s)
+        .map { rs =>
+          Ok(Json.toJson(rs))
+        }
     }
 }

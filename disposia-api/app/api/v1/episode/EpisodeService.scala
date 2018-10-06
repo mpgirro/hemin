@@ -17,10 +17,10 @@ import scala.concurrent.{ExecutionContext, Future}
 class EpisodeService @Inject()(engineService: EngineService)
                               (implicit ec: ExecutionContext) {
 
-    private val engine = engineService.engine
+  private val engine = engineService.engine
 
-    def find(id: String)(implicit mc: MarkerContext): Future[Option[Episode]] = engine.findEpisode(id)
+  def find(id: String)(implicit mc: MarkerContext): Future[Option[Episode]] = engine.findEpisode(id)
 
-    def chapters(id: String)(implicit mc: MarkerContext): Future[List[Chapter]] = engine.findChaptersByEpisode(id)
+  def chapters(id: String)(implicit mc: MarkerContext): Future[List[Chapter]] = engine.findChaptersByEpisode(id)
 
 }

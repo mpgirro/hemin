@@ -44,7 +44,6 @@ trait MongoRepository[T] {
     case None     => Future { None }
   }
 
-
   /**
     * Drops the collection of this repository
     *
@@ -92,7 +91,7 @@ trait MongoRepository[T] {
           List()
       }
 
-  // TODO untested!
+  // TODO does not seem to work!
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
     collection
       .find(query)
