@@ -69,12 +69,6 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     if (docList.getNumFound <= 0) {
       ResultsWrapper() // default parameters relate to nothing found
     } else {
-
-      val resultDocs: Array[IndexDoc] = new Array[IndexDoc](docList.getNumFound.toInt)
-      for ((d,i) <- docList.asScala.zipWithIndex) {
-        resultDocs(i) = IndexMapper.toIndexDoc(d)
-      }
-
       val dMaxPage = docList.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
@@ -83,7 +77,7 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
         currPage  = p,
         maxPage   = maxPage, // TODO
         totalHits = docList.getNumFound.toInt,
-        results   = resultDocs.toList,
+        results   = docList.asScala.map(IndexMapper.toIndexDoc).toList,
       )
     }
 
