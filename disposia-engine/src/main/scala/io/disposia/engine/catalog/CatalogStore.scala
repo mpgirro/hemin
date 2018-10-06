@@ -131,15 +131,6 @@ class CatalogStore(config: CatalogConfig)
       }
    */
 
-  /*
-  private val podcastMapper = OldPodcastMapper.INSTANCE
-  private val episodeMapper = OldEpisodeMapper.INSTANCE
-  private val feedMapper = OldFeedMapper.INSTANCE
-  private val chapterMapper = OldChapterMapper.INSTANCE
-  private val indexMapper = OldIndexMapper.INSTANCE
-  private val idMapper = OldIdMapper.INSTANCE
-  */
-
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
 
@@ -269,16 +260,7 @@ class CatalogStore(config: CatalogConfig)
                 timestamp = Some(now)
               )
             )
-            /*
-            var podcast = ImmutableOldPodcast.builder()
-              .setId(podcastId)
-              //.setExo(podcastId)
-              .setTitle(podcastId)
-              .setDescription(url)
-              .setRegistrationComplete(false)
-              .setRegistrationTimestamp(LocalDateTime.now())
-              .create()
-              */
+
             val feedId = idGenerator.newId
             val feed = Feed(
               id                    = Some(feedId),
@@ -288,18 +270,6 @@ class CatalogStore(config: CatalogConfig)
               lastStatus            = Some(FeedStatus.NEVER_CHECKED),
               registrationTimestamp = Some(now),
             )
-            /*
-            val feed = ImmutableOldFeed.builder()
-              .setId(feedId)
-              .setPodcastId(podcastId)
-              //.setExo(feedId)
-              //.setPodcastExo(podcastId)
-              .setUrl(url)
-              .setLastChecked(LocalDateTime.now())
-              .setLastStatus(FeedStatus.NEVER_CHECKED)
-              .setRegistrationTimestamp(LocalDateTime.now())
-              .create()
-              */
 
             // Note: we chain the create calls to ensure that the
             // message to the Updater is only dispatched once we can
@@ -334,15 +304,8 @@ class CatalogStore(config: CatalogConfig)
     feeds
       .findOneByUrlAndPodcastId(url, podcastId)
       .foreach {
-        case Some(f) =>
-          feeds.save(f.copy(lastChecked = Option(timestamp), lastStatus = Option(status)))
-          /*
-          feeds.save(feedMapper
-            .toImmutable(f)
-            .withLastChecked(timestamp)
-            .withLastStatus(status))
-            */
-        case None => log.warning("No Feed found for Podcast (ID:{}) and URL : {}", podcastId, url)
+        case Some(f) => feeds.save(f.copy(lastChecked = Option(timestamp), lastStatus = Option(status)))
+        case None    => log.warning("No Feed found for Podcast (ID:{}) and URL : {}", podcastId, url)
       }
   }
 
@@ -362,12 +325,9 @@ class CatalogStore(config: CatalogConfig)
         case Some(p) => podcast.patch(p)  //podcastMapper.update(podcast, p)
         case None =>
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
-          //podcastMapper.toModifiable(podcast)
           podcast
       }
       .foreach(p => {
-        //p.setRegistrationComplete(true)
-        //podcastService.save(p)
         podcasts.save(p.copy(registration = PodcastRegistrationInfo(complete = Some(true))))
 
         // TODO we will fetch feeds for checking new episodes, but not because we updated podcast metadata
@@ -384,8 +344,7 @@ class CatalogStore(config: CatalogConfig)
         case Some(e) => episode.patch(e) // episodeMapper.update(episode, e)
         case None =>
           log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
-          //episodeMapper.toModifiable(episode)
-        episode
+          episode
       }
       .foreach(e => {
         episodes.save(e)
@@ -401,14 +360,7 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.nonEmpty) {
-            fs.foreach(f => {
-              feeds.save(f.copy(url = Option(newUrl)))
-              /*
-              feeds.save(feedMapper
-                .toImmutable(f)
-                .withUrl(newUrl))
-                */
-            })
+            fs.foreach(f => feeds.save(f.copy(url = Option(newUrl))))
           } else {
             log.error("No Feed found in database with url='{}'", oldUrl)
           }
@@ -422,16 +374,12 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(id)
       .foreach {
-        case Some(p) =>
-          podcasts.save(p.copy(link = Option(newUrl)))
-          //podcasts.save(podcastMapper.toImmutable(p).withLink(newUrl))
+        case Some(p) => podcasts.save(p.copy(link = Option(newUrl)))
         case None =>
           episodes
             .findOne(id)
             .foreach {
-              case Some(e) =>
-                episodes.save(e.copy(link = Option(newUrl)))
-                //episodes.save(episodeMapper.toImmutable(e).withLink(newUrl))
+              case Some(e) => episodes.save(e.copy(link = Option(newUrl)))
               case None    => log.error("Cannot update Link URL - no Podcast or Episode found by ID : {}", id)
             }
       }
@@ -564,12 +512,6 @@ class CatalogStore(config: CatalogConfig)
       .findOne(episodeId)
       .map {
         case Some(e) => e.chapters
-          /*
-          Option(e.getChapters) match {
-            case Some(cs) => cs.asScala.toList
-            case None     => List()
-          }
-          */
         case None =>
           log.warning("Database does not contain Episode (ID) : {}", episodeId)
           List()
@@ -677,22 +619,6 @@ class CatalogStore(config: CatalogConfig)
                 )
 
                 val e = episode.patch(patch)
-
-                /*
-                val e = episodeMapper.toModifiable(episode)
-
-                e.setId(episodeId)
-                e.setPodcastId(podcastId)
-                //e.setExo(episodeId)
-                //e.setPodcastExo(podcastId)
-                e.setPodcastTitle(p.getTitle) // we'll not re-use this DTO, but extract the info again a bit further down
-                e.setRegistrationTimestamp(LocalDateTime.now())
-
-                // check if the episode has a cover image defined, and set the one of the episode
-                Option(e.getImage).getOrElse({
-                  e.setImage(p.getImage)
-                })
-                */
 
                 // save asynchronously
                 episodes

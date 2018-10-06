@@ -42,8 +42,6 @@ class IndexStore (config: IndexConfig)
 
   private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.index.dispatcher")
 
-  //private val luceneCommitter: IndexCommitter = new LuceneCommitter(config.luceneIndexPath, config.createIndex) // TODO do not alway re-create the index
-  //private val luceneSearcher: IndexSearcher = new LuceneSearcher(luceneCommitter.asInstanceOf[LuceneCommitter].getIndexWriter)
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var indexChanged = false
@@ -53,9 +51,6 @@ class IndexStore (config: IndexConfig)
   private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
 
   private var supervisor: ActorRef = _
-
-  // kickoff the committing play
-  //context.system.scheduler.schedule(config.commitInterval, config.commitInterval, self, CommitIndex)
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
@@ -84,11 +79,6 @@ class IndexStore (config: IndexConfig)
       supervisor = ref
       supervisor ! ReportIndexStoreStartupComplete
 
-      /*
-    case CommitIndex =>
-      commitIndexIfChanged()
-      */
-
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.id)
       cache.enqueue(doc)
@@ -107,125 +97,8 @@ class IndexStore (config: IndexConfig)
       log.debug("Received IndexStoreUpdateDocLink({},'{}')", id, link)
       updateLinkQueue.enqueue((id, link))
 
-      /*
-    case IndexSearch(query, page, size) =>
-      log.debug("Received SearchIndex('{}',{},{}) message", query, page, size)
-
-      //var currQuery = query // make a copy in case of an exception
-      val origSender = sender()
-
-      Future {
-        var results: ResultsWrapper = null
-        blocking {
-          val rs = luceneSearcher.search(query, page, size)
-          //results = luceneSearcher.search(query, page, size)
-          results = IndexMapper.toResults(rs)
-        }
-
-        if (results.totalHits > 0){
-          origSender ! IndexSearchResults(results)
-        } else {
-          log.warning("No Podcast matching query: '{}' found in the index", query)
-          //sender ! NoIndexResultsFound(query)
-          origSender ! IndexSearchResults(ResultsWrapper())
-        }
-
-        //currQuery = "" // wipe the copy
-      }
-      */
-
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
-
-  /*
-  private def commitIndexIfChanged(): Unit = {
-    var committed = false
-    //if (indexChanged) {
-    if (cache.nonEmpty) {
-      log.debug("Committing Index due to pending changes")
-
-      for (doc <- cache) {
-        luceneCommitter.add(IndexMapper.toIndexDoc(doc))
-      }
-      luceneCommitter.commit()
-      //indexChanged = false
-      cache.clear()
-
-      committed = true
-      log.debug("Finished Index due to pending changes")
-    }
-
-    if (updateWebsiteQueue.nonEmpty) {
-      log.debug("Processing pending entries in website queue")
-      luceneSearcher.refresh()
-      processWebsiteQueue(updateWebsiteQueue)
-      luceneCommitter.commit()
-      committed = true
-      log.debug("Finished pending entries in website queue")
-    }
-
-    if (updateImageQueue.nonEmpty) {
-      log.debug("Processing pending entries in image queue")
-      luceneSearcher.refresh()
-      processImageQueue(updateImageQueue)
-      luceneCommitter.commit()
-      committed = true
-      log.debug("Finished pending entries in image queue")
-    }
-
-    if (updateLinkQueue.nonEmpty) {
-      log.debug("Processing pending entries in link queue")
-      luceneSearcher.refresh()
-      processLinkQueue(updateLinkQueue)
-      luceneCommitter.commit()
-      committed = true
-      log.debug("Finished pending entries in link queue")
-    }
-
-    if (committed) {
-      luceneSearcher.refresh()
-    }
-  }
-
-  private def processWebsiteQueue(queue: mutable.Queue[(String,String)]): Unit = {
-    if (queue.nonEmpty) {
-      val (id,html) = queue.dequeue()
-      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableOldIndexDoc])
-      entry match {
-        case Some(doc) => luceneCommitter.update(doc.withWebsiteData(html))
-        case None      => log.error("Could not retrieve from index for update website (ID) : {}", id)
-      }
-
-      processWebsiteQueue(queue)
-    }
-  }
-
-  private def processImageQueue(queue: mutable.Queue[(String,String)]): Unit = {
-    if (queue.nonEmpty) {
-      val (id,image) = queue.dequeue()
-      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableOldIndexDoc])
-      entry match {
-        case Some(doc) => luceneCommitter.update(doc.withImage(image))
-        case None      => log.error("Could not retrieve from index for update image (ID) : {}", id)
-      }
-
-      processImageQueue(queue)
-    }
-  }
-
-  private def processLinkQueue(queue: mutable.Queue[(String,String)]): Unit = {
-    if (queue.nonEmpty) {
-      val (id,link) = queue.dequeue()
-      val entry = luceneSearcher.findById(id).asScala.map(_.asInstanceOf[ImmutableOldIndexDoc])
-      entry match {
-        case Some(doc) => luceneCommitter.update(doc.withLink(link))
-        case None      => log.error("Could not retrieve from index for update link (ID) : {}", id)
-      }
-
-      processLinkQueue(queue)
-    }
-  }
-  */
 
 }

@@ -22,8 +22,6 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     .allowCompression(false) // TODO
     .build()
 
-  //private val indexMapper = OldIndexMapper.INSTANCE
-
   private val searchFields = List(
     IndexField.TITLE,
     IndexField.DESCRIPTION,
@@ -81,36 +79,12 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
       ResultsWrapper(
-        currPage = p,
-        maxPage = maxPage, // TODO
+        currPage  = p,
+        maxPage   = maxPage, // TODO
         totalHits = docList.getNumFound.toInt,
-        results = resultDocs.toList,
+        results   = resultDocs.toList,
       )
     }
-
-    /*
-    val resultWrapper = ImmutableOldResultWrapper.builder
-
-    // set some sane values, we'll overwrite these if all goes well
-    resultWrapper.setCurrPage(0)
-    resultWrapper.setMaxPage(0)
-    resultWrapper.setTotalHits(0)
-
-    if (docList.getNumFound <= 0) {
-      resultWrapper.setResults(List().asJava)
-    } else {
-      val resultDocs: Array[OldIndexDoc] = new Array[OldIndexDoc](docList.getNumFound.toInt)
-      for ((d,i) <- docList.asScala.zipWithIndex) {
-        resultDocs(i) = indexMapper.toImmutable(d)
-      }
-
-      resultWrapper.setCurrPage(p)
-      resultWrapper.setTotalHits(docList.getNumFound.toInt)
-      resultWrapper.setResults(resultDocs.toList.asJava)
-    }
-
-    resultWrapper.create
-    */
 
     /*
     val qOp = queryOperator.getOrElse("AND")

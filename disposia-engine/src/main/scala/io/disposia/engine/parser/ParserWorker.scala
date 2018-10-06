@@ -26,12 +26,6 @@ class ParserWorker (config: ParserConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  /*
-  private val podcastMapper = OldPodcastMapper.INSTANCE
-  private val episodeMapper = OldEpisodeMapper.INSTANCE
-  private val indexMapper = OldIndexMapper.INSTANCE
-  */
-
   private var catalog: ActorRef = _
   private var index: ActorRef = _
   private var crawler: ActorRef = _
@@ -198,66 +192,9 @@ class ParserWorker (config: ParserConfig)
       registerEpisode(podcastId, e)
     }
 
-    /*
-    val parser = RomeFeedParser.of(feedData)
-    Option(parser.getPodcast) match {
-      case Some(podcast) =>
-        val p = podcastMapper.toModifiable(podcast)
-        // TODO try-catch for Feedparseerror here, send update
-        // directoryStore ! FeedStatusUpdate(feedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
-
-        //p.setExo(podcastId)
-        p.setId(podcastId)
-
-        Option(p.getTitle).foreach(t => p.setTitle(t.trim))
-        Option(p.getDescription).foreach(d => p.setDescription(Jsoup.clean(d, Whitelist.basic())))
-
-        if (isNewPodcast) {
-
-          // experimental: this works but has terrible performance and assumes we have a GUI app
-          // Option(p.getItunesImage).foreach(img => {
-          //     p.setItunesImage(base64Image(img))
-          // })
-
-          val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
-          //emitIndexEvent(indexEvent)
-          index ! indexEvent
-
-          // request that the podcasts website will get added to the index as well, if possible
-          Option(p.getLink) match {
-            case Some(link) =>
-              crawler ! DownloadWithHeadCheck(p.getId, link, WebsiteFetchJob())
-            case None => log.debug("No link set for podcast {} --> no website data will be added to the index", p.getId)
-          }
-        }
-
-        // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
-        val catalogEvent = UpdatePodcast(podcastId, feedUrl, PodcastMapper.toPodcast(p))
-        //emitCatalogEvent(catalogEvent)
-        catalog ! catalogEvent
-
-        // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
-        Option(parser.getEpisodes) match {
-          case Some(es) =>
-            for(e <- es.asScala){
-              registerEpisode(podcastId, e)
-            }
-          case None => log.warning("Parsing generated a NULL-List[OldEpisode] for feed: {}", feedUrl)
-        }
-      case None => log.warning("Parsing generated a NULL-PodcastDocument for feed: {}", feedUrl)
-    }
-    */
   }
 
   private def registerEpisode(podcastId: String, episode: Episode): Unit = {
-
-    /*
-    val e = episodeMapper.toModifiable(episode)
-
-    Option(e.getTitle).foreach(t => e.setTitle(t.trim))
-    Option(e.getDescription).foreach(d => e.setDescription(Jsoup.clean(d, Whitelist.basic())))
-    Option(e.getContentEncoded).foreach(c => e.setContentEncoded(Jsoup.clean(c, Whitelist.basic())))
-    */
 
     // cleanup some potentially markuped texts
     val e = episode.patch(
@@ -267,13 +204,6 @@ class ParserWorker (config: ParserConfig)
         contentEncoded = episode.contentEncoded.map(Jsoup.clean(_, Whitelist.basic()))
       )
     )
-
-    /* TODO
-    // experimental: this works but has terrible performance and assumes we have a GUI app
-    Option(e.getItunesImage).foreach(img => {
-        e.setItunesImage(base64Image(img))
-    })
-    */
 
     val catalogCommand = RegisterEpisodeIfNew(podcastId, e)
     //sendCatalogCommand(catalogCommand)
