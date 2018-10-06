@@ -4,6 +4,15 @@ function propose() {
     curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/feed/propose
 }
 
+function propose_file() {
+    while 
+        read feed 
+    do 
+        echo "proposing $feed"
+        propose "$feed"
+    done < "feeds-${1}.txt" 
+}
+
 function search() {
     curl "http://localhost:9000/api/v1/search?q=${1}&p=1&s=20"
 }
@@ -37,6 +46,9 @@ COMMAND=$@
 case $1 in
     "propose")
         propose $2
+        ;;
+    "propose-file")
+        propose_file $2
         ;;
     "search")
         search $2
