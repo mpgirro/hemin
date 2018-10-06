@@ -46,12 +46,6 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
     findAll(query)
   }
 
-  def findAll(page: Int, size: Int): Future[List[Episode]] = {
-    log.debug("Request to get all Episodes by page : {} and size : {}", page, size)
-    val query = BSONDocument()
-    findAll(query, page, size)
-  }
-
   def findAllByPodcastAndGuid(podcastId: String, guid: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Podcast (ID) : {} and GUID : {}", podcastId, guid)
     val query = toDocument(Map(

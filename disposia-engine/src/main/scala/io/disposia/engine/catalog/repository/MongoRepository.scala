@@ -80,6 +80,23 @@ trait MongoRepository[T] {
           None
       }
 
+  /**
+    *
+    * @param page The page of the result frames to retrieve
+    * @param size The size of the frame to retrieve
+    * @return The results within the window (page*size, size)
+    */
+  def findAll(page: Int, size: Int): Future[List[T]] = {
+    log.debug("Request to get all by page : {} and size : {}", page, size)
+    if (page < 1 || size < 1) {
+      log.warn("Window parameters are too small (page = {}, size = {})", page, size)
+      Future { List() }
+    } else {
+      val query = BSONDocument()
+      findAll(query, page, size)
+    }
+  }
+
   protected[this] def findAll(query: BSONDocument): Future[List[T]] =
     collection
       .find(query)

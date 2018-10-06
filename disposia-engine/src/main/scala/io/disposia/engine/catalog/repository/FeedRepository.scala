@@ -54,12 +54,6 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
     findAll(query)
   }
 
-  def findAll(page: Int, size: Int): Future[List[Feed]] = {
-    log.debug("Request to get all Feeds by page : {} and size : {}", page, size)
-    val query = BSONDocument()
-    findAll(query, page, size)
-  }
-
   def findAllByUrl(url: String): Future[List[Feed]] = {
     log.debug("Request to get all Feeds by URL : {}", url)
     val query = toDocument(Map("url" -> toBsonS(url)))

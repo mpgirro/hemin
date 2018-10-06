@@ -40,12 +40,6 @@ class PodcastRepository(db: DefaultDB, ec: ExecutionContext)
     findOne(query)
   }
 
-  def findAll(page: Int, size: Int): Future[List[Podcast]] = {
-    log.debug("Request to get all Podcasts by page : {} and size : {}", page, size)
-    val query = BSONDocument()
-    findAll(query, page, size)
-  }
-
   def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
     val query = toDocument(Map("registrationComplete" -> toBsonB(true)))
