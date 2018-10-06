@@ -2,9 +2,6 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.catalog.repository.BsonConversion
-import reactivemongo.bson.{BSONDocumentReader, BSONDocumentWriter, Macros}
-
 case class Image (
   id: Option[String]               = None,
   associateId: Option[String]      = None,

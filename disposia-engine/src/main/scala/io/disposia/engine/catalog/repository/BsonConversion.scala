@@ -3,9 +3,7 @@ package io.disposia.engine.catalog.repository
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.{FeedStatus, _}
-import io.disposia.engine.domain.episode.{EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.domain.info._
-import io.disposia.engine.domain.podcast._
 import io.disposia.engine.util.mapper.DateMapper
 import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
 

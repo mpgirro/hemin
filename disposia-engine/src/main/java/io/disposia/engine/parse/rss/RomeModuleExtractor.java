@@ -7,7 +7,6 @@ import com.rometools.modules.itunes.EntryInformation;
 import com.rometools.modules.itunes.FeedInformation;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
-import com.rometools.rome.feed.synd.SyndEnclosure;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import io.disposia.engine.parse.rss.rome.PodloveSimpleChapterModule;

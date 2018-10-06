@@ -607,17 +607,15 @@ class CatalogStore(config: CatalogConfig)
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
 
-                val patch = Episode(
+                val e = episode.copy(
                   id           = Some(episodeId),
-                  podcastId    = Option(podcastId),
+                  podcastId    = Some(podcastId),
                   podcastTitle = p.title,
                   image        = reduce(episode.image, p.image),
                   registration = EpisodeRegistrationInfo(
                     timestamp = Some(LocalDateTime.now())
                   )
                 )
-
-                val e = episode.patch(patch)
 
                 // save asynchronously
                 episodes
@@ -638,12 +636,6 @@ class CatalogStore(config: CatalogConfig)
                       //self ! catalogEvent
 
                       // request that the website will get added to the episodes index entry as well
-                      /*
-                      Option(e.getLink) match {
-                        case Some(url) => updater ! ProcessFeed(e.getId, url, WebsiteFetchJob())
-                        case None      => log.debug("No link set for episode {} --> no website data will be added to the index", episode.getId)
-                      }
-                      */
                       e.link match {
                         case Some(url) =>
                           e.id match {

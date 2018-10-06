@@ -1,4 +1,5 @@
 package io.disposia.engine.searcher.retriever
+
 import io.disposia.engine.domain.{IndexDoc, IndexField, ResultsWrapper}
 import io.disposia.engine.index.IndexConfig
 import io.disposia.engine.util.mapper.IndexMapper

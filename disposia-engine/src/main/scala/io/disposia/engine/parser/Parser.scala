@@ -6,7 +6,6 @@ import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.exception.FeedParsingException
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 object Parser {

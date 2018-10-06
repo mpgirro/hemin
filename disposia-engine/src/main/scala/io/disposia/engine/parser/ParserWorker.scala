@@ -6,12 +6,12 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
-import io.disposia.engine.domain.{Episode, FeedStatus, Podcast}
+import io.disposia.engine.domain.{Episode, FeedStatus}
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
 import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 import io.disposia.engine.parser.feed.RomeFeedParser
-import io.disposia.engine.util.mapper.{EpisodeMapper, IndexMapper, PodcastMapper}
+import io.disposia.engine.util.mapper.IndexMapper
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 

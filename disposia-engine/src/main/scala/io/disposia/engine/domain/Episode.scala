@@ -2,7 +2,6 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.domain.episode.{EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.domain.info.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 import io.disposia.engine.util.mapper.reduce
 

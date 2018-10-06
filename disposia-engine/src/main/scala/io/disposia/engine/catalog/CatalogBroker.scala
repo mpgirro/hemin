@@ -8,8 +8,6 @@ import com.typesafe.config.ConfigFactory
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
 
-import scala.collection.JavaConverters._
-
 object CatalogBroker {
   final val name = "catalog"
   def props(config: CatalogConfig): Props = Props(new CatalogBroker(config))
