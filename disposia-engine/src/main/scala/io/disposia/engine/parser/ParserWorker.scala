@@ -155,12 +155,10 @@ class ParserWorker (config: ParserConfig)
   private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
     val parser = new RomeFeedParser(feedData)
-    val p = parser.podcast.patch(
-      Podcast(
-        id          = Some(podcastId),
-        title       = parser.podcast.title.map(_.trim),
-        description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
-      )
+    val p = parser.podcast.copy(
+      id          = Some(podcastId),
+      title       = parser.podcast.title.map(_.trim),
+      description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
     )
 
     if (isNewPodcast) {
@@ -194,18 +192,16 @@ class ParserWorker (config: ParserConfig)
 
   }
 
-  private def registerEpisode(podcastId: String, episode: Episode): Unit = {
+  private def registerEpisode(podcastId: String, e: Episode): Unit = {
 
     // cleanup some potentially markuped texts
-    val e = episode.patch(
-      Episode(
-        title       = episode.title.map(_.trim),
-        description = episode.description.map(Jsoup.clean(_, Whitelist.basic())),
-        contentEncoded = episode.contentEncoded.map(Jsoup.clean(_, Whitelist.basic()))
-      )
+    val episode = e.copy(
+      title          = e.title.map(_.trim),
+      description    = e.description.map(Jsoup.clean(_, Whitelist.basic())),
+      contentEncoded = e.contentEncoded.map(Jsoup.clean(_, Whitelist.basic()))
     )
 
-    val catalogCommand = RegisterEpisodeIfNew(podcastId, e)
+    val catalogCommand = RegisterEpisodeIfNew(podcastId, episode)
     //sendCatalogCommand(catalogCommand)
     catalog ! catalogCommand
   }
