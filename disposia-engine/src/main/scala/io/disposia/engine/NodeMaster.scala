@@ -1,6 +1,7 @@
 package io.disposia.engine
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
+import akka.util.Timeout
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.NodeMaster.{GetCatalogBroker, GetIndexBroker, GetUpdater}
 import io.disposia.engine.catalog.CatalogStore
@@ -16,6 +17,7 @@ import io.disposia.engine.searcher.Searcher.SearcherMessage
 import io.disposia.engine.updater.Updater
 import io.disposia.engine.updater.Updater.UpdaterMessage
 
+import scala.concurrent.ExecutionContextExecutor
 import scala.language.postfixOps
 
 object NodeMaster {
@@ -34,11 +36,11 @@ class NodeMaster (config: EngineConfig)
 
   override val supervisorStrategy: SupervisorStrategy = SupervisorStrategy.stoppingStrategy
 
-  private implicit val executionContext = context.system.dispatcher
+  private implicit val executionContext: ExecutionContextExecutor = context.system.dispatcher
 
   //private val cluster = Cluster(context.system)
 
-  private implicit val INTERNAL_TIMEOUT = config.internalTimeout
+  private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
 
   private var index: ActorRef = _
   private var catalog: ActorRef = _

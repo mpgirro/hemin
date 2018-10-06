@@ -12,9 +12,6 @@ import util.{ArrayWrapper, JsonWrites}
 import scala.concurrent.ExecutionContext
 
 
-/**
-  * @author max
-  */
 class EpisodeController @Inject()(cc: EpisodeControllerComponents,
                                   episodeActionBuilder: EpisodeActionBuilder,
                                   episodeService: EpisodeService,

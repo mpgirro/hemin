@@ -44,11 +44,13 @@ class IndexStore (config: IndexConfig)
 
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
+  /*
   private var indexChanged = false
   private val cache: mutable.Queue[IndexDoc] = new mutable.Queue
   private val updateWebsiteQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateImageQueue: mutable.Queue[(String,String)] = new mutable.Queue
   private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
+  */
 
   private var supervisor: ActorRef = _
 
@@ -81,9 +83,10 @@ class IndexStore (config: IndexConfig)
 
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.id)
-      cache.enqueue(doc)
+      //cache.enqueue(doc)
       solrCommiter.save(doc)
 
+      /*
     case UpdateDocWebsiteDataIndexEvent(id, html) =>
       log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", id)
       updateWebsiteQueue.enqueue((id,html))
@@ -96,6 +99,7 @@ class IndexStore (config: IndexConfig)
     case UpdateDocLinkIndexEvent(id, link) =>
       log.debug("Received IndexStoreUpdateDocLink({},'{}')", id, link)
       updateLinkQueue.enqueue((id, link))
+      */
 
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
