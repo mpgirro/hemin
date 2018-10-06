@@ -2,6 +2,6 @@
 
 DIR="$(dirname "$(which "$0")")"
 
-source "$DIR"/dev.env
+source "$DIR"/prod.env
 
 "$DIR"/cli "$@"
