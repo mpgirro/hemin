@@ -1,4 +1,5 @@
-package io.disposia.engine.domain.episode
+package io.disposia.engine.domain.info
+
 
 case class EpisodeEnclosureInfo(
   url: Option[String]  = None,

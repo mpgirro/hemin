@@ -1,5 +1,6 @@
 package io.disposia.engine.util.mapper
 
+import io.disposia.engine.domain.info.PodcastItunesInfo
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.domain.{IndexDoc, IndexField, Podcast}
 import org.apache.solr.common.SolrDocument

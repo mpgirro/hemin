@@ -6,7 +6,8 @@ import com.google.common.base.Strings.isNullOrEmpty
 import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.domain.episode.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.disposia.engine.domain.episode.{EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.disposia.engine.domain.info._
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.domain.{Chapter, Episode, Podcast}
 import io.disposia.engine.parse.rss.RomeModuleExtractor

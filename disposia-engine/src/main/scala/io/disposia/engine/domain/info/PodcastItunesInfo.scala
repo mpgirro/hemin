@@ -1,6 +1,7 @@
-package io.disposia.engine.domain.podcast
+package io.disposia.engine.domain.info
 
-case class PodcastItunesInfo (
+
+case class PodcastItunesInfo(
   summary: Option[String]         = None,
   author: Option[String]          = None,
   keywords: Option[Array[String]] = None,

@@ -2,6 +2,7 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
+import io.disposia.engine.domain.info._
 import io.disposia.engine.domain.podcast._
 import io.disposia.engine.util.mapper.reduce
 

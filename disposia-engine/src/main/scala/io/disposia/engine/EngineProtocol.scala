@@ -2,9 +2,7 @@ package io.disposia.engine
 
 import akka.actor.ActorRef
 
-/**
-  * @author Maximilian Irro
-  */
+
 object EngineProtocol {
 
     // These messages are sent to propagate actorRefs to other actors, to overcome circular dependencies

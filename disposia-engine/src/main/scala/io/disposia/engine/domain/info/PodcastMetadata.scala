@@ -1,8 +1,9 @@
-package io.disposia.engine.domain.podcast
+package io.disposia.engine.domain.info
 
 import java.time.LocalDateTime
 
-case class PodcastMetadata (
+
+case class PodcastMetadata(
   lastBuildDate: Option[LocalDateTime] = None,
   language: Option[String]             = None,
   generator: Option[String]            = None,

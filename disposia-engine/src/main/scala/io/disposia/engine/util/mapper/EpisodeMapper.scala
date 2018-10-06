@@ -1,6 +1,6 @@
 package io.disposia.engine.util.mapper
 
-import io.disposia.engine.domain.episode.EpisodeItunesInfo
+import io.disposia.engine.domain.info.EpisodeItunesInfo
 import io.disposia.engine.domain.{Episode, IndexDoc, IndexField}
 import org.apache.solr.common.SolrDocument
 
