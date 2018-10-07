@@ -9,7 +9,7 @@ import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedRepository(db: DefaultDB, ec: ExecutionContext)
+class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
   override protected[this] def log: Logger = Logger(getClass)
@@ -20,18 +20,20 @@ class FeedRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.feedReader
 
-  override protected[this] def collection: BSONCollection = db.apply("feeds")
+  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
   override def save(feed: Feed): Future[Feed] = {
     val query = BSONDocument("id" -> feed.id)
-    collection
+    collection.flatMap { _
       .update(query, feed, upsert = true)
-      .flatMap { _ => findOne(feed.id)
-        .map {
-          case Some(f) => f
-          case None    => throw new RuntimeException("Saving Feed to database was unsuccessful : " + feed)
-        }
+      .flatMap { _ =>
+        findOne(feed.id)
+          .map {
+            case Some(f) => f
+            case None => throw new RuntimeException("Saving Feed to database was unsuccessful : " + feed)
+          }
       }
+    }
   }
 
   override def findOne(id: String): Future[Option[Feed]] = {

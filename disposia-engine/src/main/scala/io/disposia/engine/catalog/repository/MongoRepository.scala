@@ -15,7 +15,7 @@ trait MongoRepository[T] {
 
   protected[this] def log: Logger
 
-  protected[this] def collection: BSONCollection
+  protected[this] def collection: Future[BSONCollection]
 
   /**
     * Save entity to database collection
@@ -50,8 +50,9 @@ trait MongoRepository[T] {
     * @return true if drop was successful
     */
   def drop: Future[Boolean] = {
-    log.debug("Dropping collection : {}", collection.name)
-    collection.drop(failIfNotFound = true)
+    collection.flatMap { c =>
+      log.debug("Dropping collection : {}", c.name)
+      c.drop(failIfNotFound = true) }
   }
 
   /**
@@ -71,7 +72,7 @@ trait MongoRepository[T] {
   def findAll(example: T): Future[List[T]] = findAll(bsonWriter.write(example))
 
   protected[this] def findOne(query: BSONDocument): Future[Option[T]] =
-    collection
+    collection.flatMap { _
       .find(query)
       .one[T]
       .recover {
@@ -79,6 +80,7 @@ trait MongoRepository[T] {
           log.error("Error on findOne({}) : {}", query, ex)
           None
       }
+    }
 
   /**
     *
@@ -98,7 +100,7 @@ trait MongoRepository[T] {
   }
 
   protected[this] def findAll(query: BSONDocument): Future[List[T]] =
-    collection
+    collection.flatMap { _
       .find(query)
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
@@ -107,12 +109,13 @@ trait MongoRepository[T] {
           log.error("Error on findAll({}) : {}", query, ex)
           List()
       }
+    }
 
   // TODO does not seem to work!
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
-    collection
+    collection.flatMap { _
       .find(query)
-      .options(QueryOpts(page*size, size)) // TODO start, pageSize --> (page*size, size)
+      .options(QueryOpts(page * size, size)) // TODO start, pageSize --> (page*size, size)
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
       .recover {
@@ -120,5 +123,6 @@ trait MongoRepository[T] {
           log.error("Error on findAll({}) : {}", query, ex)
           List()
       }
+    }
 
 }

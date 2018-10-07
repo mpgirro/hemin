@@ -15,8 +15,7 @@ import io.disposia.engine.util.IdGenerator
 import io.disposia.engine.util.mapper.{IndexMapper, reduce}
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
-import scala.concurrent.duration._
-import scala.concurrent.{Await, ExecutionContext}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object CatalogStore {
@@ -102,16 +101,16 @@ class CatalogStore(config: CatalogConfig)
 
   private lazy val lnm = s"${connection.supervisor}/${connection.name}"
 
-  @inline private def resolveDB(ec: ExecutionContext) =
-    connection.database(dbName)(ec).andThen {
+  @inline private def resolveDB: Future[DefaultDB] =
+    connection.database(dbName).andThen {
       case _ => /*logger.debug*/ log.info(s"[$lnm] MongoDB resolved: $dbName")
     }
 
-  private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
+  //private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
 
-  private val podcasts: PodcastRepository = new PodcastRepository(db, executionContext)
-  private val episodes: EpisodeRepository = new EpisodeRepository(db, executionContext)
-  private val feeds: FeedRepository = new FeedRepository(db, executionContext)
+  private val podcasts: PodcastRepository = new PodcastRepository(resolveDB, executionContext)
+  private val episodes: EpisodeRepository = new EpisodeRepository(resolveDB, executionContext)
+  private val feeds: FeedRepository = new FeedRepository(resolveDB, executionContext)
   //private val chapters: ChapterRepository = new ChapterRepository(db, executionContext)
 
   // white all data if we please
@@ -642,7 +641,7 @@ class CatalogStore(config: CatalogConfig)
                             case Some(id) => updater ! ProcessFeed(id, url, WebsiteFetchJob())
                             case None     => log.error(s"Cannot send ProcessFeed (_,$url,WebsiteFetchJob) message -- Episode.id is None")
                           }
-                        case None      => log.debug("No link set for episode {} --> no website data will be added to the index", episode.id)
+                        case None => log.debug("No link set for episode {} --> no website data will be added to the index", episode.id)
                       }
 
                     case Failure(ex) => onError("Could not save new Episode", ex)

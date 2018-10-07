@@ -9,7 +9,7 @@ import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
+class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Episode] {
 
   override protected[this] def log: Logger = Logger(getClass)
@@ -20,18 +20,20 @@ class EpisodeRepository(db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def bsonReader: BSONDocumentReader[Episode] = BsonConversion.episodeReader
 
-  override protected[this] def collection: BSONCollection = db.apply("episodes")
+  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("episodes"))
 
   override def save(episode: Episode): Future[Episode] = {
     val query = BSONDocument("id" -> episode.id)
-    collection
+    collection.flatMap { _
       .update(query, episode, upsert = true)
-      .flatMap { _ => findOne(episode.id)
-        .map {
-          case Some(e) => e
-          case None    => throw new RuntimeException("Saving Episode to database was unsuccessful : " + episode)
-        }
+      .flatMap { _ =>
+        findOne(episode.id)
+          .map {
+            case Some(e) => e
+            case None => throw new RuntimeException("Saving Episode to database was unsuccessful : " + episode)
+          }
       }
+    }
   }
 
   override def findOne(id: String): Future[Option[Episode]] = {

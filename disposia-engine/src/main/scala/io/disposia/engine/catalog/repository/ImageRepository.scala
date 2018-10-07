@@ -10,7 +10,7 @@ import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ImageRepository (db: DefaultDB, ec: ExecutionContext)
+class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Image] {
 
   override protected[this] def log: Logger = Logger(getClass)
@@ -21,18 +21,20 @@ class ImageRepository (db: DefaultDB, ec: ExecutionContext)
 
   override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = BsonConversion.imageReader
 
-  override protected[this] def collection: BSONCollection = db.apply("images")
+  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 
   override def save(image: Image): Future[Image] = {
     val query = BSONDocument("id" -> image.id)
-    collection
+    collection.flatMap { _
       .update(query, image, upsert = true)
-      .flatMap { _ => findOne(image.id)
-        .map {
-          case Some(i) => i
-          case None    => throw new RuntimeException("Saving Image to database was unsuccessful : " + image)
-        }
+      .flatMap { _ =>
+        findOne(image.id)
+          .map {
+            case Some(i) => i
+            case None => throw new RuntimeException("Saving Image to database was unsuccessful : " + image)
+          }
       }
+    }
   }
 
   override def findOne(id: String): Future[Option[Image]] = {
