@@ -18,7 +18,7 @@ case class Podcast(
   itunes: PodcastItunesInfo             = PodcastItunesInfo(),
   feedpress: PodcastFeedpressInfo       = PodcastFeedpressInfo(),
   fyyd: PodcastFyydInfo                 = PodcastFyydInfo()
-) {
+) extends Patchable[Podcast] {
 
   def patch(diff: Podcast): Podcast = Option(diff) match {
     case None => this

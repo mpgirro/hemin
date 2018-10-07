@@ -12,14 +12,8 @@ case class Feed(
   lastChecked: Option[LocalDateTime]           = None,
   lastStatus: Option[FeedStatus]               = None,
   registrationTimestamp: Option[LocalDateTime] = None
-) {
+) extends Patchable[Feed] {
 
-  /**
-    * Updates the current instance's fields by all non-None fields of the patch
-    *
-    * @param diff the instance with set fields that need updating
-    * @return the updated instance
-    */
   def patch(diff: Feed): Feed = Option(diff) match {
     case None => this
     case Some(x) =>

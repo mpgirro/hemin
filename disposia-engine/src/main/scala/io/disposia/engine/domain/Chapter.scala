@@ -9,7 +9,7 @@ case class Chapter(
   title: Option[String]     = None,
   href: Option[String]      = None,
   image: Option[String]     = None
-) {
+) extends Patchable[Chapter] {
 
   def patch(diff: Chapter): Chapter = Option(diff) match {
     case None => this

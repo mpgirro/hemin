@@ -20,7 +20,7 @@ case class IndexDoc(
   contentEncoded: Option[String] = None,
   transcript: Option[String]     = None,
   websiteData: Option[String]    = None
-) {
+) extends Patchable[IndexDoc] {
 
   def patch(diff: IndexDoc): IndexDoc = Option(diff) match {
     case None => this
