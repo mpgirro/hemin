@@ -2,19 +2,16 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.util.mapper.reduce
-
-
 case class Feed(
   id: Option[String]                           = None,
   podcastId: Option[String]                    = None,
   url: Option[String]                          = None,
   lastChecked: Option[LocalDateTime]           = None,
   lastStatus: Option[FeedStatus]               = None,
-  registrationTimestamp: Option[LocalDateTime] = None
+  registrationTimestamp: Option[LocalDateTime] = None,
 ) extends Patchable[Feed] {
 
-  def patch(diff: Feed): Feed = Option(diff) match {
+  override def patch(diff: Feed): Feed = Option(diff) match {
     case None => this
     case Some(x) =>
       Feed(

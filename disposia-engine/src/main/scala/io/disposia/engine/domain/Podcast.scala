@@ -3,7 +3,6 @@ package io.disposia.engine.domain
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.info._
-import io.disposia.engine.util.mapper.reduce
 
 
 case class Podcast(
@@ -17,10 +16,10 @@ case class Podcast(
   registration: PodcastRegistrationInfo = PodcastRegistrationInfo(),
   itunes: PodcastItunesInfo             = PodcastItunesInfo(),
   feedpress: PodcastFeedpressInfo       = PodcastFeedpressInfo(),
-  fyyd: PodcastFyydInfo                 = PodcastFyydInfo()
+  fyyd: PodcastFyydInfo                 = PodcastFyydInfo(),
 ) extends Patchable[Podcast] {
 
-  def patch(diff: Podcast): Podcast = Option(diff) match {
+  override def patch(diff: Podcast): Podcast = Option(diff) match {
     case None => this
     case Some(x) =>
       Podcast(

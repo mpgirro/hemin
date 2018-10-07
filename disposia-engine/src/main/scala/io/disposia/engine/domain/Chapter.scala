@@ -1,17 +1,15 @@
 package io.disposia.engine.domain
 
-import io.disposia.engine.util.mapper.reduce
-
 case class Chapter(
   id: Option[String]        = None,
   episodeId: Option[String] = None,
   start: Option[String]     = None,
   title: Option[String]     = None,
   href: Option[String]      = None,
-  image: Option[String]     = None
+  image: Option[String]     = None,
 ) extends Patchable[Chapter] {
 
-  def patch(diff: Chapter): Chapter = Option(diff) match {
+  override def patch(diff: Chapter): Chapter = Option(diff) match {
     case None => this
     case Some(x) =>
       Chapter(

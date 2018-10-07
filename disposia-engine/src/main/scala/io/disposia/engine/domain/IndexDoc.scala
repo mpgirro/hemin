@@ -2,9 +2,6 @@ package io.disposia.engine.domain
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.util.mapper.reduce
-
-
 case class IndexDoc(
   docType: Option[String]        = None,
   id: Option[String]             = None,
@@ -19,10 +16,10 @@ case class IndexDoc(
   chapterMarks: Option[String]   = None,
   contentEncoded: Option[String] = None,
   transcript: Option[String]     = None,
-  websiteData: Option[String]    = None
+  websiteData: Option[String]    = None,
 ) extends Patchable[IndexDoc] {
 
-  def patch(diff: IndexDoc): IndexDoc = Option(diff) match {
+  override def patch(diff: IndexDoc): IndexDoc = Option(diff) match {
     case None => this
     case Some(x) =>
       IndexDoc(

@@ -3,7 +3,6 @@ package io.disposia.engine.domain
 import java.time.LocalDateTime
 
 import io.disposia.engine.domain.info.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
-import io.disposia.engine.util.mapper.reduce
 
 case class Episode(
   id: Option[String]                    = None,
@@ -20,17 +19,10 @@ case class Episode(
   chapters: List[Chapter]               = List(),
   itunes: EpisodeItunesInfo             = EpisodeItunesInfo(),
   enclosure: EpisodeEnclosureInfo       = EpisodeEnclosureInfo(),
-  registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo()
-) {
+  registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo(),
+) extends Patchable[Episode] {
 
-  /**
-    * Patches a copy of the current instance with the diff . Only non-None fields
-    * of the diff overwrite the values of the current instance in the copy.
-    *
-    * @param diff An instance with the specific fields that get patched
-    * @return The copy of this instance with the non-None fields of diff applied
-    */
-  def patch(diff: Episode): Episode = Option(diff) match {
+  override def patch(diff: Episode): Episode = Option(diff) match {
     case None => this
     case Some(x) =>
       Episode(

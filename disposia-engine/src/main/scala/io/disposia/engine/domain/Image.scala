@@ -10,5 +10,5 @@ case class Image (
   name: Option[String]             = None,
   contentType: Option[String]      = None,
   size: Option[Long]               = None,
-  createdAt: Option[LocalDateTime] = None
+  createdAt: Option[LocalDateTime] = None,
 )
