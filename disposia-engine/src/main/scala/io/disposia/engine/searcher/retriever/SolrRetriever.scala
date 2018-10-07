@@ -43,6 +43,8 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
 
   private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultsWrapper = {
 
+    // TODO sort is unused (and never set in caller)
+
     val offset = (p-1) * s
 
     val query = new SolrQuery()
@@ -63,21 +65,20 @@ class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRet
     }
     */
 
-    val response: QueryResponse = solr.query(query)
-    val docList: SolrDocumentList = response.getResults
+    val results: SolrDocumentList = solr.query(query).getResults
 
-    if (docList.getNumFound <= 0) {
+    if (results.getNumFound <= 0) {
       ResultsWrapper() // default parameters relate to nothing found
     } else {
-      val dMaxPage = docList.getNumFound.toDouble / s.toDouble
+      val dMaxPage = results.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
       ResultsWrapper(
         currPage  = p,
         maxPage   = maxPage, // TODO
-        totalHits = docList.getNumFound.toInt,
-        results   = docList.asScala.map(IndexMapper.toIndexDoc).toList,
+        totalHits = results.getNumFound.toInt,
+        results   = results.asScala.map(IndexMapper.toIndexDoc).toList,
       )
     }
 
