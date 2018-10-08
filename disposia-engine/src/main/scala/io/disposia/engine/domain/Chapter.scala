@@ -9,17 +9,27 @@ case class Chapter(
   image: Option[String]     = None,
 ) extends Patchable[Chapter] {
 
-  override def patch(diff: Chapter): Chapter = Option(diff) match {
+  override def patchLeft(diff: Chapter): Chapter = Option(diff) match {
     case None => this
-    case Some(x) =>
-      Chapter(
-        id        = reduce(this.id, x.id),
-        episodeId = reduce(this.episodeId, x.episodeId),
-        start     = reduce(this.start, x.start),
-        title     = reduce(this.title, x.title),
-        href      = reduce(this.href, x.href),
-        image     = reduce(this.image, x.image),
-      )
+    case Some(that) => Chapter(
+      id        = reduceLeft(this.id, that.id),
+      episodeId = reduceLeft(this.episodeId, that.episodeId),
+      start     = reduceLeft(this.start, that.start),
+      title     = reduceLeft(this.title, that.title),
+      href      = reduceLeft(this.href, that.href),
+      image     = reduceLeft(this.image, that.image),
+    )
   }
 
+  override def patchRight(diff: Chapter): Chapter = Option(diff) match {
+    case None => this
+    case Some(that) => Chapter(
+      id        = reduceRight(this.id, that.id),
+      episodeId = reduceRight(this.episodeId, that.episodeId),
+      start     = reduceRight(this.start, that.start),
+      title     = reduceRight(this.title, that.title),
+      href      = reduceRight(this.href, that.href),
+      image     = reduceRight(this.image, that.image),
+    )
+  }
 }

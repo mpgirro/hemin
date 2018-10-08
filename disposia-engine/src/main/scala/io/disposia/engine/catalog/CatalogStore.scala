@@ -12,7 +12,7 @@ import io.disposia.engine.domain.info.{EpisodeRegistrationInfo, PodcastRegistrat
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
 import io.disposia.engine.updater.Updater.ProcessFeed
 import io.disposia.engine.util.IdGenerator
-import io.disposia.engine.util.mapper.{IndexMapper, reduce}
+import io.disposia.engine.util.mapper.IndexMapper
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -320,7 +320,7 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(podcastId)
       .map {
-        case Some(p) => podcast.patch(p)  //podcastMapper.update(podcast, p)
+        case Some(p) => podcast.patchRight(p)  //podcastMapper.update(podcast, p)
         case None =>
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           podcast
@@ -339,7 +339,7 @@ class CatalogStore(config: CatalogConfig)
     episodes
       .findOne(episode.id)
       .map {
-        case Some(e) => episode.patch(e) // episodeMapper.update(episode, e)
+        case Some(e) => episode.patchRight(e) // episodeMapper.update(episode, e)
         case None =>
           log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
           episode
@@ -606,15 +606,17 @@ class CatalogStore(config: CatalogConfig)
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
 
-                val e = episode.copy(
-                  id           = Some(episodeId),
-                  podcastId    = Some(podcastId),
-                  podcastTitle = p.title,
-                  image        = reduce(episode.image, p.image),
-                  registration = EpisodeRegistrationInfo(
-                    timestamp = Some(LocalDateTime.now())
-                  )
-                )
+                val e = episode
+                  .copy(
+                    id           = Some(episodeId),
+                    podcastId    = Some(podcastId),
+                    podcastTitle = p.title,
+                    registration = EpisodeRegistrationInfo(
+                      timestamp = Some(LocalDateTime.now())
+                    ))
+                  .patchLeft(Episode(
+                    image = p.image
+                  ))
 
                 // save asynchronously
                 episodes
@@ -635,13 +637,10 @@ class CatalogStore(config: CatalogConfig)
                       //self ! catalogEvent
 
                       // request that the website will get added to the episodes index entry as well
-                      e.link match {
-                        case Some(url) =>
-                          e.id match {
-                            case Some(id) => updater ! ProcessFeed(id, url, WebsiteFetchJob())
-                            case None     => log.error(s"Cannot send ProcessFeed (_,$url,WebsiteFetchJob) message -- Episode.id is None")
-                          }
-                        case None => log.debug("No link set for episode {} --> no website data will be added to the index", episode.id)
+                      (e.id, e.link) match {
+                        case (Some(id), Some(url)) => updater ! ProcessFeed(id, url, WebsiteFetchJob())
+                        case (_, None)             => log.debug("No link set for episode {} --> no website data will be added to the index", e.id)
+                        case (None, _)             => log.error(s"Cannot send ProcessFeed (_,${e.link},WebsiteFetchJob) message -- Episode.id is None")
                       }
 
                     case Failure(ex) => onError("Could not save new Episode", ex)
