@@ -2,6 +2,7 @@ package io.disposia.engine
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
+import io.disposia.engine.cnc.CliProcessor
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, blocking}
@@ -14,30 +15,11 @@ object App {
 
   private implicit val INTERNAL_TIMEOUT: Timeout = 5.seconds
 
-  private val log = Logger(classOf[App])
+  private val log = Logger(getClass)
 
   private val engine = new Engine()
-  private var shutdown = false
 
-  private val usageMap = Map(
-    "propose"        -> "feed [feed [feed]]",
-    "benchmark"      -> "<feed|index|search>",
-    "benchmark feed" -> "feed <url>",
-    "benchmark index"-> "",
-    "benchmark search"-> "",
-    "check podcast"  -> "[all|<id>]",
-    "check feed"     -> "[all|<id>]",
-    "count"          -> "[podcasts|episodes|feeds]",
-    "search"         -> "query [query [query]]",
-    "print database" -> "[podcasts|episodes|feeds]",
-    "load feeds"     -> "[test|massive]",
-    "load fyyd"      -> "[episodes <podcastId> <fyydId>]",
-    "save feeds"     -> "<dest>",
-    "crawl fyyd"     -> "count",
-    "get podcast"    -> "<id>",
-    "get episode"    -> "<id>",
-    "request mean episodes" -> ""
-  )
+  private var shutdown = false
 
   def main(args: Array[String]): Unit = {
 
@@ -49,8 +31,9 @@ object App {
 
   }
 
-  private def repl() {
+  private def repl(): Unit = {
 
+    val cli = new CliProcessor(engine.bus, engine.config, ec)
     log.info("CLI read to take commands")
 
     while(!shutdown){
@@ -58,7 +41,14 @@ object App {
         val input = StdIn.readLine()
         log.debug("CLI read : {}", input)
 
-        Option(input).foreach(i => exec(i.split(" ")))
+        Option(input)
+          .map(_.split(" "))
+          .map(_.toList)
+          .foreach { ls: List[String] => ls match {
+            case q@("q" | "quit" | "exit") :: _ => shutdown = true
+            case others => println(cli.process(others))
+          }
+          }
       }
     }
 
@@ -66,60 +56,8 @@ object App {
     engine.shutdown()
   }
 
-  private def exec(commands: Array[String]): Unit = {
-    commands.toList match {
-      case "help" :: _ => help()
-      case q@("q" | "quit" | "exit") :: _ => shutdown = true
-
-      case "propose" :: Nil   => usage("propose")
-      case "propose" :: feeds => feeds.foreach(f => engine.propose(f))
-
-      case "search" :: Nil          => usage("search")
-      case "search" :: query :: Nil => search(query)
-      //case "search" :: query :: _   => usage("search")
-
-      case "get" :: "podcast" :: Nil       => usage("get podcast")
-      case "get" :: "podcast" :: id :: Nil => printPodcast(id)
-      case "get" :: "podcast" :: id :: _   => usage("get podcast")
-
-      case "get" :: "podcast-feeds" :: Nil       => usage("get podcast")
-      case "get" :: "podcast-feeds" :: id :: Nil => printFeedsByPodcast(id)
-      case "get" :: "podcast-feeds" :: id :: _   => usage("get podcast")
-
-      case "get" :: "episode" :: Nil       => usage("get episode")
-      case "get" :: "episode" :: id :: Nil => printEpisode(id)
-      case "get" :: "episode" :: id :: _   => usage("get episode")
-
-      case "get" :: "episode-chapters" :: Nil       => usage("get chapters")
-      case "get" :: "episode-chapters" :: id :: Nil => printChaptersByEpisode(id)
-      case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
-
-      case _  => help()
-    }
-  }
-
-  private def usage(cmd: String): Unit = {
-    if (usageMap.contains(cmd)) {
-      val args = usageMap.get(cmd)
-      println("Command parsing error")
-      println("Usage: " + cmd + " " + args)
-    } else {
-      println("Unknown command: " + cmd)
-      println("These are the available commands:")
-      for ( (k,v) <- usageMap ) {
-        println(k + "\t" + v)
-      }
-    }
-  }
-
-  private def help(): Unit = {
-    println("This is an interactive REPL providing a CLI to the search engine. Functions are:\n")
-    for ( (k,v) <- usageMap ) {
-      println(k + "\t" + v)
-    }
-    println("\nFeel free to play around!\n")
-  }
-
+  /*
+  @Deprecated
   private def search(query: String): Unit = {
     engine
       .search(query, 1, 20)
@@ -136,6 +74,7 @@ object App {
       }
   }
 
+  @Deprecated
   private def printPodcast(id: String): Unit = {
     engine
       .findPodcast(id)
@@ -149,6 +88,7 @@ object App {
       }
   }
 
+  @Deprecated
   private def printEpisode(id: String): Unit = {
     engine
       .findEpisode(id)
@@ -162,6 +102,7 @@ object App {
       }
   }
 
+  @Deprecated
   private def printChaptersByEpisode(id: String): Unit = {
     engine
       .findChaptersByEpisode(id)
@@ -175,6 +116,7 @@ object App {
       }
   }
 
+  @Deprecated
   private def printFeedsByPodcast(id: String): Unit = {
     engine
       .findFeedsByPodcast(id)
@@ -187,5 +129,6 @@ object App {
         case Failure(reason) => println("ERROR: " + reason.getMessage)
       }
   }
+  */
 
 }

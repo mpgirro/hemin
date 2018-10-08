@@ -6,6 +6,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
+import io.disposia.engine.NodeMaster.{CliInput, CliOutput}
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
@@ -16,7 +17,7 @@ import scala.language.postfixOps
 
 class Engine {
 
-  private var config: EngineConfig = _
+  private var engineConfig: EngineConfig = _
   private implicit var internalTimeout: Timeout = _
 
   private val log = Logger(classOf[Engine])
@@ -36,12 +37,12 @@ class Engine {
   def start(): Unit = {
     // load and init the configuration
     val globalConfig = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-    config = EngineConfig.load(globalConfig)
-    internalTimeout = config.internalTimeout
+    engineConfig = EngineConfig.load(globalConfig)
+    internalTimeout = engineConfig.internalTimeout
 
     // init the actorsystem and local master for this node
     val system = ActorSystem("disposia", globalConfig)
-    master = system.actorOf(Props(new NodeMaster(config)), NodeMaster.name)
+    master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)
 
     // wait until all actors in the hierarchy report they are up and running
     var warmup = true
@@ -60,17 +61,22 @@ class Engine {
     log.info("engine is up and running")
   }
 
-  def shutdown(): Unit = {
-    bus ! ShutdownSystem
-  }
+  def shutdown(): Unit = bus ! ShutdownSystem
 
-  def bus(): ActorRef = master
+  def bus: ActorRef = master
+
+  def config: EngineConfig = engineConfig
+
+  def cli(args: String): Future[String] =
+    (bus ? CliInput(args)).map {
+      case CliOutput(txt) => txt
+    }
 
   def propose(url: String): Unit = bus ! ProposeNewFeed(url)
 
   def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] = {
-    val p: Int = page.getOrElse(config.indexConfig.defaultPage)
-    val s: Int = size.getOrElse(config.indexConfig.defaultSize)
+    val p: Int = page.getOrElse(engineConfig.indexConfig.defaultPage)
+    val s: Int = size.getOrElse(engineConfig.indexConfig.defaultSize)
 
     search(query, p, s)
   }
@@ -96,8 +102,8 @@ class Engine {
     }
 
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-    val p: Int = page.getOrElse(config.catalogConfig.defaultPage) - 1
-    val s: Int = size.getOrElse(config.catalogConfig.defaultSize)
+    val p: Int = page.getOrElse(engineConfig.catalogConfig.defaultPage) - 1
+    val s: Int = size.getOrElse(engineConfig.catalogConfig.defaultSize)
 
     (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
       case AllPodcastsResult(ps) => ps
