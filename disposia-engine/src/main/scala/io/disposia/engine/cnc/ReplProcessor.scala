@@ -8,11 +8,19 @@ import io.disposia.engine.EngineConfig
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
-import io.disposia.engine.cnc.CliFormatter.format
+import io.disposia.engine.cnc.ReplFormatter.format
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
-class CliProcessor (bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
+/**
+  * A processor for interactive commands. This is not a fully
+  * fledged REPL, since it does not print the evaluation results.
+  *
+  * @param bus
+  * @param config
+  * @param executionContext
+  */
+class ReplProcessor(bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
 
   private val log = Logger(getClass)
 
