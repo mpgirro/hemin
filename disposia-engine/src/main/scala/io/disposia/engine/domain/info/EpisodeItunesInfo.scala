@@ -8,5 +8,5 @@ case class EpisodeItunesInfo(
   summary: Option[String]     = None,
   season: Option[Int]         = None,
   episode: Option[Int]        = None,
-  episodeType: Option[String] = None
+  episodeType: Option[String] = None,
 )

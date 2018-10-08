@@ -9,5 +9,5 @@ case class PodcastMetadata(
   generator: Option[String]            = None,
   copyright: Option[String]            = None,
   docs: Option[String]                 = None,
-  managingEditor: Option[String]       = None
+  managingEditor: Option[String]       = None,
 )

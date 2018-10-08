@@ -16,7 +16,7 @@ case class Episode(
   description: Option[String]           = None,
   image: Option[String]                 = None,
   contentEncoded: Option[String]        = None,
-  chapters: List[Chapter]               = List(),
+  chapters: List[Chapter]               = Nil,
   itunes: EpisodeItunesInfo             = EpisodeItunesInfo(),
   enclosure: EpisodeEnclosureInfo       = EpisodeEnclosureInfo(),
   registration: EpisodeRegistrationInfo = EpisodeRegistrationInfo(),
