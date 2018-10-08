@@ -118,6 +118,8 @@ dependencies {
     compile "com.softwaremill.sttp:core_$scala_major_version:$sttp_version"
     compile "com.softwaremill.sttp:akka-http-backend_$scala_major_version:$sttp_version"
 
+    compile "com.lihaoyi:pprint_$scala_major_version:0.5.3" // http://www.lihaoyi.com/PPrint/
+
     // JUnit Jupiter API and TestEngine implementation
     //test.useJUnitPlatform()
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
