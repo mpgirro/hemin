@@ -6,7 +6,7 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.disposia.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
-import io.disposia.engine.NodeMaster.{CliInput, CliOutput}
+import io.disposia.engine.NodeMaster.{ReplInput, ReplOutput}
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
@@ -68,8 +68,8 @@ class Engine {
   def config: EngineConfig = engineConfig
 
   def cli(args: String): Future[String] =
-    (bus ? CliInput(args)).map {
-      case CliOutput(txt) => txt
+    (bus ? ReplInput(args)).map {
+      case ReplOutput(txt) => txt
     }
 
   def propose(url: String): Unit = bus ! ProposeNewFeed(url)

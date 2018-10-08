@@ -25,7 +25,7 @@ object App {
 
   private def repl(): Unit = {
 
-    val repl = new ReplProcessor(engine.bus, engine.config, ec)
+    val processor = new ReplProcessor(engine.bus, engine.config, ec)
     log.info("CLI is ready to take commands")
 
     while(running){
@@ -38,7 +38,7 @@ object App {
           .map(_.toList)
           .foreach {
             case q@("q" | "quit" | "exit") :: _ => running = false
-            case others => println(repl.process(others))
+            case cmd => println(processor.eval(cmd))
           }
       }
     }

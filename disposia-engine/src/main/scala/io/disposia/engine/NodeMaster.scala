@@ -25,11 +25,11 @@ object NodeMaster {
   final val name = "node"
   def props(config: EngineConfig): Props = Props(new NodeMaster(config))
 
-  case class GetCatalogBroker()
-  case class GetIndexBroker()
-  case class GetUpdater()
-  case class CliInput(input: String)
-  case class CliOutput(output: String)
+  case class GetCatalogBroker() // TODO delete
+  case class GetIndexBroker()   // TODO delete
+  case class GetUpdater()       // TODO delete
+  case class ReplInput(input: String)
+  case class ReplOutput(output: String)
 }
 
 class NodeMaster (config: EngineConfig)
@@ -45,7 +45,7 @@ class NodeMaster (config: EngineConfig)
 
   private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
 
-  private val cli = new ReplProcessor(self, config, executionContext)
+  private val processor = new ReplProcessor(self, config, executionContext)
 
   private var index: ActorRef = _
   private var catalog: ActorRef = _
@@ -107,7 +107,7 @@ class NodeMaster (config: EngineConfig)
 
   override def receive: Receive = {
 
-    case CliInput(input) => onCliInput(input, sender)
+    case ReplInput(input) => onReplInput(input, sender)
 
     case GetCatalogBroker => sender ! catalog
     case GetIndexBroker => sender ! index
@@ -152,8 +152,8 @@ class NodeMaster (config: EngineConfig)
 
   private def isEngineOperational: Boolean = catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && searcherStartupComplete && updaterStartupComplete
 
-  private def onCliInput(input: String, theSender: ActorRef): Unit = Future {
-    theSender ! CliOutput(cli.process(input))
+  private def onReplInput(input: String, theSender: ActorRef): Unit = Future {
+    theSender ! ReplOutput(processor.eval(input))
   }
 
   private def onTerminated(corpse: ActorRef): Unit = {

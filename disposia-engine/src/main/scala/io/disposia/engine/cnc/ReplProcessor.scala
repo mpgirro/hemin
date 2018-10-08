@@ -26,17 +26,17 @@ class ReplProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execu
 
   private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
 
-  def process(args: String): String = Option(args)
+  def eval(args: String): String = Option(args)
     .map(_.split(" "))
-    .map(process)
+    .map(eval)
     .getOrElse("Input was NULL")
 
-  def process(args: Array[String]): String = Option(args)
+  def eval(args: Array[String]): String = Option(args)
     .map(_.toList)
-    .map(process)
+    .map(eval)
     .getOrElse("Input was NULL")
 
-  def process(args: List[String]): String = Option(args)
+  def eval(args: List[String]): String = Option(args)
     .map {
       case "help" :: _ => help()
       //case q@("q" | "quit" | "exit") :: _ => shutdown = true
@@ -149,7 +149,6 @@ class ReplProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execu
     val msg = s"CLI has no specific handler for type : ${unhandled.getClass}"
     log.error(msg)
     msg // return to frontend (CLI/Web)
-    //throw new UnsupportedOperationException(msg)
   }
 
 }
