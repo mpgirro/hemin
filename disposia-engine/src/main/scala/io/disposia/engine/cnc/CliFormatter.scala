@@ -4,7 +4,8 @@ import io.disposia.engine.domain._
 
 object CliFormatter {
 
-  /*
+  /* TODO 2018-10-08: once PPrint support outputting field names (see https://github.com/lihaoyi/PPrint/issues/4) , I want to use these implementations
+   *
   def format(podcast: Podcast): String = pprint.apply(podcast).toString()
 
   def format(episode: Episode): String = pprint.apply(episode).toString()
