@@ -251,8 +251,8 @@ class CatalogStore(config: CatalogConfig)
             val podcastId = idGenerator.newId
             val podcast = Podcast(
               id          = Some(podcastId),
-              title       = Some(podcastId),
-              description = Some(url),
+              //title       = Some(podcastId),
+              //description = Some(url),
               registration = PodcastRegistrationInfo(
                 complete  = Some(false),
                 timestamp = Some(now)

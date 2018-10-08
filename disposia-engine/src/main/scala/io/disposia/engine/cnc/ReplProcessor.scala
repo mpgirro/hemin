@@ -16,6 +16,8 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * A processor for interactive commands. This is not a fully
   * fledged REPL, since it does not print the evaluation results.
   *
+  * TODO: rewrite the eval(String): String methods to stream-based output, e.g. for proposing feeds
+  *
   * @param bus
   * @param config
   * @param executionContext

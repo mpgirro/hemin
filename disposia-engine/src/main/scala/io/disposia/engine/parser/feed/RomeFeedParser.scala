@@ -3,6 +3,7 @@ package io.disposia.engine.parser.feed
 import java.io.StringReader
 
 import com.google.common.base.Strings.isNullOrEmpty
+import com.rometools.modules.itunes.FeedInformation
 import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
@@ -24,6 +25,7 @@ class RomeFeedParser(private val xmlData: String) {
   private val inputSource: InputSource = new InputSource(new StringReader(xmlData))
   private val input: SyndFeedInput = new SyndFeedInput
   private val feed: SyndFeed = input.build(inputSource)
+  private val feedItunesModule: Option[FeedInformation] = RomeModuleExtractor.getItunesModule(feed).asScala
 
   val podcast: Podcast = parseFeed(feed)
   val episodes: List[Episode] = extractEpisodes(feed)
@@ -39,37 +41,6 @@ class RomeFeedParser(private val xmlData: String) {
       ex.printStackTrace()
   }
   */
-
-  // TODO unused
-  private def fromSyndImage(src: SyndImage): Option[String] = Option(src)
-    .flatMap { img: SyndImage => if (isNullOrEmpty(img.getUrl)) None else Some(img.getUrl) }
-
-  // TODO unused
-  private def withTitleFallback(p: Podcast, i: SyndImage): Podcast = {
-    if (p.title.isEmpty && !isNullOrEmpty(i.getTitle)) {
-      p.copy(title = Option(i.getTitle))
-    } else {
-      p
-    }
-  }
-
-  // TODO unused
-  private def withLinkFallback(p: Podcast, i: SyndImage): Podcast = {
-    if (p.link.isEmpty && !isNullOrEmpty(i.getLink)) {
-      p.copy(link = UrlMapper.sanitize(i.getLink))
-    } else {
-      p
-    }
-  }
-
-  // TODO unused
-  private def withDescriptionFallback(p: Podcast, i: SyndImage): Podcast = {
-    if (p.description.isEmpty && !isNullOrEmpty(i.getDescription)) {
-      p.copy(description = Option(i.getDescription))
-    } else {
-      p
-    }
-  }
 
   private def parseFeed(feed: SyndFeed): Podcast = {
 
@@ -119,13 +90,13 @@ class RomeFeedParser(private val xmlData: String) {
 
     Podcast(
       id              = None,
-      title           = Option(feed.getTitle),
-      link            = UrlMapper.sanitize(feed.getLink),
-      description     = Option(feed.getDescription),
+      title           = podcastTitleWithImageFallback,
+      link            = podcastLinkWithImageFallback,
+      description     = podcastDescriptionWithImageFallback,
       pubDate         = DateMapper.asLocalDateTime(feed.getPublishedDate),
-      image           = fromSyndImage(feed.getImage),
+      image           = podcastImageWithItunesFallback,
       meta = PodcastMetadata(
-        lastBuildDate  = None,  // TODO the parser does not yet produces this
+        lastBuildDate  = None,  // TODO the parser does not yet produce this
         language       = Option(feed.getLanguage),
         generator      = Option(feed.getGenerator),
         copyright      = Option(feed.getCopyright),
@@ -167,14 +138,74 @@ class RomeFeedParser(private val xmlData: String) {
     )
   )
 
-  private def podcastItunesInfo: PodcastItunesInfo = RomeModuleExtractor
-    .getItunesModule(feed).asScala
+  private def podcastTitleWithImageFallback: Option[String] = {
+    val feedTitle = Option(feed.getTitle)
+    val imgTitle = Option(feed.getImage).map(_.getTitle)
+
+    (feedTitle, imgTitle) match {
+      case (Some(_), _)    => feedTitle
+      case (None, Some(_)) => imgTitle
+      case (_, _)          => None
+    }
+  }
+
+  private def podcastLinkWithImageFallback: Option[String] = {
+    val feedLink = Option(feed.getLink)
+    val imgLink = Option(feed.getImage).map(_.getLink)
+
+    val link = (feedLink, imgLink) match {
+      case (Some(_), _)    => feedLink
+      case (None, Some(_)) => imgLink
+      case (_, _)          => None
+    }
+    link.flatMap(UrlMapper.sanitize)
+  }
+
+  private def podcastDescriptionWithImageFallback: Option[String] = {
+    val feedDescr = Option(feed.getDescription)
+    val imgDescr = Option(feed.getImage).map(_.getDescription)
+
+    (feedDescr, imgDescr) match {
+      case (Some(_), _)    => feedDescr
+      case (None, Some(_)) => imgDescr
+      case (_, _)          => None
+    }
+  }
+
+  private def podcastImageWithItunesFallback: Option[String] = {
+    val feedImg: Option[String] = Option(feed.getImage)
+      .flatMap { img: SyndImage =>
+        if (isNullOrEmpty(img.getUrl))
+          None
+        else
+          Some(img.getUrl)
+      }
+
+    val itunesImg: Option[String] = feedItunesModule
+      .map(_.getImage)
+      .map(_.toString)
+      .orElse(None)
+
+    (feedImg, itunesImg) match {
+      case (Some(_), _)    => feedImg
+      case (None, Some(_)) => itunesImg
+      case (_, _)          => None
+    }
+  }
+
+  private def podcastItunesInfo: PodcastItunesInfo = feedItunesModule
     .map { itunes =>
       PodcastItunesInfo(
         summary     = Option(itunes.getSummary),
         author      = Option(itunes.getAuthor),
-        keywords    = Option(itunes.getKeywords),
-        categories  = Option(itunes.getCategories).map(cs => cs.asScala.map(c => c.getName).toSet),
+        keywords    = Option(itunes.getKeywords)
+          .map(_.toList)
+          .getOrElse(Nil),
+        categories  = Option(itunes.getCategories)
+          .map(cs => cs.asScala.map(c => c.getName))
+          .map(_.toSet)  // eliminate duplicates
+          .map(_.toList)
+          .getOrElse(Nil),
         explicit    = Option(itunes.getExplicit),
         block       = Option(itunes.getBlock),
         podcastType = Option(itunes.getType),

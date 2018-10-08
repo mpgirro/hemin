@@ -18,7 +18,7 @@ object App {
   private var running = true
 
   def main(args: Array[String]): Unit = {
-    log.info("Starting engine...")
+    log.info("Starting engine ...")
     engine.start()
     repl() // TODO distinguish between interactive and non-interactive mode
   }

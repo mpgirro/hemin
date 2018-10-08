@@ -17,10 +17,7 @@ object JsonWrites {
   private def toNullD(d: Option[LocalDateTime]): JsValue = d.map(toJson).getOrElse(JsNull)
   private def toNullF(f: Option[FeedStatus]): JsValue =f.map(toJson).getOrElse(JsNull)
 
-  private def toNullA(opt: Option[Iterable[String]]): JsArray = opt match {
-    case Some(as) => jsonFromStringIterable(as)
-    case None => JsArray()
-  }
+  private def toNullA(as: Iterable[String]): JsArray = jsonFromStringIterable(as)
 
   /*
   private def toNullA(opt: Option[Array[String]]): JsArray = opt match {
@@ -95,7 +92,7 @@ object JsonWrites {
       "itunesCategories"      -> toNullA(p.itunes.categories),
       "itunesSummary"         -> toNullS(p.itunes.summary),
       "itunesAuthor"          -> toNullS(p.itunes.author),
-      "itunesKeywords"        -> toNullA(p.itunes.keywords.map(ks => ks.toIterable)),
+      "itunesKeywords"        -> toNullA(p.itunes.keywords),
       "itunesExplicit"        -> toNullB(p.itunes.explicit),
       "itunesBlock"           -> toNullB(p.itunes.block),
       "itunesType"            -> toNullS(p.itunes.podcastType),
