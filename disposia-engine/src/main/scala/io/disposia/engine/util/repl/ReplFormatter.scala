@@ -1,4 +1,4 @@
-package io.disposia.engine.cnc
+package io.disposia.engine.util.repl
 
 import io.disposia.engine.domain._
 
@@ -23,9 +23,21 @@ object ReplFormatter {
   def format(xs: List[Any]): String = pprint.apply(xs).toString()
   */
 
-  def format(podcast: Podcast): String = prettyPrint(podcast)
+  def format(podcast: Podcast): String = {
+    val p = podcast.description match {
+      case Some(d) => podcast.copy(description = Some("<HIDDEN TO SAFE SPACE>"))
+      case None    => podcast
+    }
+    prettyPrint(p)
+  }
 
-  def format(episode: Episode): String = prettyPrint(episode)
+  def format(episode: Episode): String = {
+    val e = episode.description match {
+      case Some(d) => episode.copy(description = Some("<HIDDEN TO SAFE SPACE>"))
+      case None    => episode
+    }
+    prettyPrint(e)
+  }
 
   def format(feed: Feed): String = prettyPrint(feed)
 

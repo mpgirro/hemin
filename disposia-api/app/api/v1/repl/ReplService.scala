@@ -1,6 +1,6 @@
 package api.v1.repl
 
-import io.disposia.engine.cnc.ReplProcessor
+import io.disposia.engine.util.repl.ReplProcessor
 import javax.inject.Inject
 import services.EngineService
 

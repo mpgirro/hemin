@@ -6,7 +6,7 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.NodeMaster._
 import io.disposia.engine.catalog.CatalogStore
 import io.disposia.engine.catalog.CatalogStore.CatalogMessage
-import io.disposia.engine.cnc.ReplProcessor
+import io.disposia.engine.util.repl.ReplProcessor
 import io.disposia.engine.crawler.Crawler
 import io.disposia.engine.crawler.Crawler.CrawlerMessage
 import io.disposia.engine.index.IndexStore

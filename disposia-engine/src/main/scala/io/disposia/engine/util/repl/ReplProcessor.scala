@@ -1,4 +1,4 @@
-package io.disposia.engine.cnc
+package io.disposia.engine.util.repl
 
 import akka.actor.ActorRef
 import akka.pattern.ask
@@ -8,7 +8,7 @@ import io.disposia.engine.EngineConfig
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
-import io.disposia.engine.cnc.ReplFormatter.format
+import io.disposia.engine.util.repl.ReplFormatter.format
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 

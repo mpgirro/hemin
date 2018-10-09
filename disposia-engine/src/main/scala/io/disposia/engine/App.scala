@@ -2,7 +2,7 @@ package io.disposia.engine
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.cnc.ReplProcessor
+import io.disposia.engine.util.repl.ReplProcessor
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, blocking}
