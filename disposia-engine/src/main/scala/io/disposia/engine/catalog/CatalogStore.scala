@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.catalog.repository.{EpisodeRepository, FeedRepository, PodcastRepository}
-import io.disposia.engine.crawler.Crawler.{NewPodcastFetchJob, UpdateEpisodesFetchJob, WebsiteFetchJob}
+import io.disposia.engine.crawler.Crawler._
 import io.disposia.engine.domain._
 import io.disposia.engine.domain.info.{EpisodeRegistrationInfo, PodcastRegistrationInfo}
 import io.disposia.engine.index.IndexStore.AddDocIndexEvent
@@ -605,6 +605,10 @@ class CatalogStore(config: CatalogConfig)
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
+
+                episode.image.foreach { img =>
+                  crawler ! DownloadWithHeadCheck(podcastId, img, EpisodeImageFetchJob())
+                }
 
                 val e = episode
                   .copy(

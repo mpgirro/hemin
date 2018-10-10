@@ -1,16 +1,22 @@
 package io.disposia.engine.parser
 
+import java.io.{ByteArrayInputStream, InputStream}
+import java.nio.charset.StandardCharsets
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 import java.time.LocalDateTime
+import java.util.Formatter
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.catalog.CatalogStore._
-import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
-import io.disposia.engine.domain.{Episode, FeedStatus}
+import io.disposia.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
+import io.disposia.engine.domain.{Episode, FeedStatus, Image}
 import io.disposia.engine.exception.FeedParsingException
 import io.disposia.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
-import io.disposia.engine.parser.Parser.{ParseFyydEpisodes, ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.parser.Parser._
 import io.disposia.engine.parser.feed.RomeFeedParser
+import io.disposia.engine.util.HashUtil
 import io.disposia.engine.util.mapper.IndexMapper
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
@@ -86,6 +92,10 @@ class ParserWorker (config: ParserConfig)
 
     case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
+    case ParsePodcastImage(podcastId, imageData) => onParsePodcastImage(podcastId, imageData)
+
+    case ParseEpisodeImage(episodeId, imageData) => onParseEpisodeImage(episodeId, imageData)
+
     case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
 
   }
@@ -138,6 +148,42 @@ class ParserWorker (config: ParserConfig)
     throw new UnsupportedOperationException("currently not implemented")
   }
 
+  private def onParsePodcastImage(podcastId: String, imageData: String): Unit = {
+    log.debug("Received ParsePodcastImage({},_)", podcastId)
+
+    val image = imageFromData(podcastId, imageData)
+
+    // TODO send message to Catalog
+  }
+
+  private def onParseEpisodeImage(episodeId: String, imageData: String): Unit = {
+    log.debug("Received ParseEpisodeImage({},_)", episodeId)
+
+    val image = imageFromData(episodeId, imageData)
+
+    // TODO send message to Catalog
+  }
+
+  private def imageFromData(associateId: String, imageData: String): Image = {
+    val image = com.sksamuel.scrimage.Image.fromStream(inputStreamFromString(imageData))
+    val data = transform(image)
+
+    // TODO set more fields of following instance!
+    Image(
+      associateId = Some(associateId),
+      data        = Some(data),
+      hash        = Some(HashUtil.sha1(data)),
+    )
+  }
+
+  private def inputStreamFromString(data: String): InputStream =
+    new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8.name))
+
+  private def transform(image: com.sksamuel.scrimage.Image): Array[Byte] = image
+    .cover(500, 500)
+    .bound(500, 500)
+    .bytes
+
   /*
   private def sendCatalogCommand(command: CatalogCommand): Unit = {
       mediator ! Send("/user/node/"+CatalogBroker.name, command, localAffinity = true)
@@ -167,6 +213,9 @@ class ParserWorker (config: ParserConfig)
       // Option(p.getItunesImage).foreach(img => {
       //     p.setItunesImage(base64Image(img))
       // })
+      p.image.foreach { img =>
+        crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
+      }
 
       val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
       //emitIndexEvent(indexEvent)
@@ -174,9 +223,8 @@ class ParserWorker (config: ParserConfig)
 
       // request that the podcasts website will get added to the index as well, if possible
       p.link match {
-        case Some(link) =>
-          crawler ! DownloadWithHeadCheck(p.id.get, link, WebsiteFetchJob())
-        case None => log.debug("No link set for podcast {} --> no website data will be added to the index", p.id.get)
+        case Some(link) => crawler ! DownloadWithHeadCheck(p.id.get, link, WebsiteFetchJob())
+        case None       => log.debug("No link set for podcast {} --> no website data will be added to the index", p.id.get)
       }
     }
 

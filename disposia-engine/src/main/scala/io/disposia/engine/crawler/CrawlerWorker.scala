@@ -10,7 +10,7 @@ import io.disposia.engine.crawler.Crawler._
 import io.disposia.engine.domain.FeedStatus
 import io.disposia.engine.exception.EchoException
 import io.disposia.engine.index.IndexStore.UpdateDocLinkIndexEvent
-import io.disposia.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
+import io.disposia.engine.parser.Parser._
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}
@@ -18,7 +18,9 @@ import scala.language.postfixOps
 
 object CrawlerWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
-  def props(config: CrawlerConfig): Props = Props(new CrawlerWorker(config)).withDispatcher("echo.crawler.dispatcher")
+  def props(config: CrawlerConfig): Props =
+    Props(new CrawlerWorker(config))
+      .withDispatcher("echo.crawler.dispatcher")
 }
 
 class CrawlerWorker (config: CrawlerConfig)
@@ -251,6 +253,12 @@ class CrawlerWorker (config: CrawlerConfig)
 
         case WebsiteFetchJob() =>
           parser ! ParseWebsiteData(id, data)
+
+        case PodcastImageFetchJob() =>
+          parser ! ParsePodcastImage(id, data)
+
+        case EpisodeImageFetchJob() =>
+          parser ! ParseEpisodeImage(id, data)
       }
     }
   }
