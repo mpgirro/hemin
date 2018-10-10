@@ -20,10 +20,10 @@ class CatalogBroker (config: CatalogConfig)
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
   private val CONFIG = ConfigFactory.load()
-  private val STORE_COUNT: Int = Option(CONFIG.getInt("echo.catalog.store-count")).getOrElse(1) // TODO
-  private val DATABASE_URLs = Array("jdbc:h2:mem:echo1", "jdbc:h2:mem:echo2")// TODO I'll have to thing about a better solution in a distributed context
+  private val STORE_COUNT: Int = Option(CONFIG.getInt("hemin.catalog.store-count")).getOrElse(1) // TODO
+  private val DATABASE_URLs = Array("jdbc:h2:mem:hemin1", "jdbc:h2:mem:hemin2")// TODO I'll have to thing about a better solution in a distributed context
 
-  private val eventStreamName = Option(CONFIG.getString("echo.catalog.event-stream")).getOrElse("catalog-event-stream")
+  private val eventStreamName = Option(CONFIG.getString("hemin.catalog.event-stream")).getOrElse("catalog-event-stream")
   private val mediator = DistributedPubSub(context.system).mediator
   mediator ! Subscribe(eventStreamName, self) // subscribe to the topic (= event stream)
   mediator ! Put(self) // register to the path
@@ -84,6 +84,11 @@ class CatalogBroker (config: CatalogConfig)
     case message =>
       log.warning("Routing GENERAL message of kind (assuming it should be broadcast) : {}", message.getClass)
       broadcastRouter.route(message, sender())
+  }
+
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   private def createCatalogStore(storeIndex: Int, databaseUrl: String): ActorRef = {

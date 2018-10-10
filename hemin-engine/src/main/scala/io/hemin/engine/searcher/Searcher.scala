@@ -14,7 +14,7 @@ object Searcher {
   final val name = "searcher"
   def props(config: IndexConfig): Props =
     Props(new Searcher(config))
-      .withDispatcher("echo.searcher.dispatcher")
+      .withDispatcher("hemin.searcher.dispatcher")
 
   trait SearcherMessage
   trait SearcherQuery extends SearcherMessage
@@ -30,7 +30,7 @@ class Searcher (config: IndexConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.searcher.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.searcher.dispatcher")
 
   private val solrRetriever = new SolrRetriever(config, executionContext)
 
@@ -60,7 +60,11 @@ class Searcher (config: IndexConfig)
             ex.printStackTrace()
         }
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
+
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
 }

@@ -8,9 +8,9 @@ import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.domain.FeedStatus
+import io.hemin.engine.exception.HeminException
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.parser.Parser._
-import io.hemin.engine.exception.EchoException
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}
@@ -20,7 +20,7 @@ object CrawlerWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
   def props(config: CrawlerConfig): Props =
     Props(new CrawlerWorker(config))
-      .withDispatcher("echo.crawler.dispatcher")
+      .withDispatcher("hemin.crawler.dispatcher")
 }
 
 class CrawlerWorker (config: CrawlerConfig)
@@ -29,7 +29,7 @@ class CrawlerWorker (config: CrawlerConfig)
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
   // important, or we will experience starvation on processing many feeds at once
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.crawler.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.crawler.dispatcher")
 
   private implicit val actorSystem: ActorSystem = context.system
   private implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))
@@ -52,7 +52,7 @@ class CrawlerWorker (config: CrawlerConfig)
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
     cause match {
-      case e: EchoException =>
+      case e: HeminException =>
         log.error("HEAD response prevented fetching resource : {} [reason : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
       case e: java.net.ConnectException =>
         log.error("java.net.ConnectException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
@@ -117,8 +117,11 @@ class CrawlerWorker (config: CrawlerConfig)
     case LoadFyydEpisodes(podcastId, fyydId) =>
       //onLoadFyydEpisodes(podcastId, fyydId)
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
 
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   /*

@@ -22,7 +22,7 @@ object CatalogStore {
     final val name = "catalog"
     def props(config: CatalogConfig): Props =
       Props(new CatalogStore(config))
-        .withDispatcher("echo.catalog.dispatcher")
+        .withDispatcher("hemin.catalog.dispatcher")
 
     trait CatalogMessage
     trait CatalogEvent extends CatalogMessage
@@ -72,7 +72,7 @@ class CatalogStore(config: CatalogConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("echo.catalog.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.catalog.dispatcher")
 
   private val idGenerator = new IdGenerator(1)  // TODO get shardId from Config
 
@@ -219,8 +219,11 @@ class CatalogStore(config: CatalogConfig)
 
     case DebugPrintAllFeeds => debugPrintAllFeeds()
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
 
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   /*

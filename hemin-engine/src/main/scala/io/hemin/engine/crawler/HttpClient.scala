@@ -6,7 +6,7 @@ import java.util.Optional
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.domain.HeadResult
-import io.hemin.engine.exception.EchoException
+import io.hemin.engine.exception.HeminException
 
 import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration._
@@ -25,7 +25,7 @@ class HttpClient (val timeout: Long,
     sttpBackend.close()
   }
 
-  @throws(classOf[EchoException])
+  @throws(classOf[HeminException])
   @throws(classOf[java.net.ConnectException])
   @throws(classOf[java.net.SocketTimeoutException])
   @throws(classOf[java.net.UnknownHostException])
@@ -66,9 +66,9 @@ class HttpClient (val timeout: Long,
           log.debug("Redirecting {} to {}", url, location.getOrElse("NON PROVIDED"))
         case 302 => // odd, but ok
         case 404 => // not found: nothing there worth processing
-          throw new EchoException(s"HEAD request reported status ${response.code} : ${response.statusText}")
+          throw new HeminException(s"HEAD request reported status ${response.code} : ${response.statusText}")
         case 503 => // service unavailable
-          throw new EchoException(s"HEAD request reported status ${response.code} : ${response.statusText}")
+          throw new HeminException(s"HEAD request reported status ${response.code} : ${response.statusText}")
         case _   =>
           log.warn("Received unexpected status from HEAD request : {} {} on {}", response.code, response.statusText, url)
       }
@@ -83,9 +83,9 @@ class HttpClient (val timeout: Long,
         if (!isValidMime(mime)) {
           mime match {
             case _@("audio/mpeg" | "application/octet-stream") =>
-              throw new EchoException(s"Invalid MIME-type '${mime}' of '${url}'")
+              throw new HeminException(s"Invalid MIME-type '${mime}' of '${url}'")
             case _ =>
-              throw new EchoException(s"Unexpected MIME-type '${mime}' of '${url}")
+              throw new HeminException(s"Unexpected MIME-type '${mime}' of '${url}")
           }
         }
       case None =>
@@ -138,7 +138,7 @@ class HttpClient (val timeout: Long,
     )
   }
 
-  @throws(classOf[EchoException])
+  @throws(classOf[HeminException])
   @throws(classOf[java.net.ConnectException])
   @throws(classOf[java.net.SocketTimeoutException])
   @throws(classOf[java.net.UnknownHostException])
@@ -165,21 +165,21 @@ class HttpClient (val timeout: Long,
 
     if (!response.isSuccess) {
       //log.error("Download resulted in a non-success response code : {}", response.code)
-      throw new EchoException(s"Download resulted in a non-success response code : ${response.code}") // TODO make dedicated exception
+      throw new HeminException(s"Download resulted in a non-success response code : ${response.code}") // TODO make dedicated exception
     }
 
     response.contentType.foreach(ct => {
       val mimeType = ct.split(";")(0).trim
       if (!isValidMime(mimeType)) {
         //log.error("Aborted before downloading a file with invalid MIME-type : '{}' from : '{}'", mimeType, url)
-        throw new EchoException(s"Aborted before downloading a file with invalid MIME-type : '${mimeType}'") // TODO make dedicated exception
+        throw new HeminException(s"Aborted before downloading a file with invalid MIME-type : '${mimeType}'") // TODO make dedicated exception
       }
     })
 
     response.contentLength.foreach(cl => {
       if (cl > DOWNLOAD_MAXBYTES) {
         //log.error("Refusing to download resource because content length exceeds maximum: {} > {}", cl, DOWNLOAD_MAXBYTES)
-        throw new EchoException(s"Refusing to download resource because content length exceeds maximum: ${cl} > ${DOWNLOAD_MAXBYTES}")
+        throw new HeminException(s"Refusing to download resource because content length exceeds maximum: ${cl} > ${DOWNLOAD_MAXBYTES}")
       }
     })
 
@@ -187,7 +187,7 @@ class HttpClient (val timeout: Long,
     response.body match {
       case Left(errorMessage) =>
         //log.error("Error collecting download body, message : {}", errorMessage)
-        throw new EchoException(s"Error collecting download body, message : ${errorMessage}") // TODO make dedicated exception
+        throw new HeminException(s"Error collecting download body, message : ${errorMessage}") // TODO make dedicated exception
       case Right(data) =>
         log.debug("Finished collecting content from GET response : {}", url)
 

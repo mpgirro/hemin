@@ -25,7 +25,7 @@ object ParserWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
   def props(config: ParserConfig): Props =
     Props(new ParserWorker(config))
-      .withDispatcher("echo.parser.dispatcher")
+      .withDispatcher("hemin.parser.dispatcher")
 }
 
 class ParserWorker (config: ParserConfig)
@@ -97,8 +97,11 @@ class ParserWorker (config: ParserConfig)
 
     case ParseEpisodeImage(episodeId, imageData) => onParseEpisodeImage(episodeId, imageData)
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
 
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   private def onParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String): Unit = {

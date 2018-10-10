@@ -9,7 +9,7 @@ import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.exception.EchoException
+import io.hemin.engine.exception.HeminException
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -18,7 +18,7 @@ object Crawler {
   final val name = "crawler"
   def props(config: CrawlerConfig): Props =
     Props(new Crawler(config))
-      .withDispatcher("echo.crawler.dispatcher")
+      .withDispatcher("hemin.crawler.dispatcher")
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage
@@ -55,7 +55,7 @@ class Crawler (config: CrawlerConfig)
 
   override val supervisorStrategy: SupervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-      case _: EchoException                => Resume
+      case _: HeminException                => Resume
       case _: ConnectException             => Resume
       case _: SocketTimeoutException       => Resume
       case _: UnknownHostException         => Resume
@@ -104,6 +104,11 @@ class Crawler (config: CrawlerConfig)
     case work =>
       log.debug("Routing work of kind : {}", work.getClass)
       router.route(work, sender())
+  }
+
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   private def reportStartupCompleteIfViable(): Unit = {

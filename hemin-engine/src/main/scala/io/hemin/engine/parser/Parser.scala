@@ -12,7 +12,7 @@ object Parser {
   final val name = "parser"
   def props(config: ParserConfig): Props =
     Props(new Parser(config))
-      .withDispatcher("echo.parser.dispatcher")
+      .withDispatcher("hemin.parser.dispatcher")
 
   trait ParserMessage
   case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
@@ -88,6 +88,11 @@ class Parser (config: ParserConfig)
     case work =>
       log.debug("Routing work of kind : {}", work.getClass)
       router.route(work, sender())
+  }
+
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
   private def reportStartupCompleteIfViable(): Unit = {

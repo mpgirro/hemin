@@ -11,7 +11,7 @@ object Updater {
   final val name = "updater"
   def props(config: UpdaterConfig): Props =
     Props(new Updater(config))
-      .withDispatcher("echo.updater.dispatcher")
+      .withDispatcher("hemin.updater.dispatcher")
 
   trait UpdaterMessage
   case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
@@ -51,7 +51,11 @@ class Updater (config: UpdaterConfig)
       log.debug("Received ProcessFeed({},{},{})", id, url, job)
       crawler ! DownloadWithHeadCheck(id, url, job)
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
+
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
 }

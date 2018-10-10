@@ -143,6 +143,11 @@ class NodeMaster (config: EngineConfig)
     case ShutdownSystem   => onSystemShutdown()
   }
 
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
+  }
+
   private def isEngineOperational: Boolean =
     catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && searcherStartupComplete && updaterStartupComplete
 

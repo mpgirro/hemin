@@ -24,11 +24,11 @@ class IndexBroker (config: IndexConfig)
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
   private val CONFIG = ConfigFactory.load()
-  private val STORE_COUNT: Int = Option(CONFIG.getInt("echo.index.store-count")).getOrElse(1) // TODO
-  private val INDEX_PATHs = Array("/Users/max/volumes/echo/index_1", "/Users/max/volumes/echo/index_2") // TODO I'll have to thing about a better solution in a distributed context
-  private val CREATE_INDEX: Boolean = Option(CONFIG.getBoolean("echo.index.create-index")).getOrElse(false)
+  private val STORE_COUNT: Int = Option(CONFIG.getInt("hemin.index.store-count")).getOrElse(1) // TODO
+  private val INDEX_PATHs = Array("/Users/max/volumes/hemin/index_1", "/Users/max/volumes/hemin/index_2") // TODO I'll have to thing about a better solution in a distributed context
+  private val CREATE_INDEX: Boolean = Option(CONFIG.getBoolean("hemin.index.create-index")).getOrElse(false)
 
-  private val eventStreamName = Option(CONFIG.getString("echo.index.event-stream")).getOrElse("index-event-stream")
+  private val eventStreamName = Option(CONFIG.getString("hemin.index.event-stream")).getOrElse("index-event-stream")
   private val mediator = DistributedPubSub(context.system).mediator
   mediator ! Subscribe(eventStreamName, self) // subscribe to the topic (= event stream)
   mediator ! Put(self) // register to the path
