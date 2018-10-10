@@ -53,7 +53,7 @@ object CliFormatter {
 
   def format(xs: List[Any]): String = prettyPrint(xs)
 
-  private def truncat(value: String): String = value.substring(0, Math.min(value.length, 20)) ++ " ..."
+  private def truncat(value: String): String = value.substring(0, Math.min(value.length, 40)) ++ " ..."
 
   /**
     * Pretty prints a Scala value similar to its source represention.
