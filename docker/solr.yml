@@ -10,4 +10,4 @@ services:
     entrypoint:
       - docker-entrypoint.sh
       - solr-precreate
-      - disposia
+      - hemin
