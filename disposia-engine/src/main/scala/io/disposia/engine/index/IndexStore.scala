@@ -15,7 +15,8 @@ import scala.language.postfixOps
 object IndexStore {
   final val name = "index"
   def props(config: IndexConfig): Props =
-    Props(new IndexStore(config)).withDispatcher("echo.index.dispatcher")
+    Props(new IndexStore(config))
+      .withDispatcher("echo.index.dispatcher")
 
   trait IndexMessage
   trait IndexEvent extends IndexMessage

@@ -10,7 +10,9 @@ import scala.concurrent.duration._
 
 object Parser {
   final val name = "parser"
-  def props(config: ParserConfig): Props = Props(new Parser(config))
+  def props(config: ParserConfig): Props =
+    Props(new Parser(config))
+      .withDispatcher("echo.parser.dispatcher")
 
   trait ParserMessage
   case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage

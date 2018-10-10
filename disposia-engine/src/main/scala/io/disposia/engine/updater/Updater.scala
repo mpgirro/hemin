@@ -10,7 +10,8 @@ import io.disposia.engine.updater.Updater.ProcessFeed
 object Updater {
   final val name = "updater"
   def props(config: UpdaterConfig): Props =
-    Props(new Updater(config)).withDispatcher("echo.updater.dispatcher")
+    Props(new Updater(config))
+      .withDispatcher("echo.updater.dispatcher")
 
   trait UpdaterMessage
   case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage

@@ -13,7 +13,8 @@ import scala.util.{Failure, Success}
 object Searcher {
   final val name = "searcher"
   def props(config: IndexConfig): Props =
-    Props(new Searcher(config)).withDispatcher("echo.searcher.dispatcher")
+    Props(new Searcher(config))
+      .withDispatcher("echo.searcher.dispatcher")
 
   trait SearcherMessage
   trait SearcherQuery extends SearcherMessage

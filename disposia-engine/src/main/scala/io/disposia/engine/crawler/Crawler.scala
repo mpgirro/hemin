@@ -16,7 +16,9 @@ import scala.concurrent.duration._
 
 object Crawler {
   final val name = "crawler"
-  def props(config: CrawlerConfig): Props = Props(new Crawler(config))
+  def props(config: CrawlerConfig): Props =
+    Props(new Crawler(config))
+      .withDispatcher("echo.crawler.dispatcher")
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage

@@ -24,7 +24,8 @@ import org.jsoup.safety.Whitelist
 object ParserWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
   def props(config: ParserConfig): Props =
-    Props(new ParserWorker(config)).withDispatcher("echo.parser.dispatcher")
+    Props(new ParserWorker(config))
+      .withDispatcher("echo.parser.dispatcher")
 }
 
 class ParserWorker (config: ParserConfig)

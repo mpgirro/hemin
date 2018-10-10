@@ -20,9 +20,9 @@ import scala.util.{Failure, Success}
 
 object CatalogStore {
     final val name = "catalog"
-    def props(config: CatalogConfig): Props = {
-        Props(new CatalogStore(config)).withDispatcher("echo.catalog.dispatcher")
-    }
+    def props(config: CatalogConfig): Props =
+      Props(new CatalogStore(config))
+        .withDispatcher("echo.catalog.dispatcher")
 
     trait CatalogMessage
     trait CatalogEvent extends CatalogMessage
