@@ -1,6 +1,6 @@
 import { AppPage } from './app.po';
 
-describe('disposia-web App', () => {
+describe('hemin-web App', () => {
   let page: AppPage;
 
   beforeEach(() => {

@@ -1,4 +1,4 @@
-# disposia:web
+# hemin:web
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.6.3.
 
@@ -25,8 +25,8 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 After a production build, a Docker image can be built with:
 
 ```
-docker build -t disposia-web:latest . 
-docker run -p 80:80 --name disposia-web disposia-web 
+docker build -t hemin-web:latest . 
+docker run -p 80:80 --name hemin-web hemin-web 
 ```
 
 ## Running unit tests
