@@ -1,6 +1,6 @@
 package api.v1.podcast
 
-import io.disposia.engine.domain._
+import io.hemin.engine.domain._
 import javax.inject.Inject
 import play.api.MarkerContext
 import services.EngineService
@@ -8,7 +8,7 @@ import services.EngineService
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * Controls access to the backend data, returning [[io.disposia.engine.domain.Podcast]]
+  * Controls access to the backend data, returning [[io.hemin.engine.domain.Podcast]]
   */
 class PodcastService @Inject()(engineService: EngineService)
                               (implicit ec: ExecutionContext) {

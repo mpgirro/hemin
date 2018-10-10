@@ -1,7 +1,7 @@
 package api.v1.search
 
 import com.typesafe.config.ConfigFactory
-import io.disposia.engine.domain.ResultsWrapper
+import io.hemin.engine.domain.ResultsWrapper
 import javax.inject.Inject
 import play.api.MarkerContext
 import services.EngineService
@@ -11,7 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 // TODO das hier ist ein Service
 
 /**
-  * Controls access to the backend data, returning [[io.disposia.engine.domain.ResultsWrapper]]
+  * Controls access to the backend data, returning [[io.hemin.engine.domain.ResultsWrapper]]
   */
 class SearchService @Inject()(engineService: EngineService)
                              (implicit ec: ExecutionContext) {

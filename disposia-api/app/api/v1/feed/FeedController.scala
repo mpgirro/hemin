@@ -1,6 +1,6 @@
 package api.v1.feed
 
-import io.disposia.engine.domain._
+import io.hemin.engine.domain._
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes

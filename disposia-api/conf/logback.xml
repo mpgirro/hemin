@@ -58,7 +58,7 @@
     <logger name="services" level="INFO" />
     <logger name="api.v1" level="TRACE" />
 
-    <logger name="io.disposia" level="INFO" />
+    <logger name="io.hemin" level="INFO" />
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/> <!-- TODO: obsolete? -->

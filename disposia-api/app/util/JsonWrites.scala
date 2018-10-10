@@ -2,8 +2,8 @@ package util
 
 import java.time.LocalDateTime
 
-import io.disposia.engine.domain.{FeedStatus, _}
-import io.disposia.engine.util.mapper.DateMapper
+import io.hemin.engine.domain.{FeedStatus, _}
+import io.hemin.engine.util.mapper.DateMapper
 import play.api.libs.json._
 
 import scala.collection.JavaConverters._

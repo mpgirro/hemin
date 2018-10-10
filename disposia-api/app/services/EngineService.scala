@@ -1,6 +1,6 @@
 package services
 
-import io.disposia.engine.Engine
+import io.hemin.engine.Engine
 import javax.inject._
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle

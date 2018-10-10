@@ -1,6 +1,6 @@
 package api.v1.search
 
-import io.disposia.engine.domain.ResultsWrapper
+import io.hemin.engine.domain.ResultsWrapper
 import javax.inject.Inject
 import play.api.Logger
 import play.api.http.FileMimeTypes

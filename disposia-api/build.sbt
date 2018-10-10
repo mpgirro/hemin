@@ -15,7 +15,7 @@ def gatlingVersion(scalaBinVer: String): String = scalaBinVer match {
 
 libraryDependencies += guice
 
-libraryDependencies += "io.disposia" % "disposia-engine" % "1.0-SNAPSHOT"
+libraryDependencies += "io.hemin" % "hemin-engine" % "1.0-SNAPSHOT"
 
 libraryDependencies += "org.joda" % "joda-convert" % "1.9.2"
 libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "4.11"
@@ -33,7 +33,7 @@ lazy val root = (project in file("."))
   .configs(GatlingTest)
   .settings(inConfig(GatlingTest)(Defaults.testSettings): _*)
   .settings(
-    name := """disposia-api""",
+    name := """hemin-api""",
     scalaSource in GatlingTest := baseDirectory.value / "/gatling/simulation"
   )
 
