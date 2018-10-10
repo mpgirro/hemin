@@ -2,5 +2,5 @@
 
 COMMAND=$*
 
-curl -X POST -H "Content-Type: text/plain" -d "$COMMAND" "http://localhost:9000/api/v1/repl"
-#curl -H "Authorization: Bearer $DISPOSIA_CLI_TOKEN" -d "$COMMAND" "https://disposia.io/api/v1/repl"
+curl -X POST -H "Content-Type: text/plain" -d "$COMMAND" "http://localhost:9000/api/v1/cli"
+#curl -H "Authorization: Bearer $DISPOSIA_CLI_TOKEN" -d "$COMMAND" "https://disposia.io/api/v1/cli"

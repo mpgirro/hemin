@@ -11,7 +11,7 @@ public class HashUtil {
         return byteArray2Hex(md.digest(data));
     }
 
-    private static String byteArray2Hex(final byte[] hash) {
+    private static String byteArray2Hex(byte[] hash) {
         final Formatter formatter = new Formatter();
         for (byte b : hash) {
             formatter.format("%02x", b);

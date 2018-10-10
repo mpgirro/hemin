@@ -1,4 +1,4 @@
-package io.disposia.engine.util.repl
+package io.disposia.engine.util.cli
 
 import akka.actor.ActorRef
 import akka.pattern.ask
@@ -8,12 +8,12 @@ import io.disposia.engine.EngineConfig
 import io.disposia.engine.catalog.CatalogStore._
 import io.disposia.engine.domain._
 import io.disposia.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
-import io.disposia.engine.util.repl.ReplFormatter.format
+import io.disposia.engine.util.cli.CliFormatter.format
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
-  * A processor for interactive commands. This is not a fully
+  * command language interpreter processor for interactive commands. This is not a fully
   * fledged REPL, since it does not print the evaluation results.
   *
   * TODO: rewrite the eval(String): String methods to stream-based output, e.g. for proposing feeds
@@ -22,7 +22,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
   * @param config
   * @param executionContext
   */
-class ReplProcessor(bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
+class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
 
   private val log = Logger(getClass)
 

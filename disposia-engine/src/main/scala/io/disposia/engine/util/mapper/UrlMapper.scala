@@ -14,14 +14,14 @@ object UrlMapper {
     }
 
   def sanitize(url: String): Option[String] = Option(url)
-    .map(URLEncoder.encode(_, "UTF-8"))
     .map { _
-      .replace("%", "")   // the char `^` breaks Play, even URL encoded
       .replace("<", "")
       .replace(">", "")
       .replace("\n", "")
       .replace("\t", "")
       .replace("\r", "")
     }
+    //.map(URLEncoder.encode(_, "UTF-8"))
+    //.map(_.replace("%", "")) // the char `^` breaks Play, even URL encoded
 
 }

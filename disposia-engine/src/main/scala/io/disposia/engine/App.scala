@@ -2,7 +2,7 @@ package io.disposia.engine
 
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import io.disposia.engine.util.repl.ReplProcessor
+import io.disposia.engine.util.cli.CliProcessor
 
 import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, blocking}
@@ -25,7 +25,7 @@ object App {
 
   private def repl(): Unit = {
 
-    val processor = new ReplProcessor(engine.bus, engine.config, ec)
+    val processor = new CliProcessor(engine.bus, engine.config, ec)
     log.info("CLI is ready to take commands")
 
     while(running){

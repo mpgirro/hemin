@@ -1,8 +1,8 @@
-package io.disposia.engine.util.repl
+package io.disposia.engine.util.cli
 
 import io.disposia.engine.domain._
 
-object ReplFormatter {
+object CliFormatter {
 
   /* TODO 2018-10-08: once PPrint support outputting field names (see https://github.com/lihaoyi/PPrint/issues/4) , I want to use these implementations
    *

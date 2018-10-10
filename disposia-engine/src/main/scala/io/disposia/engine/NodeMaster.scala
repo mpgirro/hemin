@@ -6,7 +6,7 @@ import io.disposia.engine.EngineProtocol._
 import io.disposia.engine.NodeMaster._
 import io.disposia.engine.catalog.CatalogStore
 import io.disposia.engine.catalog.CatalogStore.CatalogMessage
-import io.disposia.engine.util.repl.ReplProcessor
+import io.disposia.engine.util.cli.CliProcessor
 import io.disposia.engine.crawler.Crawler
 import io.disposia.engine.crawler.Crawler.CrawlerMessage
 import io.disposia.engine.index.IndexStore
@@ -45,7 +45,7 @@ class NodeMaster (config: EngineConfig)
 
   private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
 
-  private val processor = new ReplProcessor(self, config, executionContext)
+  private val processor = new CliProcessor(self, config, executionContext)
 
   private var index: ActorRef = _
   private var catalog: ActorRef = _

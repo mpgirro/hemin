@@ -10,7 +10,7 @@ GET   /api/v1/episode/:id/chapters    api.v1.episode.EpisodeController.chapters(
 GET   /api/v1/episode/:id/image       api.v1.episode.EpisodeController.image(id: String)
 GET   /api/v1/feed/:id                api.v1.feed.FeedController.find(id: String)
 POST  /api/v1/feed/propose            api.v1.feed.FeedController.propose
-POST  /api/v1/repl                    api.v1.repl.ReplController.eval
+POST  /api/v1/cli                    api.v1.cli.CliController.eval
 ->    /api/v1/posts                   api.v1.post.PostRouter
 
 # Map static resources from the /public folder to the /assets URL path
