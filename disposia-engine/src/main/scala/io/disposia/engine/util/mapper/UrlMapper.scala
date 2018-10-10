@@ -1,6 +1,6 @@
 package io.disposia.engine.util.mapper
 
-import java.net.{MalformedURLException, URL}
+import java.net.{MalformedURLException, URL, URLEncoder}
 
 object UrlMapper {
 
@@ -14,7 +14,9 @@ object UrlMapper {
     }
 
   def sanitize(url: String): Option[String] = Option(url)
+    .map(URLEncoder.encode(_, "UTF-8"))
     .map { _
+      .replace("%", "")   // the char `^` breaks Play, even URL encoded
       .replace("<", "")
       .replace(">", "")
       .replace("\n", "")
