@@ -23,21 +23,16 @@ object CliFormatter {
   def format(xs: List[Any]): String = pprint.apply(xs).toString()
   */
 
-  def format(podcast: Podcast): String = {
-    val p = podcast.description match {
-      case Some(d) => podcast.copy(description = Some("<HIDDEN TO SAFE SPACE>"))
-      case None    => podcast
-    }
-    prettyPrint(p)
-  }
+  def format(podcast: Podcast): String =
+    prettyPrint(podcast.copy(
+      description = podcast.description.map(truncat),
+    ))
 
-  def format(episode: Episode): String = {
-    val e = episode.description match {
-      case Some(d) => episode.copy(description = Some("<HIDDEN TO SAFE SPACE>"))
-      case None    => episode
-    }
-    prettyPrint(e)
-  }
+  def format(episode: Episode): String =
+    prettyPrint(episode.copy(
+      description    = episode.description.map(truncat),
+      contentEncoded = episode.contentEncoded.map(truncat),
+    ))
 
   def format(feed: Feed): String = prettyPrint(feed)
 
@@ -45,11 +40,20 @@ object CliFormatter {
 
   def format(image: Image): String = prettyPrint(image)
 
-  def format(indexDoc: IndexDoc): String = prettyPrint(indexDoc)
+  def format(doc: IndexDoc): String =
+    prettyPrint(doc.copy(
+      description    = doc.description.map(truncat),
+      chapterMarks   = doc.chapterMarks.map(truncat),
+      contentEncoded = doc.contentEncoded.map(truncat),
+      transcript     = doc.transcript.map(truncat),
+      websiteData    = doc.websiteData.map(truncat),
+    ))
 
   def format(results: ResultsWrapper): String = prettyPrint(results)
 
   def format(xs: List[Any]): String = prettyPrint(xs)
+
+  private def truncat(value: String): String = value.substring(0, Math.min(value.length, 20)) ++ " ..."
 
   /**
     * Pretty prints a Scala value similar to its source represention.

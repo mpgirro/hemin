@@ -12,7 +12,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 /**
-  * Configuration for [[Engine]]
+  * Configuration for [[io.hemin.engine.Engine]]
   */
 case class EngineConfig(
   appConfig: AppConfig,           // Config when we start an engine stand-alone
