@@ -39,7 +39,7 @@
 
     <!-- for further appenders see http://logback.qos.ch/manual/appenders.html -->q
 
-    <logger name="io.disposia.engine" level="INFO" />
+    <logger name="io.hemin.engine" level="INFO" />
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>

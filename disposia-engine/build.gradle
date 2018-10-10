@@ -24,11 +24,11 @@ sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
 assert System.properties['java.specification.version'] == '1.8'
 
-group 'io.disposia'
+group 'io.hemin'
 version '1.0-SNAPSHOT'
 description = ''
 
-mainClassName = 'io.disposia.engine.App'
+mainClassName = 'io.hemin.engine.App'
 
 compileJava {
     options.compilerArgs = [
