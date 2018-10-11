@@ -5,6 +5,8 @@ import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers}
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Packages up the component dependencies for the post controller.
   *
@@ -18,5 +20,5 @@ case class FeedControllerComponents @Inject()(feedActionBuilder: FeedActionBuild
                                               messagesApi: MessagesApi,
                                               langs: Langs,
                                               fileMimeTypes: FileMimeTypes,
-                                              executionContext: scala.concurrent.ExecutionContext)
+                                              executionContext: ExecutionContext)
   extends ControllerComponents

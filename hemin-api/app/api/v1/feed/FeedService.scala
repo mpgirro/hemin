@@ -1,18 +1,14 @@
 package api.v1.feed
 
-import com.google.common.base.Strings.isNullOrEmpty
-import com.typesafe.config.ConfigFactory
 import io.hemin.engine.domain._
-import javax.inject.{Inject, Provider}
+import javax.inject.Inject
 import play.api.MarkerContext
 import services.EngineService
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// TODO das hier ist ein Service
-
 /**
-  * Controls access to the backend data, returning [[io.hemin.engine.domain.Feed]]
+  * Controls access to the backend data
   */
 class FeedService @Inject()(engineService: EngineService)
                            (implicit ec: ExecutionContext) {

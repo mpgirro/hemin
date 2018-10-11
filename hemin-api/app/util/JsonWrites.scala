@@ -1,6 +1,7 @@
 package util
 
 import java.time.LocalDateTime
+import java.util.Base64
 
 import io.hemin.engine.domain.{FeedStatus, _}
 import io.hemin.engine.util.mapper.DateMapper
@@ -17,7 +18,9 @@ object JsonWrites {
   private def toNullD(d: Option[LocalDateTime]): JsValue = d.map(toJson).getOrElse(JsNull)
   private def toNullF(f: Option[FeedStatus]): JsValue =f.map(toJson).getOrElse(JsNull)
 
+  private def toNullA(bytes: Option[Array[Byte]]): JsValue = toNullS(bytes.map(Base64.getEncoder.encodeToString))
   private def toNullA(as: Iterable[String]): JsArray = jsonFromStringIterable(as)
+
 
   /*
   private def toNullA(opt: Option[Array[String]]): JsArray = opt match {
@@ -48,7 +51,6 @@ object JsonWrites {
 
   private def jsonFromStringIterable(ss: Iterable[String]): JsArray = JsArray(ss.map(s => JsString(s)).toVector)
   private def jsonFromDocumentIterable(is: Iterable[IndexDoc]): JsArray = JsArray(is.map(implicitIndexDocWrites.writes).toVector)
-
 
   implicit def implicitArrayWrites[T](implicit fmt: Writes[T]): Writes[ArrayWrapper[T]] =
     (as: ArrayWrapper[T]) => JsObject(Seq(
@@ -144,6 +146,18 @@ object JsonWrites {
       "href"      -> toNullS(c.href),
       "image"     -> toNullS(c.image),
       "episodeId" -> toNullS(c.episodeId)
+    ))
+
+  implicit val implicitImageWrites: Writes[Image] =
+    (i: Image) => JsObject(List(
+      "id"          -> toNullS(i.id),
+      "associateId" -> toNullS(i.associateId),
+      "data"        -> toNullA(i.data),
+      "hash"        -> toNullS(i.hash),
+      "name"        -> toNullS(i.name),
+      "contentType" -> toNullS(i.contentType),
+      "size"        -> toNullL(i.size),
+      "createdAt"   -> toNullD(i.createdAt),
     ))
 
 }

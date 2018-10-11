@@ -33,8 +33,9 @@ class FeedController @Inject()(cc: FeedControllerComponents,
       log.trace(s"GET feed: id = $id")
       feedService
         .find(id)
-        .map { f =>
-          Ok(Json.toJson(f))
+        .map {
+          case Some(f) => Ok(Json.toJson(f))
+          case None    => NotFound
         }
     }
 

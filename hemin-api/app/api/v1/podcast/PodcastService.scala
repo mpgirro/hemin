@@ -8,7 +8,7 @@ import services.EngineService
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * Controls access to the backend data, returning [[io.hemin.engine.domain.Podcast]]
+  * Controls access to the backend data
   */
 class PodcastService @Inject()(engineService: EngineService)
                               (implicit ec: ExecutionContext) {

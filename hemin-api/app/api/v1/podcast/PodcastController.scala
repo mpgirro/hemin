@@ -37,8 +37,9 @@ class PodcastController @Inject()(cc: PodcastControllerComponents,
       log.trace(s"GET podcast: id = $id")
       podcastService
         .find(id)
-        .map { p =>
-          Ok(Json.toJson(p))
+        .map {
+          case Some(p) => Ok(Json.toJson(p))
+          case None    => NotFound
         }
     }
 
@@ -70,17 +71,6 @@ class PodcastController @Inject()(cc: PodcastControllerComponents,
         .map { fs =>
           Ok(Json.toJson(ArrayWrapper(fs)))
         }
-    }
-
-  def image(id: String): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
-      log.trace(s"GET image by podcast: id = $id")
-      /*
-      podcastService.image(id).map { image =>
-        Ok(Json.toJson(image))
-      }
-      */
-      throw new UnsupportedOperationException("not yet implemented")
     }
 
 }
