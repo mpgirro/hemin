@@ -36,7 +36,7 @@ class RomeFeedParser(private val xmlData: String) {
     // TODO
 
   } catch {
-    case ex: Throwable =>
+    case ex: Exception =>
       log.error("RomeFeedParser could not parse the feed : {}", ex.getMessage)
       ex.printStackTrace()
   }

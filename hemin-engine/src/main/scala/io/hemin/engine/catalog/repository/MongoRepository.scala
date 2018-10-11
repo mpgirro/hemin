@@ -76,7 +76,7 @@ trait MongoRepository[T] {
       .find(query)
       .one[T]
       .recover {
-        case ex: Throwable =>
+        case ex: Exception =>
           log.error("Error on findOne({}) : {}", query, ex)
           None
       }
@@ -105,7 +105,7 @@ trait MongoRepository[T] {
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
       .recover {
-        case ex: Throwable =>
+        case ex: Exception =>
           log.error("Error on findAll({}) : {}", query, ex)
           List()
       }
@@ -119,7 +119,7 @@ trait MongoRepository[T] {
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
       .recover {
-        case ex: Throwable =>
+        case ex: Exception =>
           log.error("Error on findAll({}) : {}", query, ex)
           List()
       }
