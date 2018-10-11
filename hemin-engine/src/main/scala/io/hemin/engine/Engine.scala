@@ -101,6 +101,11 @@ class Engine {
       case FeedResult(f) => f
     }
 
+  def findImage(id: String): Future[Option[Image]] =
+    (bus ? GetImage(id)).map {
+      case ImageResult(i) => i
+    }
+
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
     val p: Int = page.getOrElse(engineConfig.catalogConfig.defaultPage) - 1
     val s: Int = size.getOrElse(engineConfig.catalogConfig.defaultSize)
