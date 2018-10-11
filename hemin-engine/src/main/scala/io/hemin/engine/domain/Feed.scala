@@ -2,7 +2,7 @@ package io.hemin.engine.domain
 
 import java.time.LocalDateTime
 
-case class Feed(
+final case class Feed(
   id: Option[String]                           = None,
   podcastId: Option[String]                    = None,
   url: Option[String]                          = None,

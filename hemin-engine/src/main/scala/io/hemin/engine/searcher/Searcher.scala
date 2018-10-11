@@ -20,9 +20,9 @@ object Searcher {
   trait SearcherQuery extends SearcherMessage
   trait SearcherQueryResult extends SearcherMessage
   // SearchQueries
-  case class SearcherRequest(query: String, page: Int, size: Int) extends SearcherQuery
+  final case class SearcherRequest(query: String, page: Int, size: Int) extends SearcherQuery
   // SearchQueryResults
-  case class SearcherResults(results: ResultsWrapper) extends SearcherQueryResult
+  final case class SearcherResults(results: ResultsWrapper) extends SearcherQueryResult
 }
 
 class Searcher (config: IndexConfig)

@@ -4,8 +4,7 @@ import java.time.LocalDateTime
 
 import io.hemin.engine.domain.info._
 
-
-case class Podcast(
+final case class Podcast(
   id: Option[String]                    = None,
   title: Option[String]                 = None,
   link: Option[String]                  = None,

@@ -2,7 +2,7 @@ package io.hemin.engine.domain
 
 import java.time.LocalDateTime
 
-case class IndexDoc(
+final case class IndexDoc(
   docType: Option[String]        = None,
   id: Option[String]             = None,
   title: Option[String]          = None,

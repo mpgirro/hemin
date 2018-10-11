@@ -30,42 +30,42 @@ object CatalogStore {
   trait CatalogQuery extends CatalogMessage
   trait CatalogQueryResult extends CatalogMessage
   // CatalogCommands
-  case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
-  case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
+  final case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
+  final case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
   // CatalogEvents
   //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
-  case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
-  case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
-  case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
-  case class SaveChapter(chapter: Chapter) extends CatalogEvent
-  case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
-  case class UpdateEpisode(episode: Episode) extends CatalogEvent
-  case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
+  final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
+  final case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
+  final case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
+  final case class SaveChapter(chapter: Chapter) extends CatalogEvent
+  final case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
+  final case class UpdateEpisode(episode: Episode) extends CatalogEvent
+  final case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
   // CatalogQueries
-  case class GetPodcast(id: String) extends CatalogQuery
-  case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
-  case class GetAllPodcastsRegistrationComplete(page: Int, size: Int) extends CatalogQuery
-  case class GetAllFeeds(page: Int, size: Int) extends CatalogQuery
-  case class GetEpisode(id: String) extends CatalogQuery
-  case class GetEpisodesByPodcast(podcastId: String) extends CatalogQuery
-  case class GetFeedsByPodcast(podcastId: String) extends CatalogQuery
-  case class GetChaptersByEpisode(episodeId: String) extends CatalogQuery
-  case class GetFeed(id: String) extends CatalogQuery
-  case class GetImage(id: String) extends CatalogQuery
-  case class CheckPodcast(id: String) extends CatalogQuery
-  case class CheckFeed(id: String) extends CatalogQuery
+  final case class GetPodcast(id: String) extends CatalogQuery
+  final case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
+  final case class GetAllPodcastsRegistrationComplete(page: Int, size: Int) extends CatalogQuery
+  final case class GetAllFeeds(page: Int, size: Int) extends CatalogQuery
+  final case class GetEpisode(id: String) extends CatalogQuery
+  final case class GetEpisodesByPodcast(podcastId: String) extends CatalogQuery
+  final case class GetFeedsByPodcast(podcastId: String) extends CatalogQuery
+  final case class GetChaptersByEpisode(episodeId: String) extends CatalogQuery
+  final case class GetFeed(id: String) extends CatalogQuery
+  final case class GetImage(id: String) extends CatalogQuery
+  final case class CheckPodcast(id: String) extends CatalogQuery
+  final case class CheckFeed(id: String) extends CatalogQuery
   //case class CheckAllPodcasts() extends CatalogQuery
-  case class CheckAllFeeds() extends CatalogQuery
+  final case class CheckAllFeeds() extends CatalogQuery
   // CatalogQueryResults
-  case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
-  case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
-  case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
-  case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
-  case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
-  case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
-  case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
-  case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
-  case class ImageResult(image: Option[Image]) extends CatalogQueryResult
+  final case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
+  final case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
+  final case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
+  final case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
+  final case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult
+  final case class FeedsByPodcastResult(feeds: List[Feed]) extends CatalogQueryResult
+  final case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
+  final case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
+  final case class ImageResult(image: Option[Image]) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 

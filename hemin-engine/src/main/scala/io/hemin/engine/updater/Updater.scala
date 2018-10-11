@@ -14,7 +14,7 @@ object Updater {
       .withDispatcher("hemin.updater.dispatcher")
 
   trait UpdaterMessage
-  case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
+  final case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
 }
 
 class Updater (config: UpdaterConfig)

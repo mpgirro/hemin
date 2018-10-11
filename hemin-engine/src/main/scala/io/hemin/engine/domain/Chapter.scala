@@ -1,6 +1,6 @@
 package io.hemin.engine.domain
 
-case class Chapter(
+final case class Chapter(
   id: Option[String]        = None,
   episodeId: Option[String] = None,
   start: Option[String]     = None,

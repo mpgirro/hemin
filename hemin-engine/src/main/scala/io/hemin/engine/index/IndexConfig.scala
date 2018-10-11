@@ -5,7 +5,7 @@ import scala.concurrent.duration.FiniteDuration
 /**
   * Configuration for [[io.hemin.engine.index.IndexStore]]
   */
-case class IndexConfig (
+final case class IndexConfig (
   luceneIndexPath: String,
   solrUri: String,
   solrQueueSize: Int,

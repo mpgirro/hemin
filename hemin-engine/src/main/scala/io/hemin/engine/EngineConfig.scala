@@ -14,7 +14,7 @@ import scala.concurrent.duration._
 /**
   * Configuration for [[io.hemin.engine.Engine]]
   */
-case class EngineConfig(
+final case class EngineConfig(
   appConfig: AppConfig,           // Config when we start an engine stand-alone
   catalogConfig: CatalogConfig,
   crawlerConfig: CrawlerConfig,

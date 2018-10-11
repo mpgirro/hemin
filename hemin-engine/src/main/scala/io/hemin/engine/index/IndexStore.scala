@@ -24,16 +24,16 @@ object IndexStore {
   trait IndexQuery extends IndexMessage
   trait IndexQueryResult extends IndexMessage
   // IndexEvents
-  case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
-  case class UpdateDocWebsiteDataIndexEvent(id: String, html: String) extends IndexEvent
-  case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
-  case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent
+  final case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
+  final case class UpdateDocWebsiteDataIndexEvent(id: String, html: String) extends IndexEvent
+  final case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
+  final case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent
   // IndexCommands
   //case class CommitIndex() extends IndexCommand
   // IndexQueries
-  case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
+  final case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
-  case class IndexSearchResults(results: ResultsWrapper) extends IndexQueryResult
+  final case class IndexSearchResults(results: ResultsWrapper) extends IndexQueryResult
 }
 
 class IndexStore (config: IndexConfig)
@@ -102,8 +102,11 @@ class IndexStore (config: IndexConfig)
       updateLinkQueue.enqueue((id, link))
       */
 
-    case unhandled => log.warning("Received unhandled message of type : {}", unhandled.getClass)
+  }
 
+  override def unhandled(msg: Any): Unit = {
+    super.unhandled(msg)
+    log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
 }

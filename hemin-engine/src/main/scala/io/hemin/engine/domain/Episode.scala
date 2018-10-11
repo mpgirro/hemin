@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 import io.hemin.engine.domain.info.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 
-case class Episode(
+final case class Episode(
   id: Option[String]                    = None,
   podcastId: Option[String]             = None,
   podcastTitle: Option[String]          = None,

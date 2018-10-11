@@ -1,7 +1,6 @@
 package io.hemin.engine.domain.info
 
-
-case class EpisodeItunesInfo(
+final case class EpisodeItunesInfo(
   duration: Option[String]    = None,
   subtitle: Option[String]    = None,
   author: Option[String]      = None,

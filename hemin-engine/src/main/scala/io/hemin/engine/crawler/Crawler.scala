@@ -22,14 +22,14 @@ object Crawler {
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage
-  case class NewPodcastFetchJob() extends FetchJob
-  case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
-  case class WebsiteFetchJob() extends FetchJob
-  case class PodcastImageFetchJob() extends FetchJob
-  case class EpisodeImageFetchJob() extends FetchJob
+  final case class NewPodcastFetchJob() extends FetchJob
+  final case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
+  final case class WebsiteFetchJob() extends FetchJob
+  final case class PodcastImageFetchJob() extends FetchJob
+  final case class EpisodeImageFetchJob() extends FetchJob
 
-  case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage
-  case class DownloadContent(id: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
+  final case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage
+  final case class DownloadContent(id: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
 }
 
 class Crawler (config: CrawlerConfig)

@@ -2,8 +2,7 @@ package io.hemin.engine.domain.info
 
 import java.time.LocalDateTime
 
-
-case class PodcastMetadata(
+final case class PodcastMetadata(
   lastBuildDate: Option[LocalDateTime] = None,
   language: Option[String]             = None,
   generator: Option[String]            = None,

@@ -25,8 +25,8 @@ object NodeMaster {
   final val name = "node"
   def props(config: EngineConfig): Props = Props(new NodeMaster(config))
 
-  case class CliInput(input: String)
-  case class CliOutput(output: String)
+  final case class CliInput(input: String)
+  final case class CliOutput(output: String)
 }
 
 class NodeMaster (config: EngineConfig)

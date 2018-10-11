@@ -15,12 +15,12 @@ object Parser {
       .withDispatcher("hemin.parser.dispatcher")
 
   trait ParserMessage
-  case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
-  case class ParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String) extends ParserMessage
-  case class ParseWebsiteData(id: String, html: String) extends ParserMessage
-  case class ParseFyydEpisodes(podcastId: String, episodesData: String) extends ParserMessage
-  case class ParsePodcastImage(podcastId: String, imageData: String) extends ParserMessage
-  case class ParseEpisodeImage(episodeId: String, imageData: String) extends ParserMessage
+  final case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
+  final case class ParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String) extends ParserMessage
+  final case class ParseWebsiteData(id: String, html: String) extends ParserMessage
+  final case class ParseFyydEpisodes(podcastId: String, episodesData: String) extends ParserMessage
+  final case class ParsePodcastImage(podcastId: String, imageData: String) extends ParserMessage
+  final case class ParseEpisodeImage(episodeId: String, imageData: String) extends ParserMessage
 }
 
 class Parser (config: ParserConfig)

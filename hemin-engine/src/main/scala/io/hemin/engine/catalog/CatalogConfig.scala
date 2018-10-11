@@ -3,7 +3,7 @@ package io.hemin.engine.catalog
 /**
   * Configuration for [[io.hemin.engine.catalog.CatalogStore]]
   */
-case class CatalogConfig (
+final case class CatalogConfig (
   mongoUri: String,
   createDatabase: Boolean,
   defaultPage: Int,

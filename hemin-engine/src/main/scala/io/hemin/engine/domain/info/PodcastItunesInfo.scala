@@ -1,7 +1,6 @@
 package io.hemin.engine.domain.info
 
-
-case class PodcastItunesInfo(
+final case class PodcastItunesInfo(
   summary: Option[String]     = None,
   author: Option[String]      = None,
   keywords: List[String]      = Nil,

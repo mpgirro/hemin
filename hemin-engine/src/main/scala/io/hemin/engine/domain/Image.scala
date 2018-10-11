@@ -2,7 +2,7 @@ package io.hemin.engine.domain
 
 import java.time.LocalDateTime
 
-case class Image (
+final case class Image (
   id: Option[String]               = None,
   associateId: Option[String]      = None,
   data: Option[Array[Byte]]        = None,
