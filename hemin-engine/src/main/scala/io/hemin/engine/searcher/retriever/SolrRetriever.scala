@@ -1,11 +1,9 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.domain.{IndexDoc, ResultsWrapper}
-import io.hemin.engine.index.IndexConfig
+import io.hemin.engine.domain.{IndexField, ResultsWrapper}
+import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.util.mapper.IndexMapper
-import io.hemin.engine.domain.IndexField
 import org.apache.solr.client.solrj.impl.HttpSolrClient
-import org.apache.solr.client.solrj.response.QueryResponse
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
 import org.apache.solr.common.SolrDocumentList
 
@@ -13,9 +11,11 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 
 
-class SolrRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRetriever {
+class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends IndexRetriever {
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
+
+  override protected[this] def searcherConfig: SearcherConfig = config
 
   override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultsWrapper =
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)

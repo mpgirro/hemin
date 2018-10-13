@@ -6,6 +6,7 @@ import io.hemin.engine.catalog.CatalogConfig
 import io.hemin.engine.crawler.CrawlerConfig
 import io.hemin.engine.index.IndexConfig
 import io.hemin.engine.parser.ParserConfig
+import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.updater.UpdaterConfig
 
 import scala.collection.JavaConverters._
@@ -20,12 +21,13 @@ final case class EngineConfig(
   crawlerConfig: CrawlerConfig,
   indexConfig: IndexConfig,
   parserConfig: ParserConfig,
+  searcherConfig: SearcherConfig,
   updaterConfig: UpdaterConfig,
   internalTimeout: Timeout
 )
 
 object EngineConfig {
-  /** Loads the configu. To be used from `main()` or equivalent. */
+  /** Loads the config. To be used from `main()` or equivalent. */
   def loadFromEnvironment(): EngineConfig =
     load(ConfigFactory
       .load(System.getProperty("config.resource", "application.conf"))
@@ -40,7 +42,7 @@ object EngineConfig {
         createDatabase = config.getBoolean("hemin.catalog.create-database"),
         defaultPage    = config.getInt("hemin.catalog.default-page"),
         defaultSize    = config.getInt("hemin.catalog.default-size"),
-        maxPageSize    = config.getInt("hemin.catalog.max-page-size")
+        maxPageSize    = config.getInt("hemin.catalog.max-page-size"),
       ),
       crawlerConfig = CrawlerConfig(
         workerCount      = config.getInt("hemin.crawler.worker-count"),
@@ -56,14 +58,17 @@ object EngineConfig {
         createIndex     = config.getBoolean("hemin.index.create-index"),
         commitInterval  = config.getInt("hemin.index.commit-interval").seconds,
         workerCount     = config.getInt("hemin.index.handler-count"),
-        defaultPage     = config.getInt("hemin.index.default-page"),
-        defaultSize     = config.getInt("hemin.index.default-size"),
       ),
       parserConfig = ParserConfig(
-        workerCount = config.getInt("hemin.parser.worker-count")
+        workerCount = config.getInt("hemin.parser.worker-count"),
+      ),
+      searcherConfig = SearcherConfig(
+        solrUri     = config.getString("hemin.searcher.solr-uri"),
+        defaultPage = config.getInt("hemin.searcher.default-page"),
+        defaultSize = config.getInt("hemin.searcher.default-size"),
       ),
       updaterConfig = UpdaterConfig(),
-      internalTimeout = config.getInt("hemin.internal-timeout").seconds
+      internalTimeout = config.getInt("hemin.internal-timeout").seconds,
     )
 
   private def defaultConfig(): Config = {
@@ -84,10 +89,11 @@ object EngineConfig {
       "hemin.index.create-index"         -> false,
       "hemin.index.commit-interval"      -> 3,
       "hemin.index.handler-count"        -> 5,
-      "hemin.index.default-page"         -> 1,
-      "hemin.index.default-size"         -> 20,
       "hemin.parser.worker-count"        -> 2,
-      "hemin.internal-timeout"           -> 5
+      "hemin.searcher.solr-uri"          -> "http://localhost:8983/solr/hemin",
+      "hemin.searcher.default-page"      -> 1,
+      "hemin.searcher.default-size"      -> 20,
+      "hemin.internal-timeout"           -> 5,
     )
     ConfigFactory.parseMap(defaults.asJava)
   }

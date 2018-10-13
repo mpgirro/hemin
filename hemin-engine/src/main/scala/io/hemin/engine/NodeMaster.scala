@@ -66,7 +66,7 @@ class NodeMaster (config: EngineConfig)
     parser   = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
     crawler  = context.watch(context.actorOf(Crawler.props(config.crawlerConfig),      Crawler.name))
     catalog  = context.watch(context.actorOf(CatalogStore.props(config.catalogConfig), CatalogStore.name))
-    searcher = context.watch(context.actorOf(Searcher.props(config.indexConfig),       Searcher.name))
+    searcher = context.watch(context.actorOf(Searcher.props(config.searcherConfig),    Searcher.name))
     updater  = context.watch(context.actorOf(Updater.props(config.updaterConfig),      Updater.name))
 
 

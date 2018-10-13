@@ -13,6 +13,4 @@ final case class IndexConfig (
   createIndex: Boolean,
   commitInterval: FiniteDuration,
   workerCount: Int,
-  defaultPage: Int,
-  defaultSize: Int
 )

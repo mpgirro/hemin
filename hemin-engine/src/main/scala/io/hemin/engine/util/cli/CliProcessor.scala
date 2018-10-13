@@ -110,7 +110,8 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
     out.mkString
   }
 
-  private def search(query: String): String = resolveResponse(bus ? SearcherRequest(query, config.indexConfig.defaultPage, config.indexConfig.defaultSize))
+  private def search(query: String): String =
+    resolveResponse(bus ? SearcherRequest(query, Some(config.searcherConfig.defaultPage), Some(config.searcherConfig.defaultSize)))
 
   private def getPodcast(id: String): String = resolveResponse(bus ? GetPodcast(id))
 

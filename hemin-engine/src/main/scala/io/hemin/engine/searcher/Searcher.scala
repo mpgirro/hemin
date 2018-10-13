@@ -2,7 +2,6 @@ package io.hemin.engine.searcher
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol.{ActorRefSupervisor, ReportSearcherStartupComplete}
-import io.hemin.engine.index.IndexConfig
 import io.hemin.engine.domain.ResultsWrapper
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.searcher.retriever.SolrRetriever
@@ -12,7 +11,7 @@ import scala.util.{Failure, Success}
 
 object Searcher {
   final val name = "searcher"
-  def props(config: IndexConfig): Props =
+  def props(config: SearcherConfig): Props =
     Props(new Searcher(config))
       .withDispatcher("hemin.searcher.dispatcher")
 
@@ -20,12 +19,12 @@ object Searcher {
   trait SearcherQuery extends SearcherMessage
   trait SearcherQueryResult extends SearcherMessage
   // SearchQueries
-  final case class SearcherRequest(query: String, page: Int, size: Int) extends SearcherQuery
+  final case class SearcherRequest(query: String, page: Option[Int], size: Option[Int]) extends SearcherQuery
   // SearchQueryResults
   final case class SearcherResults(results: ResultsWrapper) extends SearcherQueryResult
 }
 
-class Searcher (config: IndexConfig)
+class Searcher (config: SearcherConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)

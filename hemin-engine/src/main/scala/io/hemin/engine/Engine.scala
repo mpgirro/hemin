@@ -74,14 +74,7 @@ class Engine {
 
   def propose(url: String): Unit = bus ! ProposeNewFeed(url)
 
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] = {
-    val p: Int = page.getOrElse(engineConfig.indexConfig.defaultPage)
-    val s: Int = size.getOrElse(engineConfig.indexConfig.defaultSize)
-
-    search(query, p, s)
-  }
-
-  def search(query: String, page: Int, size: Int): Future[ResultsWrapper] =
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] =
     (bus ? SearcherRequest(query, page, size)).map {
       case SearcherResults(rs) => rs
     }

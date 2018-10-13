@@ -1,14 +1,16 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.index.IndexConfig
 import io.hemin.engine.domain.ResultsWrapper
+import io.hemin.engine.searcher.SearcherConfig
 
 import scala.concurrent.ExecutionContext
 
 
-class ElasticRetriever (config: IndexConfig, ec: ExecutionContext) extends IndexRetriever {
+class ElasticRetriever (config: SearcherConfig, ec: ExecutionContext) extends IndexRetriever {
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
+
+  override protected[this] def searcherConfig: SearcherConfig = config
 
   override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultsWrapper = {
     // TODO implement!
