@@ -2,29 +2,31 @@ package io.hemin.engine
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
+import akka.stream.ActorAttributes.Dispatcher
 import akka.util.Timeout
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.hemin.engine.NodeMaster.{CliInput, CliOutput}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.domain._
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
+import io.hemin.engine.searcher.SearcherConfig
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-class Engine {
+class Engine (globalConfig: Config) {
 
-  private var engineConfig: EngineConfig = _
-  private implicit var internalTimeout: Timeout = _
+  private val log = Logger(getClass)
+  private val engineConfig: EngineConfig = EngineConfig.load(globalConfig)
 
-  private val log = Logger(classOf[Engine])
+  private implicit val internalTimeout: Timeout = engineConfig.internalTimeout
+  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
   private var master: ActorRef = _
-
-  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
   /* TODO ich will einen CircuitBreaker, habe aber keinen Scheduler weil das hier kein Actor ist
   private val indexBreaker =
@@ -34,14 +36,26 @@ class Engine {
           .onHalfOpen(breakerHalfOpen("Index"))
   */
 
+  private def defaultActorSystemConfig: Config = {
+    val defaults = Map(
+      SearcherConfig.dispatcherId -> Map(
+        "type"       -> Dispatcher,
+        "executor"   -> "fork-join-executor",
+        "throughput" -> 100,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
+    )
+    ConfigFactory.parseMap(defaults.asJava)
+  }
+
   def start(): Unit = {
-    // load and init the configuration
-    val globalConfig = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-    engineConfig = EngineConfig.load(globalConfig)
-    internalTimeout = engineConfig.internalTimeout
 
     // init the actorsystem and local master for this node
-    val system = ActorSystem("hemin", globalConfig)
+    val system = ActorSystem("hemin", globalConfig.withFallback(defaultActorSystemConfig))
     master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)
 
     // wait until all actors in the hierarchy report they are up and running

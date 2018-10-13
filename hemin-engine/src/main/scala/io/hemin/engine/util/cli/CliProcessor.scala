@@ -41,14 +41,12 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
   def eval(args: List[String]): String = Option(args)
     .map {
       case "help" :: _ => help()
-      //case q@("q" | "quit" | "exit") :: _ => shutdown = true
 
       case "propose" :: Nil => usage("propose")
       case "propose" :: feeds => propose(feeds)
 
       case "search" :: Nil => usage("search")
       case "search" :: query :: Nil => search(query)
-      //case "search" :: query :: _   => usage("search")
 
       case "get" :: "podcast" :: Nil => usage("get podcast")
       case "get" :: "podcast" :: id :: Nil => getPodcast(id)
@@ -132,7 +130,7 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
     case Some(c: Chapter) => format(c)
     case Some(i: Image)   => format(i)
     case Some(other) => unhandled(other)
-    case None  => "No database record found"
+    case None => "No database record found"
 
   }
 

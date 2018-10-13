@@ -1,6 +1,7 @@
 package io.hemin.engine
 
 import akka.util.Timeout
+import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.util.cli.CliProcessor
 
@@ -11,10 +12,13 @@ import scala.io.StdIn
 object App {
 
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
-  private implicit val INTERNAL_TIMEOUT: Timeout = 5.seconds
+  private implicit val APPLICATION_TIMEOUT: Timeout = 5.seconds
 
   private val log = Logger(getClass)
-  private val engine = new Engine()
+
+  // load and init the configuration
+  private val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
+  private val engine = new Engine(config)
   private var running = true
 
   def main(args: Array[String]): Unit = {

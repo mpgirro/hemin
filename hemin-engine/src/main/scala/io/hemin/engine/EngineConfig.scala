@@ -1,5 +1,6 @@
 package io.hemin.engine
 
+import akka.stream.ActorAttributes.Dispatcher
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.catalog.CatalogConfig
