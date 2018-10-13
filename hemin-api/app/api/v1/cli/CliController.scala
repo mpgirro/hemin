@@ -12,13 +12,15 @@ class CliController @Inject()(cc: ControllerComponents,
   private val log = Logger(getClass).logger
 
   def eval = Action { implicit request =>
-    request.body.asText.map(cmd => {
-      log.trace(s"EVAL: $cmd")
-      Ok(cliService.eval(cmd))
-    }).getOrElse({
-      log.warn(s"EVAL: no command given [BadRequest]")
-      BadRequest
-    })
+    request.body.asText
+      .map { cmd =>
+        log.trace(s"EVAL: $cmd")
+        Ok(cliService.eval(cmd))
+      }
+      .getOrElse {
+        log.warn(s"EVAL: no command given [BadRequest]")
+        BadRequest
+      }
   }
 
 }

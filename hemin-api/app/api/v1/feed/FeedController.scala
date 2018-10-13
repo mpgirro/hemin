@@ -40,14 +40,16 @@ class FeedController @Inject()(cc: FeedControllerComponents,
     }
 
   def propose = Action { implicit request =>
-    request.body.asText.map(url => {
-      log.trace(s"propose feed: $url")
-      feedService.propose(url)
-      Ok
-    }).getOrElse({
-      log.warn(s"propose feed: No URL in body [BadRequest]")
-      BadRequest
-    })
+    request.body.asText
+      .map { url =>
+        log.trace(s"propose feed: $url")
+        feedService.propose(url)
+        Ok
+      }
+      .getOrElse {
+        log.warn(s"propose feed: No URL in body [BadRequest]")
+        BadRequest
+      }
   }
 
 }
