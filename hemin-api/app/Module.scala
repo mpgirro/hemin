@@ -2,8 +2,8 @@ import javax.inject._
 import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Configuration, Environment}
-import services.EngineService
-import api.v1.post._
+import example.post._
+import api.v1.services.EngineService
 
 /**
   * Sets up custom components for Play.

@@ -1,16 +1,16 @@
-GET   /                               controllers.HomeController.index
-GET   /api/v1/search                  api.v1.search.SearchController.search(q: String, p: Option[Int], s: Option[Int])
-GET   /api/v1/podcast                 api.v1.podcast.PodcastController.all(p: Option[Int], s: Option[Int])
-GET   /api/v1/podcast/:id             api.v1.podcast.PodcastController.find(id: String)
-GET   /api/v1/podcast/:id/episodes    api.v1.podcast.PodcastController.episodes(id: String)
-GET   /api/v1/podcast/:id/feeds       api.v1.podcast.PodcastController.feeds(id: String)
-GET   /api/v1/episode/:id             api.v1.episode.EpisodeController.find(id: String)
-GET   /api/v1/episode/:id/chapters    api.v1.episode.EpisodeController.chapters(id: String)
-GET   /api/v1/feed/:id                api.v1.feed.FeedController.find(id: String)
-POST  /api/v1/feed/propose            api.v1.feed.FeedController.propose
-GET   /api/v1/image/:id               api.v1.image.ImageController.find(id: String)
-POST  /api/v1/cli                     api.v1.cli.CliController.eval
-->    /api/v1/posts                   api.v1.post.PostRouter
+GET   /                               api.v1.controllers.HomeController.index
+GET   /api/v1/search                  api.v1.controllers.SearchController.search(q: String, p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
+GET   /api/v1/podcast/:id/episodes    api.v1.controllers.PodcastController.episodes(id: String)
+GET   /api/v1/podcast/:id/feeds       api.v1.controllers.PodcastController.feeds(id: String)
+GET   /api/v1/episode/:id             api.v1.controllers.EpisodeController.find(id: String)
+GET   /api/v1/episode/:id/chapters    api.v1.controllers.EpisodeController.chapters(id: String)
+GET   /api/v1/feed/:id                api.v1.controllers.FeedController.find(id: String)
+POST  /api/v1/feed/propose            api.v1.controllers.FeedController.propose
+GET   /api/v1/image/:id               api.v1.controllers.ImageController.find(id: String)
+POST  /api/v1/cli                     api.v1.controllers.CliController.eval
+->    /api/v1/posts                   example.post.PostRouter
 
 # Map static resources from the /public folder to the /assets URL path
 GET   /assets/*file                   controllers.Assets.at(path="/public", file)

@@ -40,7 +40,7 @@ Play handles HTTP routing and representation for the REST API and makes it easy 
 Play has two complimentary routing mechanisms.  In the conf directory, there's a file called "routes" which contains entries for the HTTP method and a relative URL path, and points it at an action in a controller.
 
 ```
-GET    /               controllers.HomeController.index()
+GET    /               api.v1.controllers.HomeController.index()
 ```
 
 This is useful for situations where a front end service is rendering HTML.  However, Play also contains a more powerful routing DSL that we will use for the REST API.
