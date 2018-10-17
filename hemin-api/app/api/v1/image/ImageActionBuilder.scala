@@ -10,7 +10,7 @@ import util.RequestMarkerContext
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * The action builder for Search Results.
+  * The action builder for Images.
   *
   * This is the place to put logging, metrics, to augment
   * the request with contextual data, and manipulate the
@@ -24,16 +24,14 @@ class ImageActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: Pl
 
   override val parser: BodyParser[AnyContent] = playBodyParsers.anyContent
 
-  type PostRequestBlock[A] = ImageRequest[A] => Future[Result]
+  type ImageRequestBlock[A] = ImageRequest[A] => Future[Result]
 
   private val log = Logger(this.getClass)
 
   override def invokeBlock[A](request: Request[A],
-                              block: PostRequestBlock[A]): Future[Result] = {
+                              block: ImageRequestBlock[A]): Future[Result] = {
     // Convert to marker context and use request in block
     implicit val markerContext: MarkerContext = requestHeaderToMarkerContext(request)
-    //logger.trace(s"invokeBlock: ")
-
     val future = block(new ImageRequest(request, messagesApi))
 
     future.map { result =>

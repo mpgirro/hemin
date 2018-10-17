@@ -28,7 +28,7 @@ class SearchController @Inject() (cc: SearchControllerComponents,
 
   def search(q: String, p: Option[Int], s: Option[Int]): Action[AnyContent] =
     SearchAction.async { implicit request =>
-      log.trace(s"search: q = $q & p = $p & s = $s")
+      log.trace(s"SEARCH: q = $q & p = $p & s = $s")
       searchService
         .search(q,p,s)
         .map { rs =>
