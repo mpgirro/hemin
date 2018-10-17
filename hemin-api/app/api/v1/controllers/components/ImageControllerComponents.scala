@@ -6,7 +6,7 @@ import api.v1.services.ImageService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
-import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 
 /**
   * Packages up the component dependencies for the post controller.
@@ -14,9 +14,9 @@ import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers
   * This is a good way to minimize the surface area exposed to the controller, so the
   * controller only has to have one thing injected.
   */
-case class ImageControllerComponents @Inject()(imageActionBuilder: ImageActionBuilder,
-                                               imageService: ImageService,
-                                               actionBuilder: DefaultActionBuilder,
+case class ImageControllerComponents @Inject()(actionBuilder: ImageActionBuilder,
+                                               service: ImageService,
+                                               //actionBuilder: DefaultActionBuilder,
                                                parsers: PlayBodyParsers,
                                                messagesApi: MessagesApi,
                                                langs: Langs,

@@ -1,36 +1,20 @@
 package api.v1.controllers
 
-import api.v1.actions.FeedActionBuilder
 import api.v1.controllers.bases.FeedBaseController
 import api.v1.controllers.components.FeedControllerComponents
-import api.v1.services.FeedService
-import io.hemin.engine.domain._
 import javax.inject.Inject
 import play.api.Logger
-import play.api.http.FileMimeTypes
-import play.api.i18n.{Langs, MessagesApi}
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.Json
 import play.api.mvc._
-import api.v1.utils.{ArrayWrapper, JsonWrites}
 
 import scala.concurrent.ExecutionContext
 
 
-class FeedController @Inject()(cc: FeedControllerComponents,
-                               feedActionBuilder: FeedActionBuilder,
-                               feedService: FeedService,
-                               actionBuilder: DefaultActionBuilder,
-                               parsers: PlayBodyParsers,
-                               messagesApi: MessagesApi,
-                               langs: Langs,
-                               fileMimeTypes: FileMimeTypes)
-                              (implicit ec: ExecutionContext)
+class FeedController @Inject() (cc: FeedControllerComponents)
+                               (implicit ec: ExecutionContext)
   extends FeedBaseController(cc) {
 
   private val log = Logger(getClass).logger
-
-  private implicit val feedWriter: Writes[Feed] = JsonWrites.implicitFeedWrites
-  private implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
 
   def find(id: String): Action[AnyContent] =
     FeedAction.async { implicit request =>

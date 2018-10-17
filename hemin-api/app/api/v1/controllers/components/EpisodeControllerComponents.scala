@@ -6,17 +6,17 @@ import api.v1.services.EpisodeService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
-import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 
 /**
-  * Packages up the component dependencies for the post controller.
+  * Packages up the component dependencies for the Episode controller.
   *
   * This is a good way to minimize the surface area exposed to the controller, so the
   * controller only has to have one thing injected.
   */
-case class EpisodeControllerComponents @Inject()(episodeActionBuilder: EpisodeActionBuilder,
-                                                 episodeResourceHandler: EpisodeService,
-                                                 actionBuilder: DefaultActionBuilder,
+case class EpisodeControllerComponents @Inject()(actionBuilder: EpisodeActionBuilder,
+                                                 service: EpisodeService,
+                                                 //actionBuilder: DefaultActionBuilder,
                                                  parsers: PlayBodyParsers,
                                                  messagesApi: MessagesApi,
                                                  langs: Langs,

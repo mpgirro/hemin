@@ -6,7 +6,7 @@ import api.v1.services.FeedService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
-import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers}
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 
 /**
   * Packages up the component dependencies for the post controller.
@@ -14,9 +14,9 @@ import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers
   * This is a good way to minimize the surface area exposed to the controller, so the
   * controller only has to have one thing injected.
   */
-case class FeedControllerComponents @Inject()(feedActionBuilder: FeedActionBuilder,
-                                              feedService: FeedService,
-                                              actionBuilder: DefaultActionBuilder,
+case class FeedControllerComponents @Inject()(actionBuilder: FeedActionBuilder,
+                                              service: FeedService,
+                                              //actionBuilder: DefaultActionBuilder,
                                               parsers: PlayBodyParsers,
                                               messagesApi: MessagesApi,
                                               langs: Langs,
