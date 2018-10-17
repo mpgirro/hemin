@@ -37,10 +37,8 @@ class SearchActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: P
 
     future.map { result =>
       request.method match {
-        case GET | HEAD =>
-          result.withHeaders("Cache-Control" -> s"max-age: 100")
-        case other =>
-          result
+        case GET | HEAD => result.withHeaders("Cache-Control" -> s"max-age: 100")
+        case other      => result
       }
     }
   }
