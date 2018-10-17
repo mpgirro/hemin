@@ -1,6 +1,8 @@
 package api.v1.controllers
 
 import api.v1.actions.SearchActionBuilder
+import api.v1.controllers.bases.SearchBaseController
+import api.v1.controllers.components.SearchControllerComponents
 import api.v1.services.SearchService
 import io.hemin.engine.domain.ResultsWrapper
 import javax.inject.Inject

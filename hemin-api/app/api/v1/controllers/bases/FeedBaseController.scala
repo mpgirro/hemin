@@ -1,10 +1,11 @@
-package api.v1.controllers
+package api.v1.controllers.bases
 
 import api.v1.actions.FeedActionBuilder
+import api.v1.controllers.components.FeedControllerComponents
 import api.v1.services.FeedService
+import api.v1.utils.RequestMarkerContext
 import javax.inject.Inject
 import play.api.mvc.{BaseController, ControllerComponents}
-import api.v1.utils.RequestMarkerContext
 
 /**
   * Exposes actions and handler to the PostController by wiring the injected state into the base class.

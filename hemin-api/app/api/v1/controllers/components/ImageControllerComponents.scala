@@ -1,4 +1,4 @@
-package api.v1.controllers
+package api.v1.controllers.components
 
 import api.v1.actions.ImageActionBuilder
 import api.v1.concurrent.ImageExecutionContext
@@ -7,8 +7,6 @@ import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ControllerComponents, DefaultActionBuilder, PlayBodyParsers}
-
-import scala.concurrent.ExecutionContext
 
 /**
   * Packages up the component dependencies for the post controller.

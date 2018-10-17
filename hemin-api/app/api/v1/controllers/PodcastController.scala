@@ -1,6 +1,8 @@
 package api.v1.controllers
 
 import api.v1.actions.PodcastActionBuilder
+import api.v1.controllers.bases.PodcastBaseController
+import api.v1.controllers.components.PodcastControllerComponents
 import api.v1.services.PodcastService
 import io.hemin.engine.domain._
 import javax.inject.Inject

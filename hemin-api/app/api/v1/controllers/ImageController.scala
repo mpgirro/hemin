@@ -1,6 +1,8 @@
 package api.v1.controllers
 
 import api.v1.actions.ImageActionBuilder
+import api.v1.controllers.bases.ImageBaseController
+import api.v1.controllers.components.ImageControllerComponents
 import api.v1.services.ImageService
 import io.hemin.engine.domain._
 import javax.inject.Inject

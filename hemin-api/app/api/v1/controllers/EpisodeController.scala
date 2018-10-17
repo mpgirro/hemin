@@ -1,6 +1,8 @@
 package api.v1.controllers
 
 import api.v1.actions.EpisodeActionBuilder
+import api.v1.controllers.bases.EpisodeBaseController
+import api.v1.controllers.components.EpisodeControllerComponents
 import api.v1.services.EpisodeService
 import io.hemin.engine.domain._
 import javax.inject.Inject

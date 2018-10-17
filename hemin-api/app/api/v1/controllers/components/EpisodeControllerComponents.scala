@@ -1,4 +1,4 @@
-package api.v1.controllers
+package api.v1.controllers.components
 
 import api.v1.actions.EpisodeActionBuilder
 import api.v1.concurrent.EpisodeExecutionContext
