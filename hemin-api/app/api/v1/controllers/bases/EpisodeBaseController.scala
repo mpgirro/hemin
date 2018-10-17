@@ -9,6 +9,8 @@ import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}
 
+import scala.concurrent.ExecutionContext
+
 /**
   * Exposes actions and handler to the EpisodeController by wiring the injected state into the base class.
   */
@@ -16,6 +18,8 @@ class EpisodeBaseController @Inject()(cc: EpisodeControllerComponents)
     extends BaseController with RequestMarkerContext {
 
   override protected def controllerComponents: ControllerComponents = cc
+
+  protected implicit val executionContext: ExecutionContext = cc.executionContext
 
   protected implicit val episodeWriter: Writes[Episode] = JsonWrites.implicitEpisodeWrites
   protected implicit val chapterWriter: Writes[Chapter] = JsonWrites.implicitChapterWrites

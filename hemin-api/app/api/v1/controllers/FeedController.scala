@@ -7,11 +7,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
-
-
 class FeedController @Inject() (cc: FeedControllerComponents)
-                               (implicit ec: ExecutionContext)
   extends FeedBaseController(cc) {
 
   private val log = Logger(getClass).logger

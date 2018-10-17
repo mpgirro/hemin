@@ -8,11 +8,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
-
-
 class PodcastController @Inject() (cc: PodcastControllerComponents)
-                                  (implicit ec: ExecutionContext)
   extends PodcastBaseController(cc) {
 
   private val log = Logger(getClass).logger

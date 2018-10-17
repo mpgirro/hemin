@@ -5,7 +5,6 @@ import javax.inject.Inject
 import play.api.Logger
 import play.api.mvc.{AbstractController, ControllerComponents}
 
-
 class CliController @Inject() (cc: ControllerComponents,
                                cliService: CliService)
   extends AbstractController(cc) {

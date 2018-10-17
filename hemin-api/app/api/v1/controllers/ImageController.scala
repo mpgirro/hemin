@@ -7,10 +7,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
-
 class ImageController @Inject() (cc: ImageControllerComponents)
-                                (implicit ec: ExecutionContext)
   extends ImageBaseController(cc) {
 
   private val log = Logger(getClass).logger

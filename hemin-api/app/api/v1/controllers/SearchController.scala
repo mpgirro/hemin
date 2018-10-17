@@ -7,10 +7,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-import scala.concurrent.ExecutionContext
-
 class SearchController @Inject() (cc: SearchControllerComponents)
-                                 (implicit ec: ExecutionContext)
   extends SearchBaseController(cc) {
 
   private val log = Logger(getClass).logger

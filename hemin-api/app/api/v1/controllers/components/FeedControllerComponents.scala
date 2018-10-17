@@ -16,7 +16,6 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers}
   */
 case class FeedControllerComponents @Inject()(actionBuilder: FeedActionBuilder,
                                               service: FeedService,
-                                              //actionBuilder: DefaultActionBuilder,
                                               parsers: PlayBodyParsers,
                                               messagesApi: MessagesApi,
                                               langs: Langs,

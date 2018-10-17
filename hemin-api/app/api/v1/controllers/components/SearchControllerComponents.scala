@@ -16,7 +16,6 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers}
   */
 case class SearchControllerComponents @Inject()(actionBuilder: SearchActionBuilder,
                                                 service: SearchService,
-                                                //actionBuilder: DefaultActionBuilder,
                                                 parsers: PlayBodyParsers,
                                                 messagesApi: MessagesApi,
                                                 langs: Langs,

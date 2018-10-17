@@ -16,7 +16,6 @@ import play.api.mvc.{ControllerComponents, PlayBodyParsers}
   */
 case class PodcastControllerComponents @Inject()(actionBuilder: PodcastActionBuilder,
                                                  service: PodcastService,
-                                                 //actionBuilder: DefaultActionBuilder,
                                                  parsers: PlayBodyParsers,
                                                  messagesApi: MessagesApi,
                                                  langs: Langs,
