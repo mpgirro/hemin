@@ -51,7 +51,7 @@ trait MongoRepository[T] {
     */
   def drop: Future[Boolean] = {
     collection.flatMap { c =>
-      log.debug("Dropping collection : {}", c.name)
+      log.info("Dropping collection : {}", c.name)
       c.drop(failIfNotFound = true) }
   }
 
