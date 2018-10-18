@@ -3,14 +3,11 @@ package io.hemin.engine.index
 import scala.concurrent.duration.FiniteDuration
 
 object IndexConfig {
-  val dispatcherId: String = "hemin.index.dispatcher"
+  val dispatcher: String = "hemin.index.dispatcher"
 }
 
-/**
-  * Configuration for [[io.hemin.engine.index.IndexStore]]
-  */
+/** Configuration for [[io.hemin.engine.index.IndexStore]] */
 final case class IndexConfig (
-  dispatcherId: String = IndexConfig.dispatcherId,
   luceneIndexPath: String,
   solrUri: String,
   solrQueueSize: Int,
@@ -18,4 +15,7 @@ final case class IndexConfig (
   createIndex: Boolean,
   commitInterval: FiniteDuration,
   workerCount: Int,
-)
+) {
+  val dispatcher: String = IndexConfig.dispatcher
+  val mailbox: String = IndexStorePriorityMailbox.name
+}

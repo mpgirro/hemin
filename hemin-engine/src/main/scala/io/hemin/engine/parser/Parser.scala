@@ -13,8 +13,8 @@ object Parser {
   final val name = "parser"
   def props(config: ParserConfig): Props =
     Props(new Parser(config))
-      .withDispatcher(config.dispatcherId)
-      .withMailbox(ParserPriorityMailbox.name)
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 
   trait ParserMessage
   final case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
@@ -28,9 +28,10 @@ object Parser {
 class Parser (config: ParserConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private var workerIndex = 0
 

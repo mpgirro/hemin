@@ -13,7 +13,8 @@ object Updater {
   final val name = "updater"
   def props(config: UpdaterConfig): Props =
     Props(new Updater(config))
-      .withDispatcher(config.dispatcherId)
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 
   trait UpdaterMessage
   final case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
@@ -22,9 +23,10 @@ object Updater {
 class Updater (config: UpdaterConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private var catalog: ActorRef = _
   private var crawler: ActorRef = _

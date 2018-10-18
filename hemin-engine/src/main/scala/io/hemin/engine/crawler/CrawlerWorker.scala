@@ -20,16 +20,17 @@ object CrawlerWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
   def props(config: CrawlerConfig): Props =
     Props(new CrawlerWorker(config))
-      .withDispatcher("hemin.crawler.dispatcher")
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 }
 
 class CrawlerWorker (config: CrawlerConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
-  // important, or we will experience starvation on processing many feeds at once
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.crawler.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private implicit val actorSystem: ActorSystem = context.system
   private implicit val materializer: ActorMaterializer = ActorMaterializer(ActorMaterializerSettings(actorSystem))

@@ -21,17 +21,23 @@ import io.hemin.engine.util.HashUtil
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
+import scala.concurrent.ExecutionContext
+
 object ParserWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
   def props(config: ParserConfig): Props =
     Props(new ParserWorker(config))
-      .withDispatcher("hemin.parser.dispatcher")
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 }
 
 class ParserWorker (config: ParserConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
+
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private var catalog: ActorRef = _
   private var index: ActorRef = _

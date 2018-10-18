@@ -22,7 +22,8 @@ object CatalogStore {
   final val name = "catalog"
   def props(config: CatalogConfig): Props =
     Props(new CatalogStore(config))
-      .withDispatcher(config.dispatcherId)
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 
   trait CatalogMessage
   trait CatalogEvent extends CatalogMessage
@@ -72,9 +73,10 @@ object CatalogStore {
 class CatalogStore(config: CatalogConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private val idGenerator = new IdGenerator(1)  // TODO get shardId from Config
 

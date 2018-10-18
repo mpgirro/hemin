@@ -1,15 +1,15 @@
 package io.hemin.engine.searcher
 
 object SearcherConfig {
-  val dispatcherId: String = "hemin.searcher.dispatcher"
+  val dispatcher: String = "hemin.searcher.dispatcher"
 }
 
-/**
-  * Configuration for [[io.hemin.engine.searcher.Searcher]]
-  */
+/** Configuration for [[io.hemin.engine.searcher.Searcher]] */
 final case class SearcherConfig (
-  dispatcherId: String = SearcherConfig.dispatcherId,
   solrUri: String,
   defaultPage: Int,
   defaultSize: Int,
-)
+) {
+  val dispatcher: String = SearcherConfig.dispatcher
+  val mailbox: String = SearcherPriorityMailbox.name
+}

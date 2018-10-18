@@ -7,16 +7,18 @@ import com.typesafe.config.ConfigFactory._
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
+// io.hemin.engine.parser.ParserPriorityMailbox
 object ParserPriorityMailbox {
-  val name = "parser-mailbox"
+  val name = "hemin.parser.mailbox"
   val config: Config = load(parseString(
     s"""$name {
-      mailbox-type = "io.hemin.engine.parser.ParserPriorityMailbox"
+      mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
 }
 
+/** Mailbox configuration for [[io.hemin.engine.parser.Parser]] */
 class ParserPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

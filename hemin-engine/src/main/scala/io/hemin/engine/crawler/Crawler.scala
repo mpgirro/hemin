@@ -19,7 +19,8 @@ object Crawler {
   final val name = "crawler"
   def props(config: CrawlerConfig): Props =
     Props(new Crawler(config))
-      .withDispatcher(config.dispatcherId)
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage
@@ -36,9 +37,10 @@ object Crawler {
 class Crawler (config: CrawlerConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running with mailbox : {}", self.path.name, context.props.mailbox)
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcher)
 
   private var workerIndex = 0
 

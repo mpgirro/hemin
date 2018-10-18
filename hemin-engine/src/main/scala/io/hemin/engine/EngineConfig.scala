@@ -1,6 +1,5 @@
 package io.hemin.engine
 
-import akka.stream.ActorAttributes.Dispatcher
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.catalog.CatalogConfig
@@ -13,9 +12,7 @@ import io.hemin.engine.updater.UpdaterConfig
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
-/**
-  * Configuration for [[io.hemin.engine.Engine]]
-  */
+/** Configuration for [[io.hemin.engine.Engine]] */
 final case class EngineConfig(
   app: AppConfig, // Config when we start an engine stand-alone
   catalog: CatalogConfig,

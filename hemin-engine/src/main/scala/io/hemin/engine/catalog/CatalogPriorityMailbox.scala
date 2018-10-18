@@ -3,9 +3,21 @@ package io.hemin.engine.catalog
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
+import com.typesafe.config.ConfigFactory.{load, parseString}
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.catalog.CatalogStore._
 
+object CatalogPriorityMailbox {
+  val name = "hemin.parser.mailbox"
+  val config: Config = load(parseString(
+    s"""$name {
+      mailbox-type = "${classOf[CatalogPriorityMailbox].getCanonicalName}"
+      mailbox-capacity = 100
+      mailbox-push-timeout-time = 1ms
+    }"""))
+}
+
+/** Mailbox configuration for [[io.hemin.engine.catalog.CatalogStore]] */
 class CatalogPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

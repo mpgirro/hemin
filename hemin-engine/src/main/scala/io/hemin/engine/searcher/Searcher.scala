@@ -13,7 +13,8 @@ object Searcher {
   final val name = "searcher"
   def props(config: SearcherConfig): Props =
     Props(new Searcher(config))
-      .withDispatcher(config.dispatcherId)
+      .withDispatcher(config.dispatcher)
+      .withMailbox(config.mailbox)
 
   trait SearcherMessage
   trait SearcherQuery extends SearcherMessage
@@ -27,9 +28,10 @@ object Searcher {
 class Searcher (config: SearcherConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   private val solrRetriever = new SolrRetriever(config, executionContext)
 

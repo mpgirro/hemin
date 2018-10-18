@@ -8,15 +8,15 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.hemin.engine.NodeMaster.{CliInput, CliOutput}
-import io.hemin.engine.catalog.CatalogConfig
+import io.hemin.engine.catalog.{CatalogConfig, CatalogPriorityMailbox}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.crawler.CrawlerConfig
+import io.hemin.engine.crawler.{CrawlerConfig, CrawlerPriorityMailbox}
 import io.hemin.engine.domain._
-import io.hemin.engine.index.IndexConfig
+import io.hemin.engine.index.{IndexConfig, IndexStorePriorityMailbox}
 import io.hemin.engine.parser.{ParserConfig, ParserPriorityMailbox}
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
-import io.hemin.engine.searcher.SearcherConfig
-import io.hemin.engine.updater.UpdaterConfig
+import io.hemin.engine.searcher.{SearcherConfig, SearcherPriorityMailbox}
+import io.hemin.engine.updater.{UpdaterConfig, UpdaterPriorityMailbox}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -108,7 +108,12 @@ class Engine (globalConfig: Config) {
     )
     ConfigFactory
       .parseMap(defaults.asJava)
+      .withFallback(CatalogPriorityMailbox.config)
+      .withFallback(CrawlerPriorityMailbox.config)
+      .withFallback(IndexStorePriorityMailbox.config)
       .withFallback(ParserPriorityMailbox.config)
+      .withFallback(SearcherPriorityMailbox.config)
+      .withFallback(UpdaterPriorityMailbox.config)
   }
 
   def start(): Unit = {
