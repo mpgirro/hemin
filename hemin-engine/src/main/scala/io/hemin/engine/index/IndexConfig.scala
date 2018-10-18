@@ -1,13 +1,23 @@
 package io.hemin.engine.index
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.ConfigFallback
+import io.hemin.engine.util.config.StandardConfig
 
+import scala.collection.JavaConverters._
 import scala.concurrent.duration.FiniteDuration
 
-object IndexConfig extends ConfigFallback {
+object IndexConfig extends StandardConfig {
   override def name: String = "hemin.index"
+  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+    name+".lucene-index-path" -> "./data/index",
+    name+".solr-uri"          -> "http://localhost:8983/solr/hemin",
+    name+".solr-queue-size"   -> 20,
+    name+".solr-thread-count" -> 4,
+    name+".create-index"      -> false,
+    name+".commit-interval"   -> 3,
+    name+".handler-count"     -> 5,
+  ).asJava)
   override def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -20,7 +30,7 @@ object IndexConfig extends ConfigFallback {
     }}"""))
   override def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
-      mailbox-type = "${classOf[IndexStorePriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
@@ -35,8 +45,9 @@ final case class IndexConfig (
   createIndex: Boolean,
   commitInterval: FiniteDuration,
   workerCount: Int,
-) extends ConfigFallback {
+) extends StandardConfig {
   override def name: String              = IndexConfig.name
+  override def defaultConfig: Config     = IndexConfig.defaultConfig
   override def defaultDispatcher: Config = IndexConfig.defaultDispatcher
   override def defaultMailbox: Config    = IndexConfig.defaultMailbox
 }

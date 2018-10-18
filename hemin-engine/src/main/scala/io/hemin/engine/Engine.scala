@@ -12,7 +12,7 @@ import io.hemin.engine.catalog.{CatalogConfig, CatalogPriorityMailbox}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.{CrawlerConfig, CrawlerPriorityMailbox}
 import io.hemin.engine.domain._
-import io.hemin.engine.index.{IndexConfig, IndexStorePriorityMailbox}
+import io.hemin.engine.index.{IndexConfig, IndexPriorityMailbox}
 import io.hemin.engine.parser.{ParserConfig, ParserPriorityMailbox}
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.searcher.{SearcherConfig, SearcherPriorityMailbox}
@@ -26,7 +26,7 @@ import scala.language.postfixOps
 class Engine (globalConfig: Config) {
 
   private val log = Logger(getClass)
-  private val engineConfig: EngineConfig = EngineConfig.load(globalConfig)
+  private val engineConfig: EngineConfig = EngineConfig.load(globalConfig.withFallback(EngineConfig.defaultConfig()))
 
   private implicit val internalTimeout: Timeout = engineConfig.internalTimeout
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
@@ -41,91 +41,10 @@ class Engine (globalConfig: Config) {
           .onHalfOpen(breakerHalfOpen("Index"))
   */
 
-  private def defaultActorSystemConfig: Config = {
-    val defaults: Map[String,Any] = Map(
-      /*
-      CatalogConfig.dispatcherId -> Map(
-        "type"         -> Dispatcher,
-        "executor"     -> "fork-join-executor",
-        "throughput"   -> 100,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      CrawlerConfig.dispatcherId -> Map(
-        "type"         -> Dispatcher,
-        "executor"     -> "fork-join-executor",
-        "throughput"   -> 100,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      IndexConfig.dispatcherId -> Map(
-        "type"         -> Dispatcher,
-        "executor"     -> "fork-join-executor",
-        "throughput"   -> 100,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      ParserConfig.dispatcherId -> Map(
-        "type"         -> Dispatcher,
-        "executor"     -> "fork-join-executor",
-        "throughput"   -> 1,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      SearcherConfig.dispatcherId -> Map(
-        "type"       -> Dispatcher,
-        "executor"   -> "fork-join-executor",
-        "throughput" -> 100,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      UpdaterConfig.dispatcherId -> Map(
-        "type"       -> Dispatcher,
-        "executor"   -> "fork-join-executor",
-        "throughput" -> 100,
-        "fork-join-executor" -> Map(
-          "parallelism-min"    -> 4,
-          "parallelism-factor" -> 2.0,
-          "parallelism-max"    -> 8,
-        ),
-      ),
-      */
-    )
-    ConfigFactory
-      .parseMap(defaults.asJava)
-      .withFallback(CatalogConfig.defaultDispatcher)
-      .withFallback(CatalogConfig.defaultMailbox)
-      .withFallback(CrawlerConfig.defaultDispatcher)
-      .withFallback(CrawlerConfig.defaultMailbox)
-      .withFallback(IndexConfig.defaultDispatcher)
-      .withFallback(IndexConfig.defaultMailbox)
-      .withFallback(ParserConfig.defaultDispatcher)
-      .withFallback(ParserConfig.defaultMailbox)
-      .withFallback(SearcherConfig.defaultDispatcher)
-      .withFallback(SearcherConfig.defaultMailbox)
-      .withFallback(UpdaterConfig.defaultDispatcher)
-      .withFallback(UpdaterConfig.defaultMailbox)
-  }
-
   def start(): Unit = {
 
     // init the actorsystem and local master for this node
-    val system = ActorSystem("hemin", globalConfig.withFallback(defaultActorSystemConfig))
+    val system = ActorSystem("hemin", globalConfig.withFallback(EngineConfig.defaultActorSystemConfig))
     master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)
 
     // wait until all actors in the hierarchy report they are up and running

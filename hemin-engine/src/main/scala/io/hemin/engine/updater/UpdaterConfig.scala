@@ -1,11 +1,16 @@
 package io.hemin.engine.updater
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.ConfigFallback
+import io.hemin.engine.util.config.StandardConfig
 
-object UpdaterConfig extends ConfigFallback {
+import scala.collection.JavaConverters._
+
+object UpdaterConfig extends StandardConfig {
   override def name: String = "hemin.updater"
+  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+    name+".solr-uri"     -> "http://localhost:8983/solr/hemin",
+  ).asJava)
   override def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -27,8 +32,9 @@ object UpdaterConfig extends ConfigFallback {
 /** Configuration for [[io.hemin.engine.updater.Updater]] */
 final case class UpdaterConfig (
   // TODO add some config values
-) extends ConfigFallback {
+) extends StandardConfig {
   override def name: String              = UpdaterConfig.name
+  override def defaultConfig: Config     = UpdaterConfig.defaultConfig
   override def defaultDispatcher: Config = UpdaterConfig.defaultDispatcher
   override def defaultMailbox: Config    = UpdaterConfig.defaultMailbox
 }

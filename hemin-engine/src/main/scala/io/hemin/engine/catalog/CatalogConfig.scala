@@ -1,11 +1,20 @@
 package io.hemin.engine.catalog
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.ConfigFallback
+import io.hemin.engine.util.config.StandardConfig
 
-object CatalogConfig extends ConfigFallback {
+import scala.collection.JavaConverters._
+
+object CatalogConfig extends StandardConfig {
   override def name: String = "hemin.catalog"
+  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+    name+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
+    name+".create-database" -> true,
+    name+".default-page"    -> 1,
+    name+".default-size"    -> 20,
+    name+".max-page-size"   -> 10000,
+  ).asJava)
   override def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -31,8 +40,9 @@ final case class CatalogConfig (
   defaultPage: Int,
   defaultSize: Int,
   maxPageSize: Int
-) extends ConfigFallback {
+) extends StandardConfig {
   override def name: String              = CatalogConfig.name
+  override def defaultConfig: Config     = CatalogConfig.defaultConfig
   override def defaultDispatcher: Config = CatalogConfig.defaultDispatcher
   override def defaultMailbox: Config    = CatalogConfig.defaultMailbox
 }

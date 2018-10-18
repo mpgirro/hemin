@@ -1,8 +1,8 @@
-package io.hemin.engine.util
+package io.hemin.engine.util.config
 
 import com.typesafe.config.Config
 
-trait ConfigFallback {
+trait StandardConfig {
 
   /** Configuration name(space) */
   def name: String
@@ -12,6 +12,9 @@ trait ConfigFallback {
 
   /** Mailbox name */
   final def mailbox: String    = name + ".mailbox"
+
+  /** Default configuration */
+  def defaultConfig: Config
 
   /** Default actor dispatcher configuration */
   def defaultDispatcher: Config

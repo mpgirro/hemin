@@ -69,30 +69,29 @@ object EngineConfig {
       internalTimeout = config.getInt("hemin.internal-timeout").seconds,
     )
 
-  private def defaultConfig(): Config = {
-    val defaults = Map(
-      "hemin.catalog.mongo-uri"          -> "mongodb://localhost:27017/hemin",
-      "hemin.catalog.create-database"    -> true,
-      "hemin.catalog.default-page"       -> 1,
-      "hemin.catalog.default-size"       -> 20,
-      "hemin.catalog.max-page-size"      -> 10000,
-      "hemin.crawler.worker-count"       -> 5,
-      "hemin.crawler.fetch-websites"     -> false, // TODO rename to config file
-      "hemin.crawler.download-timeout"   -> 10, // TODO add to config file
-      "hemin.crawler.download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
-      "hemin.index.lucene-index-path"    -> "./data/index",
-      "hemin.index.solr-uri"             -> "http://localhost:8983/solr/hemin",
-      "hemin.index.solr-queue-size"      -> 20,
-      "hemin.index.solr-thread-count"    -> 4,
-      "hemin.index.create-index"         -> false,
-      "hemin.index.commit-interval"      -> 3,
-      "hemin.index.handler-count"        -> 5,
-      "hemin.parser.worker-count"        -> 2,
-      SearcherConfig.name+".solr-uri"          -> "http://localhost:8983/solr/hemin",
-      SearcherConfig.name+".default-page"      -> 1,
-      SearcherConfig.name+".default-size"      -> 20,
-      "hemin.internal-timeout"           -> 5,
-    )
-    ConfigFactory.parseMap(defaults.asJava)
-  }
+  def defaultConfig(): Config = ConfigFactory
+    .parseMap(Map(
+      "hemin.internal-timeout" -> 5,
+    ).asJava)
+    .withFallback(CatalogConfig.defaultConfig)
+    .withFallback(CrawlerConfig.defaultConfig)
+    .withFallback(IndexConfig.defaultConfig)
+    .withFallback(ParserConfig.defaultConfig)
+    .withFallback(SearcherConfig.defaultConfig)
+    .withFallback(UpdaterConfig.defaultConfig)
+
+  def defaultActorSystemConfig: Config = ConfigFactory.empty()
+    .withFallback(CatalogConfig.defaultDispatcher)
+    .withFallback(CatalogConfig.defaultMailbox)
+    .withFallback(CrawlerConfig.defaultDispatcher)
+    .withFallback(CrawlerConfig.defaultMailbox)
+    .withFallback(IndexConfig.defaultDispatcher)
+    .withFallback(IndexConfig.defaultMailbox)
+    .withFallback(ParserConfig.defaultDispatcher)
+    .withFallback(ParserConfig.defaultMailbox)
+    .withFallback(SearcherConfig.defaultDispatcher)
+    .withFallback(SearcherConfig.defaultMailbox)
+    .withFallback(UpdaterConfig.defaultDispatcher)
+    .withFallback(UpdaterConfig.defaultMailbox)
+
 }

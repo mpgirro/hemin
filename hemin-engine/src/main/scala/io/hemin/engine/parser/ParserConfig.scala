@@ -1,11 +1,16 @@
 package io.hemin.engine.parser
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.ConfigFallback
+import io.hemin.engine.util.config.StandardConfig
 
-object ParserConfig extends ConfigFallback {
+import scala.collection.JavaConverters._
+
+object ParserConfig extends StandardConfig {
   override def name: String = "hemin.parser"
+  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+    name+".worker-count" -> 2,
+  ).asJava)
   override def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -27,8 +32,9 @@ object ParserConfig extends ConfigFallback {
 /** Configuration for [[io.hemin.engine.parser.Parser]] */
 final case class ParserConfig (
   workerCount: Int
-) extends ConfigFallback {
+) extends StandardConfig {
   override def name: String              = ParserConfig.name
+  override def defaultConfig: Config     = ParserConfig.defaultConfig
   override def defaultDispatcher: Config = ParserConfig.defaultDispatcher
   override def defaultMailbox: Config    = ParserConfig.defaultMailbox
 }

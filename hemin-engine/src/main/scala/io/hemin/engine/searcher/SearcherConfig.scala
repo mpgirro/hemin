@@ -1,11 +1,18 @@
 package io.hemin.engine.searcher
 
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.ConfigFallback
+import io.hemin.engine.util.config.StandardConfig
 
-object SearcherConfig extends ConfigFallback {
+import scala.collection.JavaConverters._
+
+object SearcherConfig extends StandardConfig {
   override def name: String = "hemin.searcher"
+  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+    name+".solr-uri"     -> "http://localhost:8983/solr/hemin",
+    name+".default-page" -> 1,
+    name+".default-size" -> 20,
+  ).asJava)
   override def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -29,8 +36,9 @@ final case class SearcherConfig (
   solrUri: String,
   defaultPage: Int,
   defaultSize: Int,
-) extends ConfigFallback {
+) extends StandardConfig {
   override def name: String              = SearcherConfig.name
+  override def defaultConfig: Config     = SearcherConfig.defaultConfig
   override def defaultDispatcher: Config = SearcherConfig.defaultDispatcher
   override def defaultMailbox: Config    = SearcherConfig.defaultMailbox
 }
