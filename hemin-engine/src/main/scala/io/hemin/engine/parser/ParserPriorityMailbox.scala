@@ -3,22 +3,8 @@ package io.hemin.engine.parser
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import com.typesafe.config.ConfigFactory._
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
-
-/*
-// io.hemin.engine.parser.ParserPriorityMailbox
-object ParserPriorityMailbox {
-  val name = "hemin.parser.mailbox"
-  val config: Config = load(parseString(
-    s"""$name {
-      mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
-      mailbox-capacity = 100
-      mailbox-push-timeout-time = 1ms
-    }"""))
-}
-*/
 
 /** Priority mailbox for [[io.hemin.engine.parser.Parser]] */
 class ParserPriorityMailbox(settings: ActorSystem.Settings, config: Config)
