@@ -6,7 +6,7 @@ import com.typesafe.config.Config
 import io.hemin.engine.index.IndexStore._
 
 /** Priority mailbox for [[io.hemin.engine.index.IndexStore]] */
-class IndexStorePriorityMailbox(settings: ActorSystem.Settings, config: Config)
+class IndexPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {
