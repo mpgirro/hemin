@@ -112,7 +112,8 @@ class Engine (globalConfig: Config) {
       .withFallback(CrawlerPriorityMailbox.config)
       .withFallback(IndexStorePriorityMailbox.config)
       .withFallback(ParserPriorityMailbox.config)
-      .withFallback(SearcherPriorityMailbox.config)
+      .withFallback(SearcherConfig.defaultDispatcher)
+      .withFallback(SearcherConfig.defaultMailbox)
       .withFallback(UpdaterPriorityMailbox.config)
   }
 
