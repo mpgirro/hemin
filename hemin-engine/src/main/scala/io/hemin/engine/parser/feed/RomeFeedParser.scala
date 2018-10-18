@@ -115,7 +115,7 @@ class RomeFeedParser(private val xmlData: String) {
 
   private def extractEpisodes(feed: SyndFeed): List[Episode] = feed
     .getEntries.asScala
-    .map(e => extractEpisode(e))
+    .map(extractEpisode)
     .toList
 
   private def extractEpisode(e: SyndEntry): Episode = Episode(
@@ -202,7 +202,7 @@ class RomeFeedParser(private val xmlData: String) {
           .map(_.toList)
           .getOrElse(Nil),
         categories  = Option(itunes.getCategories)
-          .map(cs => cs.asScala.map(c => c.getName))
+          .map(_.asScala.map(_.getName))
           .map(_.toSet)  // eliminate duplicates
           .map(_.toList)
           .getOrElse(Nil),
@@ -242,15 +242,15 @@ class RomeFeedParser(private val xmlData: String) {
       )
     }.getOrElse(EpisodeItunesInfo())
 
-  private def episodeEnclosureInfo(e: SyndEntry): EpisodeEnclosureInfo = Option(e.getEnclosures)
-    .map { enclosures =>
-      if (enclosures.size > 1) log.warn("Encountered multiple <enclosure> elements in <item> element")
-      if (enclosures.size > 0) {
-        val enclosure = e.getEnclosures.get(0)
+  private def episodeEnclosureInfo(entry: SyndEntry): EpisodeEnclosureInfo = Option(entry.getEnclosures)
+    .map { es =>
+      if (es.size > 1) log.warn("Encountered multiple <enclosure> elements in <item> element")
+      if (es.size > 0) {
+        val e = entry.getEnclosures.get(0)
         EpisodeEnclosureInfo(
-          url    = Option(enclosure.getUrl),
-          length = Option(enclosure.getLength),
-          typ    = Option(enclosure.getType),
+          url    = Option(e.getUrl),
+          length = Option(e.getLength),
+          typ    = Option(e.getType),
         )
       } else {
         EpisodeEnclosureInfo()

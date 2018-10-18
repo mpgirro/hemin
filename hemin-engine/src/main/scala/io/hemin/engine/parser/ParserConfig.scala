@@ -6,6 +6,16 @@ import io.hemin.engine.util.config.StandardConfig
 
 import scala.collection.JavaConverters._
 
+/** Configuration for [[io.hemin.engine.parser.Parser]] */
+final case class ParserConfig (
+  workerCount: Int
+) extends StandardConfig {
+  override def name: String              = ParserConfig.name
+  override def defaultConfig: Config     = ParserConfig.defaultConfig
+  override def defaultDispatcher: Config = ParserConfig.defaultDispatcher
+  override def defaultMailbox: Config    = ParserConfig.defaultMailbox
+}
+
 object ParserConfig extends StandardConfig {
   override def name: String = "hemin.parser"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -27,14 +37,4 @@ object ParserConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.parser.Parser]] */
-final case class ParserConfig (
-  workerCount: Int
-) extends StandardConfig {
-  override def name: String              = ParserConfig.name
-  override def defaultConfig: Config     = ParserConfig.defaultConfig
-  override def defaultDispatcher: Config = ParserConfig.defaultDispatcher
-  override def defaultMailbox: Config    = ParserConfig.defaultMailbox
 }

@@ -85,7 +85,7 @@ class Crawler (config: CrawlerConfig)
       router.routees.foreach(r => r.send(msg, sender()))
 
     case msg @ ActorRefParserActor(ref) =>
-      log.debug("Received ActorRefIndexerActor(_)")
+      log.debug("Received ActorRefParserActor(_)")
       parser = ref
       router.routees.foreach(r => r.send(msg, sender()))
 

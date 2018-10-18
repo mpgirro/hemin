@@ -7,6 +7,22 @@ import io.hemin.engine.util.config.StandardConfig
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.FiniteDuration
 
+/** Configuration for [[io.hemin.engine.index.IndexStore]] */
+final case class IndexConfig (
+  luceneIndexPath: String,
+  solrUri: String,
+  solrQueueSize: Int,
+  solrThreadCount: Int,
+  createIndex: Boolean,
+  commitInterval: FiniteDuration,
+  workerCount: Int,
+) extends StandardConfig {
+  override def name: String              = IndexConfig.name
+  override def defaultConfig: Config     = IndexConfig.defaultConfig
+  override def defaultDispatcher: Config = IndexConfig.defaultDispatcher
+  override def defaultMailbox: Config    = IndexConfig.defaultMailbox
+}
+
 object IndexConfig extends StandardConfig {
   override def name: String = "hemin.index"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -34,20 +50,4 @@ object IndexConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.index.IndexStore]] */
-final case class IndexConfig (
-  luceneIndexPath: String,
-  solrUri: String,
-  solrQueueSize: Int,
-  solrThreadCount: Int,
-  createIndex: Boolean,
-  commitInterval: FiniteDuration,
-  workerCount: Int,
-) extends StandardConfig {
-  override def name: String              = IndexConfig.name
-  override def defaultConfig: Config     = IndexConfig.defaultConfig
-  override def defaultDispatcher: Config = IndexConfig.defaultDispatcher
-  override def defaultMailbox: Config    = IndexConfig.defaultMailbox
 }

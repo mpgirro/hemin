@@ -74,9 +74,9 @@ class NodeMaster (config: EngineConfig)
     index ! ActorRefSupervisor(self)
 
     crawler ! ActorRefCatalogStoreActor(catalog)
-    crawler ! ActorRefIndexStoreActor(index)
+    //crawler ! ActorRefIndexStoreActor(index)
     crawler ! ActorRefParserActor(parser)
-    crawler ! ActorRefCatalogStoreActor(catalog)
+    //crawler ! ActorRefCatalogStoreActor(catalog)
     crawler ! ActorRefSupervisor(self)
 
     parser ! ActorRefCatalogStoreActor(catalog)

@@ -2,23 +2,15 @@ package io.hemin.engine
 
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.ask
-import akka.stream.ActorAttributes.Dispatcher
 import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.hemin.engine.NodeMaster.{CliInput, CliOutput}
-import io.hemin.engine.catalog.{CatalogConfig, CatalogPriorityMailbox}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.crawler.{CrawlerConfig, CrawlerPriorityMailbox}
 import io.hemin.engine.domain._
-import io.hemin.engine.index.{IndexConfig, IndexPriorityMailbox}
-import io.hemin.engine.parser.{ParserConfig, ParserPriorityMailbox}
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
-import io.hemin.engine.searcher.{SearcherConfig, SearcherPriorityMailbox}
-import io.hemin.engine.updater.{UpdaterConfig, UpdaterPriorityMailbox}
 
-import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps

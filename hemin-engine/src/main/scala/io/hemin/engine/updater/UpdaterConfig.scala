@@ -6,6 +6,16 @@ import io.hemin.engine.util.config.StandardConfig
 
 import scala.collection.JavaConverters._
 
+/** Configuration for [[io.hemin.engine.updater.Updater]] */
+final case class UpdaterConfig (
+  // TODO add some config values
+) extends StandardConfig {
+  override def name: String              = UpdaterConfig.name
+  override def defaultConfig: Config     = UpdaterConfig.defaultConfig
+  override def defaultDispatcher: Config = UpdaterConfig.defaultDispatcher
+  override def defaultMailbox: Config    = UpdaterConfig.defaultMailbox
+}
+
 object UpdaterConfig extends StandardConfig {
   override def name: String = "hemin.updater"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -27,14 +37,4 @@ object UpdaterConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.updater.Updater]] */
-final case class UpdaterConfig (
-  // TODO add some config values
-) extends StandardConfig {
-  override def name: String              = UpdaterConfig.name
-  override def defaultConfig: Config     = UpdaterConfig.defaultConfig
-  override def defaultDispatcher: Config = UpdaterConfig.defaultDispatcher
-  override def defaultMailbox: Config    = UpdaterConfig.defaultMailbox
 }

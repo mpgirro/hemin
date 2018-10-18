@@ -6,6 +6,19 @@ import io.hemin.engine.util.config.StandardConfig
 
 import scala.collection.JavaConverters._
 
+/** Configuration for [[io.hemin.engine.crawler.Crawler]] */
+final case class CrawlerConfig (
+  workerCount: Int,
+  fetchWebsites: Boolean,
+  downloadTimeout: Int,
+  downloadMaxBytes: Long
+) extends StandardConfig {
+  override def name: String              = CrawlerConfig.name
+  override def defaultConfig: Config     = CrawlerConfig.defaultConfig
+  override def defaultDispatcher: Config = CrawlerConfig.defaultDispatcher
+  override def defaultMailbox: Config    = CrawlerConfig.defaultMailbox
+}
+
 object CrawlerConfig extends StandardConfig {
   override def name: String = "hemin.crawler"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -30,17 +43,4 @@ object CrawlerConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.crawler.Crawler]] */
-final case class CrawlerConfig (
-  workerCount: Int,
-  fetchWebsites: Boolean,
-  downloadTimeout: Int,
-  downloadMaxBytes: Long
-) extends StandardConfig {
-  override def name: String              = CrawlerConfig.name
-  override def defaultConfig: Config     = CrawlerConfig.defaultConfig
-  override def defaultDispatcher: Config = CrawlerConfig.defaultDispatcher
-  override def defaultMailbox: Config    = CrawlerConfig.defaultMailbox
 }

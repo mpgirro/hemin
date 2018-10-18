@@ -6,6 +6,20 @@ import io.hemin.engine.util.config.StandardConfig
 
 import scala.collection.JavaConverters._
 
+/** Configuration for [[io.hemin.engine.catalog.CatalogStore]] */
+final case class CatalogConfig (
+  mongoUri: String,
+  createDatabase: Boolean,
+  defaultPage: Int,
+  defaultSize: Int,
+  maxPageSize: Int
+) extends StandardConfig {
+  override def name: String              = CatalogConfig.name
+  override def defaultConfig: Config     = CatalogConfig.defaultConfig
+  override def defaultDispatcher: Config = CatalogConfig.defaultDispatcher
+  override def defaultMailbox: Config    = CatalogConfig.defaultMailbox
+}
+
 object CatalogConfig extends StandardConfig {
   override def name: String = "hemin.catalog"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -31,18 +45,4 @@ object CatalogConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.catalog.CatalogStore]] */
-final case class CatalogConfig (
-  mongoUri: String,
-  createDatabase: Boolean,
-  defaultPage: Int,
-  defaultSize: Int,
-  maxPageSize: Int
-) extends StandardConfig {
-  override def name: String              = CatalogConfig.name
-  override def defaultConfig: Config     = CatalogConfig.defaultConfig
-  override def defaultDispatcher: Config = CatalogConfig.defaultDispatcher
-  override def defaultMailbox: Config    = CatalogConfig.defaultMailbox
 }

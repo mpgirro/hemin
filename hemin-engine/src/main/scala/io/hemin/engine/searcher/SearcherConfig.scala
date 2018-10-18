@@ -6,6 +6,18 @@ import io.hemin.engine.util.config.StandardConfig
 
 import scala.collection.JavaConverters._
 
+/** Configuration for [[io.hemin.engine.searcher.Searcher]] */
+final case class SearcherConfig (
+  solrUri: String,
+  defaultPage: Int,
+  defaultSize: Int,
+) extends StandardConfig {
+  override def name: String              = SearcherConfig.name
+  override def defaultConfig: Config     = SearcherConfig.defaultConfig
+  override def defaultDispatcher: Config = SearcherConfig.defaultDispatcher
+  override def defaultMailbox: Config    = SearcherConfig.defaultMailbox
+}
+
 object SearcherConfig extends StandardConfig {
   override def name: String = "hemin.searcher"
   override def defaultConfig: Config = ConfigFactory.parseMap(Map(
@@ -29,16 +41,4 @@ object SearcherConfig extends StandardConfig {
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
-}
-
-/** Configuration for [[io.hemin.engine.searcher.Searcher]] */
-final case class SearcherConfig (
-  solrUri: String,
-  defaultPage: Int,
-  defaultSize: Int,
-) extends StandardConfig {
-  override def name: String              = SearcherConfig.name
-  override def defaultConfig: Config     = SearcherConfig.defaultConfig
-  override def defaultDispatcher: Config = SearcherConfig.defaultDispatcher
-  override def defaultMailbox: Config    = SearcherConfig.defaultMailbox
 }

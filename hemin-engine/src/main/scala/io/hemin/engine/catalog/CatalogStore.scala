@@ -107,7 +107,7 @@ class CatalogStore(config: CatalogConfig)
 
   @inline private def resolveDB: Future[DefaultDB] =
     connection.database(dbName).andThen {
-      case _ => /*logger.debug*/ log.info(s"[$lnm] MongoDB resolved: $dbName")
+      case _ => /*logger.debug*/ log.debug(s"[$lnm] MongoDB resolved: $dbName")
     }
 
   //private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
