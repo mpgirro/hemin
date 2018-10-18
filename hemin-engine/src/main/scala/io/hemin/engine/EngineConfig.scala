@@ -25,14 +25,43 @@ final case class EngineConfig(
 )
 
 object EngineConfig {
+
   /** Loads the config. To be used from `main()` or equivalent. */
   def loadFromEnvironment(): EngineConfig =
-    load(ConfigFactory
-      .load(System.getProperty("config.resource", "application.conf"))
-      .withFallback(defaultConfig()))
+    load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
 
-  /** Load from a given Typesafe Config object */
-  def load(config: Config): EngineConfig =
+  /**
+    * Load from a given a given `com.typesafe.config.Config` object.
+    * To ensure a fully initialized [[io.hemin.engine.EngineConfig]],
+    * the given Typesafe Config is interpolated with the results of
+    * [[io.hemin.engine.EngineConfig.defaultConfig()]] as the fallback
+    * values for all keys that are not set in the argument config.
+    */
+  def load(config: Config): EngineConfig = loadSafe(config.withFallback(defaultConfig()))
+
+  /**
+    * The default configuration of an [[io.hemin.engine.Engine]],
+    * as a `com.typesafe.config.Config` object. This configuration
+    * includes dispatcher and mailboxe configuration for every Akka actor.
+    */
+  def defaultConfig(): Config = ConfigFactory
+    .parseMap(Map(
+      "hemin.internal-timeout" -> 5,
+    ).asJava)
+    .withFallback(CatalogConfig.defaultConfig)
+    .withFallback(CrawlerConfig.defaultConfig)
+    .withFallback(IndexConfig.defaultConfig)
+    .withFallback(ParserConfig.defaultConfig)
+    .withFallback(SearcherConfig.defaultConfig)
+    .withFallback(UpdaterConfig.defaultConfig)
+
+  /**
+    * All keys are expected and must be present in the config map.
+    * Use [[io.hemin.engine.EngineConfig.defaultConfig()]] for the
+    * fallback values to the TypeSafe Config object before calling
+    * this method.
+    */
+  private def loadSafe(config: Config): EngineConfig =
     EngineConfig(
       app = AppConfig(),
       catalog = CatalogConfig(
@@ -68,30 +97,5 @@ object EngineConfig {
       updater = UpdaterConfig(),
       internalTimeout = config.getInt("hemin.internal-timeout").seconds,
     )
-
-  def defaultConfig(): Config = ConfigFactory
-    .parseMap(Map(
-      "hemin.internal-timeout" -> 5,
-    ).asJava)
-    .withFallback(CatalogConfig.defaultConfig)
-    .withFallback(CrawlerConfig.defaultConfig)
-    .withFallback(IndexConfig.defaultConfig)
-    .withFallback(ParserConfig.defaultConfig)
-    .withFallback(SearcherConfig.defaultConfig)
-    .withFallback(UpdaterConfig.defaultConfig)
-
-  def defaultActorSystemConfig: Config = ConfigFactory.empty()
-    .withFallback(CatalogConfig.defaultDispatcher)
-    .withFallback(CatalogConfig.defaultMailbox)
-    .withFallback(CrawlerConfig.defaultDispatcher)
-    .withFallback(CrawlerConfig.defaultMailbox)
-    .withFallback(IndexConfig.defaultDispatcher)
-    .withFallback(IndexConfig.defaultMailbox)
-    .withFallback(ParserConfig.defaultDispatcher)
-    .withFallback(ParserConfig.defaultMailbox)
-    .withFallback(SearcherConfig.defaultDispatcher)
-    .withFallback(SearcherConfig.defaultMailbox)
-    .withFallback(UpdaterConfig.defaultDispatcher)
-    .withFallback(UpdaterConfig.defaultMailbox)
 
 }

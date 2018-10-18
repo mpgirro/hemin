@@ -2,7 +2,7 @@ package io.hemin.engine.index
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.config.StandardConfig
+import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration.FiniteDuration
@@ -16,16 +16,13 @@ final case class IndexConfig (
   createIndex: Boolean,
   commitInterval: FiniteDuration,
   workerCount: Int,
-) extends StandardConfig {
-  override def name: String              = IndexConfig.name
-  override def defaultConfig: Config     = IndexConfig.defaultConfig
-  override def defaultDispatcher: Config = IndexConfig.defaultDispatcher
-  override def defaultMailbox: Config    = IndexConfig.defaultMailbox
+) extends ConfigStandardValues {
+  override def name: String = IndexConfig.name
 }
 
-object IndexConfig extends StandardConfig {
+object IndexConfig extends ConfigDefaults with ConfigStandardValues {
   override def name: String = "hemin.index"
-  override def defaultConfig: Config = ConfigFactory.parseMap(Map(
+  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
     name+".lucene-index-path" -> "./data/index",
     name+".solr-uri"          -> "http://localhost:8983/solr/hemin",
     name+".solr-queue-size"   -> 20,
@@ -34,7 +31,7 @@ object IndexConfig extends StandardConfig {
     name+".commit-interval"   -> 3,
     name+".handler-count"     -> 5,
   ).asJava)
-  override def defaultDispatcher: Config = load(parseString(
+  override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -44,7 +41,7 @@ object IndexConfig extends StandardConfig {
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
-  override def defaultMailbox: Config = load(parseString(
+  override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100

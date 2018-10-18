@@ -15,10 +15,12 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
-class Engine (globalConfig: Config) {
+class Engine (private val initConfig: Config) {
+
+  private val completeConfig = initConfig.withFallback(EngineConfig.defaultConfig())
 
   private val log = Logger(getClass)
-  private val engineConfig: EngineConfig = EngineConfig.load(globalConfig.withFallback(EngineConfig.defaultConfig()))
+  private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
 
   private implicit val internalTimeout: Timeout = engineConfig.internalTimeout
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
@@ -36,7 +38,7 @@ class Engine (globalConfig: Config) {
   def start(): Unit = {
 
     // init the actorsystem and local master for this node
-    val system = ActorSystem("hemin", globalConfig.withFallback(EngineConfig.defaultActorSystemConfig))
+    val system = ActorSystem("hemin", completeConfig)
     master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)
 
     // wait until all actors in the hierarchy report they are up and running
