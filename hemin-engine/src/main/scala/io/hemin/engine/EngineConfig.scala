@@ -17,13 +17,13 @@ import scala.concurrent.duration._
   * Configuration for [[io.hemin.engine.Engine]]
   */
 final case class EngineConfig(
-  appConfig: AppConfig,           // Config when we start an engine stand-alone
-  catalogConfig: CatalogConfig,
-  crawlerConfig: CrawlerConfig,
-  indexConfig: IndexConfig,
-  parserConfig: ParserConfig,
-  searcherConfig: SearcherConfig,
-  updaterConfig: UpdaterConfig,
+  app: AppConfig, // Config when we start an engine stand-alone
+  catalog: CatalogConfig,
+  crawler: CrawlerConfig,
+  index: IndexConfig,
+  parser: ParserConfig,
+  searcher: SearcherConfig,
+  updater: UpdaterConfig,
   internalTimeout: Timeout
 )
 
@@ -37,21 +37,21 @@ object EngineConfig {
   /** Load from a given Typesafe Config object */
   def load(config: Config): EngineConfig =
     EngineConfig(
-      appConfig = AppConfig(),
-      catalogConfig = CatalogConfig(
+      app = AppConfig(),
+      catalog = CatalogConfig(
         mongoUri       = config.getString("hemin.catalog.mongo-uri"),
         createDatabase = config.getBoolean("hemin.catalog.create-database"),
         defaultPage    = config.getInt("hemin.catalog.default-page"),
         defaultSize    = config.getInt("hemin.catalog.default-size"),
         maxPageSize    = config.getInt("hemin.catalog.max-page-size"),
       ),
-      crawlerConfig = CrawlerConfig(
+      crawler = CrawlerConfig(
         workerCount      = config.getInt("hemin.crawler.worker-count"),
         fetchWebsites    = config.getBoolean("hemin.crawler.fetch-websites"),  // TODO rename to config file
         downloadTimeout  = config.getInt("hemin.crawler.download-timeout"),    // TODO add to config file
         downloadMaxBytes = config.getLong("hemin.crawler.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
       ),
-      indexConfig = IndexConfig(
+      index = IndexConfig(
         luceneIndexPath = config.getString("hemin.index.lucene-index-path"), // TODO add to config file
         solrUri         = config.getString("hemin.index.solr-uri"),
         solrQueueSize   = config.getInt("hemin.index.solr-queue-size"),
@@ -60,15 +60,15 @@ object EngineConfig {
         commitInterval  = config.getInt("hemin.index.commit-interval").seconds,
         workerCount     = config.getInt("hemin.index.handler-count"),
       ),
-      parserConfig = ParserConfig(
+      parser = ParserConfig(
         workerCount = config.getInt("hemin.parser.worker-count"),
       ),
-      searcherConfig = SearcherConfig(
+      searcher = SearcherConfig(
         solrUri     = config.getString("hemin.searcher.solr-uri"),
         defaultPage = config.getInt("hemin.searcher.default-page"),
         defaultSize = config.getInt("hemin.searcher.default-size"),
       ),
-      updaterConfig = UpdaterConfig(),
+      updater = UpdaterConfig(),
       internalTimeout = config.getInt("hemin.internal-timeout").seconds,
     )
 

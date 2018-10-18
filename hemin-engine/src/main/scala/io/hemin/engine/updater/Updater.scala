@@ -7,11 +7,13 @@ import io.hemin.engine.catalog.CatalogStore.ProposeNewFeed
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
 import io.hemin.engine.updater.Updater.ProcessFeed
 
+import scala.concurrent.ExecutionContext
+
 object Updater {
   final val name = "updater"
   def props(config: UpdaterConfig): Props =
     Props(new Updater(config))
-      .withDispatcher("hemin.updater.dispatcher")
+      .withDispatcher(config.dispatcherId)
 
   trait UpdaterMessage
   final case class ProcessFeed(id: String, url: String, job: FetchJob) extends UpdaterMessage
@@ -21,6 +23,8 @@ class Updater (config: UpdaterConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
 
   private var catalog: ActorRef = _
   private var crawler: ActorRef = _

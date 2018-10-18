@@ -8,10 +8,15 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
 import io.hemin.engine.NodeMaster.{CliInput, CliOutput}
+import io.hemin.engine.catalog.CatalogConfig
 import io.hemin.engine.catalog.CatalogStore._
+import io.hemin.engine.crawler.CrawlerConfig
 import io.hemin.engine.domain._
+import io.hemin.engine.index.IndexConfig
+import io.hemin.engine.parser.{ParserConfig, ParserPriorityMailbox}
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.searcher.SearcherConfig
+import io.hemin.engine.updater.UpdaterConfig
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
@@ -37,7 +42,48 @@ class Engine (globalConfig: Config) {
   */
 
   private def defaultActorSystemConfig: Config = {
-    val defaults = Map(
+    val defaults: Map[String,Any] = Map(
+      /*
+      CatalogConfig.dispatcherId -> Map(
+        "type"         -> Dispatcher,
+        "executor"     -> "fork-join-executor",
+        "throughput"   -> 100,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
+      CrawlerConfig.dispatcherId -> Map(
+        "type"         -> Dispatcher,
+        "executor"     -> "fork-join-executor",
+        "throughput"   -> 100,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
+      IndexConfig.dispatcherId -> Map(
+        "type"         -> Dispatcher,
+        "executor"     -> "fork-join-executor",
+        "throughput"   -> 100,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
+      ParserConfig.dispatcherId -> Map(
+        "type"         -> Dispatcher,
+        "executor"     -> "fork-join-executor",
+        "throughput"   -> 1,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
       SearcherConfig.dispatcherId -> Map(
         "type"       -> Dispatcher,
         "executor"   -> "fork-join-executor",
@@ -48,8 +94,21 @@ class Engine (globalConfig: Config) {
           "parallelism-max"    -> 8,
         ),
       ),
+      UpdaterConfig.dispatcherId -> Map(
+        "type"       -> Dispatcher,
+        "executor"   -> "fork-join-executor",
+        "throughput" -> 100,
+        "fork-join-executor" -> Map(
+          "parallelism-min"    -> 4,
+          "parallelism-factor" -> 2.0,
+          "parallelism-max"    -> 8,
+        ),
+      ),
+      */
     )
-    ConfigFactory.parseMap(defaults.asJava)
+    ConfigFactory
+      .parseMap(defaults.asJava)
+      .withFallback(ParserPriorityMailbox.config)
   }
 
   def start(): Unit = {
@@ -114,8 +173,8 @@ class Engine (globalConfig: Config) {
     }
 
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-    val p: Int = page.getOrElse(engineConfig.catalogConfig.defaultPage) - 1
-    val s: Int = size.getOrElse(engineConfig.catalogConfig.defaultSize)
+    val p: Int = page.getOrElse(config.catalog.defaultPage) - 1
+    val s: Int = size.getOrElse(config.catalog.defaultSize)
 
     (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
       case AllPodcastsResult(ps) => ps

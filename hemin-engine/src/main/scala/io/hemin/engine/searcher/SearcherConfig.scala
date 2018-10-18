@@ -8,7 +8,7 @@ object SearcherConfig {
   * Configuration for [[io.hemin.engine.searcher.Searcher]]
   */
 final case class SearcherConfig (
-  dispatcherId: String = dispatcherId.executionContextId,
+  dispatcherId: String = SearcherConfig.dispatcherId,
   solrUri: String,
   defaultPage: Int,
   defaultSize: Int,

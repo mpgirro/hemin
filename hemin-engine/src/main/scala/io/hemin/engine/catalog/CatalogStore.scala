@@ -22,7 +22,7 @@ object CatalogStore {
   final val name = "catalog"
   def props(config: CatalogConfig): Props =
     Props(new CatalogStore(config))
-      .withDispatcher("hemin.catalog.dispatcher")
+      .withDispatcher(config.dispatcherId)
 
   trait CatalogMessage
   trait CatalogEvent extends CatalogMessage
@@ -74,7 +74,7 @@ class CatalogStore(config: CatalogConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.catalog.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
 
   private val idGenerator = new IdGenerator(1)  // TODO get shardId from Config
 

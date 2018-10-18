@@ -12,6 +12,10 @@ import io.hemin.engine.util.cli.CliFormatter.format
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 
+object CliProcessor {
+  val EMPTY_INPUT_MSG = "Input was NULL"
+}
+
 /**
   * command language interpreter processor for interactive commands. This is not a fully
   * fledged REPL, since it does not print the evaluation results.
@@ -31,41 +35,41 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
   def eval(args: String): String = Option(args)
     .map(_.split(" "))
     .map(eval)
-    .getOrElse("Input was NULL")
+    .getOrElse(CliProcessor.EMPTY_INPUT_MSG)
 
   def eval(args: Array[String]): String = Option(args)
     .map(_.toList)
     .map(eval)
-    .getOrElse("Input was NULL")
+    .getOrElse(CliProcessor.EMPTY_INPUT_MSG)
 
   def eval(args: List[String]): String = Option(args)
     .map {
       case "help" :: _ => help()
 
-      case "propose" :: Nil => usage("propose")
+      case "propose" :: Nil   => usage("propose")
       case "propose" :: feeds => propose(feeds)
 
-      case "search" :: Nil => usage("search")
+      case "search" :: Nil          => usage("search")
       case "search" :: query :: Nil => search(query)
 
-      case "get" :: "podcast" :: Nil => usage("get podcast")
+      case "get" :: "podcast" :: Nil       => usage("get podcast")
       case "get" :: "podcast" :: id :: Nil => getPodcast(id)
-      case "get" :: "podcast" :: id :: _ => usage("get podcast")
+      case "get" :: "podcast" :: id :: _   => usage("get podcast")
 
-      case "get" :: "podcast-feeds" :: Nil => usage("get podcast")
+      case "get" :: "podcast-feeds" :: Nil       => usage("get podcast")
       case "get" :: "podcast-feeds" :: id :: Nil => getFeedsByPodcast(id)
-      case "get" :: "podcast-feeds" :: id :: _ => usage("get podcast")
+      case "get" :: "podcast-feeds" :: id :: _   => usage("get podcast")
 
-      case "get" :: "episode" :: Nil => usage("get episode")
+      case "get" :: "episode" :: Nil       => usage("get episode")
       case "get" :: "episode" :: id :: Nil => getEpisode(id)
-      case "get" :: "episode" :: id :: _ => usage("get episode")
+      case "get" :: "episode" :: id :: _   => usage("get episode")
 
-      case "get" :: "episode-chapters" :: Nil => usage("get chapters")
+      case "get" :: "episode-chapters" :: Nil       => usage("get chapters")
       case "get" :: "episode-chapters" :: id :: Nil => getChaptersByEpisode(id)
-      case "get" :: "episode-chapters" :: id :: _ => usage("get chapters")
+      case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
 
       case _ => help()
-    }.getOrElse("Input was NULL")
+    }.getOrElse(CliProcessor.EMPTY_INPUT_MSG)
 
   private val usageMap = Map(
     "propose"        -> "feed [feed [feed]]",
@@ -109,35 +113,35 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
   }
 
   private def search(query: String): String =
-    resolveResponse(bus ? SearcherRequest(query, Some(config.searcherConfig.defaultPage), Some(config.searcherConfig.defaultSize)))
+    result(bus ? SearcherRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
 
-  private def getPodcast(id: String): String = resolveResponse(bus ? GetPodcast(id))
+  private def getPodcast(id: String): String = result(bus ? GetPodcast(id))
 
-  private def getEpisode(id: String): String = resolveResponse(bus ? GetEpisode(id))
+  private def getEpisode(id: String): String = result(bus ? GetEpisode(id))
 
-  private def getFeed(id: String): String = resolveResponse(bus ? GetFeed(id))
+  private def getFeed(id: String): String = result(bus ? GetFeed(id))
 
-  private def getEpisodesByPodcast(id: String): String = resolveResponse(bus ? GetEpisodesByPodcast(id))
+  private def getEpisodesByPodcast(id: String): String = result(bus ? GetEpisodesByPodcast(id))
 
-  private def getFeedsByPodcast(id: String): String = resolveResponse(bus ? GetFeedsByPodcast(id))
+  private def getFeedsByPodcast(id: String): String = result(bus ? GetFeedsByPodcast(id))
 
-  private def getChaptersByEpisode(id: String): String = resolveResponse(bus ? GetChaptersByEpisode(id))
+  private def getChaptersByEpisode(id: String): String = result(bus ? GetChaptersByEpisode(id))
 
-  private def resolveResponse(option: Option[Any]): String = option match {
+  private def result(option: Option[Any]): String = option match {
     case Some(p: Podcast) => format(p)
     case Some(e: Episode) => format(e)
     case Some(f: Feed)    => format(f)
     case Some(c: Chapter) => format(c)
     case Some(i: Image)   => format(i)
-    case Some(other) => unhandled(other)
+    case Some(other)      => unhandled(other)
     case None => "No database record found"
 
   }
 
-  private def resolveResponse(future: Future[Any]): String = Await.result(future, INTERNAL_TIMEOUT.duration) match {
-    case PodcastResult(p)            => resolveResponse(p)
-    case EpisodeResult(e)            => resolveResponse(e)
-    case FeedResult(f)               => resolveResponse(f)
+  private def result(future: Future[Any]): String = Await.result(future, INTERNAL_TIMEOUT.duration) match {
+    case PodcastResult(p)            => result(p)
+    case EpisodeResult(e)            => result(e)
+    case FeedResult(f)               => result(f)
     case SearcherResults(rs)         => format(rs)
     case EpisodesByPodcastResult(es) => format(es)
     case FeedsByPodcastResult(fs)    => format(fs)
@@ -146,8 +150,8 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
     case other => unhandled(other)
   }
 
-  private def unhandled(unhandled: Any): String = {
-    val msg = s"CLI has no specific handler for type : ${unhandled.getClass}"
+  private def unhandled(unknown: Any): String = {
+    val msg = s"CLI has no specific handler for type : ${unknown.getClass}"
     log.error(msg)
     msg // return to frontend (CLI/Web)
   }

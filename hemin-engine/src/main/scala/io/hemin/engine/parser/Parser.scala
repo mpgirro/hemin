@@ -6,13 +6,15 @@ import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.exception.FeedParsingException
 
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object Parser {
   final val name = "parser"
   def props(config: ParserConfig): Props =
     Props(new Parser(config))
-      .withDispatcher("hemin.parser.dispatcher")
+      .withDispatcher(config.dispatcherId)
+      .withMailbox(ParserPriorityMailbox.name)
 
   trait ParserMessage
   final case class ParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String) extends ParserMessage
@@ -27,6 +29,8 @@ class Parser (config: ParserConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
 
   private var workerIndex = 0
 

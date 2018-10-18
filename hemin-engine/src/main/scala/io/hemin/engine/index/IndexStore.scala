@@ -16,7 +16,7 @@ object IndexStore {
   final val name = "index"
   def props(config: IndexConfig): Props =
     Props(new IndexStore(config))
-      .withDispatcher("hemin.index.dispatcher")
+      .withDispatcher(config.dispatcherId)
 
   trait IndexMessage
   trait IndexEvent extends IndexMessage
@@ -41,7 +41,7 @@ class IndexStore (config: IndexConfig)
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
 
-  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup("hemin.index.dispatcher")
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
 
   private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 

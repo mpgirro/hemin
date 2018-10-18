@@ -12,13 +12,14 @@ import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.exception.HeminException
 
 import scala.collection.JavaConverters._
+import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 
 object Crawler {
   final val name = "crawler"
   def props(config: CrawlerConfig): Props =
     Props(new Crawler(config))
-      .withDispatcher("hemin.crawler.dispatcher")
+      .withDispatcher(config.dispatcherId)
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage
@@ -36,6 +37,8 @@ class Crawler (config: CrawlerConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+
+  private implicit val executionContext: ExecutionContext = context.system.dispatchers.lookup(config.dispatcherId)
 
   private var workerIndex = 0
 

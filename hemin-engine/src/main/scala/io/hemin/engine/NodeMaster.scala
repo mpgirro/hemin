@@ -62,12 +62,12 @@ class NodeMaster (config: EngineConfig)
 
     //val clusterDomainListener = context.watch(context.actorOf(ClusterDomainEventListener.props(), ClusterDomainEventListener.name))
 
-    index    = context.watch(context.actorOf(IndexStore.props(config.indexConfig),     IndexStore.name))
-    parser   = context.watch(context.actorOf(Parser.props(config.parserConfig),        Parser.name))
-    crawler  = context.watch(context.actorOf(Crawler.props(config.crawlerConfig),      Crawler.name))
-    catalog  = context.watch(context.actorOf(CatalogStore.props(config.catalogConfig), CatalogStore.name))
-    searcher = context.watch(context.actorOf(Searcher.props(config.searcherConfig),    Searcher.name))
-    updater  = context.watch(context.actorOf(Updater.props(config.updaterConfig),      Updater.name))
+    index    = context.watch(context.actorOf(IndexStore.props(config.index),     IndexStore.name))
+    parser   = context.watch(context.actorOf(Parser.props(config.parser),        Parser.name))
+    crawler  = context.watch(context.actorOf(Crawler.props(config.crawler),      Crawler.name))
+    catalog  = context.watch(context.actorOf(CatalogStore.props(config.catalog), CatalogStore.name))
+    searcher = context.watch(context.actorOf(Searcher.props(config.searcher),    Searcher.name))
+    updater  = context.watch(context.actorOf(Updater.props(config.updater),      Updater.name))
 
 
     // pass around references not provided by constructors due to circular dependencies
