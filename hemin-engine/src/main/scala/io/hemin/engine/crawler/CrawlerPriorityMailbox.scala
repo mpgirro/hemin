@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory.{load, parseString}
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
 
+/*
 object CrawlerPriorityMailbox {
   val name = "hemin.crawler.mailbox"
   val config: Config = load(parseString(
@@ -16,8 +17,9 @@ object CrawlerPriorityMailbox {
       mailbox-push-timeout-time = 1ms
     }"""))
 }
+*/
 
-/** Mailbox configuration for [[io.hemin.engine.crawler.Crawler]] */
+/** Priority mailbox for [[io.hemin.engine.crawler.Crawler]] */
 class CrawlerPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important

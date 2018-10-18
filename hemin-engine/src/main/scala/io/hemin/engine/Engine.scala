@@ -108,13 +108,18 @@ class Engine (globalConfig: Config) {
     )
     ConfigFactory
       .parseMap(defaults.asJava)
-      .withFallback(CatalogPriorityMailbox.config)
-      .withFallback(CrawlerPriorityMailbox.config)
-      .withFallback(IndexStorePriorityMailbox.config)
-      .withFallback(ParserPriorityMailbox.config)
+      .withFallback(CatalogConfig.defaultDispatcher)
+      .withFallback(CatalogConfig.defaultMailbox)
+      .withFallback(CrawlerConfig.defaultDispatcher)
+      .withFallback(CrawlerConfig.defaultMailbox)
+      .withFallback(IndexConfig.defaultDispatcher)
+      .withFallback(IndexConfig.defaultMailbox)
+      .withFallback(ParserConfig.defaultDispatcher)
+      .withFallback(ParserConfig.defaultMailbox)
       .withFallback(SearcherConfig.defaultDispatcher)
       .withFallback(SearcherConfig.defaultMailbox)
-      .withFallback(UpdaterPriorityMailbox.config)
+      .withFallback(UpdaterConfig.defaultDispatcher)
+      .withFallback(UpdaterConfig.defaultMailbox)
   }
 
   def start(): Unit = {

@@ -88,9 +88,9 @@ object EngineConfig {
       "hemin.index.commit-interval"      -> 3,
       "hemin.index.handler-count"        -> 5,
       "hemin.parser.worker-count"        -> 2,
-      "hemin.searcher.solr-uri"          -> "http://localhost:8983/solr/hemin",
-      "hemin.searcher.default-page"      -> 1,
-      "hemin.searcher.default-size"      -> 20,
+      SearcherConfig.name+".solr-uri"          -> "http://localhost:8983/solr/hemin",
+      SearcherConfig.name+".default-page"      -> 1,
+      SearcherConfig.name+".default-size"      -> 20,
       "hemin.internal-timeout"           -> 5,
     )
     ConfigFactory.parseMap(defaults.asJava)

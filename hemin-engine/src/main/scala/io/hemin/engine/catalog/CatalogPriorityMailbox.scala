@@ -7,6 +7,7 @@ import com.typesafe.config.ConfigFactory.{load, parseString}
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.catalog.CatalogStore._
 
+/*
 object CatalogPriorityMailbox {
   val name = "hemin.parser.mailbox"
   val config: Config = load(parseString(
@@ -16,8 +17,9 @@ object CatalogPriorityMailbox {
       mailbox-push-timeout-time = 1ms
     }"""))
 }
+*/
 
-/** Mailbox configuration for [[io.hemin.engine.catalog.CatalogStore]] */
+/** Priority mailbox for [[io.hemin.engine.catalog.CatalogStore]] */
 class CatalogPriorityMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
