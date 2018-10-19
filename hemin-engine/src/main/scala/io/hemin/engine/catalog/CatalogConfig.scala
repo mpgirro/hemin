@@ -22,6 +22,7 @@ object CatalogConfig
     with ConfigStandardValues {
 
   override def configPath: String = "hemin.catalog"
+
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
     configPath+".create-database" -> true,
@@ -29,6 +30,7 @@ object CatalogConfig
     configPath+".default-size"    -> 20,
     configPath+".max-page-size"   -> 10000,
   ).asJava)
+
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -39,10 +41,12 @@ object CatalogConfig
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
+
   override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[CatalogPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
+
 }

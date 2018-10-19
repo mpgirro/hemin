@@ -18,9 +18,11 @@ object ParserConfig
     with ConfigStandardValues {
 
   override def configPath: String = "hemin.parser"
+
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".worker-count" -> 2,
   ).asJava)
+
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -31,10 +33,12 @@ object ParserConfig
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
+
   override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
+
 }

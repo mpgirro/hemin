@@ -25,6 +25,7 @@ object IndexConfig
     with ConfigStandardValues {
 
   override def configPath: String = "hemin.index"
+
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".lucene-index-path" -> "./data/index",
     configPath+".solr-uri"          -> "http://localhost:8983/solr/hemin",
@@ -34,6 +35,7 @@ object IndexConfig
     configPath+".commit-interval"   -> 3,
     configPath+".handler-count"     -> 5,
   ).asJava)
+
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -44,10 +46,12 @@ object IndexConfig
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
+
   override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
+
 }

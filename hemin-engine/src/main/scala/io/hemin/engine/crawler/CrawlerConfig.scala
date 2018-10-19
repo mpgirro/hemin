@@ -21,12 +21,14 @@ object CrawlerConfig
     with ConfigStandardValues {
 
   override def configPath: String = "hemin.crawler"
+
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".worker-count"       -> 5,
     configPath+".fetch-websites"     -> false, // TODO rename to config file
     configPath+".download-timeout"   -> 10, // TODO add to config file
     configPath+".download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
   ).asJava)
+
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -37,10 +39,12 @@ object CrawlerConfig
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
+
   override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[CrawlerPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
+
 }

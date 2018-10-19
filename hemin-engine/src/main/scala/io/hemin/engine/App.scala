@@ -32,7 +32,7 @@ object App {
     val processor = new CliProcessor(engine.bus, engine.config, ec)
     log.info("CLI is ready to take commands")
 
-    while(running){
+    while (running) {
       blocking {
         val input = StdIn.readLine()
         log.debug("CLI read : {}", input)

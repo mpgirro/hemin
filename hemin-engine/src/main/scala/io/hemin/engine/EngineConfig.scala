@@ -26,10 +26,6 @@ final case class EngineConfig(
 
 object EngineConfig {
 
-  /** Loads the config. To be used from `main()` or equivalent. */
-  def loadFromEnvironment(): EngineConfig =
-    load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
-
   /**
     * Load from a given a given `com.typesafe.config.Config` object.
     * To ensure a fully initialized [[io.hemin.engine.EngineConfig]],
@@ -37,7 +33,7 @@ object EngineConfig {
     * [[io.hemin.engine.EngineConfig.defaultConfig()]] as the fallback
     * values for all keys that are not set in the argument config.
     */
-  def load(config: Config): EngineConfig = loadSafe(config.withFallback(defaultConfig()))
+  def load(config: Config): EngineConfig = loadFromSafeConfig(config.withFallback(defaultConfig()))
 
   /**
     * The default configuration of an [[io.hemin.engine.Engine]],
@@ -55,13 +51,17 @@ object EngineConfig {
     .withFallback(SearcherConfig.defaultConfig)
     .withFallback(UpdaterConfig.defaultConfig)
 
+  /** Loads the config. To be used from `main()` or equivalent. */
+  def loadFromEnvironment(): EngineConfig =
+    load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
+
   /**
     * All keys are expected and must be present in the config map.
     * Use [[io.hemin.engine.EngineConfig.defaultConfig()]] for the
     * fallback values to the TypeSafe Config object before calling
     * this method.
     */
-  private def loadSafe(config: Config): EngineConfig =
+  private def loadFromSafeConfig(config: Config): EngineConfig =
     EngineConfig(
       app = AppConfig(),
       catalog = CatalogConfig(

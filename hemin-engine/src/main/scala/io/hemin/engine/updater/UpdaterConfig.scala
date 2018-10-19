@@ -18,9 +18,11 @@ object UpdaterConfig
     with ConfigStandardValues {
 
   override def configPath: String = "hemin.updater"
+
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".solr-uri"     -> "http://localhost:8983/solr/hemin",
+    configPath+".solr-uri" -> "http://localhost:8983/solr/hemin",
   ).asJava)
+
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
@@ -31,10 +33,12 @@ object UpdaterConfig
         parallelism-factor = 2.0
         parallelism-max = 10
     }}"""))
+
   override protected[this] def defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[UpdaterPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
+
 }
