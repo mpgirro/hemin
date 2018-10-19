@@ -53,6 +53,7 @@ object CatalogStore {
   final case class GetChaptersByEpisode(episodeId: String) extends CatalogQuery
   final case class GetFeed(id: String) extends CatalogQuery
   final case class GetImage(id: String) extends CatalogQuery
+  final case class GetImageByAssociate(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
   final case class CheckFeed(id: String) extends CatalogQuery
   //case class CheckAllPodcasts() extends CatalogQuery
@@ -217,6 +218,8 @@ class CatalogStore(config: CatalogConfig)
     case GetFeed(id) => onGetFeed(id)
 
     case GetImage(id) => onGetImage(id)
+
+    case GetImageByAssociate(id) => onGetImageByAssociate(id)
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -553,6 +556,22 @@ class CatalogStore(config: CatalogConfig)
         case Success(i)  => i
         case Failure(ex) =>
           onError(s"Error on retrieving Image (ID=$id) from database : ", ex)
+          None // we have no results to return
+      }
+      .map { i =>
+        theSender ! ImageResult(i)
+      }
+  }
+
+  private def onGetImageByAssociate(id: String): Unit = {
+    log.debug("Received GetImageByAssociate('{}')", id)
+    val theSender = sender()
+    images
+      .findOneByAssociate(id)
+      .andThen {
+        case Success(i)  => i
+        case Failure(ex) =>
+          onError(s"Error on retrieving Image by AssociateID = $id from database : ", ex)
           None // we have no results to return
       }
       .map { i =>

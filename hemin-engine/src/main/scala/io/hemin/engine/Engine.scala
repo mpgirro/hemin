@@ -96,6 +96,11 @@ class Engine (private val initConfig: Config) {
       case ImageResult(i) => i
     }
 
+  def findImageByAssociate(id: String): Future[Option[Image]] =
+    (bus ? GetImageByAssociate(id)).map {
+      case ImageResult(i) => i
+    }
+
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
     val p: Int = page.getOrElse(config.catalog.defaultPage) - 1
     val s: Int = size.getOrElse(config.catalog.defaultSize)
