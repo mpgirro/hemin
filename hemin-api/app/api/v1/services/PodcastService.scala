@@ -22,4 +22,6 @@ class PodcastService @Inject()(engineService: EngineService)
 
   def feeds(id: String)(implicit mc: MarkerContext): Future[List[Feed]] = engine.findFeedsByPodcast(id)
 
+  def image(id: String)(implicit mc: MarkerContext): Future[Option[Image]] = engine.findImageByAssociate(id)
+
 }

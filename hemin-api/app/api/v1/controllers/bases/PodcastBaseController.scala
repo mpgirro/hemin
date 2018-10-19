@@ -4,7 +4,7 @@ import api.v1.actions.PodcastActionBuilder
 import api.v1.controllers.components.PodcastControllerComponents
 import api.v1.services.PodcastService
 import api.v1.utils.{ArrayWrapper, JsonWrites, RequestMarkerContext}
-import io.hemin.engine.domain.{Episode, Feed, Podcast}
+import io.hemin.engine.domain.{Episode, Feed, Image, Podcast}
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}
@@ -27,6 +27,7 @@ class PodcastBaseController @Inject()(cc: PodcastControllerComponents)
   protected implicit val podcastArrayWriter: Writes[ArrayWrapper[Podcast]] = JsonWrites.implicitArrayWrites[Podcast]
   protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
   protected implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
+  protected implicit val imageWriter: Writes[Image] = JsonWrites.implicitImageWrites
 
   def PodcastAction: PodcastActionBuilder = cc.actionBuilder
 

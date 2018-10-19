@@ -18,4 +18,6 @@ class EpisodeService @Inject()(engineService: EngineService)
 
   def chapters(id: String)(implicit mc: MarkerContext): Future[List[Chapter]] = engine.findChaptersByEpisode(id)
 
+  def image(id: String)(implicit mc: MarkerContext): Future[Option[Image]] = engine.findImageByAssociate(id)
+
 }

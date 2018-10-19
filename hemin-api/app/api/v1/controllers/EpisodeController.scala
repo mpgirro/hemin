@@ -34,4 +34,15 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
         }
     }
 
+  def image(id: String): Action[AnyContent] =
+    EpisodeAction.async { implicit request =>
+      log.trace(s"GET image of episode: id = $id")
+      episodeService
+        .image(id)
+        .map {
+          case Some(i) => Ok(Json.toJson(i))
+          case None    => NotFound
+        }
+    }
+
 }

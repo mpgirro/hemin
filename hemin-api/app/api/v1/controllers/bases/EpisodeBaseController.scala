@@ -4,7 +4,7 @@ import api.v1.actions.EpisodeActionBuilder
 import api.v1.controllers.components.EpisodeControllerComponents
 import api.v1.services.EpisodeService
 import api.v1.utils.{ArrayWrapper, JsonWrites, RequestMarkerContext}
-import io.hemin.engine.domain.{Chapter, Episode}
+import io.hemin.engine.domain.{Chapter, Episode, Image}
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}
@@ -25,6 +25,7 @@ class EpisodeBaseController @Inject()(cc: EpisodeControllerComponents)
   protected implicit val chapterWriter: Writes[Chapter] = JsonWrites.implicitChapterWrites
   protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
   protected implicit val chapterArrayWriter: Writes[ArrayWrapper[Chapter]] = JsonWrites.implicitArrayWrites[Chapter]
+  protected implicit val imageWriter: Writes[Image] = JsonWrites.implicitImageWrites
 
   protected def EpisodeAction: EpisodeActionBuilder = cc.actionBuilder
 
