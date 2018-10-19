@@ -17,19 +17,22 @@ final case class IndexConfig (
   commitInterval: FiniteDuration,
   workerCount: Int,
 ) extends ConfigStandardValues {
-  override def name: String = IndexConfig.name
+  override def configPath: String = IndexConfig.configPath
 }
 
-object IndexConfig extends ConfigDefaults with ConfigStandardValues {
-  override def name: String = "hemin.index"
+object IndexConfig
+  extends ConfigDefaults
+    with ConfigStandardValues {
+
+  override def configPath: String = "hemin.index"
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    name+".lucene-index-path" -> "./data/index",
-    name+".solr-uri"          -> "http://localhost:8983/solr/hemin",
-    name+".solr-queue-size"   -> 20,
-    name+".solr-thread-count" -> 4,
-    name+".create-index"      -> false,
-    name+".commit-interval"   -> 3,
-    name+".handler-count"     -> 5,
+    configPath+".lucene-index-path" -> "./data/index",
+    configPath+".solr-uri"          -> "http://localhost:8983/solr/hemin",
+    configPath+".solr-queue-size"   -> 20,
+    configPath+".solr-thread-count" -> 4,
+    configPath+".create-index"      -> false,
+    configPath+".commit-interval"   -> 3,
+    configPath+".handler-count"     -> 5,
   ).asJava)
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {

@@ -14,17 +14,20 @@ final case class CatalogConfig (
   defaultSize: Int,
   maxPageSize: Int
 ) extends ConfigStandardValues {
-  override def name: String = CatalogConfig.name
+  override def configPath: String = CatalogConfig.configPath
 }
 
-object CatalogConfig extends ConfigDefaults with ConfigStandardValues {
-  override def name: String = "hemin.catalog"
+object CatalogConfig
+  extends ConfigDefaults
+    with ConfigStandardValues {
+
+  override def configPath: String = "hemin.catalog"
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    name+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
-    name+".create-database" -> true,
-    name+".default-page"    -> 1,
-    name+".default-size"    -> 20,
-    name+".max-page-size"   -> 10000,
+    configPath+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
+    configPath+".create-database" -> true,
+    configPath+".default-page"    -> 1,
+    configPath+".default-size"    -> 20,
+    configPath+".max-page-size"   -> 10000,
   ).asJava)
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {

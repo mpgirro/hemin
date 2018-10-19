@@ -10,13 +10,16 @@ import scala.collection.JavaConverters._
 final case class ParserConfig (
   workerCount: Int
 ) extends ConfigStandardValues {
-  override def name: String = ParserConfig.name
+  override def configPath: String = ParserConfig.configPath
 }
 
-object ParserConfig extends ConfigDefaults with ConfigStandardValues {
-  override def name: String = "hemin.parser"
+object ParserConfig
+  extends ConfigDefaults
+    with ConfigStandardValues {
+
+  override def configPath: String = "hemin.parser"
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    name+".worker-count" -> 2,
+    configPath+".worker-count" -> 2,
   ).asJava)
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {

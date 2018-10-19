@@ -3,12 +3,12 @@ package io.hemin.engine.util.config
 trait ConfigStandardValues {
 
   /** Configuration name(space) */
-  def name: String
+  def configPath: String
 
   /** Dispatcher name */
-  final def dispatcher: String = name + ".dispatcher"
+  final def dispatcher: String = configPath + ".dispatcher"
 
   /** Mailbox name */
-  final def mailbox: String = name + ".mailbox"
+  final def mailbox: String = configPath + ".mailbox"
 
 }

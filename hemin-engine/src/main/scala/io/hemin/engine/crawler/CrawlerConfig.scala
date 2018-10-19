@@ -13,16 +13,19 @@ final case class CrawlerConfig (
   downloadTimeout: Int,
   downloadMaxBytes: Long
 ) extends ConfigStandardValues {
-  override def name: String = CrawlerConfig.name
+  override def configPath: String = CrawlerConfig.configPath
 }
 
-object CrawlerConfig extends ConfigDefaults with ConfigStandardValues {
-  override def name: String = "hemin.crawler"
+object CrawlerConfig
+  extends ConfigDefaults
+    with ConfigStandardValues {
+
+  override def configPath: String = "hemin.crawler"
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    name+".worker-count"       -> 5,
-    name+".fetch-websites"     -> false, // TODO rename to config file
-    name+".download-timeout"   -> 10, // TODO add to config file
-    name+".download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
+    configPath+".worker-count"       -> 5,
+    configPath+".fetch-websites"     -> false, // TODO rename to config file
+    configPath+".download-timeout"   -> 10, // TODO add to config file
+    configPath+".download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
   ).asJava)
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {

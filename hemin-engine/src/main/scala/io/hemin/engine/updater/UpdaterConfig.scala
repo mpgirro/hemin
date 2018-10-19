@@ -10,13 +10,16 @@ import scala.collection.JavaConverters._
 final case class UpdaterConfig (
   // TODO add some config values
 ) extends ConfigStandardValues {
-  override def name: String = UpdaterConfig.name
+  override def configPath: String = UpdaterConfig.configPath
 }
 
-object UpdaterConfig extends ConfigDefaults with ConfigStandardValues {
-  override def name: String = "hemin.updater"
+object UpdaterConfig
+  extends ConfigDefaults
+    with ConfigStandardValues {
+
+  override def configPath: String = "hemin.updater"
   override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
-    name+".solr-uri"     -> "http://localhost:8983/solr/hemin",
+    configPath+".solr-uri"     -> "http://localhost:8983/solr/hemin",
   ).asJava)
   override protected[this] def defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
