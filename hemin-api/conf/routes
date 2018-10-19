@@ -4,8 +4,10 @@ GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p
 GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
 GET   /api/v1/podcast/:id/episodes    api.v1.controllers.PodcastController.episodes(id: String)
 GET   /api/v1/podcast/:id/feeds       api.v1.controllers.PodcastController.feeds(id: String)
+GET   /api/v1/podcast/:id/image       api.v1.controllers.PodcastController.image(id: String)
 GET   /api/v1/episode/:id             api.v1.controllers.EpisodeController.find(id: String)
 GET   /api/v1/episode/:id/chapters    api.v1.controllers.EpisodeController.chapters(id: String)
+GET   /api/v1/episode/:id/image       api.v1.controllers.EpisodeController.image(id: String)
 GET   /api/v1/feed/:id                api.v1.controllers.FeedController.find(id: String)
 POST  /api/v1/feed/propose            api.v1.controllers.FeedController.propose
 GET   /api/v1/image/:id               api.v1.controllers.ImageController.find(id: String)
