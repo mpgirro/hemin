@@ -92,7 +92,7 @@ trait MongoRepository[T] {
     log.debug("Request to get all by page : {} and size : {}", page, size)
     if (page < 1 || size < 1) {
       log.warn("Window parameters are too small (page = {}, size = {})", page, size)
-      Future { List() }
+      Future { Nil }
     } else {
       val query = BSONDocument()
       findAll(query, page, size)
@@ -107,7 +107,7 @@ trait MongoRepository[T] {
       .recover {
         case ex: Exception =>
           log.error("Error on findAll({}) : {}", query, ex)
-          List()
+          Nil
       }
     }
 
@@ -121,7 +121,7 @@ trait MongoRepository[T] {
       .recover {
         case ex: Exception =>
           log.error("Error on findAll({}) : {}", query, ex)
-          List()
+          Nil
       }
     }
 

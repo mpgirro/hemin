@@ -423,7 +423,7 @@ class CatalogStore(config: CatalogConfig)
         case Success(ps) => ps
         case Failure(ex) =>
           onError(s"Could not get all Podcasts by page=$page and size=$size", ex)
-          List() // we have no results to return
+          Nil // we have no results to return
       }
       .map { ps =>
         theSender ! AllPodcastsResult(ps)
@@ -440,7 +440,7 @@ class CatalogStore(config: CatalogConfig)
         case Success(ps) => ps
         case Failure(ex) =>
           onError(s"Could not get all Podcasts by page=$page and size=$size and registrationCompelete=TRUE", ex)
-          List() // we have no results to return
+          Nil // we have no results to return
       }
       .map { ps =>
         theSender ! AllPodcastsResult(ps)
@@ -457,7 +457,7 @@ class CatalogStore(config: CatalogConfig)
         case Success(fs) => fs
         case Failure(ex) =>
           onError(s"Could not get all Feeds by page=$page and size=$size", ex)
-          List() // we have no results to return
+          Nil // we have no results to return
       }
       .map { fs =>
         theSender ! AllFeedsResult(fs)
@@ -491,7 +491,7 @@ class CatalogStore(config: CatalogConfig)
         case Success(es) => es
         case Failure(ex) =>
           onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
-          List() // we have no results to return
+          Nil // we have no results to return
       }
       .map { es =>
         theSender ! EpisodesByPodcastResult(es)
@@ -508,7 +508,7 @@ class CatalogStore(config: CatalogConfig)
         case Success(fs) => fs
         case Failure(ex) =>
           onError(s"Could not get all Feeds by Podcast (ID=$podcastId)", ex)
-          List() // we have no results to return
+          Nil // we have no results to return
       }
       .map { fs =>
         theSender ! FeedsByPodcastResult(fs)
@@ -525,7 +525,7 @@ class CatalogStore(config: CatalogConfig)
         case Some(e) => e.chapters
         case None =>
           log.warning("Database does not contain Episode (ID) : {}", episodeId)
-          List()
+          Nil
       }
       .foreach { cs => theSender ! ChaptersByEpisodeResult(cs) }
   }
