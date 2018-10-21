@@ -1,5 +1,6 @@
 package api.v1.services
 
+import com.typesafe.config.ConfigFactory
 import io.hemin.engine.Engine
 import javax.inject._
 import play.api.Logger
@@ -11,9 +12,10 @@ import scala.concurrent.Future
 class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
 
   private val log = Logger(getClass).logger
+  private val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
 
   log.info("Starting engine")
-  val engine: Engine = new Engine()
+  val engine: Engine = new Engine(config)
   engine.start()
 
   lifecycle.addStopHook { () =>
