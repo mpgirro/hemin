@@ -29,6 +29,10 @@ function podcast_feeds() {
     curl "http://localhost:9000/api/v1/podcast/${1}/feeds"
 }
 
+function podcast_all() {
+    curl "http://localhost:9000/api/v1/podcast?p=${1}&s=${2}"
+}
+
 function episode() {
     curl "http://localhost:9000/api/v1/episode/${1}"
 }
@@ -65,6 +69,9 @@ case $1 in
         ;;
     "podcast-feeds")
         podcast_feeds $2
+        ;;
+    "podcast-all")
+        podcast_all $2 $3
         ;;
     "episode")
         episode $2
