@@ -27,7 +27,7 @@ class RomeFeedParser(private val xmlData: String) {
   private val feed: SyndFeed = input.build(inputSource)
   private val feedItunesModule: Option[FeedInformation] = RomeModuleExtractor.getItunesModule(feed).asScala
 
-  val podcast: Podcast = parseFeed(feed)
+  val podcast: Option[Podcast] = Option(parseFeed(feed))
   val episodes: List[Episode] = extractEpisodes(feed)
 
   /*
@@ -47,7 +47,8 @@ class RomeFeedParser(private val xmlData: String) {
     // # # # # # # # # # # # # # # # # # # # # # # #
 
     // TODO process the atomlinks
-    RomeModuleExtractor.getAtomLinks(feed).asScala
+    RomeModuleExtractor.getAtomLinks(feed)
+      .asScala
       .foreach { atomLink =>
         if (atomLink.getRel == "http://podlove.org/deep-link") {
           // TODO this should be a link to the episode website (but is it always though?!)
@@ -114,14 +115,15 @@ class RomeFeedParser(private val xmlData: String) {
   }
 
   private def extractEpisodes(feed: SyndFeed): List[Episode] = feed
-    .getEntries.asScala
+    .getEntries
+    .asScala
     .map(extractEpisode)
     .toList
 
   private def extractEpisode(e: SyndEntry): Episode = Episode(
     id              = None,
     podcastId       = None,
-    podcastTitle    = podcast.title,
+    podcastTitle    = podcast.flatMap(_.title),
     title           = Option(e.getTitle),
     link            = UrlMapper.sanitize(e.getLink),
     pubDate         = DateMapper.asLocalDateTime(e.getPublishedDate),
@@ -223,13 +225,15 @@ class RomeFeedParser(private val xmlData: String) {
   )
 
   private def episodeImage(e: SyndEntry): Option[String] = RomeModuleExtractor
-    .getItunesEntryInformation(e).asScala
+    .getItunesEntryInformation(e)
+    .asScala
     .flatMap { itunes =>
-      Option(itunes.getImage).map(img => img.toExternalForm)
+      Option(itunes.getImage).map(_.toExternalForm)
     }
 
   private def episodeItunesInfo(e: SyndEntry): EpisodeItunesInfo = RomeModuleExtractor
-    .getItunesEntryInformation(e).asScala
+    .getItunesEntryInformation(e)
+    .asScala
     .map { itunes =>
       EpisodeItunesInfo(
         duration    = Option(itunes.getDuration).map(_.toString),
@@ -258,19 +262,22 @@ class RomeFeedParser(private val xmlData: String) {
     }.getOrElse(EpisodeEnclosureInfo())
 
   private def episodeContentEncoded(e: SyndEntry): Option[String] = RomeModuleExtractor
-    .getContentModule(e).asScala
+    .getContentModule(e)
+    .asScala
     .map { content =>
-      if (content.getEncodeds.size > 1) log.warn("Encountered multiple <content:encoded> elements in <item> element")
-      if (content.getEncodeds.size > 0) {
-        content.getEncodeds.get(0)
+      val es = content.getEncodeds
+      if (es.size > 1) log.warn("Encountered multiple <content:encoded> elements in <item> element")
+      if (es.size > 0) {
+        es.get(0)
       } else {
         null
       }
     }
 
   private def episodeChapters(e: SyndEntry): List[Chapter] = RomeModuleExtractor
-    .getPodloveSimpleChapterModule(e).asScala
-    .map(simpleChapters => simpleChapters.getChapters)
+    .getPodloveSimpleChapterModule(e)
+    .asScala
+    .map(_.getChapters)
     .map { _.asScala
       .map { c =>
         Chapter(
@@ -282,6 +289,6 @@ class RomeFeedParser(private val xmlData: String) {
           image     = Option(c.getImage),
         )
       }.toList
-    }.getOrElse(List())
+    }.getOrElse(Nil)
 
 }

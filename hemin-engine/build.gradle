@@ -6,9 +6,16 @@ buildscript {
     }
     dependencies {
 //    classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
-        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+//        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.1.0'
+        classpath "gradle.plugin.com.github.maiflai:gradle-scalatest:0.23"
     }
 }
+
+/*
+plugins {
+    id "com.github.maiflai.scalatest" version "0.23"
+}
+*/
 
 defaultTasks 'clean build publishToMavenLocal'
 
@@ -18,7 +25,10 @@ apply plugin: 'idea'
 apply plugin: 'application'
 //apply plugin: 'com.github.johnrengelman.shadow' // to build fat jars with gradle
 apply plugin: 'maven-publish'
-apply plugin: 'org.junit.platform.gradle.plugin'
+//apply plugin: 'org.junit.platform.gradle.plugin'
+apply plugin: "com.github.maiflai.scalatest"
+
+
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
@@ -39,6 +49,7 @@ compileJava {
 ext {
     scala_major_version = '2.12'
     scala_minor_version = '4'
+    scalatest_version = '3.0.5'
     akka_version = '2.5.11'
     akka_http_version = '10.0.11'
     slf4j_version = '1.7.25'
@@ -111,6 +122,8 @@ dependencies {
     compile "com.sksamuel.scrimage:scrimage-io-extra_2.11:$scrimage_version"
     compile "com.sksamuel.scrimage:scrimage-filters_2.11:$scrimage_version"
 
+    /*
+    // TODO remove? since we fully use scalatest now?
     // JUnit Jupiter API and TestEngine implementation
     //test.useJUnitPlatform()
     testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
@@ -118,6 +131,10 @@ dependencies {
     //testCompile("junit:junit:4.12")
     //testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0") //Support JUnit 3 and JUnit 4 tests
     testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version" // Enable use of the JUnitPlatform Runner within the IDE
+    */
+
+    testCompile "org.scalatest:scalatest_$scala_major_version:$scalatest_version"
+    testRuntime 'org.pegdown:pegdown:1.4.2' // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
 
 }
 
@@ -151,15 +168,9 @@ run.doFirst {
     // Environment variables go here.
 }
 
-test {
-    /*
-    useJUnitPlatform {
-        excludeTags 'slow'
-        includeEngines 'junit-jupiter', 'junit-vintage'
-    }
 
-    failFast = true
-    */
+/*
+test {
 
     // Always run tests, even when nothing changed.
     dependsOn 'cleanTest'
@@ -173,5 +184,6 @@ test {
 junitPlatform {
     details 'tree'
 }
+*/
 
 
