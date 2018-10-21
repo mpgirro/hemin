@@ -211,37 +211,41 @@ class ParserWorker (config: ParserConfig)
   private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
     val parser = new RomeFeedParser(feedData)
-    val p = parser.podcast.copy(
-      id          = Some(podcastId),
-      title       = parser.podcast.title.map(_.trim),
-      description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
-    )
-
-    if (isNewPodcast) {
-
-      // experimental: this works but has terrible performance and assumes we have a GUI app
-      // Option(p.getItunesImage).foreach(img => {
-      //     p.setItunesImage(base64Image(img))
-      // })
-      p.image.foreach { img =>
-        crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
+    parser.podcast
+      .map { p =>
+        p.copy(
+          id          = Some(podcastId),
+          title       = p.title.map(_.trim),
+          description = p.description.map(Jsoup.clean(_, Whitelist.basic())),
+        )
       }
+      .foreach { p =>
+        if (isNewPodcast) {
 
-      val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
-      //emitIndexEvent(indexEvent)
-      index ! indexEvent
+          // experimental: this works but has terrible performance and assumes we have a GUI app
+          // Option(p.getItunesImage).foreach(img => {
+          //     p.setItunesImage(base64Image(img))
+          // })
+          p.image.foreach { img =>
+            crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
+          }
 
-      // request that the podcasts website will get added to the index as well, if possible
-      p.link match {
-        case Some(link) => crawler ! DownloadWithHeadCheck(p.id.get, link, WebsiteFetchJob())
-        case None       => log.debug("No link set for podcast {} --> no website data will be added to the index", p.id.get)
+          val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
+          //emitIndexEvent(indexEvent)
+          index ! indexEvent
+
+          // request that the podcasts website will get added to the index as well, if possible
+          p.link match {
+            case Some(link) => crawler ! DownloadWithHeadCheck(p.id.get, link, WebsiteFetchJob())
+            case None       => log.debug("No link set for podcast {} --> no website data will be added to the index", p.id.get)
+          }
+        }
+
+        // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
+        val catalogEvent = UpdatePodcast(podcastId, feedUrl, p)
+        //emitCatalogEvent(catalogEvent)
+        catalog ! catalogEvent
       }
-    }
-
-    // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
-    val catalogEvent = UpdatePodcast(podcastId, feedUrl, p)
-    //emitCatalogEvent(catalogEvent)
-    catalog ! catalogEvent
 
     // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
     for (e <- parser.episodes) {
