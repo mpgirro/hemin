@@ -12,4 +12,4 @@
 [![Angular version](https://img.shields.io/badge/angular-5-blue.svg)](https://blog.angular.io/version-5-0-0-of-angular-now-available-37e414935ced)
 
 
-currently in the making, as a side product of my master thesis
+__DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for production.
