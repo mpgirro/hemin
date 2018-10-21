@@ -12,13 +12,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Episode] {
 
-  override protected[this] def log: Logger = Logger(getClass)
+  override protected[this] val log: Logger = Logger(getClass)
 
-  override protected[this] implicit def executionContext: ExecutionContext = ec
+  override protected[this] implicit val executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Episode] = BsonConversion.episodeWriter
+  override protected[this] implicit val bsonWriter: BSONDocumentWriter[Episode] = BsonConversion.episodeWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Episode] = BsonConversion.episodeReader
+  override protected[this] implicit val bsonReader: BSONDocumentReader[Episode] = BsonConversion.episodeReader
+
+  override protected[this] val sort: BSONDocument = BSONDocument("title" -> 1) // sort ascending by title
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("episodes"))
 

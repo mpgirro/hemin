@@ -13,23 +13,23 @@ final case class CrawlerConfig (
   downloadTimeout: Int,
   downloadMaxBytes: Long
 ) extends ConfigStandardValues {
-  override def configPath: String = CrawlerConfig.configPath
+  override val configPath: String = CrawlerConfig.configPath
 }
 
 object CrawlerConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override def configPath: String = "hemin.crawler"
+  override val configPath: String = "hemin.crawler"
 
-  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
+  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".worker-count"       -> 5,
     configPath+".fetch-websites"     -> false, // TODO rename to config file
     configPath+".download-timeout"   -> 10, // TODO add to config file
     configPath+".download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
   ).asJava)
 
-  override protected[this] def defaultDispatcher: Config = load(parseString(
+  override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -40,7 +40,7 @@ object CrawlerConfig
         parallelism-max = 10
     }}"""))
 
-  override protected[this] def defaultMailbox: Config = load(parseString(
+  override protected[this] val defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[CrawlerPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100

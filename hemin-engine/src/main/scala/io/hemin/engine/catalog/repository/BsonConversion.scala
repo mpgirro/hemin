@@ -79,11 +79,11 @@ object BsonConversion {
   implicit val implicitPodcastRegistrationInfoReader: BSONDocumentReader[PodcastRegistrationInfo] = Macros.reader[PodcastRegistrationInfo]
 
 
-  def podcastWriter: BSONDocumentWriter[Podcast] = Macros.writer[Podcast]
-  def podcastReader: BSONDocumentReader[Podcast] = Macros.reader[Podcast]
+  val podcastWriter: BSONDocumentWriter[Podcast] = Macros.writer[Podcast]
+  val podcastReader: BSONDocumentReader[Podcast] = Macros.reader[Podcast]
 
-  def chapterWriter: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
-  def chapterReader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
+  val chapterWriter: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
+  val chapterReader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
 
 
   implicit object ChapterListReader extends BSONDocumentReader[List[Chapter]] {
@@ -101,13 +101,13 @@ object BsonConversion {
       }
   }
 
-  def episodeWriter: BSONDocumentWriter[Episode] = Macros.writer[Episode]
-  def episodeReader: BSONDocumentReader[Episode] = Macros.reader[Episode]
+  val episodeWriter: BSONDocumentWriter[Episode] = Macros.writer[Episode]
+  val episodeReader: BSONDocumentReader[Episode] = Macros.reader[Episode]
 
-  def feedWriter: BSONDocumentWriter[Feed] = Macros.writer[Feed]
-  def feedReader: BSONDocumentReader[Feed] = Macros.reader[Feed]
+  val feedWriter: BSONDocumentWriter[Feed] = Macros.writer[Feed]
+  val feedReader: BSONDocumentReader[Feed] = Macros.reader[Feed]
 
-  def imageWriter: BSONDocumentWriter[Image] = Macros.writer[Image]
-  def imageReader: BSONDocumentReader[Image] = Macros.reader[Image]
+  val imageWriter: BSONDocumentWriter[Image] = Macros.writer[Image]
+  val imageReader: BSONDocumentReader[Image] = Macros.reader[Image]
 
 }

@@ -13,13 +13,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Image] {
 
-  override protected[this] def log: Logger = Logger(getClass)
+  override protected[this] val log: Logger = Logger(getClass)
 
-  override protected[this] implicit def executionContext: ExecutionContext = ec
+  override protected[this] implicit val executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Image] = BsonConversion.imageWriter
+  override protected[this] implicit val bsonWriter: BSONDocumentWriter[Image] = BsonConversion.imageWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Image] = BsonConversion.imageReader
+  override protected[this] implicit val bsonReader: BSONDocumentReader[Image] = BsonConversion.imageReader
+
+  override protected[this] val sort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 

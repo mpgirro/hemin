@@ -30,17 +30,17 @@ object EngineConfig {
     * Load from a given a given `com.typesafe.config.Config` object.
     * To ensure a fully initialized [[io.hemin.engine.EngineConfig]],
     * the given Typesafe Config is interpolated with the results of
-    * [[io.hemin.engine.EngineConfig.defaultConfig()]] as the fallback
+    * [[io.hemin.engine.EngineConfig.defaultConfig]] as the fallback
     * values for all keys that are not set in the argument config.
     */
-  def load(config: Config): EngineConfig = loadFromSafeConfig(config.withFallback(defaultConfig()))
+  def load(config: Config): EngineConfig = loadFromSafeConfig(config.withFallback(defaultConfig))
 
   /**
     * The default configuration of an [[io.hemin.engine.Engine]],
     * as a `com.typesafe.config.Config` object. This configuration
     * includes dispatcher and mailboxe configuration for every Akka actor.
     */
-  def defaultConfig(): Config = ConfigFactory
+  lazy val defaultConfig: Config = ConfigFactory
     .parseMap(Map(
       "hemin.internal-timeout" -> 5,
     ).asJava)

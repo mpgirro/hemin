@@ -17,7 +17,7 @@ import scala.language.postfixOps
 
 class Engine (private val initConfig: Config) {
 
-  private val completeConfig = initConfig.withFallback(EngineConfig.defaultConfig())
+  private val completeConfig = initConfig.withFallback(EngineConfig.defaultConfig)
 
   private val log = Logger(getClass)
   private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
@@ -102,7 +102,7 @@ class Engine (private val initConfig: Config) {
     }
 
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-    val p: Int = page.getOrElse(config.catalog.defaultPage) - 1
+    val p: Int = page.getOrElse(config.catalog.defaultPage)// - 1
     val s: Int = size.getOrElse(config.catalog.defaultSize)
 
     (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {

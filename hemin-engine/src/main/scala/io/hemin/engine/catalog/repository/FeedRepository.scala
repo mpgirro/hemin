@@ -12,13 +12,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
-  override protected[this] def log: Logger = Logger(getClass)
+  override protected[this] val log: Logger = Logger(getClass)
 
-  override protected[this] implicit def executionContext: ExecutionContext = ec
+  override protected[this] implicit val executionContext: ExecutionContext = ec
 
-  override protected[this] implicit def bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.feedWriter
+  override protected[this] implicit val bsonWriter: BSONDocumentWriter[Feed] = BsonConversion.feedWriter
 
-  override protected[this] implicit def bsonReader: BSONDocumentReader[Feed] = BsonConversion.feedReader
+  override protected[this] implicit val bsonReader: BSONDocumentReader[Feed] = BsonConversion.feedReader
+
+  override protected[this] val sort: BSONDocument = BSONDocument("url" -> 1) // sort ascending by url
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 

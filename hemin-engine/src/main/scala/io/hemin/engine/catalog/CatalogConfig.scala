@@ -14,16 +14,16 @@ final case class CatalogConfig (
   defaultSize: Int,
   maxPageSize: Int
 ) extends ConfigStandardValues {
-  override def configPath: String = CatalogConfig.configPath
+  override val configPath: String = CatalogConfig.configPath
 }
 
 object CatalogConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override def configPath: String = "hemin.catalog"
+  override val configPath: String = "hemin.catalog"
 
-  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
+  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
     configPath+".create-database" -> true,
     configPath+".default-page"    -> 1,
@@ -31,7 +31,7 @@ object CatalogConfig
     configPath+".max-page-size"   -> 10000,
   ).asJava)
 
-  override protected[this] def defaultDispatcher: Config = load(parseString(
+  override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -42,7 +42,7 @@ object CatalogConfig
         parallelism-max = 10
     }}"""))
 
-  override protected[this] def defaultMailbox: Config = load(parseString(
+  override protected[this] val defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[CatalogPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100

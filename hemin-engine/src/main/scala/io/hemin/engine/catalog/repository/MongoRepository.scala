@@ -1,7 +1,7 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import reactivemongo.api.{Cursor, QueryOpts}
+import reactivemongo.api.{Cursor, QueryOpts, ReadPreference}
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 
@@ -9,11 +9,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait MongoRepository[T] {
 
-  protected[this] implicit def executionContext: ExecutionContext
-  protected[this] implicit def bsonWriter: BSONDocumentWriter[T]
-  protected[this] implicit def bsonReader: BSONDocumentReader[T]
+  protected[this] implicit val executionContext: ExecutionContext
+  protected[this] implicit val bsonWriter: BSONDocumentWriter[T]
+  protected[this] implicit val bsonReader: BSONDocumentReader[T]
 
-  protected[this] def log: Logger
+  protected[this] val log: Logger
+
+  protected[this] val sort: BSONDocument
 
   protected[this] def collection: Future[BSONCollection]
 
@@ -102,6 +104,7 @@ trait MongoRepository[T] {
   protected[this] def findAll(query: BSONDocument): Future[List[T]] =
     collection.flatMap { _
       .find(query)
+      .sort(sort)
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
       .recover {
@@ -115,9 +118,19 @@ trait MongoRepository[T] {
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
     collection.flatMap { _
       .find(query)
-      .options(QueryOpts(page * size, size)) // TODO start, pageSize --> (page*size, size)
-      .cursor[T]()
-      .collect[List](-1, Cursor.FailOnError[List[T]]())
+      //.options(QueryOpts(skipN=(), page * size, size)) // TODO start, pageSize --> (page*size, size)
+      /*
+      .options(QueryOpts()
+        .skip((page-1) * size)
+        .batchSize(size)
+        .flags(0))
+      */
+      //.skip((page-1) * size)
+      .skip(page * size)
+      .batchSize(size)
+      .sort(sort)
+      .cursor[T](ReadPreference.primaryPreferred)
+      .collect[List](size, Cursor.FailOnError[List[T]]())
       .recover {
         case ex: Exception =>
           log.error("Error on findAll({}) : {}", query, ex)

@@ -5,13 +5,13 @@ import com.typesafe.config.Config
 trait ConfigDefaults {
 
   /** Defaults for all values of the configuration case class */
-  protected[this] def defaultValues: Config
+  protected[this] val defaultValues: Config
 
   /** Default actor dispatcher configuration */
-  protected[this] def defaultDispatcher: Config
+  protected[this] val defaultDispatcher: Config
 
   /** Default actor mailbox configuration */
-  protected[this] def defaultMailbox: Config
+  protected[this] val defaultMailbox: Config
 
   /**
     * Default configuration as a `com.typesafe.config.Config` object.
@@ -20,7 +20,7 @@ trait ConfigDefaults {
     * config instance when initializing an [[io.hemin.engine.Engine]] to
     * avoid errors from parsing partial configuration files.
     */
-  final def defaultConfig: Config = defaultValues
+  final lazy val defaultConfig: Config = defaultValues
     .withFallback(defaultDispatcher)
     .withFallback(defaultMailbox)
 

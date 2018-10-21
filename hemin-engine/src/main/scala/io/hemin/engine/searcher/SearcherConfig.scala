@@ -12,22 +12,22 @@ final case class SearcherConfig (
   defaultPage: Int,
   defaultSize: Int,
 ) extends ConfigStandardValues {
-  override def configPath: String = SearcherConfig.configPath
+  override val configPath: String = SearcherConfig.configPath
 }
 
 object SearcherConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override def configPath: String = "hemin.searcher"
+  override val configPath: String = "hemin.searcher"
 
-  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
+  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".solr-uri"     -> "http://localhost:8983/solr/hemin",
     configPath+".default-page" -> 1,
     configPath+".default-size" -> 20,
   ).asJava)
 
-  override protected[this] def defaultDispatcher: Config = load(parseString(
+  override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -38,7 +38,7 @@ object SearcherConfig
         parallelism-max = 10
     }}"""))
 
-  override protected[this] def defaultMailbox: Config = load(parseString(
+  override protected[this] val defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[SearcherPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100

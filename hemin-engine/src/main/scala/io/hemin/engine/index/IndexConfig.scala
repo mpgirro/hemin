@@ -17,16 +17,16 @@ final case class IndexConfig (
   commitInterval: FiniteDuration,
   workerCount: Int,
 ) extends ConfigStandardValues {
-  override def configPath: String = IndexConfig.configPath
+  override val configPath: String = IndexConfig.configPath
 }
 
 object IndexConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override def configPath: String = "hemin.index"
+  override val configPath: String = "hemin.index"
 
-  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
+  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".lucene-index-path" -> "./data/index",
     configPath+".solr-uri"          -> "http://localhost:8983/solr/hemin",
     configPath+".solr-queue-size"   -> 20,
@@ -36,7 +36,7 @@ object IndexConfig
     configPath+".handler-count"     -> 5,
   ).asJava)
 
-  override protected[this] def defaultDispatcher: Config = load(parseString(
+  override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -47,7 +47,7 @@ object IndexConfig
         parallelism-max = 10
     }}"""))
 
-  override protected[this] def defaultMailbox: Config = load(parseString(
+  override protected[this] val defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100

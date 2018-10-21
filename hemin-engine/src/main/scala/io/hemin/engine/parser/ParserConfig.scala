@@ -10,20 +10,20 @@ import scala.collection.JavaConverters._
 final case class ParserConfig (
   workerCount: Int
 ) extends ConfigStandardValues {
-  override def configPath: String = ParserConfig.configPath
+  override val configPath: String = ParserConfig.configPath
 }
 
 object ParserConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override def configPath: String = "hemin.parser"
+  override val configPath: String = "hemin.parser"
 
-  override protected[this] def defaultValues: Config = ConfigFactory.parseMap(Map(
+  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     configPath+".worker-count" -> 2,
   ).asJava)
 
-  override protected[this] def defaultDispatcher: Config = load(parseString(
+  override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""${this.dispatcher} {
       type = Dispatcher
       executor = "fork-join-executor"
@@ -34,7 +34,7 @@ object ParserConfig
         parallelism-max = 10
     }}"""))
 
-  override protected[this] def defaultMailbox: Config = load(parseString(
+  override protected[this] val defaultMailbox: Config = load(parseString(
     s"""${this.mailbox} {
       mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
