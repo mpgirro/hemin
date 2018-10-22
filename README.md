@@ -13,3 +13,23 @@
 
 
 __DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for production.
+
+Hemin is a podcast catalog & search engine infrastructure.
+
+
+## WebApp
+
+
+TODO
+
+
+## REST API
+
+
+TODO
+
+
+## Engine 
+
+
+TODO
