@@ -16,6 +16,7 @@ import io.hemin.engine.searcher.Searcher
 import io.hemin.engine.searcher.Searcher.SearcherMessage
 import io.hemin.engine.updater.Updater
 import io.hemin.engine.updater.Updater.UpdaterMessage
+import io.hemin.engine.util.InitializationProgress
 import io.hemin.engine.util.cli.CliProcessor
 
 import scala.concurrent.{ExecutionContextExecutor, Future}
@@ -43,6 +44,10 @@ class NodeMaster (config: EngineConfig)
   private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
 
   private val processor = new CliProcessor(self, config, executionContext)
+
+  // TODO update and use
+  private val initializationProgress =
+    new InitializationProgress(Seq(CatalogStore.name, Crawler.name, IndexStore.name, Parser.name, Searcher.name, Updater.name))
 
   private var index: ActorRef = _
   private var catalog: ActorRef = _
@@ -74,9 +79,7 @@ class NodeMaster (config: EngineConfig)
     index ! ActorRefSupervisor(self)
 
     crawler ! ActorRefCatalogStoreActor(catalog)
-    //crawler ! ActorRefIndexStoreActor(index)
     crawler ! ActorRefParserActor(parser)
-    //crawler ! ActorRefCatalogStoreActor(catalog)
     crawler ! ActorRefSupervisor(self)
 
     parser ! ActorRefCatalogStoreActor(catalog)
@@ -98,13 +101,12 @@ class NodeMaster (config: EngineConfig)
   }
 
   override def postStop: Unit = {
-
     log.info("shutting down")
   }
 
   override def receive: Receive = {
 
-    case CliInput(input) => onReplInput(input, sender)
+    case CliInput(input) => onCliInput(input, sender)
 
     case msg: CatalogMessage  => catalog.tell(msg, sender())
     case msg: CrawlerMessage  => crawler.tell(msg, sender())
@@ -113,34 +115,21 @@ class NodeMaster (config: EngineConfig)
     case msg: SearcherMessage => searcher.tell(msg, sender())
     case msg: UpdaterMessage  => updater.tell(msg, sender())
 
-    case ReportCatalogStoreStartupComplete =>
-      log.info("Catalog reported startup complete")
-      catalogStartupComplete = true
-    case ReportIndexStoreStartupComplete   =>
-      log.info("Index reported startup complete")
-      indexStartupComplete = true
-    case ReportCrawlerStartupComplete      =>
-      log.info("Crawler reported startup complete")
-      crawlerStartupComplete = true
-    case ReportParserStartupComplete       =>
-      log.info("Parser reported startup complete")
-      parserStartupComplete = true
-    case ReportSearcherStartupComplete       =>
-      log.info("Searcher reported startup complete")
-      searcherStartupComplete = true
-    case ReportUpdaterStartupComplete      =>
-      log.info("Updater reported startup complete")
-      updaterStartupComplete = true
+    case ReportCatalogStoreStartupComplete => initializationProgress.complete(CatalogStore.name)
+    case ReportIndexStoreStartupComplete   => initializationProgress.complete(IndexStore.name)
+    case ReportCrawlerStartupComplete      => initializationProgress.complete(Crawler.name)
+    case ReportParserStartupComplete       => initializationProgress.complete(Parser.name)
+    case ReportSearcherStartupComplete     => initializationProgress.complete(Searcher.name)
+    case ReportUpdaterStartupComplete      => initializationProgress.complete(Updater.name)
 
     case EngineOperational =>
-      if (isEngineOperational)
+      if (initializationProgress.isFInished)
         sender ! StartupComplete
       else
         sender ! StartupInProgress
 
     case Terminated(corpse) => onTerminated(corpse)
-
-    case ShutdownSystem   => onSystemShutdown()
+    case ShutdownSystem     => onSystemShutdown()
   }
 
   override def unhandled(msg: Any): Unit = {
@@ -148,10 +137,7 @@ class NodeMaster (config: EngineConfig)
     log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
-  private def isEngineOperational: Boolean =
-    catalogStartupComplete && indexStartupComplete && crawlerStartupComplete && parserStartupComplete && searcherStartupComplete && updaterStartupComplete
-
-  private def onReplInput(input: String, theSender: ActorRef): Unit = Future {
+  private def onCliInput(input: String, theSender: ActorRef): Unit = Future {
     theSender ! CliOutput(processor.eval(input))
   }
 

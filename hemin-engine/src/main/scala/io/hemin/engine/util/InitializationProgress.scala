@@ -1,0 +1,22 @@
+package io.hemin.engine.util
+
+import com.typesafe.scalalogging.Logger
+
+import scala.collection.mutable
+
+class InitializationProgress (subsystems: Seq[String]) {
+
+  private val log = Logger(getClass)
+  private val progress: mutable.Map[String,Boolean] = mutable.Map(subsystems.map {s => (s, false)} : _*)
+
+  def complete(subsystem: String): Unit =
+    if (progress.contains(subsystem)) {
+      log.info(s"$subsystem subsystem initialized...")
+      progress += (subsystem -> true)
+    } else {
+      log.error("Unknown subsystem : " + subsystem)
+    }
+
+  def isFInished: Boolean = progress.foldLeft(true) { case (a, (k, v)) => a && v }
+
+}
