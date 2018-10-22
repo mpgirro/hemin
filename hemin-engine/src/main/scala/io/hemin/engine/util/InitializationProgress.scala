@@ -11,7 +11,7 @@ class InitializationProgress (subsystems: Seq[String]) {
 
   def complete(subsystem: String): Unit =
     if (progress.contains(subsystem)) {
-      log.info(s"$subsystem subsystem initialized...")
+      log.info(s"${subsystem.toUpperCase} subsystem initialized ...")
       progress += (subsystem -> true)
     } else {
       log.error("Unknown subsystem : " + subsystem)

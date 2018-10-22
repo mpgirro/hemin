@@ -90,16 +90,15 @@ trait MongoRepository[T] {
     * @param size The size of the frame to retrieve
     * @return The results within the window (page*size, size)
     */
-  def findAll(page: Int, size: Int): Future[List[T]] = {
-    log.debug("Request to get all by page : {} and size : {}", page, size)
+  def findAll(page: Int, size: Int): Future[List[T]] =
     if (page < 1 || size < 1) {
       log.warn("Window parameters are too small (page = {}, size = {})", page, size)
-      Future { Nil }
+      Future.successful(Nil)
     } else {
       val query = BSONDocument()
       findAll(query, page, size)
     }
-  }
+
 
   protected[this] def findAll(query: BSONDocument): Future[List[T]] =
     collection.flatMap { _
@@ -115,20 +114,12 @@ trait MongoRepository[T] {
     }
 
   // TODO does not seem to work!
-  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
+  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] = {
+    log.info("findAll with skip={} and batchSize={}", (page*size), size)
     collection.flatMap { _
-      .find(query)
-      //.options(QueryOpts(skipN=(), page * size, size)) // TODO start, pageSize --> (page*size, size)
-      /*
-      .options(QueryOpts()
-        .skip((page-1) * size)
-        .batchSize(size)
-        .flags(0))
-      */
-      //.skip((page-1) * size)
-      .skip(page * size)
-      .batchSize(size)
+      .find(BSONDocument.empty)
       .sort(sort)
+      .skip((page-1) * size)
       .cursor[T](ReadPreference.primaryPreferred)
       .collect[List](size, Cursor.FailOnError[List[T]]())
       .recover {
@@ -136,6 +127,9 @@ trait MongoRepository[T] {
           log.error("Error on findAll({}) : {}", query, ex)
           Nil
       }
+
     }
+  }
+
 
 }

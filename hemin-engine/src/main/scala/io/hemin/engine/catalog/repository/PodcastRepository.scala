@@ -20,7 +20,7 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Podcast] = BsonConversion.podcastReader
 
-  override protected[this] val sort: BSONDocument = BSONDocument("title" -> 1) // sort ascending by title
+  override protected[this] val sort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
 
