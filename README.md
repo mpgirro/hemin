@@ -9,7 +9,12 @@
 
 __DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for production.
 
-Hemin is a podcast catalog & search engine infrastructure. It's engine is written in Scala 2.12, and the REST API relies on Play 2.6 for routing and JSON. The server is fully asynchronous, making heavy use of Scala Futures and Akka 2 actors. Hemin uses MongoDB to store the Podcast catalog, whoch is indexed by Solr.
+Hemin is a podcast catalog & search engine infrastructure. It's engine is written in Scala 2.12, which uses MongoDB to store the Podcast catalog, and indexes it with Solr. The REST API relies on Play 2.6 for routing and JSON. The server is fully asynchronous, and makes heavy use of Akka 2 actors and Scala Futures. The web client is written in Typescript and builds on the Angular framework. 
+
+The Hemin system supports the following standards:
+
+* [Podlove Simple Chapter](https://podlove.org/simple-chapters/)
+* Pages Feeds ([RFC 5005](https://tools.ietf.org/html/rfc5005))
 
 
 ## WebApp
