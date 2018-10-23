@@ -3,7 +3,7 @@ package io.hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, ReadPreference}
-import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
+import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONValue}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -67,6 +67,8 @@ trait MongoRepository[T] {
     */
   def findAll(example: T): Future[List[T]] = findAll(bsonWriter.write(example))
 
+  protected[this] def findOne(selectors: (String, Option[BSONValue])*): Future[Option[T]] = findOne(Query(selectors.toMap))
+
   protected[this] def findOne(query: BSONDocument): Future[Option[T]] =
     collection.flatMap { _
       .find(query)
@@ -93,6 +95,7 @@ trait MongoRepository[T] {
       findAll(query, page, size)
     }
 
+  protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] = findAll(Query(selectors.toMap))
 
   protected[this] def findAll(query: BSONDocument): Future[List[T]] =
     collection.flatMap { _

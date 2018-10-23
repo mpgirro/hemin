@@ -25,8 +25,6 @@ object BsonConversion {
   def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBsonD)
   def toBsonD(value: LocalDateTime): Option[BSONDateTime] = Option(value).flatMap(DateMapper.asMilliseconds).map(BSONDateTime)
 
-  def toDocument(map: Map[String, Option[BSONValue]]): BSONDocument =
-    BSONDocument.apply(map.collect { case (key, Some(value)) => key -> value })
 
   def asInt(key: String)(implicit bson: BSONDocument): Option[Int] = bson.getAs[BSONNumberLike](key).map(_.toInt)
   def asLong(key: String)(implicit bson: BSONDocument): Option[Long] = bson.getAs[BSONNumberLike](key).map(_.toLong)

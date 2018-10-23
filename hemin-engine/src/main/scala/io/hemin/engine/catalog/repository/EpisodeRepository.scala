@@ -40,23 +40,19 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Episode]] = {
     log.debug("Request to get Episode (ID) : {}", id)
-    //val query = toDocument(Map("id" -> toBsonS(id)))
-    findOne(Query(Map("id" -> toBsonS(id))))
+    findOne("id" -> toBsonS(id))
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Episode (ID) : {}", podcastId)
-    //val query = toDocument(Map("podcastId" -> toBsonS(podcastId)))
-    findAll(Query(Map("podcastId" -> toBsonS(podcastId))))
+    findAll("podcastId" -> toBsonS(podcastId))
   }
 
   def findAllByPodcastAndGuid(podcastId: String, guid: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Podcast (ID) : {} and GUID : {}", podcastId, guid)
-    val query = toDocument(Map(
+    findAll(
       "podcastId" -> toBsonS(podcastId),
-      "guid"      -> toBsonS(guid)
-    ))
-    findAll(query)
+      "guid"      -> toBsonS(guid))
   }
 
   def findOneByEnclosure(enclosureUrl: String, enclosureLength: Long, enclosureType: String): Future[List[Episode]] =
@@ -64,12 +60,11 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   def findOneByEnclosure(enclosureUrl: Option[String], enclosureLength: Option[Long], enclosureType: Option[String]): Future[List[Episode]] = {
     log.debug("Request to get Episode by enclosureUrl : '{}' and enclosureLength : {} and enclosureType : {}", enclosureUrl, enclosureLength, enclosureType)
-    val query = toDocument(Map(
+    findAll(
       "enclosureUrl"    -> toBsonS(enclosureUrl),
       "enclosureLength" -> toBsonL(enclosureLength),
-      "enclosureType"   -> toBsonS(enclosureType),
-    ))
-    findAll(query)
+      "enclosureType"   -> toBsonS(enclosureType)
+    )
   }
 
 }

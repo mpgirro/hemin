@@ -40,28 +40,24 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Feed]] = {
     log.debug("Request to get Feed (ID) : {}", id)
-    //val query = toDocument(Map("id" -> toBsonS(id)))
-    findOne(Query(Map("id" -> toBsonS(id))))
+    findOne("id" -> toBsonS(id))
   }
 
   def findOneByUrlAndPodcastId(url: String, podcastId: String): Future[Option[Feed]] = {
     log.debug("Request to get all Feeds by URL : {} and Podcast (ID) : {}", url, podcastId)
-    val query = toDocument(Map(
+    findOne(Query(
       "url"       -> toBsonS(url),
       "podcastId" -> toBsonS(podcastId))
     )
-    findOne(query)
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Feed]] = {
-    //val query = toDocument(Map("podcastId" -> toBsonS(podcastId)))
-    findAll(Query(Map("podcastId" -> toBsonS(podcastId))))
+    findAll(Query("podcastId" -> toBsonS(podcastId)))
   }
 
   def findAllByUrl(url: String): Future[List[Feed]] = {
     log.debug("Request to get all Feeds by URL : {}", url)
-    //val query = toDocument(Map("url" -> toBsonS(url)))
-    findAll(Query(Map("url" -> toBsonS(url))))
+    findAll(Query("url" -> toBsonS(url)))
   }
 
 }

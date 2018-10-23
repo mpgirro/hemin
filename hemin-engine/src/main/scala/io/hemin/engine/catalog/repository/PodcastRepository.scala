@@ -39,14 +39,12 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Podcast]] = {
     log.debug("Request to get Podcast (ID) : {}", id)
-    //val query = toDocument(Map("id" -> toBsonS(id)))
-    findOne(Query(Map("id" -> toBsonS(id))))
+    findOne("id" -> toBsonS(id))
   }
 
   def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
-    //val query = toDocument(Map("registrationComplete" -> toBsonB(true)))
-    findAll(Query(Map("registrationComplete" -> toBsonB(true))), page, size)
+    findAll(Query("registrationComplete" -> toBsonB(true)), page, size)
   }
 
 }
