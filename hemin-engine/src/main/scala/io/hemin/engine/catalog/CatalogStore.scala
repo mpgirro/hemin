@@ -695,22 +695,6 @@ class CatalogStore(config: CatalogConfig)
                     case Failure(ex) => onError("Could not save new Episode", ex)
                   }
 
-              /* TODO in case I have a bug, I need to adjust the title
-              val result = episodeService.save(e)
-
-              // we already clean up all the IDs here, just for good manners. for the chapters,
-              // we simply reuse the chapters from since bevore saving the episode, because those yet lack an ID
-              result
-                .map(r => episodeMapper.toImmutable(r)
-                  .withPodcastTitle(e.getPodcastTitle))
-                .map(r => idMapper.clearImmutable(r)
-                  .withChapters(Option(e.getChapters)
-                    .map(_
-                      .asScala
-                      .map(c => idMapper.clearImmutable(c))
-                      .asJava)
-                    .orNull))
-                    */
             }
         case None => log.error("Could not register Episode -- No  parent Podcast for (ID) : {}", podcastId)
       }

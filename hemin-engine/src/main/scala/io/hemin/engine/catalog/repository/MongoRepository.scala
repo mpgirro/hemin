@@ -1,8 +1,8 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import reactivemongo.api.{Cursor, QueryOpts, ReadPreference}
 import reactivemongo.api.collections.bson.BSONCollection
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -19,35 +19,31 @@ trait MongoRepository[T] {
 
   protected[this] def collection: Future[BSONCollection]
 
-  /**
-    * Save entity to database collection
+  /** Save entity to database collection
     *
     * @param t save entity to database
     * @return the entity as it was written to the database collection, eventually
     */
   def save(t: T): Future[T]
 
-  /**
-    * Find one entity by ID
+  /** Find one entity by ID
     *
     * @param id the ID of the entity
     * @return  the entity eventually, or None if not found
     */
   def findOne(id: String): Future[Option[T]]
 
-  /**
-    * Find one entity by ID, if the Option contains an ID
+  /** Find one entity by ID, if the Option contains an ID
     *
     * @param optId the ID of the entity wrapped in a Future
     * @return the entity eventually, or None if not found
     */
   def findOne(optId: Option[String]): Future[Option[T]] = optId match {
     case Some(id) => findOne(id)
-    case None     => Future { None }
+    case None     => Future.successful(None)
   }
 
-  /**
-    * Drops the collection of this repository
+  /** Drops the collection of this repository
     *
     * @return true if drop was successful
     */
@@ -57,16 +53,14 @@ trait MongoRepository[T] {
       c.drop(failIfNotFound = true) }
   }
 
-  /**
-    * Find one by example
+  /** Find one by example
     *
     * @param example The example object
     * @return The object matching the given example
     */
   def findOne(example: T): Future[Option[T]] = findOne(bsonWriter.write(example))
 
-  /**
-    * Find many by example
+  /** Find many by example
     *
     * @param example The example object
     * @return List of objects matching the given example
@@ -114,8 +108,7 @@ trait MongoRepository[T] {
     }
 
   // TODO does not seem to work!
-  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] = {
-    log.info("findAll with skip={} and batchSize={}", (page*size), size)
+  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
     collection.flatMap { _
       .find(BSONDocument.empty)
       .sort(sort)
@@ -127,9 +120,5 @@ trait MongoRepository[T] {
           log.error("Error on findAll({}) : {}", query, ex)
           Nil
       }
-
     }
-  }
-
-
 }

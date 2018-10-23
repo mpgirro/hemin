@@ -21,7 +21,7 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)
 
   private val solr: SolrClient = new HttpSolrClient.Builder(config.solrUri)
-    .allowCompression(false) // TODO
+    .allowCompression(false) // TODO config and why don't I want =true?
     .build()
 
   private val searchFields = List(
