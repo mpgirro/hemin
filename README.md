@@ -7,7 +7,8 @@
 [![Twitter](https://img.shields.io/badge/Twitter-%40hemin_io-blue.svg)](https://twitter.com/hemin_io)
 
 
-__DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for production.
+__DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for full production use.
+
 
 Hemin is a podcast catalog & search engine infrastructure. It's engine is written in [Scala](https://www.scala-lang.org) (and small parts in Java), uses [MongoDB](https://www.mongodb.com) to store the podcast/episode/feed catalog, and indexes the data with [Solr](http://lucene.apache.org/solr/). The REST API relies on [Play](https://www.playframework.com) for routing and JSON. The server is fully asynchronous, and makes heavy use of [Akka](https://akka.io) actors and [Scala Futures](https://docs.scala-lang.org/overviews/core/futures.html). The web client is written in [Typescript](https://www.typescriptlang.org) and builds on the [Angular](https://angular.io) framework. 
 
