@@ -40,14 +40,14 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Episode]] = {
     log.debug("Request to get Episode (ID) : {}", id)
-    val query = toDocument(Map("id" -> toBsonS(id)))
-    findOne(query)
+    //val query = toDocument(Map("id" -> toBsonS(id)))
+    findOne(Query(Map("id" -> toBsonS(id))))
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Episode (ID) : {}", podcastId)
-    val query = toDocument(Map("podcastId" -> toBsonS(podcastId)))
-    findAll(query)
+    //val query = toDocument(Map("podcastId" -> toBsonS(podcastId)))
+    findAll(Query(Map("podcastId" -> toBsonS(podcastId))))
   }
 
   def findAllByPodcastAndGuid(podcastId: String, guid: String): Future[List[Episode]] = {

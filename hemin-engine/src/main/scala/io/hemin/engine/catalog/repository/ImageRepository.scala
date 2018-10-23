@@ -41,14 +41,14 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    val query = toDocument(Map("id" -> toBsonS(id)))
-    findOne(query)
+    //val query = toDocument(Map("id" -> toBsonS(id)))
+    findOne(Query(Map("id" -> toBsonS(id))))
   }
 
   def findOneByAssociate(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    val query = toDocument(Map("associateId" -> toBsonS(id)))
-    findOne(query)
+    //val query = toDocument(Map("associateId" -> toBsonS(id)))
+    findOne(Query(Map("associateId" -> toBsonS(id))))
   }
 
 }
