@@ -13,7 +13,7 @@ import io.hemin.engine.util.cli.CliFormatter.format
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 object CliProcessor {
-  val EMPTY_INPUT_MSG = "Input was NULL"
+  val MSG_EMPTY_INPUT = "Input was NULL"
 }
 
 /**
@@ -28,6 +28,8 @@ object CliProcessor {
   */
 class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
 
+  import CliProcessor._
+
   private val log = Logger(getClass)
 
   private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
@@ -35,12 +37,12 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
   def eval(args: String): String = Option(args)
     .map(_.split(" "))
     .map(eval)
-    .getOrElse(CliProcessor.EMPTY_INPUT_MSG)
+    .getOrElse(MSG_EMPTY_INPUT)
 
   def eval(args: Array[String]): String = Option(args)
     .map(_.toList)
     .map(eval)
-    .getOrElse(CliProcessor.EMPTY_INPUT_MSG)
+    .getOrElse(MSG_EMPTY_INPUT)
 
   def eval(args: List[String]): String = Option(args)
     .map {
@@ -69,7 +71,7 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
       case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
 
       case _ => help()
-    }.getOrElse(CliProcessor.EMPTY_INPUT_MSG)
+    }.getOrElse(MSG_EMPTY_INPUT)
 
   private val usageMap = Map(
     "propose"        -> "feed [feed [feed]]",

@@ -101,14 +101,10 @@ class Engine (private val initConfig: Config) {
       case ImageResult(i) => i
     }
 
-  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = {
-    val p: Int = page.getOrElse(config.catalog.defaultPage)// - 1
-    val s: Int = size.getOrElse(config.catalog.defaultSize)
-
-    (bus ? GetAllPodcastsRegistrationComplete(p,s)).map {
+  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] =
+    (bus ? GetAllPodcastsRegistrationComplete(page, size)).map {
       case AllPodcastsResult(ps) => ps
     }
-  }
 
   def findEpisodesByPodcast(id: String): Future[List[Episode]] =
     (bus ? GetEpisodesByPodcast(id)).map {

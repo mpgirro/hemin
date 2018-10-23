@@ -44,9 +44,9 @@ object CatalogStore {
   final case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
   // CatalogQueries
   final case class GetPodcast(id: String) extends CatalogQuery
-  final case class GetAllPodcasts(page: Int, size: Int) extends CatalogQuery
-  final case class GetAllPodcastsRegistrationComplete(page: Int, size: Int) extends CatalogQuery
-  final case class GetAllFeeds(page: Int, size: Int) extends CatalogQuery
+  final case class GetAllPodcasts(page: Option[Int], size: Option[Int]) extends CatalogQuery
+  final case class GetAllPodcastsRegistrationComplete(page: Option[Int], size: Option[Int]) extends CatalogQuery
+  final case class GetAllFeeds(page: Option[Int], size: Option[Int]) extends CatalogQuery
   final case class GetEpisode(id: String) extends CatalogQuery
   final case class GetEpisodesByPodcast(podcastId: String) extends CatalogQuery
   final case class GetFeedsByPodcast(podcastId: String) extends CatalogQuery
@@ -413,12 +413,15 @@ class CatalogStore(config: CatalogConfig)
       }
   }
 
-  private def onGetAllPodcasts(page: Int, size: Int): Unit = {
+  private def onGetAllPodcasts(page: Option[Int], size: Option[Int]): Unit = {
     log.debug("Received GetAllPodcasts({},{})", page, size)
+
+    val p: Int = page.getOrElse(config.defaultPage)
+    val s: Int = size.getOrElse(config.defaultSize)
 
     val theSender = sender()
     podcasts
-      .findAll(page, size)
+      .findAll(p, s)
       .andThen {
         case Success(ps) => ps
         case Failure(ex) =>
@@ -430,12 +433,15 @@ class CatalogStore(config: CatalogConfig)
       }
   }
 
-  private def onGetAllPodcastsRegistrationComplete(page: Int, size: Int): Unit = {
+  private def onGetAllPodcastsRegistrationComplete(page: Option[Int], size: Option[Int]): Unit = {
     log.debug("Received GetAllPodcastsRegistrationComplete({},{})", page, size)
+
+    val p: Int = page.getOrElse(config.defaultPage)
+    val s: Int = size.getOrElse(config.defaultSize)
 
     val theSender = sender()
     podcasts
-      .findAllRegistrationCompleteAsTeaser(page, size)
+      .findAllRegistrationCompleteAsTeaser(p, s)
       .andThen {
         case Success(ps) => ps
         case Failure(ex) =>
@@ -447,12 +453,15 @@ class CatalogStore(config: CatalogConfig)
       }
   }
 
-  private def onGetAllFeeds(page: Int, size: Int): Unit = {
+  private def onGetAllFeeds(page: Option[Int], size: Option[Int]): Unit = {
     log.debug("Received GetAllFeeds({},{})", page, size)
+
+    val p: Int = page.getOrElse(config.defaultPage)
+    val s: Int = size.getOrElse(config.defaultSize)
 
     val theSender = sender()
     feeds
-      .findAll(page, size)
+      .findAll(p, s)
       .andThen {
         case Success(fs) => fs
         case Failure(ex) =>

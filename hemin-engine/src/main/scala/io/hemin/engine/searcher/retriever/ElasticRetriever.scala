@@ -14,7 +14,7 @@ class ElasticRetriever (config: SearcherConfig, ec: ExecutionContext) extends In
 
   override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultsWrapper = {
     // TODO implement!
-    throw new UnsupportedOperationException("ElasticRetriever.search(_,_,_) not yet implemented")
+    throw new UnsupportedOperationException("ElasticRetriever.searchIndex(_,_,_) not yet implemented")
   }
 
 }
