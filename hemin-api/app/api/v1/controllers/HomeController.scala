@@ -1,5 +1,6 @@
 package api.v1.controllers
 
+import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger
 import play.api.mvc._
@@ -7,6 +8,7 @@ import play.api.mvc._
 /**
   * A very small controller that renders a home page.
   */
+@Api("Home")
 class HomeController @Inject() (cc: ControllerComponents)
   extends AbstractController(cc) {
 

@@ -147,3 +147,6 @@ Procfile        text
 *.otf           binary
 *.woff          binary
 *.woff2         binary
+
+## Prevent Swagger from causing trouble
+public/swagger/* linguist-vendored

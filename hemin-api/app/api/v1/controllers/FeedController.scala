@@ -2,11 +2,13 @@ package api.v1.controllers
 
 import api.v1.controllers.bases.FeedBaseController
 import api.v1.controllers.components.FeedControllerComponents
+import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
+@Api("Feed")
 class FeedController @Inject() (cc: FeedControllerComponents)
   extends FeedBaseController(cc) {
 

@@ -1,10 +1,12 @@
 package api.v1.controllers
 
 import api.v1.services.CliService
+import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger
 import play.api.mvc.{AbstractController, ControllerComponents}
 
+@Api("Cli")
 class CliController @Inject() (cc: ControllerComponents,
                                cliService: CliService)
   extends AbstractController(cc) {

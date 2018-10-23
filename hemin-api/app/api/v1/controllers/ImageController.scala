@@ -2,11 +2,13 @@ package api.v1.controllers
 
 import api.v1.controllers.bases.ImageBaseController
 import api.v1.controllers.components.ImageControllerComponents
+import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
+@Api("Image")
 class ImageController @Inject() (cc: ImageControllerComponents)
   extends ImageBaseController(cc) {
 

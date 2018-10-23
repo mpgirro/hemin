@@ -1,4 +1,15 @@
+# Misc Non-API routes that serve dashboards, etc
 GET   /                               api.v1.controllers.HomeController.index
+
+# Swagger API docs
+GET   /swagger.json                   controllers.ApiHelpController.getResources
+GET   /docs/                          controllers.Assets.at(path="/public/swagger",file="index.html")
+GET   /docs/*file                     controllers.Assets.at(path="/public/swagger",file)
+
+# Map static resources from the /public folder to the /assets URL path
+#GET   /assets/*file                   controllers.Assets.at(path="/public/assets", file)
+
+# API resources
 GET   /api/v1/search                  api.v1.controllers.SearchController.search(q: String, p: Option[Int], s: Option[Int])
 GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p: Option[Int], s: Option[Int])
 GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
@@ -13,7 +24,4 @@ POST  /api/v1/feed/propose            api.v1.controllers.FeedController.propose
 GET   /api/v1/image/:id               api.v1.controllers.ImageController.find(id: String)
 POST  /api/v1/cli                     api.v1.controllers.CliController.eval
 ->    /api/v1/posts                   example.post.PostRouter
-
-# Map static resources from the /public folder to the /assets URL path
-GET   /assets/*file                   controllers.Assets.at(path="/public", file)
 
