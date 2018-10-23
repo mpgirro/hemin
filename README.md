@@ -48,4 +48,4 @@ TODO
 [![Mongo version](https://img.shields.io/badge/mongo-4.0-blue.svg)](https://docs.mongodb.com/manual/release-notes/4.0/)
 
 
-TODO
+The Hemin engine can be started as a standalone command line application that feature a REPL. Alternatively, it can be used embedded within another Scala/Java (or other compatible JVM language) application. This second way is how the Hemin API server integrates the Hemin engine.
