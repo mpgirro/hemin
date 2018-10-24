@@ -22,13 +22,13 @@ object SearcherConfig
   override val configPath: String = "hemin.searcher"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".solr-uri"     -> "http://localhost:8983/solr/hemin",
-    configPath+".default-page" -> 1,
-    configPath+".default-size" -> 20,
+    s"$configPath.solr-uri"     -> "http://localhost:8983/solr/hemin",
+    s"$configPath.default-page" -> 1,
+    s"$configPath.default-size" -> 20,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
-    s"""${this.dispatcher} {
+    s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
       throughput = 100
@@ -39,7 +39,7 @@ object SearcherConfig
     }}"""))
 
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"""${this.mailbox} {
+    s"""$mailbox {
       mailbox-type = "${classOf[SearcherPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms

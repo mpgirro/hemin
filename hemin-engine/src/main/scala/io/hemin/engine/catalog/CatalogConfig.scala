@@ -24,15 +24,15 @@ object CatalogConfig
   override val configPath: String = "hemin.catalog"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".mongo-uri"       -> "mongodb://localhost:27017/hemin",
-    configPath+".create-database" -> true,
-    configPath+".default-page"    -> 1,
-    configPath+".default-size"    -> 20,
-    configPath+".max-page-size"   -> 10000,
+    s"$configPath.mongo-uri"       -> "mongodb://localhost:27017/hemin",
+    s"$configPath.create-database" -> true,
+    s"$configPath.default-page"    -> 1,
+    s"$configPath.default-size"    -> 20,
+    s"$configPath.max-page-size"   -> 10000,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
-    s"""${this.dispatcher} {
+    s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
       throughput = 100
@@ -43,7 +43,7 @@ object CatalogConfig
     }}"""))
 
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"""${this.mailbox} {
+    s"""$mailbox {
       mailbox-type = "${classOf[CatalogPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms

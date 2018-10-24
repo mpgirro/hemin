@@ -27,17 +27,17 @@ object IndexConfig
   override val configPath: String = "hemin.index"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".lucene-index-path" -> "./data/index",
-    configPath+".solr-uri"          -> "http://localhost:8983/solr/hemin",
-    configPath+".solr-queue-size"   -> 20,
-    configPath+".solr-thread-count" -> 4,
-    configPath+".create-index"      -> false,
-    configPath+".commit-interval"   -> 3,
-    configPath+".handler-count"     -> 5,
+    s"$configPath.lucene-index-path" -> "./data/index",
+    s"$configPath.solr-uri"          -> "http://localhost:8983/solr/hemin",
+    s"$configPath.solr-queue-size"   -> 20,
+    s"$configPath.solr-thread-count" -> 4,
+    s"$configPath.create-index"      -> false,
+    s"$configPath.commit-interval"   -> 3,
+    s"$configPath.handler-count"     -> 5,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
-    s"""${this.dispatcher} {
+    s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
       throughput = 100
@@ -48,7 +48,7 @@ object IndexConfig
     }}"""))
 
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"""${this.mailbox} {
+    s"""$mailbox {
       mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms

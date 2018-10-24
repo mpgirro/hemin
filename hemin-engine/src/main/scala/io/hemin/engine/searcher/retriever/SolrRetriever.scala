@@ -69,7 +69,7 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
     val results: SolrDocumentList = solr.query(query).getResults
 
     if (results.getNumFound <= 0) {
-      ResultsWrapper() // default parameters relate to nothing found
+      ResultsWrapper.empty // default parameters relate to nothing found
     } else {
       val dMaxPage = results.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt

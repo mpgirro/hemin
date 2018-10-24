@@ -6,9 +6,9 @@ trait ConfigStandardValues {
   val configPath: String
 
   /** Dispatcher name */
-  final lazy val dispatcher: String = configPath + ".dispatcher"
+  final lazy val dispatcher: String = s"$configPath.dispatcher"
 
   /** Mailbox name */
-  final lazy val mailbox: String = configPath + ".mailbox"
+  final lazy val mailbox: String = s"$configPath.mailbox"
 
 }

@@ -22,7 +22,7 @@ trait IndexRetriever {
 
   final def search(query: String, page: Int, size: Int): Future[ResultsWrapper] = Future {
     if (isNullOrEmpty(query) || page < 1 || size < 1) {
-      ResultsWrapper()
+      ResultsWrapper.empty
     } else {
       searchIndex(query, page, size)
     }

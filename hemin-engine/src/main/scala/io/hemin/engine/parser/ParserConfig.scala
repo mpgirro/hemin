@@ -20,11 +20,11 @@ object ParserConfig
   override val configPath: String = "hemin.parser"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".worker-count" -> 2,
+    s"$configPath.worker-count" -> 2,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
-    s"""${this.dispatcher} {
+    s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
       throughput = 100
@@ -35,7 +35,7 @@ object ParserConfig
     }}"""))
 
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"""${this.mailbox} {
+    s"""$mailbox {
       mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms

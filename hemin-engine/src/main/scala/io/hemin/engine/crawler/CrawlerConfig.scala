@@ -23,14 +23,14 @@ object CrawlerConfig
   override val configPath: String = "hemin.crawler"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    configPath+".worker-count"       -> 5,
-    configPath+".fetch-websites"     -> false, // TODO rename to config file
-    configPath+".download-timeout"   -> 10, // TODO add to config file
-    configPath+".download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
+    s"$configPath.worker-count"       -> 5,
+    s"$configPath.fetch-websites"     -> false, // TODO rename to config file
+    s"$configPath.download-timeout"   -> 10, // TODO add to config file
+    s"$configPath.download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
-    s"""${this.dispatcher} {
+    s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
       throughput = 100
@@ -41,7 +41,7 @@ object CrawlerConfig
     }}"""))
 
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"""${this.mailbox} {
+    s"""$mailbox {
       mailbox-type = "${classOf[CrawlerPriorityMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
