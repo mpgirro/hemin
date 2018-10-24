@@ -51,7 +51,9 @@ class Engine (private val initConfig: Config) {
   /** Configuration of the Engine instance */
   def config: EngineConfig = engineConfig
 
-  def propose(url: String): Unit = bus ! ProposeNewFeed(url)
+  def propose(url: String): Unit = guarded {
+    bus ! ProposeNewFeed(url)
+  }
 
   def cli(args: String): Future[String] = guarded {
     (bus ? CliInput(args)).map {
@@ -134,7 +136,7 @@ class Engine (private val initConfig: Config) {
     localNode = system.actorOf(Props(new Node(engineConfig)), Node.name)
 
     // wait until all actors in the hierarchy report they are up and running
-   
+
     warmup() match {
       case succ@Success(_) =>
         log.info("ENGINE startup complete ...")
@@ -163,6 +165,8 @@ class Engine (private val initConfig: Config) {
   private def shutdownOnCold(): Try[Unit] = Failure(new HeminException("Engine shutdown failed; reason: not running"))
 
   private def guarded[T](body: => Future[T]): Future[T] = circuitBreaker.withCircuitBreaker(body)
+
+  private def guarded[T](body: => T): T = circuitBreaker.withSyncCircuitBreaker(body)
 
   private def breakerOpen(): Unit = log.warn("Circuit Breaker is open")
 
