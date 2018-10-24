@@ -1,7 +1,7 @@
 package io.hemin.engine
 
 import akka.actor.{ActorRef, ActorSystem, Props}
-import akka.pattern.ask
+import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
@@ -26,22 +26,19 @@ class Engine (private val initConfig: Config) {
 
   private val log = Logger(getClass)
   private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
+  private val nodeConfig: NodeConfig = engineConfig.node
 
-  private implicit val internalTimeout: Timeout = engineConfig.node.internalTimeout
-  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
+  private implicit val internalTimeout: Timeout = nodeConfig.internalTimeout
+  private implicit lazy val ec: ExecutionContext = system.dispatchers.lookup(nodeConfig.dispatcher)
 
-  private var actorSysten: ActorSystem = _
+  private var actorSystem: ActorSystem = _
   private var localNode: ActorRef = _
-
   private var running: Boolean = false
 
-  /* TODO ich will einen CircuitBreaker, habe aber keinen Scheduler weil das hier kein Actor ist
-  private val indexBreaker =
-      CircuitBreaker(context.system.scheduler, MAX_BREAKER_FAILURES, BREAKER_CALL_TIMEOUT, BREAKER_RESET_TIMEOUT)
-          .onOpen(breakerOpen("Index"))
-          .onClose(breakerClose("Index"))
-          .onHalfOpen(breakerHalfOpen("Index"))
-  */
+  private lazy val circuitBreaker = CircuitBreaker(system.scheduler, nodeConfig.breakerMaxFailures, nodeConfig.breakerCallTimeout.duration, nodeConfig.breakerResetTimeout.duration)
+    .onOpen(breakerOpen())
+    .onClose(breakerClose())
+    .onHalfOpen(breakerHalfOpen())
 
   /** Attempts a startup sequence of the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is already up and running. */
@@ -51,80 +48,80 @@ class Engine (private val initConfig: Config) {
     * It will produce a `Failure` if the Engine is not running. */
   def shutdown(): Try[Unit] = synchronized { if (running) shutdownOnWarm() else shutdownOnCold() }
 
-  def bus: ActorRef = localNode
-
-  def system: ActorSystem = actorSysten
-
+  /** Configuration of the Engine instance */
   def config: EngineConfig = engineConfig
-
-  def cli(args: String): Future[String] =
-    (bus ? CliInput(args)).map {
-      case CliOutput(txt) => txt
-    }
 
   def propose(url: String): Unit = bus ! ProposeNewFeed(url)
 
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] =
+  def cli(args: String): Future[String] = guarded {
+    (bus ? CliInput(args)).map {
+      case CliOutput(txt) => txt
+    }
+  }
+
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] = guarded {
     (bus ? SearcherRequest(query, page, size)).map {
       case SearcherResults(rs) => rs
     }
+  }
 
-  def findPodcast(id: String): Future[Option[Podcast]] =
+  def findPodcast(id: String): Future[Option[Podcast]] = guarded {
     (bus ? GetPodcast(id)).map {
       case PodcastResult(p) => p
     }
+  }
 
-  def findEpisode(id: String): Future[Option[Episode]] =
+  def findEpisode(id: String): Future[Option[Episode]] = guarded {
     (bus ? GetEpisode(id)).map {
       case EpisodeResult(e) => e
     }
+  }
 
-  def findFeed(id: String): Future[Option[Feed]] =
+  def findFeed(id: String): Future[Option[Feed]] = guarded {
     (bus ? GetFeed(id)).map {
       case FeedResult(f) => f
     }
+  }
 
-  def findImage(id: String): Future[Option[Image]] =
+  def findImage(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImage(id)).map {
       case ImageResult(i) => i
     }
+  }
 
-  def findImageByAssociate(id: String): Future[Option[Image]] =
+  def findImageByAssociate(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImageByAssociate(id)).map {
       case ImageResult(i) => i
     }
+  }
 
-  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] =
+  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = guarded {
     (bus ? GetAllPodcastsRegistrationComplete(page, size)).map {
       case AllPodcastsResult(ps) => ps
     }
+  }
 
-  def findEpisodesByPodcast(id: String): Future[List[Episode]] =
+  def findEpisodesByPodcast(id: String): Future[List[Episode]] = guarded {
     (bus ? GetEpisodesByPodcast(id)).map {
       case EpisodesByPodcastResult(es) => es
     }
+  }
 
-  def findFeedsByPodcast(id: String): Future[List[Feed]] =
+  def findFeedsByPodcast(id: String): Future[List[Feed]] = guarded {
     (bus ? GetFeedsByPodcast(id)).map {
       case FeedsByPodcastResult(fs) => fs
     }
+  }
 
-  def findChaptersByEpisode(id: String): Future[List[Chapter]] =
+  def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
     (bus ? GetChaptersByEpisode(id)).map {
       case ChaptersByEpisodeResult(cs) => cs
     }
-
-  private def breakerOpen(name: String): Unit = {
-    log.warn("{} Circuit Breaker is open", name)
   }
 
-  private def breakerClose(name: String): Unit = {
-    log.warn("{} Circuit Breaker is closed", name)
-  }
+  private[engine] def bus: ActorRef = localNode
 
-  private def breakerHalfOpen(name: String): Unit = {
-    log.warn("{} Circuit Breaker is half-open, next message goes through", name)
-  }
+  private[engine] def system: ActorSystem = actorSystem
 
   private def startupOnWarm(): Try[Unit] = Failure(new HeminException("Engine startup failed; reason: already running"))
 
@@ -133,10 +130,11 @@ class Engine (private val initConfig: Config) {
     log.info("ENGINE is starting up ...")
 
     // init the actorsystem and local master for this node
-    actorSysten = ActorSystem(Engine.name, completeConfig)
+    actorSystem = ActorSystem(Engine.name, completeConfig)
     localNode = system.actorOf(Props(new Node(engineConfig)), Node.name)
 
     // wait until all actors in the hierarchy report they are up and running
+   
     warmup() match {
       case succ@Success(_) =>
         log.info("ENGINE startup complete ...")
@@ -156,12 +154,20 @@ class Engine (private val initConfig: Config) {
     }
 
   private def shutdownOnWarm(): Try[Unit] = {
-    //bus ! ShutdownSystem
+    //bus ! ShutdownSystem // TODO does system.terminate() work better?
     system.terminate()
     running = false
     Success(Unit)
   }
 
   private def shutdownOnCold(): Try[Unit] = Failure(new HeminException("Engine shutdown failed; reason: not running"))
+
+  private def guarded[T](body: => Future[T]): Future[T] = circuitBreaker.withCircuitBreaker(body)
+
+  private def breakerOpen(): Unit = log.warn("Circuit Breaker is open")
+
+  private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
+
+  private def breakerHalfOpen(): Unit = log.warn("Circuit Breaker is half-open, next message goes through")
 
 }

@@ -79,8 +79,11 @@ object EngineConfig {
         workerCount     = config.getInt(s"${IndexConfig.configPath}.handler-count"),
       ),
       node = NodeConfig(
-        repl            = config.getBoolean(s"${NodeConfig.configPath}.repl"),
-        internalTimeout = config.getInt(s"${NodeConfig.configPath}.internal-timeout").seconds,
+        repl                = config.getBoolean(s"${NodeConfig.configPath}.repl"),
+        internalTimeout     = config.getInt(s"${NodeConfig.configPath}.internal-timeout").seconds,
+        breakerMaxFailures  = config.getInt(s"${NodeConfig.configPath}.breaker-max-failures"),
+        breakerCallTimeout  = config.getInt(s"${NodeConfig.configPath}.breaker-call-timeout").seconds,
+        breakerResetTimeout = config.getInt(s"${NodeConfig.configPath}.breaker-reset-timeout").seconds,
       ),
       parser = ParserConfig(
         workerCount = config.getInt(s"${ParserConfig.configPath}.worker-count"),
