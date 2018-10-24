@@ -5,15 +5,16 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineProtocol.{EngineOperational, ShutdownSystem, StartupComplete, StartupInProgress}
-import io.hemin.engine.NodeMaster.{CliInput, CliOutput}
+import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node.{CliInput, CliOutput}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.domain._
+import io.hemin.engine.exception.HeminException
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 
-import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
+import scala.util.{Failure, Success, Try}
 
 object Engine {
   val name: String = "hemin"
@@ -21,7 +22,7 @@ object Engine {
 
 class Engine (private val initConfig: Config) {
 
-  private val completeConfig = initConfig.withFallback(EngineConfig.defaultConfig)
+  private val completeConfig: Config = initConfig.withFallback(EngineConfig.defaultConfig)
 
   private val log = Logger(getClass)
   private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
@@ -29,7 +30,9 @@ class Engine (private val initConfig: Config) {
   private implicit val internalTimeout: Timeout = engineConfig.node.internalTimeout
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
-  private var master: ActorRef = _
+  private var node: ActorRef = _
+
+  private var running: Boolean = false
 
   /* TODO ich will einen CircuitBreaker, habe aber keinen Scheduler weil das hier kein Actor ist
   private val indexBreaker =
@@ -39,34 +42,11 @@ class Engine (private val initConfig: Config) {
           .onHalfOpen(breakerHalfOpen("Index"))
   */
 
-  def start(): Unit = {
+  def startup(): Try[Unit] = if (running) startupOnWarm() else startupOnCold()
 
-    // TODO prevent startup sequence of already started up
+  def shutdown(): Try[Unit] = if (running) shutdownOnWarm() else shutdownOnCold()
 
-    // init the actorsystem and local master for this node
-    val system = ActorSystem("hemin", completeConfig)
-    master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)
-
-    // wait until all actors in the hierarchy report they are up and running
-    var warmup = true
-    while (warmup) {
-      val request = bus ? EngineOperational
-      val response = Await.result(request, 10.seconds) // TODO read timeout from config
-      response match {
-        case StartupComplete   =>
-          warmup = false
-        case StartupInProgress =>
-          warmup = true
-          Thread.sleep(100)
-      }
-    }
-
-    log.info("engine is up and running")
-  }
-
-  def shutdown(): Unit = bus ! ShutdownSystem
-
-  def bus: ActorRef = master
+  def bus: ActorRef = node
 
   def config: EngineConfig = engineConfig
 
@@ -138,5 +118,40 @@ class Engine (private val initConfig: Config) {
   private def breakerHalfOpen(name: String): Unit = {
     log.warn("{} Circuit Breaker is half-open, next message goes through", name)
   }
+
+  private def startupOnWarm(): Try[Unit] = Failure(new HeminException("Engine startup failed; reason: already running"))
+
+  private def startupOnCold(): Try[Unit] = {
+    // init the actorsystem and local master for this node
+    val system = ActorSystem(Engine.name, completeConfig)
+    node = system.actorOf(Props(new Node(engineConfig)), Node.name)
+
+    // wait until all actors in the hierarchy report they are up and running
+    warmup() match {
+      case succ@Success(_) =>
+        log.info("ENGINE is started ...")
+        succ
+      case fail@Failure(_) => fail
+    }
+  }
+
+  private def warmup(): Try[Unit] =
+    Await.result(bus ? EngineOperational, internalTimeout.duration) match {
+      case StartupComplete =>
+        running = true
+        Success(Unit)
+      case StartupInProgress =>
+        Thread.sleep(25) // don't wait too busy
+        warmup()
+    }
+
+
+  private def shutdownOnWarm(): Try[Unit] = {
+    bus ! ShutdownSystem
+    running = false
+    Success(Unit)
+  }
+
+  private def shutdownOnCold(): Try[Unit] = Failure(new HeminException("Engine shutdown failed; reason: not running"))
 
 }

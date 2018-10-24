@@ -3,7 +3,7 @@ package io.hemin.engine
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
 import akka.util.Timeout
 import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.NodeMaster._
+import io.hemin.engine.Node._
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.catalog.CatalogStore.CatalogMessage
 import io.hemin.engine.crawler.Crawler
@@ -22,10 +22,10 @@ import io.hemin.engine.util.cli.CliProcessor
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
-object NodeMaster {
+object Node {
   final val name = "node"
   def props(config: EngineConfig): Props =
-    Props(new NodeMaster(config))
+    Props(new Node(config))
       .withDispatcher(config.node.dispatcher)
       .withMailbox(config.node.mailbox)
 
@@ -33,7 +33,7 @@ object NodeMaster {
   final case class CliOutput(output: String)
 }
 
-class NodeMaster (config: EngineConfig)
+class Node(config: EngineConfig)
   extends Actor with ActorLogging {
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))

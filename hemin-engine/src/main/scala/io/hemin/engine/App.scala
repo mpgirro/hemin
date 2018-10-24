@@ -5,14 +5,11 @@ import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.util.cli.CliProcessor
 
-import scala.concurrent.duration._
 import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
+import scala.util.{Failure, Success}
 
 object App {
-
-  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
-  private implicit val APPLICATION_TIMEOUT: Timeout = 5.seconds
 
   private val log = Logger(getClass)
 
@@ -21,11 +18,21 @@ object App {
   private val engine = new Engine(config)
   private var running = true
 
+  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
+  private implicit val APPLICATION_TIMEOUT: Timeout = engine.config.node.internalTimeout
+
+  sys.addShutdownHook({
+    shutdown("Terminating on SIGTERM")
+  })
+
   def main(args: Array[String]): Unit = {
     log.info("Starting engine ...")
-    engine.start()
-    if (engine.config.node.repl) {
-      repl()
+    engine.startup() match {
+      case Success(_)  =>
+        if (engine.config.node.repl) {
+          repl()
+        }
+      case Failure(ex) => log.error(ex.getMessage)
     }
   }
 
@@ -37,7 +44,7 @@ object App {
     while (running) {
       blocking {
         val input = StdIn.readLine()
-        log.debug("CLI read : {}", input)
+        log.debug("REPL input : {}", input)
 
         Option(input)
           .map(_.split(" "))
@@ -49,13 +56,13 @@ object App {
       }
     }
 
-    log.info("Terminating due to user request")
-    engine.shutdown()
+    shutdown("Terminating on CLI input request")
   }
 
-  sys.addShutdownHook({
-    log.debug("App ShutdownHook called")
-    engine.shutdown()
-  })
-
+  private def shutdown(message: String): Unit =
+    engine.shutdown() match {
+      case Success(_)  => log.info(message)
+      case Failure(ex) => log.error(ex.getMessage)
+    }
+  
 }

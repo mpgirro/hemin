@@ -7,7 +7,7 @@ import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
 
-/** Configuration for [[io.hemin.engine.NodeMaster]], which extend to [[io.hemin.engine.App]] */
+/** Configuration for [[io.hemin.engine.Node]], which extend to [[io.hemin.engine.App]] */
 final case class NodeConfig(
   repl: Boolean,
   internalTimeout: Timeout,
@@ -19,7 +19,7 @@ object NodeConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${NodeMaster.name}"
+  override val configPath: String = s"${Engine.name}.${Node.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.repl"             -> true,

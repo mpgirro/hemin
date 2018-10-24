@@ -24,8 +24,9 @@ object EngineProtocol {
   final case class ReportWorkerStartupComplete() // for worker/handler delegation children
 
   final case class EngineOperational()
-  final case class StartupComplete()
-  final case class StartupInProgress()
+  sealed trait StartupStatus
+  final case class StartupComplete() extends StartupStatus
+  final case class StartupInProgress() extends StartupStatus
 
   // These are maintenance methods, I use during development
   final case class DebugPrintAllPodcasts()    // User/CLI -> CatalogStore
