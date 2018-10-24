@@ -7,7 +7,9 @@ import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
 
-/** Configuration for [[io.hemin.engine.Node]], which extend to [[io.hemin.engine.App]] */
+/** Configuration for [[io.hemin.engine.Node]],
+  * which extends to [[io.hemin.engine.App]] when in standalone mode
+  */
 final case class NodeConfig(
   repl: Boolean,
   internalTimeout: Timeout,
@@ -26,7 +28,6 @@ object NodeConfig
     s"$configPath.internal-timeout" -> 5,
   ).asJava)
 
-  // TODO run the NodeMaster on a dedicated dispatcher
   /** The App does not run on an actor dispatcher */
   override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""$dispatcher {
@@ -38,7 +39,6 @@ object NodeConfig
       throughput = 1
     }"""))
 
-  // TODO run the NodeMaster on a dedicated mailbox
   /** The App does not have an actor mailbox */
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"$mailbox { }"))

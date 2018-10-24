@@ -30,7 +30,8 @@ class Engine (private val initConfig: Config) {
   private implicit val internalTimeout: Timeout = engineConfig.node.internalTimeout
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
-  private var node: ActorRef = _
+  private var actorSysten: ActorSystem = _
+  private var localNode: ActorRef = _
 
   private var running: Boolean = false
 
@@ -42,11 +43,17 @@ class Engine (private val initConfig: Config) {
           .onHalfOpen(breakerHalfOpen("Index"))
   */
 
-  def startup(): Try[Unit] = if (running) startupOnWarm() else startupOnCold()
+  /** Attempts a startup sequence of the Engine. This operation is thread-safe.
+    * It will produce a `Failure` if the Engine is already up and running. */
+  def startup(): Try[Unit] = synchronized { if (running) startupOnWarm() else startupOnCold() }
 
-  def shutdown(): Try[Unit] = if (running) shutdownOnWarm() else shutdownOnCold()
+  /** Attempts a shutdown sequence of the Engine. This operation is thread-safe.
+    * It will produce a `Failure` if the Engine is not running. */
+  def shutdown(): Try[Unit] = synchronized { if (running) shutdownOnWarm() else shutdownOnCold() }
 
-  def bus: ActorRef = node
+  def bus: ActorRef = localNode
+
+  def system: ActorSystem = actorSysten
 
   def config: EngineConfig = engineConfig
 
@@ -122,14 +129,17 @@ class Engine (private val initConfig: Config) {
   private def startupOnWarm(): Try[Unit] = Failure(new HeminException("Engine startup failed; reason: already running"))
 
   private def startupOnCold(): Try[Unit] = {
+
+    log.info("ENGINE is starting up ...")
+
     // init the actorsystem and local master for this node
-    val system = ActorSystem(Engine.name, completeConfig)
-    node = system.actorOf(Props(new Node(engineConfig)), Node.name)
+    actorSysten = ActorSystem(Engine.name, completeConfig)
+    localNode = system.actorOf(Props(new Node(engineConfig)), Node.name)
 
     // wait until all actors in the hierarchy report they are up and running
     warmup() match {
       case succ@Success(_) =>
-        log.info("ENGINE is started ...")
+        log.info("ENGINE startup complete ...")
         succ
       case fail@Failure(_) => fail
     }
@@ -145,9 +155,9 @@ class Engine (private val initConfig: Config) {
         warmup()
     }
 
-
   private def shutdownOnWarm(): Try[Unit] = {
-    bus ! ShutdownSystem
+    //bus ! ShutdownSystem
+    system.terminate()
     running = false
     Success(Unit)
   }

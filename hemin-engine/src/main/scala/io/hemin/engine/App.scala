@@ -1,6 +1,5 @@
 package io.hemin.engine
 
-import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.util.cli.CliProcessor
@@ -18,25 +17,23 @@ object App {
   private val engine = new Engine(config)
   private var running = true
 
-  private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
-  private implicit val APPLICATION_TIMEOUT: Timeout = engine.config.node.internalTimeout
-
   sys.addShutdownHook({
     shutdown("Terminating on SIGTERM")
   })
 
-  def main(args: Array[String]): Unit = {
-    log.info("Starting engine ...")
+  def main(args: Array[String]): Unit =
     engine.startup() match {
       case Success(_)  =>
         if (engine.config.node.repl) {
-          repl()
+          // we want to run the App's REPL on the same thread-pool as the local node master is running on
+          val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
+
+          repl(ec)
         }
       case Failure(ex) => log.error(ex.getMessage)
     }
-  }
 
-  private def repl(): Unit = {
+  private def repl(ec: ExecutionContext): Unit = {
 
     val processor = new CliProcessor(engine.bus, engine.config, ec)
     log.info("CLI is ready to take commands")
@@ -64,5 +61,5 @@ object App {
       case Success(_)  => log.info(message)
       case Failure(ex) => log.error(ex.getMessage)
     }
-  
+
 }
