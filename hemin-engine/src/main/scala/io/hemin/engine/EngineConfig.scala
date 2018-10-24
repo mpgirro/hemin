@@ -44,6 +44,7 @@ object EngineConfig {
     .parseMap(Map(
       "hemin.internal-timeout" -> 5,
     ).asJava)
+    .withFallback(AppConfig.defaultConfig)
     .withFallback(CatalogConfig.defaultConfig)
     .withFallback(CrawlerConfig.defaultConfig)
     .withFallback(IndexConfig.defaultConfig)
@@ -63,7 +64,9 @@ object EngineConfig {
     */
   private def loadFromSafeConfig(config: Config): EngineConfig =
     EngineConfig(
-      app = AppConfig(),
+      app = AppConfig(
+        repl = config.getBoolean("hemin.app.repl"),
+      ),
       catalog = CatalogConfig(
         mongoUri       = config.getString("hemin.catalog.mongo-uri"),
         createDatabase = config.getBoolean("hemin.catalog.create-database"),
@@ -90,12 +93,12 @@ object EngineConfig {
         workerCount = config.getInt("hemin.parser.worker-count"),
       ),
       searcher = SearcherConfig(
-        solrUri     = config.getString("hemin.searcher.solr-uri"),
+        solrUri     = config.getString(s"${SearcherConfig.configPath}.solr-uri"),
         defaultPage = config.getInt("hemin.searcher.default-page"),
         defaultSize = config.getInt("hemin.searcher.default-size"),
       ),
       updater = UpdaterConfig(),
-      internalTimeout = config.getInt("hemin.internal-timeout").seconds,
+      internalTimeout = config.getInt("hemin.internal-timeout").seconds, // TODO move into nodeConfig
     )
 
 }

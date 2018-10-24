@@ -37,6 +37,8 @@ class Engine (private val initConfig: Config) {
 
   def start(): Unit = {
 
+    // TODO prevent startup sequence of already started up
+
     // init the actorsystem and local master for this node
     val system = ActorSystem("hemin", completeConfig)
     master = system.actorOf(Props(new NodeMaster(engineConfig)), NodeMaster.name)

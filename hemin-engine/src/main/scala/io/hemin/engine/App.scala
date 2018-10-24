@@ -24,7 +24,9 @@ object App {
   def main(args: Array[String]): Unit = {
     log.info("Starting engine ...")
     engine.start()
-    repl() // TODO distinguish between interactive and non-interactive mode
+    if (engine.config.app.repl) {
+      repl()
+    }
   }
 
   private def repl(): Unit = {
@@ -50,5 +52,10 @@ object App {
     log.info("Terminating due to user request")
     engine.shutdown()
   }
+
+  sys.addShutdownHook({
+    log.debug("App ShutdownHook called")
+    engine.shutdown()
+  })
 
 }
