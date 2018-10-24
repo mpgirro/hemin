@@ -4,7 +4,8 @@ import com.github.simplyscala.{MongoEmbedDatabase, MongodProps}
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.exception.HeminException
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.tagobjects.Slow
+import org.scalatest.{BeforeAndAfter, FlatSpec, Ignore, Matchers}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.Future
@@ -12,6 +13,7 @@ import scala.util.{Failure, Success}
 
 // TODO this spec relies on a complete engine setup present (mongo, solr); there should be in memory dummies present
 
+@Ignore // TODO this test is ignored at the moment, because it is slow, spams the output and is not really useful
 class EngineSpec
   extends FlatSpec
     with Matchers
@@ -32,12 +34,14 @@ class EngineSpec
   var mongoProps: MongodProps = null
 
   before {
-    mongoProps = mongoStart()   // by default port = 12345 & version = Version.3.3.1
-  }                               // add your own port & version parameters in mongoStart method if you need it
+    mongoProps = mongoStart()
+  }
 
-  after { mongoStop(mongoProps) }
+  after {
+    mongoStop(mongoProps)
+  }
 
-  "The Engine" should "fail on API calls when it is already started" in {
+  "The Engine" should "fail on API calls when it is already started" taggedAs Slow in {
     val engine = newEngine()
 
     val res = engine.shutdown()
@@ -49,7 +53,7 @@ class EngineSpec
     }
   }
 
-  it should "fail on consecutive shutdowns" in {
+  it should "fail on consecutive shutdowns" taggedAs Slow in {
     val engine = newEngine()
 
     val res1 = engine.shutdown()
