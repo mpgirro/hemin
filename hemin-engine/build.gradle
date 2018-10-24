@@ -136,6 +136,7 @@ dependencies {
     testCompile "org.scalatest:scalatest_$scala_major_version:$scalatest_version"
     testRuntime 'org.pegdown:pegdown:1.4.2' // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
 
+    testCompile "com.github.simplyscala:scalatest-embedmongo_$scala_major_version:0.2.4"
 }
 
 jar {

@@ -1,5 +1,7 @@
 package io.hemin.engine
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
@@ -28,25 +30,33 @@ class Engine (private val initConfig: Config) {
   private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
   private val nodeConfig: NodeConfig = engineConfig.node
 
-  private implicit val internalTimeout: Timeout = nodeConfig.internalTimeout
-  private implicit lazy val ec: ExecutionContext = system.dispatchers.lookup(nodeConfig.dispatcher)
+  private implicit lazy val internalTimeout: Timeout = nodeConfig.internalTimeout
+  private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(nodeConfig.dispatcher)
 
-  private var actorSystem: ActorSystem = _
-  private var localNode: ActorRef = _
-  private var running: Boolean = false
+  // init the actorsystem and local master for this node
+  private[engine] lazy val system: ActorSystem = ActorSystem(Engine.name, completeConfig)
+  private[engine] lazy val bus: ActorRef = system.actorOf(Props(new Node(engineConfig)), Node.name)
 
   private lazy val circuitBreaker = CircuitBreaker(system.scheduler, nodeConfig.breakerMaxFailures, nodeConfig.breakerCallTimeout.duration, nodeConfig.breakerResetTimeout.duration)
     .onOpen(breakerOpen())
     .onClose(breakerClose())
     .onHalfOpen(breakerHalfOpen())
 
+  private var running: AtomicBoolean = new AtomicBoolean(false)
+
+  // Run the startup sequence. This will throw an exception in case a Failure occured
+  startupSequence() match {
+    case Success(_)  =>
+    case Failure(ex) => throw ex
+  }
+
   /** Attempts a startup sequence of the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is already up and running. */
-  def startup(): Try[Unit] = synchronized { if (running) startupOnWarm() else startupOnCold() }
+  //def startup(): Try[Unit] = synchronized { if (running) startupOnWarm() else startupSequence() }
 
   /** Attempts a shutdown sequence of the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is not running. */
-  def shutdown(): Try[Unit] = synchronized { if (running) shutdownOnWarm() else shutdownOnCold() }
+  def shutdown(): Try[Unit] = synchronized { if (running.get()) shutdownOnWarm() else shutdownOnCold() }
 
   /** Configuration of the Engine instance */
   def config: EngineConfig = engineConfig
@@ -121,22 +131,10 @@ class Engine (private val initConfig: Config) {
     }
   }
 
-  private[engine] def bus: ActorRef = localNode
-
-  private[engine] def system: ActorSystem = actorSystem
-
-  private def startupOnWarm(): Try[Unit] = Failure(new HeminException("Engine startup failed; reason: already running"))
-
-  private def startupOnCold(): Try[Unit] = {
-
+  /** this will tap the lazy values, and wait until all actors
+    * in the hierarchy report that they are up and running */
+  private def startupSequence(): Try[Unit] = synchronized {
     log.info("ENGINE is starting up ...")
-
-    // init the actorsystem and local master for this node
-    actorSystem = ActorSystem(Engine.name, completeConfig)
-    localNode = system.actorOf(Props(new Node(engineConfig)), Node.name)
-
-    // wait until all actors in the hierarchy report they are up and running
-
     warmup() match {
       case succ@Success(_) =>
         log.info("ENGINE startup complete ...")
@@ -148,7 +146,7 @@ class Engine (private val initConfig: Config) {
   private def warmup(): Try[Unit] =
     Await.result(bus ? EngineOperational, internalTimeout.duration) match {
       case StartupComplete =>
-        running = true
+        running.set(true)
         Success(Unit)
       case StartupInProgress =>
         Thread.sleep(25) // don't wait too busy
@@ -158,20 +156,32 @@ class Engine (private val initConfig: Config) {
   private def shutdownOnWarm(): Try[Unit] = {
     //bus ! ShutdownSystem // TODO does system.terminate() work better?
     system.terminate()
-    running = false
+    running.set(false)
     Success(Unit)
   }
 
   private def shutdownOnCold(): Try[Unit] = Failure(new HeminException("Engine shutdown failed; reason: not running"))
 
-  private def guarded[T](body: => Future[T]): Future[T] = circuitBreaker.withCircuitBreaker(body)
+  private def guarded[T](body: => Future[T]): Future[T] =
+    if (running.get()) {
+      circuitBreaker.withCircuitBreaker(body)
+    } else {
+      Future.failed(notRunningException)
+    }
 
-  private def guarded[T](body: => T): T = circuitBreaker.withSyncCircuitBreaker(body)
+  private def guarded[T](body: => T): T =
+    if (running.get()) {
+      circuitBreaker.withSyncCircuitBreaker(body)
+    } else {
+      throw notRunningException
+    }
 
-  private def breakerOpen(): Unit = log.warn("Circuit Breaker is open")
+  private def notRunningException: HeminException = new HeminException("Guard prevented call; reason: Engine not running")
+
+  private def breakerOpen(): Unit = log.info("Circuit Breaker is open")
 
   private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
 
-  private def breakerHalfOpen(): Unit = log.warn("Circuit Breaker is half-open, next message goes through")
+  private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
 
 }

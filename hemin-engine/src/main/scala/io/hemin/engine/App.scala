@@ -13,8 +13,8 @@ object App {
   private val log = Logger(getClass)
 
   // load and init the configuration
-  private val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-  private val engine = new Engine(config)
+  private lazy val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
+  private lazy val engine = new Engine(config)
   private var running = true
 
   sys.addShutdownHook({
@@ -22,15 +22,11 @@ object App {
   })
 
   def main(args: Array[String]): Unit =
-    engine.startup() match {
-      case Success(_)  =>
-        if (engine.config.node.repl) {
-          // we want to run the App's REPL on the same thread-pool as the local node master is running on
-          val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
+    if (engine.config.node.repl) {
+      // we want to run the App's REPL on the same thread-pool as the local node master is running on
+      val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
 
-          repl(ec)
-        }
-      case Failure(ex) => log.error(ex.getMessage)
+      repl(ec)
     }
 
   private def repl(ec: ExecutionContext): Unit = {

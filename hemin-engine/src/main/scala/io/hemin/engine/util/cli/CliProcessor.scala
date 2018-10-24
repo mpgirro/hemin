@@ -47,6 +47,8 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
   def eval(args: List[String]): String = Option(args)
     .map {
       case "help" :: _ => help()
+      case "ping" :: Nil => "pong"
+      case "echo" :: echo => echo.mkString(" ")
 
       case "propose" :: Nil   => usage("propose")
       case "propose" :: feeds => propose(feeds)
