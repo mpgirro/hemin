@@ -22,7 +22,7 @@ class Engine (private val initConfig: Config) {
   private val log = Logger(getClass)
   private val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
 
-  private implicit val internalTimeout: Timeout = engineConfig.internalTimeout
+  private implicit val internalTimeout: Timeout = engineConfig.node.internalTimeout
   private implicit val ec: ExecutionContext = ExecutionContext.global // TODO anderen als global EC
 
   private var master: ActorRef = _

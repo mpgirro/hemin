@@ -16,9 +16,9 @@ object CliProcessor {
   val MSG_EMPTY_INPUT = "Input was NULL"
 }
 
-/**
-  * command language interpreter processor for interactive commands. This is not a fully
-  * fledged REPL, since it does not print the evaluation results.
+/** Command language interpreter processor for interactive commands.
+  * This is not a fully fledged REPL, since it does not print the
+  * evaluation results.
   *
   * TODO: rewrite the eval(String): String methods to stream-based output, e.g. for proposing feeds
   *
@@ -32,7 +32,7 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
 
   private val log = Logger(getClass)
 
-  private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
+  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
 
   def eval(args: String): String = Option(args)
     .map(_.split(" "))

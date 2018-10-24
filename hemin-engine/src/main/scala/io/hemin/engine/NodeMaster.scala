@@ -19,12 +19,15 @@ import io.hemin.engine.updater.Updater.UpdaterMessage
 import io.hemin.engine.util.InitializationProgress
 import io.hemin.engine.util.cli.CliProcessor
 
-import scala.concurrent.{ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
 import scala.language.postfixOps
 
 object NodeMaster {
   final val name = "node"
-  def props(config: EngineConfig): Props = Props(new NodeMaster(config))
+  def props(config: EngineConfig): Props =
+    Props(new NodeMaster(config))
+      .withDispatcher(config.node.dispatcher)
+      .withMailbox(config.node.mailbox)
 
   final case class CliInput(input: String)
   final case class CliOutput(output: String)
@@ -33,15 +36,16 @@ object NodeMaster {
 class NodeMaster (config: EngineConfig)
   extends Actor with ActorLogging {
 
-  log.debug("{} running on dispatcher {}", self.path.name, context.props.dispatcher)
+  log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
+  log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
   override val supervisorStrategy: SupervisorStrategy = SupervisorStrategy.stoppingStrategy
 
-  private implicit val executionContext: ExecutionContextExecutor = context.system.dispatcher
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
   //private val cluster = Cluster(context.system)
 
-  private implicit val INTERNAL_TIMEOUT: Timeout = config.internalTimeout
+  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
 
   private val processor = new CliProcessor(self, config, executionContext)
 
@@ -56,6 +60,7 @@ class NodeMaster (config: EngineConfig)
   private var searcher: ActorRef = _
   private var updater: ActorRef = _
 
+  // TODO delete
   private var indexStartupComplete = false
   private var catalogStartupComplete = false
   private var crawlerStartupComplete = false

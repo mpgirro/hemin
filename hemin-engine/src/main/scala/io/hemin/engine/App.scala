@@ -24,7 +24,7 @@ object App {
   def main(args: Array[String]): Unit = {
     log.info("Starting engine ...")
     engine.start()
-    if (engine.config.app.repl) {
+    if (engine.config.node.repl) {
       repl()
     }
   }
