@@ -19,7 +19,7 @@ object NodeConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override val configPath: String = "hemin.node"
+  override val configPath: String = s"${Engine.name}.${NodeMaster.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.repl"             -> true,

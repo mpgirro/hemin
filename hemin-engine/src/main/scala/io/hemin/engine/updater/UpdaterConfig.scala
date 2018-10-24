@@ -2,6 +2,7 @@ package io.hemin.engine.updater
 
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
+import io.hemin.engine.Engine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -17,7 +18,7 @@ object UpdaterConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override val configPath: String = "hemin.updater"
+  override val configPath: String = s"${Engine.name}.${Updater.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.solr-uri" -> "http://localhost:8983/solr/hemin",

@@ -15,6 +15,10 @@ import scala.concurrent.duration._
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 
+object Engine {
+  val name: String = "hemin"
+}
+
 class Engine (private val initConfig: Config) {
 
   private val completeConfig = initConfig.withFallback(EngineConfig.defaultConfig)

@@ -2,6 +2,7 @@ package io.hemin.engine.parser
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
+import io.hemin.engine.Engine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -17,7 +18,7 @@ object ParserConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override val configPath: String = "hemin.parser"
+  override val configPath: String = s"${Engine.name}.${Parser.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.worker-count" -> 2,

@@ -2,7 +2,8 @@ package io.hemin.engine.catalog
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.util.config.{ConfigStandardValues, ConfigDefaults}
+import io.hemin.engine.Engine
+import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
 
@@ -21,7 +22,7 @@ object CatalogConfig
   extends ConfigDefaults
     with ConfigStandardValues {
 
-  override val configPath: String = "hemin.catalog"
+  override val configPath: String = s"${Engine.name}.${CatalogStore.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.mongo-uri"       -> "mongodb://localhost:27017/hemin",

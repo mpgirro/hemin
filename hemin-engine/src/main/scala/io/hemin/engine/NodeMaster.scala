@@ -19,7 +19,7 @@ import io.hemin.engine.updater.Updater.UpdaterMessage
 import io.hemin.engine.util.InitializationProgress
 import io.hemin.engine.util.cli.CliProcessor
 
-import scala.concurrent.{ExecutionContext, ExecutionContextExecutor, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
 
 object NodeMaster {
@@ -42,10 +42,9 @@ class NodeMaster (config: EngineConfig)
   override val supervisorStrategy: SupervisorStrategy = SupervisorStrategy.stoppingStrategy
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
+  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
 
   //private val cluster = Cluster(context.system)
-
-  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
 
   private val processor = new CliProcessor(self, config, executionContext)
 
@@ -59,14 +58,6 @@ class NodeMaster (config: EngineConfig)
   private var parser: ActorRef = _
   private var searcher: ActorRef = _
   private var updater: ActorRef = _
-
-  // TODO delete
-  private var indexStartupComplete = false
-  private var catalogStartupComplete = false
-  private var crawlerStartupComplete = false
-  private var parserStartupComplete = false
-  private var searcherStartupComplete = false
-  private var updaterStartupComplete = false
 
   override def preStart(): Unit = {
 

@@ -137,7 +137,6 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
     case Some(i: Image)   => format(i)
     case Some(other)      => unhandled(other)
     case None => "No database record found"
-
   }
 
   private def result(future: Future[Any]): String = Await.result(future, INTERNAL_TIMEOUT.duration) match {
@@ -148,7 +147,6 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: Execut
     case EpisodesByPodcastResult(es) => format(es)
     case FeedsByPodcastResult(fs)    => format(fs)
     case ChaptersByEpisodeResult(cs) => format(cs)
-
     case other => unhandled(other)
   }
 
