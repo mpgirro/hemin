@@ -33,7 +33,7 @@ class Engine (private val initConfig: Config) {
   private implicit lazy val internalTimeout: Timeout = nodeConfig.internalTimeout
   private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(nodeConfig.dispatcher)
 
-  // init the actorsystem and local master for this node
+  // lazy init the actor system and local bus for this node
   private[engine] lazy val system: ActorSystem = ActorSystem(Engine.name, completeConfig)
   private[engine] lazy val bus: ActorRef = system.actorOf(Props(new Node(engineConfig)), Node.name)
 
@@ -44,15 +44,11 @@ class Engine (private val initConfig: Config) {
 
   private var running: AtomicBoolean = new AtomicBoolean(false)
 
-  // Run the startup sequence. This will throw an exception in case a Failure occured
+  // Run the startup sequence. This will throw an exception in case a Failure occurred
   startupSequence() match {
-    case Success(_)  =>
+    case Success(_)  => log.info("ENGINE startup complete ...")
     case Failure(ex) => throw ex
   }
-
-  /** Attempts a startup sequence of the Engine. This operation is thread-safe.
-    * It will produce a `Failure` if the Engine is already up and running. */
-  //def startup(): Try[Unit] = synchronized { if (running) startupOnWarm() else startupSequence() }
 
   /** Attempts a shutdown sequence of the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is not running. */
@@ -131,16 +127,11 @@ class Engine (private val initConfig: Config) {
     }
   }
 
-  /** this will tap the lazy values, and wait until all actors
-    * in the hierarchy report that they are up and running */
+  /** the call to warmup() will tap the lazy values, and wait until all
+    * actors in the hierarchy report that they are up and running */
   private def startupSequence(): Try[Unit] = synchronized {
     log.info("ENGINE is starting up ...")
-    warmup() match {
-      case succ@Success(_) =>
-        log.info("ENGINE startup complete ...")
-        succ
-      case fail@Failure(_) => fail
-    }
+    warmup()
   }
 
   private def warmup(): Try[Unit] =
