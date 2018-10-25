@@ -25,13 +25,24 @@ class EngineSpec
     .parseMap(Map("hemin.catalog.mongo-uri" -> mongoUri).asJava)
     .withFallback(EngineConfig.defaultConfig)
 
-  def mongoHost: String = mongoProps.mongodProcess.getConfig.net().getServerAddress.getCanonicalHostName
-  def mongoPort: Int = mongoProps.mongodProcess.getConfig.net().getPort
+  var mongoProps: MongodProps = null
+
+  def mongoHost: String = Option(mongoProps)
+    .map(_.mongodProcess)
+    .map(_.getConfig)
+    .map(_.net)
+    .map(_.getServerAddress)
+    .map(_.getCanonicalHostName)
+    .getOrElse("localhost")
+  def mongoPort: Int = Option(mongoProps)
+    .map(_.mongodProcess)
+    .map(_.getConfig)
+    .map(_.net)
+    .map(_.getPort)
+    .getOrElse(12345)
   def mongoUri: String =  s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
 
   def newEngine(): Engine = new Engine(defaultConfig(mongoUri))
-
-  var mongoProps: MongodProps = null
 
   before {
     mongoProps = mongoStart()
