@@ -2,31 +2,27 @@ package io.hemin.engine
 
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.util.cli.CliProcessor
 
 import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
-object EngineApp {
+/** Main entry point to use a [[io.hemin.engine.Engine]] in standalone mode */
+object EngineApp extends App {
 
   private val log = Logger(getClass)
 
   // load and init the configuration
   private lazy val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
   private lazy val engine = new Engine(config)
+  private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
+
   private var running = true
 
-  sys.addShutdownHook({
-    shutdown("Terminating on SIGTERM")
-  })
-
-  def main(args: Array[String]): Unit =
-    if (engine.config.node.repl) {
-      // we want to run the App's REPL on the same thread-pool as the local node master is running on
-      val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
-
-      repl(ec)
+  private def shutdown(message: String): Unit =
+    engine.shutdown() match {
+      case Success(_)  => log.info(message)
+      case Failure(ex) => log.error(ex.getMessage)
     }
 
   private def repl(ec: ExecutionContext): Unit = {
@@ -52,10 +48,14 @@ object EngineApp {
     shutdown("Terminating on CLI input request")
   }
 
-  private def shutdown(message: String): Unit =
-    engine.shutdown() match {
-      case Success(_)  => log.info(message)
-      case Failure(ex) => log.error(ex.getMessage)
-    }
+
+  sys.addShutdownHook({
+    shutdown("Terminating on SIGTERM")
+  })
+
+
+  if (engine.config.node.repl) {
+    repl(ec)
+  }
 
 }

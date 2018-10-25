@@ -23,18 +23,25 @@ final case class EngineConfig(
 
 object EngineConfig {
 
-  /** Load from a given a given `com.typesafe.config.Config` object.
-    * To ensure a fully initialized [[io.hemin.engine.EngineConfig]],
-    * the given Typesafe Config is interpolated with the results of
+  /** Load from a given `com.typesafe.config.Config` object.  To ensure
+    * a fully initialized [[io.hemin.engine.EngineConfig]], the given
+    * Typesafe Config is interpolated with the results of
     * [[io.hemin.engine.EngineConfig.defaultConfig]] as the fallback
     * values for all keys that are not set in the argument config.
     */
   def load(config: Config): EngineConfig = loadFromSafeConfig(config.withFallback(defaultConfig))
 
-  /** The default configuration of an [[io.hemin.engine.Engine]],
-    * as a `com.typesafe.config.Config` object. This configuration
-    * includes dispatcher and mailboxe configuration for every Akka actor.
-    */
+  /** Loads the config file `application.conf` and initializes a
+    * structure-fixed configuration instance. To be used from `main()`
+    * or equivalent. The resulting [[io.hemin.engine.EngineConfig]]
+    * will have default values for all fields that were not specified
+    * in the config file. */
+  def loadFromEnvironment(): EngineConfig =
+    load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
+
+  /** The default configuration of an [[io.hemin.engine.Engine]], as a
+    * `com.typesafe.config.Config` object. This configuration includes
+    * dispatcher and mailbox configuration for every Akka actor. */
   lazy val defaultConfig: Config = ConfigFactory
     .empty()
     .withFallback(CatalogConfig.defaultConfig)
@@ -45,15 +52,15 @@ object EngineConfig {
     .withFallback(SearcherConfig.defaultConfig)
     .withFallback(UpdaterConfig.defaultConfig)
 
-  /** Loads the config. To be used from `main()` or equivalent. */
-  def loadFromEnvironment(): EngineConfig =
-    load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
+  /** The default configuration of an [[io.hemin.engine.Engine]]
+    * as a structure-fixed configuration instance. Equivalent to
+    * [[io.hemin.engine.EngineConfig.defaultConfig]] */
+  lazy val defaultEngineConfig: EngineConfig = loadFromSafeConfig(defaultConfig)
 
   /** All keys are expected and must be present in the config map.
     * Use [[io.hemin.engine.EngineConfig.defaultConfig()]] for the
     * fallback values to the TypeSafe Config object before calling
-    * this method.
-    */
+    * this method. */
   private def loadFromSafeConfig(config: Config): EngineConfig =
     EngineConfig(
       catalog = CatalogConfig(
