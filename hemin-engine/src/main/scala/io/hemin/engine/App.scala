@@ -31,7 +31,7 @@ object App {
 
   private def repl(ec: ExecutionContext): Unit = {
 
-    val processor = new CliProcessor(engine.bus, engine.config, ec)
+    val processor = engine.cliProcessor(ec)
     log.info("CLI is ready to take commands")
 
     while (running) {

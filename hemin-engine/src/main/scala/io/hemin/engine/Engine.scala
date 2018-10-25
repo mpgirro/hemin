@@ -13,6 +13,7 @@ import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.domain._
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
+import io.hemin.engine.util.cli.CliProcessor
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -50,7 +51,7 @@ class Engine (private val initConfig: Config) {
     case Failure(ex) => throw ex
   }
 
-  /** Attempts a shutdown sequence of the Engine. This operation is thread-safe.
+  /** Attempts to shutdown the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is not running. */
   def shutdown(): Try[Unit] = synchronized { if (running.get()) shutdownOnWarm() else shutdownOnCold() }
 
@@ -127,6 +128,13 @@ class Engine (private val initConfig: Config) {
     }
   }
 
+  /** Returns a new `CliProcessor` instance, that runs on the provided ExecutionContext
+    *
+    * @param ec ExecutionContext that the CliProcessor is running on
+    * @return new CliProcessor instance
+    */
+  def cliProcessor(ec: ExecutionContext): CliProcessor = new CliProcessor(bus, config, ec)
+
   /** the call to warmup() will tap the lazy values, and wait until all
     * actors in the hierarchy report that they are up and running */
   private def startupSequence(): Try[Unit] = synchronized {
@@ -145,6 +153,7 @@ class Engine (private val initConfig: Config) {
     }
 
   private def shutdownOnWarm(): Try[Unit] = {
+    log.info("ENGINE is shutting down ...")
     //bus ! ShutdownSystem // TODO does system.terminate() work better?
     system.terminate()
     running.set(false)

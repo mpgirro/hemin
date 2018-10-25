@@ -24,9 +24,9 @@ object CliProcessor {
   *
   * @param bus
   * @param config
-  * @param executionContext
+  * @param ec
   */
-class CliProcessor(bus: ActorRef, config: EngineConfig, executionContext: ExecutionContext) {
+class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
 
   import CliProcessor._
 
