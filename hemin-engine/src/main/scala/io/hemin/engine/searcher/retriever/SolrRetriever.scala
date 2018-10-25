@@ -66,20 +66,20 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
     }
     */
 
-    val results: SolrDocumentList = solr.query(query).getResults
+    val rs: SolrDocumentList = solr.query(query).getResults
 
-    if (results.getNumFound <= 0) {
+    if (rs.getNumFound <= 0) {
       ResultPage.empty // default parameters relate to nothing found
     } else {
-      val dMaxPage = results.getNumFound.toDouble / s.toDouble
+      val dMaxPage = rs.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
       ResultPage(
         currPage  = p,
         maxPage   = maxPage, // TODO
-        totalHits = results.getNumFound.toInt,
-        results   = results.asScala.map(IndexMapper.toIndexDoc).toList,
+        totalHits = rs.getNumFound.toInt,
+        results   = rs.asScala.map(IndexMapper.toIndexDoc).toList,
       )
     }
 

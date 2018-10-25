@@ -8,7 +8,7 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-@Api("Search")
+@Api
 class SearchController @Inject() (cc: SearchControllerComponents)
   extends SearchBaseController(cc) {
 

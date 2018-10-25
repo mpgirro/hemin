@@ -1,6 +1,6 @@
 package api.v1.services
 
-import io.hemin.engine.domain.ResultsWrapper
+import io.hemin.engine.domain.ResultPage
 import javax.inject.Inject
 import play.api.MarkerContext
 
@@ -14,7 +14,7 @@ class SearchService @Inject()(engineService: EngineService)
 
   private val engine = engineService.engine
 
-  def search(query: String, page: Option[Int], size: Option[Int])(implicit mc: MarkerContext): Future[ResultsWrapper] =
+  def search(query: String, page: Option[Int], size: Option[Int])(implicit mc: MarkerContext): Future[ResultPage] =
     engine.search(query, page, size)
 
 }

@@ -60,8 +60,8 @@ object JsonWrites {
   /**
     * Mapping to write a ResultWrapper out as a JSON value.
     */
-  implicit val implicitWrapperWrites: Writes[ResultsWrapper] =
-    (w: ResultsWrapper) => JsObject(List(
+  implicit val implicitWrapperWrites: Writes[ResultPage] =
+    (w: ResultPage) => JsObject(List(
       "currPage"  -> toNullJson(w.currPage),
       "maxPage"   -> toNullJson(w.maxPage),
       "totalHits" -> toNullJson(w.totalHits),
