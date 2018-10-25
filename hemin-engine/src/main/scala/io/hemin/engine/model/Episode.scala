@@ -1,8 +1,8 @@
-package io.hemin.engine.domain
+package io.hemin.engine.model
 
 import java.time.LocalDateTime
 
-import io.hemin.engine.domain.info.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
+import io.hemin.engine.model.info.{EpisodeEnclosureInfo, EpisodeItunesInfo, EpisodeRegistrationInfo}
 
 final case class Episode(
   id: Option[String]                    = None,

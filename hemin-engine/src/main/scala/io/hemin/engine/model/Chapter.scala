@@ -1,4 +1,4 @@
-package io.hemin.engine.domain
+package io.hemin.engine.model
 
 final case class Chapter(
   id: Option[String]        = None,

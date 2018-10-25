@@ -7,8 +7,8 @@ import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
 import io.hemin.engine.crawler.Crawler._
-import io.hemin.engine.domain._
-import io.hemin.engine.domain.info.{EpisodeRegistrationInfo, PodcastRegistrationInfo}
+import io.hemin.engine.model._
+import io.hemin.engine.model.info.{EpisodeRegistrationInfo, PodcastRegistrationInfo}
 import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.updater.Updater.ProcessFeed
 import io.hemin.engine.util.IdGenerator

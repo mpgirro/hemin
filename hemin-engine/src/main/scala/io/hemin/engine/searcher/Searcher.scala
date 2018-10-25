@@ -2,7 +2,7 @@ package io.hemin.engine.searcher
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol.{ActorRefSupervisor, ReportSearcherStartupComplete}
-import io.hemin.engine.domain.ResultPage
+import io.hemin.engine.model.ResultPage
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.searcher.retriever.SolrRetriever
 

@@ -2,8 +2,8 @@ package io.hemin.engine.catalog.repository
 
 import java.time.LocalDateTime
 
-import io.hemin.engine.domain.{FeedStatus, _}
-import io.hemin.engine.domain.info._
+import io.hemin.engine.model.{FeedStatus, _}
+import io.hemin.engine.model.info._
 import io.hemin.engine.util.mapper.DateMapper
 import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
 

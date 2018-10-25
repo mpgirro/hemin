@@ -1,4 +1,4 @@
-package io.hemin.engine.domain;
+package io.hemin.engine.model;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 

@@ -3,8 +3,8 @@ package io.hemin.engine.util.mapper
 import java.util.Date
 
 import com.google.common.collect.Lists
-import io.hemin.engine.domain.IndexDoc
-import io.hemin.engine.domain.IndexField
+import io.hemin.engine.model.IndexDoc
+import io.hemin.engine.model.IndexField
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 object SolrMapper {

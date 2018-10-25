@@ -2,7 +2,7 @@ package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.domain.{IndexDoc, ResultPage}
+import io.hemin.engine.model.{IndexDoc, ResultPage}
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter
 import io.hemin.engine.util.ExecutorServiceWrapper

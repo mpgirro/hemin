@@ -11,7 +11,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
-import io.hemin.engine.domain.{Episode, FeedStatus, Image}
+import io.hemin.engine.model.{Episode, FeedStatus, Image}
 import io.hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser

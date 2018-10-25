@@ -10,7 +10,7 @@ import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.Node.{CliInput, CliOutput}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.domain._
+import io.hemin.engine.model._
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.util.cli.CliProcessor

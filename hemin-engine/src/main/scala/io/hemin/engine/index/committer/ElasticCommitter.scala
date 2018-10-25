@@ -1,6 +1,6 @@
 package io.hemin.engine.index.committer
 
-import io.hemin.engine.domain.IndexDoc
+import io.hemin.engine.model.IndexDoc
 
 class ElasticCommitter extends IndexCommitter {
 

@@ -1,6 +1,6 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.domain.ResultPage
+import io.hemin.engine.model.ResultPage
 import io.hemin.engine.searcher.SearcherConfig
 
 import scala.concurrent.ExecutionContext

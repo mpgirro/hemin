@@ -1,6 +1,6 @@
 package io.hemin.engine.util.cli
 
-import io.hemin.engine.domain._
+import io.hemin.engine.model._
 
 object CliFormatter {
 

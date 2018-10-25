@@ -1,4 +1,4 @@
-package io.hemin.engine.domain;
+package io.hemin.engine.model;
 
 public class IndexField {
 

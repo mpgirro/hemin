@@ -2,7 +2,7 @@ package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.repository.BsonConversion._
-import io.hemin.engine.domain.Podcast
+import io.hemin.engine.model.Podcast
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._

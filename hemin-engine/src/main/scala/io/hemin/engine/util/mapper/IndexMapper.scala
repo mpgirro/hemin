@@ -1,8 +1,8 @@
 package io.hemin.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
-import io.hemin.engine.domain.{Episode, IndexDoc, Podcast}
-import io.hemin.engine.domain.IndexField
+import io.hemin.engine.model.{Episode, IndexDoc, Podcast}
+import io.hemin.engine.model.IndexField
 import org.apache.solr.common.SolrDocument
 
 object IndexMapper {

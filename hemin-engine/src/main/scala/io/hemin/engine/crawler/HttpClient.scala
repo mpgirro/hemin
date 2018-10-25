@@ -5,7 +5,7 @@ import java.util.Optional
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.domain.HeadResult
+import io.hemin.engine.model.HeadResult
 import io.hemin.engine.exception.HeminException
 
 import scala.compat.java8.OptionConverters._

@@ -1,4 +1,4 @@
-package io.hemin.engine.domain.info
+package io.hemin.engine.model.info
 
 final case class PodcastItunesInfo(
   summary: Option[String]     = None,

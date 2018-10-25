@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.index.IndexConfig
-import io.hemin.engine.domain.IndexDoc
+import io.hemin.engine.model.IndexDoc
 import io.hemin.engine.util.mapper.SolrMapper.toSolr
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient
 import org.apache.solr.client.solrj.{SolrClient, SolrServerException}

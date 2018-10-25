@@ -1,6 +1,6 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.domain.{IndexField, ResultPage}
+import io.hemin.engine.model.{IndexField, ResultPage}
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.util.mapper.IndexMapper
 import org.apache.solr.client.solrj.impl.HttpSolrClient

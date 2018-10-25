@@ -1,7 +1,7 @@
 package io.hemin.engine.searcher.retriever
 
 import com.google.common.base.Strings.isNullOrEmpty
-import io.hemin.engine.domain.ResultPage
+import io.hemin.engine.model.ResultPage
 import io.hemin.engine.searcher.SearcherConfig
 
 import scala.concurrent.{ExecutionContext, Future}

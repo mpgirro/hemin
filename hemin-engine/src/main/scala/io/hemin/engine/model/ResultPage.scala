@@ -1,8 +1,8 @@
-package io.hemin.engine.domain
+package io.hemin.engine.model
 
 object ResultPage {
 
-  /** An "empty" [[io.hemin.engine.domain.ResultPage]] representing no results found. */
+  /** An "empty" [[io.hemin.engine.model.ResultPage]] representing no results found. */
   final val empty: ResultPage = ResultPage()
 
 }
