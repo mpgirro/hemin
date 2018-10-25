@@ -1,6 +1,6 @@
 package api.v1.services
 
-import io.hemin.engine.domain._
+import io.hemin.engine.model._
 import javax.inject.Inject
 import play.api.MarkerContext
 

@@ -3,7 +3,7 @@ package api.v1.utils
 import java.time.LocalDateTime
 import java.util.Base64
 
-import io.hemin.engine.domain.{FeedStatus, _}
+import io.hemin.engine.model.{FeedStatus, _}
 import io.hemin.engine.util.mapper.DateMapper
 import play.api.libs.json._
 
