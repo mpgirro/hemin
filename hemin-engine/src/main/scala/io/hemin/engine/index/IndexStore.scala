@@ -2,7 +2,7 @@ package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.domain.{IndexDoc, ResultsWrapper}
+import io.hemin.engine.domain.{IndexDoc, ResultPage}
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter
 import io.hemin.engine.util.ExecutorServiceWrapper
@@ -34,7 +34,7 @@ object IndexStore {
   // IndexQueries
   final case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
   // IndexQueryResults
-  final case class IndexSearchResults(results: ResultsWrapper) extends IndexQueryResult
+  final case class IndexSearchResults(results: ResultPage) extends IndexQueryResult
 }
 
 class IndexStore (config: IndexConfig)
@@ -64,7 +64,7 @@ class IndexStore (config: IndexConfig)
         log.error("Error trying to search the index; reason: {}", e.getMessage)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
-        sender ! IndexSearchResults(ResultsWrapper()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+        sender ! IndexSearchResults(ResultPage()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
       //currQuery = ""
     }
     super.postRestart(cause)

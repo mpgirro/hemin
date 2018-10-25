@@ -68,7 +68,7 @@ class Engine (private val initConfig: Config) {
     }
   }
 
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultsWrapper] = guarded {
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultPage] = guarded {
     (bus ? SearcherRequest(query, page, size)).map {
       case SearcherResults(rs) => rs
     }

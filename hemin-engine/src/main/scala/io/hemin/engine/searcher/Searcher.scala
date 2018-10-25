@@ -2,7 +2,7 @@ package io.hemin.engine.searcher
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol.{ActorRefSupervisor, ReportSearcherStartupComplete}
-import io.hemin.engine.domain.ResultsWrapper
+import io.hemin.engine.domain.ResultPage
 import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
 import io.hemin.engine.searcher.retriever.SolrRetriever
 
@@ -22,7 +22,7 @@ object Searcher {
   // SearchQueries
   final case class SearcherRequest(query: String, page: Option[Int], size: Option[Int]) extends SearcherQuery
   // SearchQueryResults
-  final case class SearcherResults(results: ResultsWrapper) extends SearcherQueryResult
+  final case class SearcherResults(results: ResultPage) extends SearcherQueryResult
 }
 
 class Searcher (config: SearcherConfig)

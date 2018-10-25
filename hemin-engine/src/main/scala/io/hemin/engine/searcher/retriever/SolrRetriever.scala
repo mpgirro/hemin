@@ -1,6 +1,6 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.domain.{IndexField, ResultsWrapper}
+import io.hemin.engine.domain.{IndexField, ResultPage}
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.util.mapper.IndexMapper
 import org.apache.solr.client.solrj.impl.HttpSolrClient
@@ -17,7 +17,7 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
 
   override protected[this] def searcherConfig: SearcherConfig = config
 
-  override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultsWrapper =
+  override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultPage =
     searchSolr(q, p, s, queryOperator=Some("AND"), minMatch=None, sort=None)
 
   private val solr: SolrClient = new HttpSolrClient.Builder(config.solrUri)
@@ -42,7 +42,7 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
       .mkString(" ")
   }
 
-  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultsWrapper = {
+  private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultPage = {
 
     // TODO sort is unused (and never set in caller)
 
@@ -69,13 +69,13 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
     val results: SolrDocumentList = solr.query(query).getResults
 
     if (results.getNumFound <= 0) {
-      ResultsWrapper.empty // default parameters relate to nothing found
+      ResultPage.empty // default parameters relate to nothing found
     } else {
       val dMaxPage = results.getNumFound.toDouble / s.toDouble
       val mp = Math.ceil(dMaxPage).toInt
       val maxPage = if (mp == 0 && p == 1) 1 else mp
 
-      ResultsWrapper(
+      ResultPage(
         currPage  = p,
         maxPage   = maxPage, // TODO
         totalHits = results.getNumFound.toInt,
