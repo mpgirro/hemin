@@ -27,8 +27,8 @@ class RomeFeedParser(private val xmlData: String) {
   private val feed: SyndFeed = input.build(inputSource)
   private val feedItunesModule: Option[FeedInformation] = RomeModuleExtractor.getItunesModule(feed).asScala
 
-  val podcast: Option[Podcast] = Option(parseFeed(feed))
-  val episodes: List[Episode] = extractEpisodes(feed)
+  lazy val podcast: Option[Podcast] = Option(parseFeed(feed))
+  lazy val episodes: List[Episode] = extractEpisodes(feed)
 
   /*
   try {
