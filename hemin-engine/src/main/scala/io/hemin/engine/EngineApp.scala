@@ -8,7 +8,7 @@ import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
-object App {
+object EngineApp {
 
   private val log = Logger(getClass)
 

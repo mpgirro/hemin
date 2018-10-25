@@ -17,7 +17,7 @@ class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
   val engine: Engine = new Engine(config)
 
   lifecycle.addStopHook { () =>
-    Future.successful(engine.shutdown()) // TODO sure that I want future.successful?
+    Future.successful(engine.shutdown())
   }
 
 }

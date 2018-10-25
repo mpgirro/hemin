@@ -38,7 +38,7 @@ group 'io.hemin'
 version '1.0-SNAPSHOT'
 description = ''
 
-mainClassName = 'io.hemin.engine.App'
+mainClassName = 'io.hemin.engine.EngineApp'
 
 compileJava {
     options.compilerArgs = [

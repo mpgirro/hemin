@@ -8,7 +8,7 @@ import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 import scala.collection.JavaConverters._
 
 /** Configuration for [[io.hemin.engine.Node]],
-  * which extends to [[io.hemin.engine.App]] when in standalone mode
+  * which extends to [[io.hemin.engine.EngineApp]] when in standalone mode
   */
 final case class NodeConfig(
   repl: Boolean,
