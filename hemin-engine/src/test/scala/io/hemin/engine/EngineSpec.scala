@@ -42,7 +42,12 @@ class EngineSpec
     .getOrElse(12345)
   def mongoUri: String =  s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
 
-  def newEngine(): Engine = new Engine(defaultConfig(mongoUri))
+  def newEngine(): Engine = Engine.of(defaultConfig(mongoUri)) match {
+    case Success(e)  => e
+    case Failure(ex) =>
+      assert(false, s"Failed to startup engine; reason : ${ex.getMessage}")
+      null // TODO can I return a better result value (just to please the compiler?)
+  }
 
   before {
     mongoProps = mongoStart()

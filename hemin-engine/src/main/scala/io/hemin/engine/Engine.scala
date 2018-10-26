@@ -1,6 +1,5 @@
 package io.hemin.engine
 
-import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -11,21 +10,21 @@ import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineProtocol._
 import io.hemin.engine.Node.{CliInput, CliOutput}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.model._
 import io.hemin.engine.exception.HeminException
+import io.hemin.engine.model._
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import io.hemin.engine.util.cli.CliProcessor
 
 import scala.concurrent.forkjoin.ForkJoinPool
-import scala.concurrent.{Await, ExecutionContext, Future, blocking}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 object Engine {
   final val name: String = "hemin"
+  def of(config: Config): Try[Engine] = Try(new Engine(config))
 }
 
-class Engine (private val initConfig: Config) {
+class Engine private (val initConfig: Config) {
 
   private val log = Logger(getClass)
 
@@ -58,7 +57,7 @@ class Engine (private val initConfig: Config) {
   // Run the startup sequence. This will throw an exception in case a Failure occurred
   startupSequence() match {
     case Success(_)  => log.info("ENGINE startup complete ...")
-    case Failure(ex) => throw ex
+    case Failure(ex) => throw ex // escalate the construction fault, the factory method will wrap it in a Try-Failure
   }
 
 
@@ -144,51 +143,10 @@ class Engine (private val initConfig: Config) {
   private def startupSequence(): Try[Unit] = /*synchronized*/ {
     log.info("ENGINE is starting up ...")
     warmup()
-    //warmup3(dispatchStartupStatusCheck)
   }
-
-  /*
-  private def warmup2(): Future[String] = {
-    (bus ? EngineOperational)
-      .andThen {
-        case Success(x)  => x match {
-          case StartupComplete =>
-            running.set(true)
-            Future.successful[String]("ENGINE startup complete ...")
-          case StartupInProgress =>
-            Thread.sleep(25) // don't wait too busy
-            warmup2()
-        }
-        case Failure(ex) => Future.failed[String](ex)
-      }
-  }
-  */
-
-  /*
-  private def warmup3(status: Future[StartupStatus]): Try[Unit] = {
-    if (status.isCompleted) {
-      Await.result(status, internalTimeout.duration) match {
-        case StartupStatus(true) =>
-          running.set(true)
-          Success(Unit)
-        case StartupStatus(false) =>
-          warmup3(dispatchStartupStatusCheck)
-      }
-    } else {
-      Thread.`yield`() // TODO experimental; somehow we need to ensure that the Node actor makes progress...
-      Thread.sleep(50) // don't wait too busy
-      warmup3(status)
-    }
-  }
-
-  private def dispatchStartupStatusCheck: Future[StartupStatus] = (bus ? EngineOperational).mapTo[StartupStatus]
-  */
-
 
   private def warmup(): Try[Unit] = /*blocking*/ {
     val startup = bus ? EngineOperational
-    //Thread.`yield`() // TODO experimental
-    //Thread.sleep(100) // don't wait too busy
     Await.result(startup, internalTimeout.duration) match {
       case StartupStatus(true) =>
         running.set(true)

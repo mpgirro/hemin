@@ -16,7 +16,13 @@ object EngineApp extends App {
 
   // load and init the configuration
   private lazy val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-  private lazy val engine = new Engine(config)
+  private lazy val engine = Engine.of(config) match {
+    case Success(e)  => e
+    case Failure(ex) =>
+      shutdown(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")
+      null // TODO can I return a better result value (just to please the compiler?)
+  }
+
   //private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
   private implicit lazy val ec: ExecutionContext = ExecutionContext.global // TODO
 
@@ -26,24 +32,24 @@ object EngineApp extends App {
   private lazy val STATUS_ERROR: Int = -1
 
   private def shutdown(message: String): Unit = {
-    val status: Int = engine.shutdown() match {
-      case Success(_) =>
-        log.info(message)
-        STATUS_SUCCESS
-      case Failure(ex) =>
-        log.error(ex.getMessage)
-        ex.printStackTrace()
-        STATUS_ERROR
-    }
+    val status: Int = Option(engine)
+      .map { _
+        .shutdown() match {
+          case Success(_) =>
+            log.info(message)
+            STATUS_SUCCESS
+          case Failure(ex) =>
+            log.error(ex.getMessage)
+            ex.printStackTrace()
+            STATUS_ERROR
+        }
+      }.getOrElse(STATUS_ERROR)
     System.exit(status)
   }
 
 
   private def repl(ec: ExecutionContext): Unit = {
-
-    //val processor = engine.cliProcessor(ec)
     log.info("CLI is ready to take commands")
-
     while (running.get) {
       blocking {
         val input = StdIn.readLine()
@@ -55,7 +61,6 @@ object EngineApp extends App {
           .foreach {
             case _@("q" | "quit" | "exit") :: _ => running.set(false)
             case _ => engine.cli(input).onComplete(println)(ec)
-              //println(processor.eval(cmd))
           }
       }
     }
