@@ -38,7 +38,7 @@ class Searcher (config: SearcherConfig)
   private var supervisor: ActorRef = _
 
   override def postStop: Unit = {
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", Searcher.name.toUpperCase)
   }
 
   override def receive: Receive = {

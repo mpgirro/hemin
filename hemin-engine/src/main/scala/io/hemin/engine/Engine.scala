@@ -1,5 +1,6 @@
 package io.hemin.engine
 
+import java.util.concurrent.ThreadPoolExecutor
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -15,7 +16,8 @@ import io.hemin.engine.exception.HeminException
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 import io.hemin.engine.util.cli.CliProcessor
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.forkjoin.ForkJoinPool
+import scala.concurrent.{Await, ExecutionContext, Future, blocking}
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
@@ -34,7 +36,8 @@ class Engine (private val initConfig: Config) {
 
   private implicit lazy val internalTimeout: Timeout = engineConfig.node.internalTimeout
   //private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(engineConfig.node.dispatcher)
-  private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global // TODO
+  //private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global // TODO
+  private implicit val executionContext: ExecutionContext = newExecutionContext // TODO
 
   // lazy init the actor system and local bus for this node
   private[engine] val system: ActorSystem = ActorSystem(Engine.name, completeConfig)
@@ -136,52 +139,72 @@ class Engine (private val initConfig: Config) {
       .map(_.chapters)
   }
 
-  /** Returns a new `CliProcessor` instance, that runs on the provided ExecutionContext
-    *
-    * @param ec ExecutionContext that the CliProcessor is running on
-    * @return new CliProcessor instance
-    */
-  def cliProcessor(ec: ExecutionContext): CliProcessor = new CliProcessor(bus, config, ec)
-
   /** The call to warmup() will tap the lazy values, and wait until all
     * subsystems in the actor hierarchy report that they are up and running */
   private def startupSequence(): Try[Unit] = synchronized {
     log.info("ENGINE is starting up ...")
     warmup()
+    //warmup3(dispatchStartupStatusCheck)
   }
 
-  private def warmup(): Try[Unit] = {
-    /*
+  /*
+  private def warmup2(): Future[String] = {
     (bus ? EngineOperational)
-        .andThen {
-          case Success(_) => {
-            case StartupComplete =>
-              running.set(true)
-              Success(Unit)
-            case StartupInProgress =>
-              Thread.sleep(25) // don't wait too busy
-              warmup()
-          }
-          case Failure(ex) => Failure(startupError(ex))
+      .andThen {
+        case Success(x)  => x match {
+          case StartupComplete =>
+            running.set(true)
+            Future.successful[String]("ENGINE startup complete ...")
+          case StartupInProgress =>
+            Thread.sleep(25) // don't wait too busy
+            warmup2()
         }
-        */
+        case Failure(ex) => Future.failed[String](ex)
+      }
+  }
+  */
 
-    Await.result(bus ? EngineOperational, internalTimeout.duration) match {
-      case StartupComplete =>
+  /*
+  private def warmup3(status: Future[StartupStatus]): Try[Unit] = {
+    if (status.isCompleted) {
+      Await.result(status, internalTimeout.duration) match {
+        case StartupStatus(true) =>
+          running.set(true)
+          Success(Unit)
+        case StartupStatus(false) =>
+          warmup3(dispatchStartupStatusCheck)
+      }
+    } else {
+      Thread.`yield`() // TODO experimental; somehow we need to ensure that the Node actor makes progress...
+      Thread.sleep(50) // don't wait too busy
+      warmup3(status)
+    }
+  }
+
+  private def dispatchStartupStatusCheck: Future[StartupStatus] = (bus ? EngineOperational).mapTo[StartupStatus]
+  */
+
+
+  private def warmup(): Try[Unit] = blocking {
+    val startup = bus ? EngineOperational
+    //Thread.`yield`() // TODO experimental
+    Thread.sleep(100) // don't wait too busy
+    Await.result(startup, internalTimeout.duration) match {
+      case StartupStatus(true) =>
         running.set(true)
         Success(Unit)
-      case StartupInProgress =>
+      case StartupStatus(false) =>
         Thread.sleep(25) // don't wait too busy
         warmup()
     }
-
   }
+
 
   private def shutdownOnWarm(): Try[Unit] = {
     log.info("ENGINE is shutting down ...")
     //bus ! ShutdownSystem // TODO does system.terminate() work better?
-    val terminate = Await.result(system.terminate(), internalTimeout.duration)
     running.set(false) // we always set running to false, because on error the engine is still screwed up
+    val terminate = Await.result(system.terminate(), internalTimeout.duration)
     Try(terminate) match {
       case Success(_)  => Success(Unit)
       case Failure(ex) => Failure(shutdownError(ex))
@@ -224,5 +247,14 @@ class Engine (private val initConfig: Config) {
   private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
 
   private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
+
+  private def newExecutionContext: ExecutionContext = {
+    /*
+    ExecutionContext.fromExecutor(new ForkJoinPool(initialParallelism: Int))
+    ExecutionContext.fromExecutor(Executors.newFixedThreadPool(limit: Int))
+    */
+    ExecutionContext.fromExecutor(new ForkJoinPool(4))
+  }
+
 
 }

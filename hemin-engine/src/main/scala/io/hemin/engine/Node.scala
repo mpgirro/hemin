@@ -48,7 +48,6 @@ class Node(config: EngineConfig)
 
   private val processor = new CliProcessor(self, config, executionContext)
 
-  // TODO update and use
   private val initializationProgress =
     new InitializationProgress(Seq(CatalogStore.name, Crawler.name, IndexStore.name, Parser.name, Searcher.name, Updater.name))
 
@@ -97,7 +96,7 @@ class Node(config: EngineConfig)
   }
 
   override def postStop: Unit = {
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", Node.name.toUpperCase)
   }
 
   override def receive: Receive = {
@@ -119,10 +118,13 @@ class Node(config: EngineConfig)
     case ReportUpdaterStartupComplete      => initializationProgress.complete(Updater.name)
 
     case EngineOperational =>
-      if (initializationProgress.isFinished)
-        sender ! StartupComplete
-      else
-        sender ! StartupInProgress
+      if (initializationProgress.isFinished) {
+        //sender ! StartupComplete
+        sender ! StartupStatus(complete = true)
+      } else {
+        //sender ! StartupInProgress
+        sender ! StartupStatus(complete = false)
+      }
 
     case Terminated(corpse) => onTerminated(corpse)
     case ShutdownSystem     => onSystemShutdown()

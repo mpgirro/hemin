@@ -74,7 +74,7 @@ class Crawler (config: CrawlerConfig)
     }
 
   override def postStop: Unit = {
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", Crawler.name.toUpperCase)
   }
 
   override def receive: Receive = {

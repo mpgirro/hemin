@@ -74,7 +74,7 @@ class IndexStore (config: IndexConfig)
     //Option(luceneCommitter).foreach(_.destroy())
     //Option(luceneSearcher).foreach(_.destroy())
 
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", IndexStore.name.toUpperCase)
   }
 
   override def receive: Receive = {

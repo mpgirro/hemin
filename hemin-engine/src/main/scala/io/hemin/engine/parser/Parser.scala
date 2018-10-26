@@ -57,7 +57,7 @@ class Parser (config: ParserConfig)
     }
 
   override def postStop: Unit = {
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", Parser.name.toUpperCase)
   }
 
   override def receive: Receive = {

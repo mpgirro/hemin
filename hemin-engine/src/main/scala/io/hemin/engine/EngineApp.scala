@@ -1,5 +1,7 @@
 package io.hemin.engine
 
+import java.util.concurrent.atomic.AtomicBoolean
+
 import com.typesafe.config.ConfigFactory
 import com.typesafe.scalalogging.Logger
 
@@ -18,20 +20,31 @@ object EngineApp extends App {
   //private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
   private implicit lazy val ec: ExecutionContext = ExecutionContext.global // TODO
 
-  private var running = true
+  private val running: AtomicBoolean = new AtomicBoolean(true)
 
-  private def shutdown(message: String): Unit =
-    engine.shutdown() match {
-      case Success(_)  => log.info(message)
-      case Failure(ex) => log.error(ex.getMessage)
+  private lazy val STATUS_SUCCESS: Int = 0
+  private lazy val STATUS_ERROR: Int = -1
+
+  private def shutdown(message: String): Unit = {
+    val status: Int = engine.shutdown() match {
+      case Success(_) =>
+        log.info(message)
+        STATUS_SUCCESS
+      case Failure(ex) =>
+        log.error(ex.getMessage)
+        ex.printStackTrace()
+        STATUS_ERROR
     }
+    System.exit(status)
+  }
+
 
   private def repl(ec: ExecutionContext): Unit = {
 
-    val processor = engine.cliProcessor(ec)
+    //val processor = engine.cliProcessor(ec)
     log.info("CLI is ready to take commands")
 
-    while (running) {
+    while (running.get) {
       blocking {
         val input = StdIn.readLine()
         log.debug("REPL input : {}", input)
@@ -40,8 +53,9 @@ object EngineApp extends App {
           .map(_.split(" "))
           .map(_.toList)
           .foreach {
-            case q@("q" | "quit" | "exit") :: _ => running = false
-            case cmd => println(processor.eval(cmd))
+            case _@("q" | "quit" | "exit") :: _ => running.set(false)
+            case _ => engine.cli(input).onComplete(println)(ec)
+              //println(processor.eval(cmd))
           }
       }
     }

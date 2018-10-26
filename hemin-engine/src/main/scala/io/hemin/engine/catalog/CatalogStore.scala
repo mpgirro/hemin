@@ -125,6 +125,7 @@ class CatalogStore(config: CatalogConfig)
     podcasts.drop
     episodes.drop
     feeds.drop
+    images.drop
   }
 
   /* TODO
@@ -145,7 +146,7 @@ class CatalogStore(config: CatalogConfig)
   }
 
   override def postStop(): Unit = {
-    log.info("shutting down")
+    log.info("{} subsystem shutting down", CatalogStore.name.toUpperCase)
   }
 
   override def receive: Receive = {

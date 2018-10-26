@@ -32,6 +32,10 @@ class Updater (config: UpdaterConfig)
   private var crawler: ActorRef = _
   private var supervisor: ActorRef = _
 
+  override def postStop: Unit = {
+    log.info("{} subsystem shutting down", Updater.name.toUpperCase)
+  }
+
   override def receive: Receive = {
 
     case ActorRefCatalogStoreActor(ref) =>
