@@ -141,7 +141,7 @@ class Engine (private val initConfig: Config) {
 
   /** The call to warmup() will tap the lazy values, and wait until all
     * subsystems in the actor hierarchy report that they are up and running */
-  private def startupSequence(): Try[Unit] = synchronized {
+  private def startupSequence(): Try[Unit] = /*synchronized*/ {
     log.info("ENGINE is starting up ...")
     warmup()
     //warmup3(dispatchStartupStatusCheck)
@@ -185,10 +185,10 @@ class Engine (private val initConfig: Config) {
   */
 
 
-  private def warmup(): Try[Unit] = blocking {
+  private def warmup(): Try[Unit] = /*blocking*/ {
     val startup = bus ? EngineOperational
     //Thread.`yield`() // TODO experimental
-    Thread.sleep(100) // don't wait too busy
+    //Thread.sleep(100) // don't wait too busy
     Await.result(startup, internalTimeout.duration) match {
       case StartupStatus(true) =>
         running.set(true)
