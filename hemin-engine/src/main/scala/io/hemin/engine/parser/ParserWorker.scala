@@ -2,22 +2,19 @@ package io.hemin.engine.parser
 
 import java.io.{ByteArrayInputStream, InputStream}
 import java.nio.charset.StandardCharsets
-import java.security.MessageDigest
-import java.security.NoSuchAlgorithmException
 import java.time.LocalDateTime
-import java.util.Formatter
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
-import io.hemin.engine.model.{Episode, FeedStatus, Image}
+import io.hemin.engine.exception.FeedParsingException
 import io.hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
+import io.hemin.engine.model.{Episode, FeedStatus, Image}
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
-import io.hemin.engine.util.mapper.IndexMapper
-import io.hemin.engine.exception.FeedParsingException
 import io.hemin.engine.util.HashUtil
+import io.hemin.engine.util.mapper.IndexMapper
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 

@@ -4,14 +4,13 @@ import java.io.UnsupportedEncodingException
 import java.net.{ConnectException, SocketTimeoutException, UnknownHostException}
 import java.nio.charset.{IllegalCharsetNameException, MalformedInputException}
 
-import javax.net.ssl.SSLHandshakeException
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node._
 import io.hemin.engine.exception.HeminException
+import javax.net.ssl.SSLHandshakeException
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
 

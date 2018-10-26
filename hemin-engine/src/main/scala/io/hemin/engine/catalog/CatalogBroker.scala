@@ -5,7 +5,7 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node.{ActorRefCrawlerActor, ActorRefSupervisor}
 import io.hemin.engine.catalog.CatalogStore.{CatalogCommand, CatalogEvent, CatalogQuery}
 
 object CatalogBroker {

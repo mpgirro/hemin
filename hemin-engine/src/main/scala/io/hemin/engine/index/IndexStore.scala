@@ -1,14 +1,13 @@
 package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.model.{IndexDoc, ResultPage}
+import io.hemin.engine.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
+import io.hemin.engine.exception.SearchException
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter
+import io.hemin.engine.model.{IndexDoc, ResultPage}
 import io.hemin.engine.util.ExecutorServiceWrapper
-import io.hemin.engine.exception.SearchException
 
-import scala.collection.mutable
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
 

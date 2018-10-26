@@ -3,7 +3,7 @@ package io.hemin.engine.catalog
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
 import io.hemin.engine.crawler.Crawler._
@@ -15,7 +15,7 @@ import io.hemin.engine.util.IdGenerator
 import io.hemin.engine.util.mapper.IndexMapper
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object CatalogStore {

@@ -4,12 +4,12 @@ import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
-import io.hemin.engine.model.FeedStatus
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
+import io.hemin.engine.model.FeedStatus
 import io.hemin.engine.parser.Parser._
 
 import scala.compat.java8.OptionConverters._

@@ -1,5 +1,6 @@
 package io.hemin.engine
 
+import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.actor.{ActorRef, ActorSystem, Props}
@@ -7,14 +8,12 @@ import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.Node.{CliInput, CliOutput}
+import io.hemin.engine.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.model._
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 
-import scala.concurrent.forkjoin.ForkJoinPool
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
@@ -29,29 +28,31 @@ class Engine private (val initConfig: Config) {
   private val log = Logger(getClass)
 
   private lazy val running: AtomicBoolean = new AtomicBoolean(false)
+  private lazy val completedInitConfig: Config = initConfig.withFallback(EngineConfig.defaultConfig)
 
-  private lazy val completeConfig: Config = initConfig.withFallback(EngineConfig.defaultConfig)
-  private lazy val engineConfig: EngineConfig = EngineConfig.load(completeConfig)
 
-  private implicit lazy val internalTimeout: Timeout = engineConfig.node.internalTimeout
+  private implicit lazy val internalTimeout: Timeout = config.node.internalTimeout
   //private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(engineConfig.node.dispatcher)
   //private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global // TODO
   private implicit val executionContext: ExecutionContext = newExecutionContext // TODO
 
   // lazy init the actor system and local bus for this node
-  private[engine] val system: ActorSystem = ActorSystem(Engine.name, completeConfig)
-  private[engine] val node: ActorRef = system.actorOf(Props(new Node(engineConfig)), Node.name)
+  private[engine] val system: ActorSystem = ActorSystem(Engine.name, completedInitConfig)
+  private[engine] val node: ActorRef = system.actorOf(Props(new Node(config)), Node.name)
 
   private lazy val circuitBreaker: CircuitBreaker =
     (for {
       scheduler    <- Option(system).map(_.scheduler)
-      maxFailures  <- Option(engineConfig).map(_.node.breakerMaxFailures)
-      callTimeout  <- Option(engineConfig).map(_.node.breakerCallTimeout.duration)
-      resetTimeout <- Option(engineConfig).map(_.node.breakerResetTimeout.duration)
+      maxFailures  <- Option(config).map(_.node.breakerMaxFailures)
+      callTimeout  <- Option(config).map(_.node.breakerCallTimeout.duration)
+      resetTimeout <- Option(config).map(_.node.breakerResetTimeout.duration)
     } yield CircuitBreaker(scheduler, maxFailures, callTimeout, resetTimeout)
       .onOpen(breakerOpen())
       .onClose(breakerClose())
       .onHalfOpen(breakerHalfOpen())).get
+
+  /** Configuration of the Engine instance */
+  lazy val config: EngineConfig = EngineConfig.load(completedInitConfig)
 
 
   // Run the startup sequence. This will throw an exception in case a Failure occurred
@@ -61,12 +62,10 @@ class Engine private (val initConfig: Config) {
   }
 
 
+
   /** Attempts to shutdown the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is not running. */
   def shutdown(): Try[Unit] = synchronized { if (running.get) shutdownOnWarm() else shutdownOnCold() }
-
-  /** Configuration of the Engine instance */
-  def config: EngineConfig = engineConfig
 
   def propose(url: String): Try[Unit] = guarded {
     bus ! ProposeNewFeed(url)

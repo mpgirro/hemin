@@ -3,7 +3,7 @@ package io.hemin.engine.crawler
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import io.hemin.engine.EngineProtocol._
+import io.hemin.engine.Node.{ActorRefCatalogStoreActor, ActorRefParserActor, CrawlFyyd}
 import io.hemin.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
 
 /** Priority mailbox for [[io.hemin.engine.crawler.Crawler]] */
