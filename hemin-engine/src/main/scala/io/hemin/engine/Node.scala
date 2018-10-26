@@ -42,7 +42,7 @@ class Node(config: EngineConfig)
   override val supervisorStrategy: SupervisorStrategy = SupervisorStrategy.stoppingStrategy
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
-  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
+  private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
   //private val cluster = Cluster(context.system)
 
@@ -112,14 +112,14 @@ class Node(config: EngineConfig)
     case msg: UpdaterMessage  => updater.tell(msg, sender())
 
     case ReportCatalogStoreStartupComplete => initializationProgress.complete(CatalogStore.name)
-    case ReportIndexStoreStartupComplete   => initializationProgress.complete(IndexStore.name)
     case ReportCrawlerStartupComplete      => initializationProgress.complete(Crawler.name)
+    case ReportIndexStoreStartupComplete   => initializationProgress.complete(IndexStore.name)
     case ReportParserStartupComplete       => initializationProgress.complete(Parser.name)
     case ReportSearcherStartupComplete     => initializationProgress.complete(Searcher.name)
     case ReportUpdaterStartupComplete      => initializationProgress.complete(Updater.name)
 
     case EngineOperational =>
-      if (initializationProgress.isFInished)
+      if (initializationProgress.isFinished)
         sender ! StartupComplete
       else
         sender ! StartupInProgress

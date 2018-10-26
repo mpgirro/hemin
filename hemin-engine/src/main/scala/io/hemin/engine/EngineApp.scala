@@ -15,7 +15,8 @@ object EngineApp extends App {
   // load and init the configuration
   private lazy val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
   private lazy val engine = new Engine(config)
-  private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
+  //private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
+  private implicit lazy val ec: ExecutionContext = ExecutionContext.global // TODO
 
   private var running = true
 

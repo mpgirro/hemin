@@ -60,7 +60,7 @@ object CatalogStore {
   final case class CheckAllFeeds() extends CatalogQuery
   // CatalogQueryResults
   final case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
-  final case class AllPodcastsResult(results: List[Podcast]) extends CatalogQueryResult
+  final case class AllPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
   final case class AllFeedsResult(results: List[Feed]) extends CatalogQueryResult
   final case class EpisodeResult(episode: Option[Episode]) extends CatalogQueryResult                      // TODO make it an option, and remove NothingFound message
   final case class EpisodesByPodcastResult(episodes: List[Episode]) extends CatalogQueryResult

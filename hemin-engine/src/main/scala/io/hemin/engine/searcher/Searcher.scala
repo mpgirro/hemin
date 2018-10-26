@@ -3,7 +3,7 @@ package io.hemin.engine.searcher
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.EngineProtocol.{ActorRefSupervisor, ReportSearcherStartupComplete}
 import io.hemin.engine.model.ResultPage
-import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
+import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 import io.hemin.engine.searcher.retriever.SolrRetriever
 
 import scala.concurrent.ExecutionContext
@@ -20,9 +20,9 @@ object Searcher {
   trait SearcherQuery extends SearcherMessage
   trait SearcherQueryResult extends SearcherMessage
   // SearchQueries
-  final case class SearcherRequest(query: String, page: Option[Int], size: Option[Int]) extends SearcherQuery
+  final case class SearchRequest(query: String, page: Option[Int], size: Option[Int]) extends SearcherQuery
   // SearchQueryResults
-  final case class SearcherResults(results: ResultPage) extends SearcherQueryResult
+  final case class SearchResults(results: ResultPage) extends SearcherQueryResult
 }
 
 class Searcher (config: SearcherConfig)
@@ -48,13 +48,13 @@ class Searcher (config: SearcherConfig)
       supervisor = ref
       supervisor ! ReportSearcherStartupComplete
 
-    case SearcherRequest(query, page, size) =>
+    case SearchRequest(query, page, size) =>
       log.debug("Received SearchRequest('{}',{},{}) message", query, page, size)
 
       val theSender = sender()
       solrRetriever.search(query, page, size)
         .onComplete {
-          case Success(rs) => theSender ! SearcherResults(rs)
+          case Success(rs) => theSender ! SearchResults(rs)
           case Failure(ex) =>
             log.error("Error on searching Index : {}", ex)
             ex.printStackTrace()

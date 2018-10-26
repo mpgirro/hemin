@@ -1,7 +1,7 @@
 package io.hemin.engine.searcher
 
-import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
+import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.Engine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
@@ -23,7 +23,7 @@ object SearcherConfig
   override val configPath: String = s"${Engine.name}.${Searcher.name}"
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.solr-uri"     -> "http://localhost:8983/solr/hemin",
+    s"$configPath.solr-uri" -> s"http://localhost:8983/solr/${Engine.name}",
     s"$configPath.default-page" -> 1,
     s"$configPath.default-size" -> 20,
   ).asJava)

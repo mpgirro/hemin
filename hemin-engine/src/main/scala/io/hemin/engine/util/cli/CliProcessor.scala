@@ -7,7 +7,7 @@ import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.model._
-import io.hemin.engine.searcher.Searcher.{SearcherRequest, SearcherResults}
+import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 import io.hemin.engine.util.cli.CliFormatter.format
 
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -117,7 +117,7 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
   }
 
   private def search(query: String): String =
-    result(bus ? SearcherRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
+    result(bus ? SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
 
   private def getPodcast(id: String): String = result(bus ? GetPodcast(id))
 
@@ -145,7 +145,7 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
     case PodcastResult(p)            => result(p)
     case EpisodeResult(e)            => result(e)
     case FeedResult(f)               => result(f)
-    case SearcherResults(rs)         => format(rs)
+    case SearchResults(rs)         => format(rs)
     case EpisodesByPodcastResult(es) => format(es)
     case FeedsByPodcastResult(fs)    => format(fs)
     case ChaptersByEpisodeResult(cs) => format(cs)

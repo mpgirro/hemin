@@ -15,11 +15,10 @@ package io.hemin.engine.model
   *
   * All models except the [[io.hemin.engine.model.ResultPage]] extend the
   * [[io.hemin.engine.model.Patchable]] trait. Hence they provide two methods,
-  * [[io.hemin.engine.model.Patchable.patchLeft()]] and [[io.hemin.engine.model.Patchable.patchRight()]],
-  * which are used to perform sane updates to the members of a model, with
-  * respect to `Option` and `List`. For example, and `Option` that is `Some(a)`
-  * will only be patched if the new value is `Some(b)`. Otherwise, the old value
-  * will be kept.
+  * `patchLeft()` and `patchRight()`, which are used to perform sane updates
+  * to the members of a model, with respect to `Option` and `List`. For example,
+  * and `Option` that is `Some(a)` will only be patched if the new value is
+  * `Some(b)`. Otherwise, the old value will be kept.
   *
   * @author Maximilian Irro
   */

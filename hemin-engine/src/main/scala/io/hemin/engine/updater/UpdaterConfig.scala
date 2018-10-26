@@ -20,9 +20,7 @@ object UpdaterConfig
 
   override val configPath: String = s"${Engine.name}.${Updater.name}"
 
-  override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.solr-uri" -> "http://localhost:8983/solr/hemin",
-  ).asJava)
+  override protected[this] val defaultValues: Config = ConfigFactory.empty()
 
   override protected[this] val defaultDispatcher: Config = load(parseString(
     s"""$dispatcher {

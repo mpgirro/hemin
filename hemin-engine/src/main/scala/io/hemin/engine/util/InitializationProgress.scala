@@ -17,6 +17,6 @@ class InitializationProgress (subsystems: Seq[String]) {
       log.error("Unknown subsystem : " + subsystem)
     }
 
-  def isFInished: Boolean = progress.foldLeft(true) { case (a, (k, v)) => a && v }
+  def isFinished: Boolean = progress.foldLeft(true) { case (a, (k,v)) => a && v }
 
 }

@@ -29,7 +29,7 @@ object IndexConfig
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.lucene-index-path" -> "./data/index",
-    s"$configPath.solr-uri"          -> "http://localhost:8983/solr/hemin",
+    s"$configPath.solr-uri"          -> s"http://localhost:8983/solr/${Engine.name}",
     s"$configPath.solr-queue-size"   -> 20,
     s"$configPath.solr-thread-count" -> 4,
     s"$configPath.create-index"      -> false,
