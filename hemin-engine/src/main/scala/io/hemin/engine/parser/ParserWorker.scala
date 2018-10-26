@@ -5,7 +5,7 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.Node._
+import io.hemin.engine.node.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
 import io.hemin.engine.exception.FeedParsingException

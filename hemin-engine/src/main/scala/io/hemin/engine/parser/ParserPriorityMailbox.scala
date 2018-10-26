@@ -3,7 +3,7 @@ package io.hemin.engine.parser
 import akka.actor.ActorSystem
 import akka.dispatch.{PriorityGenerator, UnboundedPriorityMailbox}
 import com.typesafe.config.Config
-import io.hemin.engine.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor}
+import io.hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor}
 import io.hemin.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 /** Priority mailbox for [[io.hemin.engine.parser.Parser]] */

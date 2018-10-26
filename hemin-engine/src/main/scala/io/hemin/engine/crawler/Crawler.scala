@@ -7,7 +7,7 @@ import java.nio.charset.{IllegalCharsetNameException, MalformedInputException}
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import io.hemin.engine.Node._
+import io.hemin.engine.node.Node._
 import io.hemin.engine.exception.HeminException
 import javax.net.ssl.SSLHandshakeException
 

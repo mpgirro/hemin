@@ -1,7 +1,7 @@
 package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
+import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
 import io.hemin.engine.exception.SearchException
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter

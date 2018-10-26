@@ -1,13 +1,14 @@
-package io.hemin.engine
+package io.hemin.engine.node
 
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
+import io.hemin.engine.{Engine, node}
 
 import scala.collection.JavaConverters._
 
-/** Configuration for [[io.hemin.engine.Node]], which extends
+/** Configuration for [[node.Node]], which extends
   * to [[io.hemin.engine.EngineApp]] when in standalone mode
   */
 final case class NodeConfig(

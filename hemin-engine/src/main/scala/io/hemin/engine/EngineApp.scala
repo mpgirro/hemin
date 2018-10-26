@@ -2,7 +2,7 @@ package io.hemin.engine
 
 import java.util.concurrent.atomic.AtomicBoolean
 
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 
 import scala.concurrent.{ExecutionContext, blocking}
@@ -14,22 +14,21 @@ object EngineApp extends App {
 
   private val log = Logger(getClass)
 
-  // load and init the configuration
-  private lazy val config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-  private lazy val engine = Engine.of(config) match {
+  // exit status code of the program upon termination
+  private lazy val STATUS_SUCCESS: Int = 0
+  private lazy val STATUS_ERROR: Int = -1
+
+  // load the configuration and startup the engine
+  private lazy val config: Config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
+  private lazy val engine: Engine = Engine.of(config) match {
     case Success(e)  => e
     case Failure(ex) =>
       shutdown(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")
       null // TODO can I return a better result value (just to please the compiler?)
   }
+  private lazy val running: AtomicBoolean = new AtomicBoolean(true)
 
-  //private lazy val ec: ExecutionContext = engine.system.dispatchers.lookup(engine.config.node.dispatcher)
-  private implicit lazy val ec: ExecutionContext = ExecutionContext.global // TODO
-
-  private val running: AtomicBoolean = new AtomicBoolean(true)
-
-  private lazy val STATUS_SUCCESS: Int = 0
-  private lazy val STATUS_ERROR: Int = -1
+  private implicit lazy val ec: ExecutionContext = ExecutionContext.global
 
   private def shutdown(message: String): Unit = {
     val status: Int = Option(engine)
@@ -46,7 +45,6 @@ object EngineApp extends App {
       }.getOrElse(STATUS_ERROR)
     System.exit(status)
   }
-
 
   private def repl(ec: ExecutionContext): Unit = {
     log.info("CLI is ready to take commands")

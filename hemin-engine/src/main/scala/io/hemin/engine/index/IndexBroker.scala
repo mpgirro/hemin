@@ -6,8 +6,7 @@ import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.Node.ActorRefSupervisor
+import io.hemin.engine.node.Node.ActorRefSupervisor
 import io.hemin.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
 import io.hemin.engine.exception.SearchException
 

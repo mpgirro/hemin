@@ -1,15 +1,15 @@
-package io.hemin.engine
+package io.hemin.engine.node
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
 import akka.util.Timeout
-import io.hemin.engine.EngineProtocol._
-import io.hemin.engine.Node._
+import io.hemin.engine.EngineConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.catalog.CatalogStore.CatalogMessage
 import io.hemin.engine.crawler.Crawler
 import io.hemin.engine.crawler.Crawler.CrawlerMessage
 import io.hemin.engine.index.IndexStore
 import io.hemin.engine.index.IndexStore.IndexMessage
+import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser
 import io.hemin.engine.parser.Parser.ParserMessage
 import io.hemin.engine.searcher.Searcher
@@ -50,21 +50,15 @@ object Node {
   final case class ReportUpdaterStartupComplete()
   final case class ReportWorkerStartupComplete() // for worker/handler delegation children
 
+  // Startup protocol messags
   final case class EngineOperational()
-  //sealed trait StartupStatus
-  //final case class StartupComplete() extends StartupStatus
-  //final case class StartupInProgress() extends StartupStatus
   final case class StartupStatus(complete: Boolean)
 
   // These are maintenance methods, I use during development
-  final case class DebugPrintAllPodcasts()    // User/CLI -> CatalogStore
-  final case class DebugPrintAllEpisodes()    // User/CLI -> CatalogStore
-  final case class DebugPrintAllFeeds()
-  //case class DebugPrintCountAllPodcasts()
-  //case class DebugPrintCountAllEpisodes()
-  //case class DebugPrintCountAllFeeds()
-  final case class LoadTestFeeds()            // CLI -> CatalogStore
-  final case class LoadMassiveFeeds()         // CLI -> CatalogStore
+  trait DebugMessage
+  final case class DebugPrintAllPodcasts() extends DebugMessage
+  final case class DebugPrintAllEpisodes() extends DebugMessage
+  final case class DebugPrintAllFeeds() extends DebugMessage
 
   // User -> Crawler
   // TODO: automatic: Crawler -> Crawler on a regular basis
@@ -162,10 +156,8 @@ class Node(config: EngineConfig)
 
     case EngineOperational =>
       if (initializationProgress.isFinished) {
-        //sender ! StartupComplete
         sender ! StartupStatus(complete = true)
       } else {
-        //sender ! StartupInProgress
         sender ! StartupStatus(complete = false)
       }
 

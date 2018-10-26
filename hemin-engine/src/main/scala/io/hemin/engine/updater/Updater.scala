@@ -2,9 +2,9 @@ package io.hemin.engine.updater
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.google.common.base.Strings.isNullOrEmpty
-import io.hemin.engine.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor, ActorRefSupervisor, ReportUpdaterStartupComplete}
 import io.hemin.engine.catalog.CatalogStore.ProposeNewFeed
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
+import io.hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor, ActorRefSupervisor, ReportUpdaterStartupComplete}
 import io.hemin.engine.updater.Updater.ProcessFeed
 
 import scala.concurrent.ExecutionContext

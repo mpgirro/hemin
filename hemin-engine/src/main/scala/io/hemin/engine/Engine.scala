@@ -8,10 +8,11 @@ import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.model._
+import io.hemin.engine.node.Node
+import io.hemin.engine.node.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
@@ -34,7 +35,7 @@ class Engine private (val initConfig: Config) {
   private implicit lazy val internalTimeout: Timeout = config.node.internalTimeout
   //private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(engineConfig.node.dispatcher)
   //private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global // TODO
-  private implicit val executionContext: ExecutionContext = newExecutionContext // TODO
+  private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
   // lazy init the actor system and local bus for this node
   private[engine] val system: ActorSystem = ActorSystem(Engine.name, completedInitConfig)
@@ -62,10 +63,15 @@ class Engine private (val initConfig: Config) {
   }
 
 
-
   /** Attempts to shutdown the Engine. This operation is thread-safe.
     * It will produce a `Failure` if the Engine is not running. */
-  def shutdown(): Try[Unit] = synchronized { if (running.get) shutdownOnWarm() else shutdownOnCold() }
+  def shutdown(): Try[Unit] = synchronized {
+    if (running.get) {
+      shutdownOnWarm()
+    } else {
+      shutdownOnCold()
+    }
+  }
 
   def propose(url: String): Try[Unit] = guarded {
     bus ! ProposeNewFeed(url)
@@ -156,7 +162,6 @@ class Engine private (val initConfig: Config) {
     }
   }
 
-
   private def shutdownOnWarm(): Try[Unit] = {
     log.info("ENGINE is shutting down ...")
     //bus ! ShutdownSystem // TODO does system.terminate() work better?
@@ -205,6 +210,7 @@ class Engine private (val initConfig: Config) {
 
   private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
 
+  // TODO delete
   private def newExecutionContext: ExecutionContext = {
     /*
     ExecutionContext.fromExecutor(new ForkJoinPool(initialParallelism: Int))

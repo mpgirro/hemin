@@ -3,7 +3,7 @@ package io.hemin.engine.parser
 import akka.actor.SupervisorStrategy.{Escalate, Resume}
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import io.hemin.engine.Node._
+import io.hemin.engine.node.Node._
 import io.hemin.engine.exception.FeedParsingException
 
 import scala.concurrent.ExecutionContext

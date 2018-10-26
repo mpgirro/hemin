@@ -3,7 +3,7 @@ package io.hemin.engine.catalog
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.Node._
+import io.hemin.engine.node.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
 import io.hemin.engine.crawler.Crawler._

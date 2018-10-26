@@ -4,6 +4,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.catalog.CatalogConfig
 import io.hemin.engine.crawler.CrawlerConfig
 import io.hemin.engine.index.IndexConfig
+import io.hemin.engine.node.NodeConfig
 import io.hemin.engine.parser.ParserConfig
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.updater.UpdaterConfig
