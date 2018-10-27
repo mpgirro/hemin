@@ -13,26 +13,26 @@ final case class SearcherConfig (
   defaultPage: Int,
   defaultSize: Int,
 ) extends ConfigStandardValues {
-  override val configPath: String = SearcherConfig.configPath
+  override val namespace: String = SearcherConfig.namespace
 }
 
 object SearcherConfig
   extends ConfigDefaults[SearcherConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${Searcher.name}"
+  override val namespace: String = s"${Engine.name}.${Searcher.name}"
 
   override def fromConfig(config: Config): SearcherConfig =
     SearcherConfig(
-      solrUri     = config.getString(s"$configPath.solr-uri"),
-      defaultPage = config.getInt(s"$configPath.default-page"),
-      defaultSize = config.getInt(s"$configPath.default-size"),
+      solrUri     = config.getString(s"$namespace.solr-uri"),
+      defaultPage = config.getInt(s"$namespace.default-page"),
+      defaultSize = config.getInt(s"$namespace.default-size"),
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.solr-uri" -> s"http://localhost:8983/solr/${Engine.name}",
-    s"$configPath.default-page" -> 1,
-    s"$configPath.default-size" -> 20,
+    s"$namespace.solr-uri" -> s"http://localhost:8983/solr/${Engine.name}",
+    s"$namespace.default-page" -> 1,
+    s"$namespace.default-size" -> 20,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

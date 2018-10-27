@@ -11,14 +11,14 @@ import scala.collection.JavaConverters._
 final case class UpdaterConfig (
   // TODO add some config values
 ) extends ConfigStandardValues {
-  override val configPath: String = UpdaterConfig.configPath
+  override val namespace: String = UpdaterConfig.namespace
 }
 
 object UpdaterConfig
   extends ConfigDefaults[UpdaterConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${Updater.name}"
+  override val namespace: String = s"${Engine.name}.${Updater.name}"
 
   override def fromConfig(config: Config): UpdaterConfig = UpdaterConfig()
 

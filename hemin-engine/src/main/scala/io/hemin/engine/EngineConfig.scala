@@ -9,8 +9,6 @@ import io.hemin.engine.parser.ParserConfig
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.updater.UpdaterConfig
 
-import scala.concurrent.duration._
-
 /** Configuration for [[io.hemin.engine.Engine]]
   *
   * @param catalog Configuration for [[io.hemin.engine.catalog.CatalogStore]] subsystem

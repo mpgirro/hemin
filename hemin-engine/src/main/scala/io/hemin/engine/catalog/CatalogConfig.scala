@@ -15,30 +15,30 @@ final case class CatalogConfig (
   defaultSize: Int,
   maxPageSize: Int
 ) extends ConfigStandardValues {
-  override val configPath: String = CatalogConfig.configPath
+  override val namespace: String = CatalogConfig.namespace
 }
 
 object CatalogConfig
   extends ConfigDefaults[CatalogConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${CatalogStore.name}"
+  override val namespace: String = s"${Engine.name}.${CatalogStore.name}"
 
   override def fromConfig(config: Config): CatalogConfig =
     CatalogConfig(
-      mongoUri       = config.getString(s"$configPath.mongo-uri"),
-      createDatabase = config.getBoolean(s"$configPath.create-database"),
-      defaultPage    = config.getInt(s"$configPath.default-page"),
-      defaultSize    = config.getInt(s"$configPath.default-size"),
-      maxPageSize    = config.getInt(s"$configPath.max-page-size"),
+      mongoUri       = config.getString(s"$namespace.mongo-uri"),
+      createDatabase = config.getBoolean(s"$namespace.create-database"),
+      defaultPage    = config.getInt(s"$namespace.default-page"),
+      defaultSize    = config.getInt(s"$namespace.default-size"),
+      maxPageSize    = config.getInt(s"$namespace.max-page-size"),
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.mongo-uri"       -> "mongodb://localhost:27017/hemin",
-    s"$configPath.create-database" -> true,
-    s"$configPath.default-page"    -> 1,
-    s"$configPath.default-size"    -> 20,
-    s"$configPath.max-page-size"   -> 10000,
+    s"$namespace.mongo-uri"       -> "mongodb://localhost:27017/hemin",
+    s"$namespace.create-database" -> true,
+    s"$namespace.default-page"    -> 1,
+    s"$namespace.default-size"    -> 20,
+    s"$namespace.max-page-size"   -> 10000,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

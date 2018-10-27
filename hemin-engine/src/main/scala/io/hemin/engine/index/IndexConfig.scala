@@ -18,34 +18,34 @@ final case class IndexConfig (
   commitInterval: FiniteDuration,
   workerCount: Int,
 ) extends ConfigStandardValues {
-  override val configPath: String = IndexConfig.configPath
+  override val namespace: String = IndexConfig.namespace
 }
 
 object IndexConfig
   extends ConfigDefaults[IndexConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${IndexStore.name}"
+  override val namespace: String = s"${Engine.name}.${IndexStore.name}"
 
   override def fromConfig(config: Config): IndexConfig =
     IndexConfig(
-      luceneIndexPath = config.getString(s"$configPath.lucene-index-path"), // TODO add to config file
-      solrUri         = config.getString(s"$configPath.solr-uri"),
-      solrQueueSize   = config.getInt(s"$configPath.solr-queue-size"),
-      solrThreadCount = config.getInt(s"$configPath.solr-thread-count"),
-      createIndex     = config.getBoolean(s"$configPath.create-index"),
-      commitInterval  = config.getInt(s"$configPath.commit-interval").seconds,
-      workerCount     = config.getInt(s"$configPath.handler-count"),
+      luceneIndexPath = config.getString(s"$namespace.lucene-index-path"), // TODO add to config file
+      solrUri         = config.getString(s"$namespace.solr-uri"),
+      solrQueueSize   = config.getInt(s"$namespace.solr-queue-size"),
+      solrThreadCount = config.getInt(s"$namespace.solr-thread-count"),
+      createIndex     = config.getBoolean(s"$namespace.create-index"),
+      commitInterval  = config.getInt(s"$namespace.commit-interval").seconds,
+      workerCount     = config.getInt(s"$namespace.handler-count"),
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.lucene-index-path" -> "./data/index",
-    s"$configPath.solr-uri"          -> s"http://localhost:8983/solr/${Engine.name}",
-    s"$configPath.solr-queue-size"   -> 20,
-    s"$configPath.solr-thread-count" -> 4,
-    s"$configPath.create-index"      -> false,
-    s"$configPath.commit-interval"   -> 3,
-    s"$configPath.handler-count"     -> 5,
+    s"$namespace.lucene-index-path" -> "./data/index",
+    s"$namespace.solr-uri"          -> s"http://localhost:8983/solr/${Engine.name}",
+    s"$namespace.solr-queue-size"   -> 20,
+    s"$namespace.solr-thread-count" -> 4,
+    s"$namespace.create-index"      -> false,
+    s"$namespace.commit-interval"   -> 3,
+    s"$namespace.handler-count"     -> 5,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

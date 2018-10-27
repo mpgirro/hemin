@@ -14,7 +14,7 @@ class InitializationProgress (subsystems: Seq[String]) {
       log.info(s"${subsystem.toUpperCase} subsystem initialized ...")
       progress += (subsystem -> true)
     } else {
-      log.error("Unknown subsystem : " + subsystem)
+      log.error("Initialization does no monitor the progress of this subsystem : " + subsystem)
     }
 
   def isFinished: Boolean = progress.foldLeft(true) { case (a, (k,v)) => a && v }

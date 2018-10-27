@@ -14,28 +14,28 @@ final case class CrawlerConfig (
   downloadTimeout: Int,
   downloadMaxBytes: Long
 ) extends ConfigStandardValues {
-  override val configPath: String = CrawlerConfig.configPath
+  override val namespace: String = CrawlerConfig.namespace
 }
 
 object CrawlerConfig
   extends ConfigDefaults[CrawlerConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${Crawler.name}"
+  override val namespace: String = s"${Engine.name}.${Crawler.name}"
 
   override def fromConfig(config: Config): CrawlerConfig =
     CrawlerConfig(
-      workerCount      = config.getInt(s"$configPath.worker-count"),
-      fetchWebsites    = config.getBoolean(s"$configPath.fetch-websites"),  // TODO rename to config file
-      downloadTimeout  = config.getInt(s"$configPath.download-timeout"),    // TODO add to config file
-      downloadMaxBytes = config.getLong(s"$configPath.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
+      workerCount      = config.getInt(s"$namespace.worker-count"),
+      fetchWebsites    = config.getBoolean(s"$namespace.fetch-websites"),  // TODO rename to config file
+      downloadTimeout  = config.getInt(s"$namespace.download-timeout"),    // TODO add to config file
+      downloadMaxBytes = config.getLong(s"$namespace.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.worker-count"       -> 5,
-    s"$configPath.fetch-websites"     -> false, // TODO rename to config file
-    s"$configPath.download-timeout"   -> 10, // TODO add to config file
-    s"$configPath.download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
+    s"$namespace.worker-count"       -> 5,
+    s"$namespace.fetch-websites"     -> false, // TODO rename to config file
+    s"$namespace.download-timeout"   -> 10, // TODO add to config file
+    s"$namespace.download-max-bytes" -> 5242880, // = 5  * 1024 * 1024 // TODO add to config file
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

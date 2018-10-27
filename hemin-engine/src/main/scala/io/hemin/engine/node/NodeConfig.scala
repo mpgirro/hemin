@@ -19,30 +19,30 @@ final case class NodeConfig(
   breakerCallTimeout: Timeout,
   breakerResetTimeout: Timeout,
 ) extends ConfigStandardValues {
-  override val configPath: String = NodeConfig.configPath
+  override val namespace: String = NodeConfig.namespace
 }
 
 object NodeConfig
   extends ConfigDefaults[NodeConfig]
     with ConfigStandardValues {
 
-  override val configPath: String = s"${Engine.name}.${Node.name}"
+  override val namespace: String = s"${Engine.name}.${Node.name}"
 
   override def fromConfig(config: Config): NodeConfig =
     NodeConfig(
-      repl                = config.getBoolean(s"$configPath.repl"),
-      internalTimeout     = config.getInt(s"$configPath.internal-timeout").seconds,
-      breakerMaxFailures  = config.getInt(s"$configPath.breaker-max-failures"),
-      breakerCallTimeout  = config.getInt(s"$configPath.breaker-call-timeout").seconds,
-      breakerResetTimeout = config.getInt(s"$configPath.breaker-reset-timeout").seconds,
+      repl                = config.getBoolean(s"$namespace.repl"),
+      internalTimeout     = config.getInt(s"$namespace.internal-timeout").seconds,
+      breakerMaxFailures  = config.getInt(s"$namespace.breaker-max-failures"),
+      breakerCallTimeout  = config.getInt(s"$namespace.breaker-call-timeout").seconds,
+      breakerResetTimeout = config.getInt(s"$namespace.breaker-reset-timeout").seconds,
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$configPath.repl"                  -> true,
-    s"$configPath.internal-timeout"      -> 5,
-    s"$configPath.breaker-max-failures"  -> 2,
-    s"$configPath.breaker-call-timeout"  -> 2,
-    s"$configPath.breaker-reset-timeout" -> 5,
+    s"$namespace.repl"                  -> true,
+    s"$namespace.internal-timeout"      -> 5,
+    s"$namespace.breaker-max-failures"  -> 2,
+    s"$namespace.breaker-call-timeout"  -> 2,
+    s"$namespace.breaker-reset-timeout" -> 5,
   ).asJava)
 
   /** The App does not run on an actor dispatcher */
