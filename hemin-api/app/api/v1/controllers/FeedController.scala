@@ -8,6 +8,8 @@ import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
+import scala.concurrent.Future
+
 @Api("Feed")
 class FeedController @Inject() (cc: FeedControllerComponents)
   extends FeedBaseController(cc) {
@@ -25,17 +27,21 @@ class FeedController @Inject() (cc: FeedControllerComponents)
         }
     }
 
-  def propose = Action { implicit request =>
-    request.body.asText
-      .map { url =>
-        log.trace(s"PROPOSE feed: $url")
-        feedService.propose(url)
-        Ok
+  def propose: Action[AnyContent] =
+    FeedAction.async { implicit request =>
+      Future {
+        request.body.asText match {
+          case Some(url) =>
+            log.trace(s"PROPOSE feed: $url")
+            feedService.propose(url)
+            Ok
+          case None =>
+            log.warn(s"PROPOSE feed: No URL in body [BadRequest]")
+            BadRequest
+        }
       }
-      .getOrElse {
-        log.warn(s"PROPOSE feed: No URL in body [BadRequest]")
-        BadRequest
-      }
-  }
+
+
+    }
 
 }
