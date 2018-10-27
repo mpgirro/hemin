@@ -21,6 +21,7 @@ import io.hemin.engine.util.cli.CliProcessor
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 object Node {
   final val name = "node"

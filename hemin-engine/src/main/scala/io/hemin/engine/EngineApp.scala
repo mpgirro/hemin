@@ -46,8 +46,9 @@ object EngineApp extends App {
     System.exit(status)
   }
 
-  private def repl(ec: ExecutionContext): Unit = {
+  private def repl(): Unit = {
     log.info("CLI is ready to take commands")
+
     while (running.get) {
       blocking {
         val input = StdIn.readLine()
@@ -58,7 +59,13 @@ object EngineApp extends App {
           .map(_.toList)
           .foreach {
             case _@("q" | "quit" | "exit") :: _ => running.set(false)
-            case _ => engine.cli(input).onComplete(println)(ec)
+            case _ => engine
+              .cli(input)
+              .andThen {
+                case Success(output) => output
+                case Failure(ex)     => ex.getMessage
+              }
+              .foreach(println)
           }
       }
     }
@@ -73,7 +80,7 @@ object EngineApp extends App {
 
 
   if (engine.config.node.repl) {
-    repl(ec)
+    repl()
   }
 
 }
