@@ -24,17 +24,14 @@ object Engine {
   def of(config: Config): Try[Engine] = Try(new Engine(config))
 }
 
-class Engine private (val initConfig: Config) {
+class Engine private (private val initConfig: Config) {
 
   private val log = Logger(getClass)
 
   private lazy val running: AtomicBoolean = new AtomicBoolean(false)
   private lazy val completedInitConfig: Config = initConfig.withFallback(EngineConfig.defaultConfig)
 
-
   private implicit lazy val internalTimeout: Timeout = config.node.internalTimeout
-  //private implicit lazy val executionContext: ExecutionContext = system.dispatchers.lookup(engineConfig.node.dispatcher)
-  //private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global // TODO
   private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
   // lazy init the actor system and local bus for this node
@@ -77,6 +74,8 @@ class Engine private (val initConfig: Config) {
     bus ! ProposeNewFeed(url)
   }
 
+  /** Processes the arguments by the Command Language Interpreter,
+    * and returns the resulting data as text */
   def cli(args: String): Future[String] = guarded {
     (bus ? CliInput(args))
       .mapTo[CliOutput]
@@ -89,6 +88,7 @@ class Engine private (val initConfig: Config) {
       .map(_.results)
   }
 
+  /** Finds a [[io.hemin.engine.model.Podcast]] by ID */
   def findPodcast(id: String): Future[Option[Podcast]] = guarded {
     (bus ? GetPodcast(id))
       .mapTo[PodcastResult]

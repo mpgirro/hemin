@@ -6,15 +6,10 @@ import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.model._
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import io.hemin.engine.util.cli.CliFormatter.format
+import io.hemin.engine.util.cli.CliFormatter.{format, unhandled}
 
-import scala.concurrent.{Await, ExecutionContext, Future}
-
-object CliProcessor {
-  val MSG_EMPTY_INPUT = "Input was NULL"
-}
+import scala.concurrent.{ExecutionContext, Future}
 
 /** Command language interpreter processor for interactive commands.
   * This is not a fully fledged REPL, since it does not print the
@@ -28,27 +23,26 @@ object CliProcessor {
   */
 class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
 
-  import CliProcessor._
-
   private val log = Logger(getClass)
 
-  private implicit val INTERNAL_TIMEOUT: Timeout = config.node.internalTimeout
+  private implicit val executionContext: ExecutionContext = ec
+  private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
-  def eval(args: String): String = Option(args)
+  def eval(args: String): Future[String] = Option(args)
     .map(_.split(" "))
     .map(eval)
-    .getOrElse(MSG_EMPTY_INPUT)
+    .getOrElse(emptyInput)
 
-  def eval(args: Array[String]): String = Option(args)
+  def eval(args: Array[String]): Future[String] = Option(args)
     .map(_.toList)
     .map(eval)
-    .getOrElse(MSG_EMPTY_INPUT)
+    .getOrElse(emptyInput)
 
-  def eval(args: List[String]): String = Option(args)
+  def eval(args: List[String]): Future[String] = Option(args)
     .map {
-      case "help" :: _ => help()
-      case "ping" :: Nil => "pong"
-      case "echo" :: echo => echo.mkString(" ")
+      case "help" :: _   => help()
+      case "ping" :: Nil => pong
+      case "echo" :: txt => echo(txt)
 
       case "propose" :: Nil   => usage("propose")
       case "propose" :: feeds => propose(feeds)
@@ -73,9 +67,9 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
       case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
 
       case _ => help()
-    }.getOrElse(MSG_EMPTY_INPUT)
+    }.getOrElse(emptyInput)
 
-  private val usageMap = Map(
+  private lazy val usageMap = Map(
     "propose"        -> "feed [feed [feed]]",
     "benchmark"      -> "<feed|index|search>",
     "benchmark feed" -> "feed <url>",
@@ -95,67 +89,56 @@ class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
     "request mean episodes" -> ""
   )
 
-  // TODO implement
-  private def usage(cmd: String): String = s"USAGE not yet implemented for command : $cmd"
+  private lazy val emptyInput: Future[String] = Future.successful("Input command was empty")
+  private lazy val pong: Future[String] = Future.successful("pong")
 
-  private def help(): String = {
+  private def echo(txt: List[String]): Future[String] = Future.successful(txt.mkString(" "))
+
+  // TODO implement
+  private def usage(cmd: String): Future[String] = Future.successful(s"USAGE not yet implemented for command : $cmd")
+
+  private def help(): Future[String] = {
     val out = new StringBuilder
     out ++= "This is an interactive REPL to the engine. Available commands are:\n"
     for ( (k,v) <- usageMap ) {
       out ++= s"$k\t$v"
     }
-    out.mkString
+    Future.successful(out.mkString)
   }
 
-  private def propose(feeds: List[String]): String = {
+  private def propose(feeds: List[String]): Future[String] = {
     val out = new StringBuilder
     feeds.foreach { f =>
       out ++= "proposing " + f
       bus ! ProposeNewFeed(f)
     }
-    out.mkString
+    Future.successful(out.mkString)
   }
 
-  private def search(query: String): String =
+  private def search(query: String): Future[String] =
     result(bus ? SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
 
-  private def getPodcast(id: String): String = result(bus ? GetPodcast(id))
+  private def getPodcast(id: String): Future[String] = result(bus ? GetPodcast(id))
 
-  private def getEpisode(id: String): String = result(bus ? GetEpisode(id))
+  private def getEpisode(id: String): Future[String] = result(bus ? GetEpisode(id))
 
-  private def getFeed(id: String): String = result(bus ? GetFeed(id))
+  private def getFeed(id: String): Future[String] = result(bus ? GetFeed(id))
 
-  private def getEpisodesByPodcast(id: String): String = result(bus ? GetEpisodesByPodcast(id))
+  private def getEpisodesByPodcast(id: String): Future[String] = result(bus ? GetEpisodesByPodcast(id))
 
-  private def getFeedsByPodcast(id: String): String = result(bus ? GetFeedsByPodcast(id))
+  private def getFeedsByPodcast(id: String): Future[String] = result(bus ? GetFeedsByPodcast(id))
 
-  private def getChaptersByEpisode(id: String): String = result(bus ? GetChaptersByEpisode(id))
+  private def getChaptersByEpisode(id: String): Future[String] = result(bus ? GetChaptersByEpisode(id))
 
-  private def result(option: Option[Any]): String = option match {
-    case Some(p: Podcast) => format(p)
-    case Some(e: Episode) => format(e)
-    case Some(f: Feed)    => format(f)
-    case Some(c: Chapter) => format(c)
-    case Some(i: Image)   => format(i)
-    case Some(other)      => unhandled(other)
-    case None => "No database record found"
-  }
-
-  private def result(future: Future[Any]): String = Await.result(future, INTERNAL_TIMEOUT.duration) match {
-    case PodcastResult(p)            => result(p)
-    case EpisodeResult(e)            => result(e)
-    case FeedResult(f)               => result(f)
-    case SearchResults(rs)         => format(rs)
+  private def result(future: Future[Any]): Future[String] = future.map {
+    case PodcastResult(p)            => format(p)
+    case EpisodeResult(e)            => format(e)
+    case FeedResult(f)               => format(f)
+    case SearchResults(rs)           => format(rs)
     case EpisodesByPodcastResult(es) => format(es)
     case FeedsByPodcastResult(fs)    => format(fs)
     case ChaptersByEpisodeResult(cs) => format(cs)
-    case other => unhandled(other)
-  }
-
-  private def unhandled(unknown: Any): String = {
-    val msg = s"CLI has no specific handler for type : ${unknown.getClass}"
-    log.error(msg)
-    msg // return to frontend (CLI/Web)
+    case other                       => unhandled(other)
   }
 
 }

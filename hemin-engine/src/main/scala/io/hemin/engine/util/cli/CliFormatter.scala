@@ -1,8 +1,11 @@
 package io.hemin.engine.util.cli
 
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.model._
 
 object CliFormatter {
+
+  private val log = Logger(getClass)
 
   /* TODO 2018-10-08: once PPrint support outputting field names (see https://github.com/lihaoyi/PPrint/issues/4) , I want to use these implementations
    *
@@ -22,6 +25,24 @@ object CliFormatter {
 
   def format(xs: List[Any]): String = pprint.apply(xs).toString()
   */
+
+  private lazy val none: String = "None"
+
+  def unhandled(unknown: Any): String = {
+    val msg = s"Formatter has no specific handler for type : ${unknown.getClass}"
+    log.error(msg)
+    msg
+  }
+
+  def format(option: Option[Any]): String = option match {
+    case Some(p: Podcast) => format(p)
+    case Some(e: Episode) => format(e)
+    case Some(f: Feed)    => format(f)
+    case Some(c: Chapter) => format(c)
+    case Some(i: Image)   => format(i)
+    case Some(other)      => unhandled(other)
+    case None             => none
+  }
 
   def format(podcast: Podcast): String =
     prettyPrint(podcast.copy(

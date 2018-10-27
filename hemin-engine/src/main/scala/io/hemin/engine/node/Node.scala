@@ -170,9 +170,10 @@ class Node(config: EngineConfig)
     log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
-  private def onCliInput(input: String, theSender: ActorRef): Unit = Future {
-    theSender ! CliOutput(processor.eval(input))
-  }
+  private def onCliInput(input: String, theSender: ActorRef): Unit = processor
+    .eval(input)
+    .mapTo[String]
+    .foreach(output => theSender ! CliOutput(output))
 
   private def onTerminated(corpse: ActorRef): Unit = {
     log.error("Oh noh! A critical subsystem died : {}", corpse.path)
