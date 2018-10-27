@@ -42,7 +42,7 @@ class EngineSpec
     .getOrElse(12345)
   def mongoUri: String =  s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
 
-  def newEngine(): Engine = Engine.of(defaultConfig(mongoUri)) match {
+  def newEngine(): Engine = Engine.boot(defaultConfig(mongoUri)) match {
     case Success(e)  => e
     case Failure(ex) =>
       assert(false, s"Failed to startup engine; reason : ${ex.getMessage}")

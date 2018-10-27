@@ -20,7 +20,7 @@ object EngineApp extends App {
 
   // load the configuration and startup the engine
   private lazy val config: Config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-  private lazy val engine: Engine = Engine.of(config) match {
+  private lazy val engine: Engine = Engine.boot(config) match {
     case Success(e)  => e
     case Failure(ex) =>
       shutdown(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")

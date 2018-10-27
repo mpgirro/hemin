@@ -16,7 +16,7 @@ class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
 
   private val config: Config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
 
-  val engine: Engine = Engine.of(config) match {
+  val engine: Engine = Engine.boot(config) match {
     case Success(e)  => e
     case Failure(ex) =>
       log.error(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")

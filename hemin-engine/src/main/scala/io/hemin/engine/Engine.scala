@@ -21,7 +21,7 @@ import scala.util.{Failure, Success, Try}
 
 object Engine {
   final val name: String = "hemin"
-  def of(config: Config): Try[Engine] = Try(new Engine(config))
+  def boot(config: Config): Try[Engine] = Try(new Engine(config))
 }
 
 class Engine private (private val initConfig: Config) {
