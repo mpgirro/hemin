@@ -15,10 +15,15 @@ final case class ParserConfig (
 }
 
 object ParserConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[ParserConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${Parser.name}"
+
+  override def fromConfig(config: Config): ParserConfig =
+    ParserConfig(
+      workerCount = config.getInt(s"$configPath.worker-count"),
+    )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.worker-count" -> 2,

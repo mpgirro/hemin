@@ -6,7 +6,7 @@ import io.hemin.engine.Engine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
-import scala.concurrent.duration.FiniteDuration
+import scala.concurrent.duration._
 
 /** Configuration for [[io.hemin.engine.index.IndexStore]] */
 final case class IndexConfig (
@@ -22,10 +22,21 @@ final case class IndexConfig (
 }
 
 object IndexConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[IndexConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${IndexStore.name}"
+
+  override def fromConfig(config: Config): IndexConfig =
+    IndexConfig(
+      luceneIndexPath = config.getString(s"$configPath.lucene-index-path"), // TODO add to config file
+      solrUri         = config.getString(s"$configPath.solr-uri"),
+      solrQueueSize   = config.getInt(s"$configPath.solr-queue-size"),
+      solrThreadCount = config.getInt(s"$configPath.solr-thread-count"),
+      createIndex     = config.getBoolean(s"$configPath.create-index"),
+      commitInterval  = config.getInt(s"$configPath.commit-interval").seconds,
+      workerCount     = config.getInt(s"$configPath.handler-count"),
+    )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.lucene-index-path" -> "./data/index",

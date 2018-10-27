@@ -11,7 +11,16 @@ import io.hemin.engine.updater.UpdaterConfig
 
 import scala.concurrent.duration._
 
-/** Configuration for [[io.hemin.engine.Engine]] */
+/** Configuration for [[io.hemin.engine.Engine]]
+  *
+  * @param catalog Configuration for [[io.hemin.engine.catalog.CatalogStore]] subsystem
+  * @param crawler Configuration for [[io.hemin.engine.crawler.Crawler]] subsystem
+  * @param index Configuration for [[io.hemin.engine.index.IndexStore]] subsystem
+  * @param node Configuration for [[io.hemin.engine.node.Node]] subsystem manager
+  * @param parser Configuration for [[io.hemin.engine.parser.Parser]] subsystem
+  * @param searcher Configuration for [[io.hemin.engine.searcher.Searcher]] subsystem
+  * @param updater Configuration for [[io.hemin.engine.updater.Updater]] subsystem
+  */
 final case class EngineConfig(
   catalog: CatalogConfig,
   crawler: CrawlerConfig,
@@ -64,44 +73,13 @@ object EngineConfig {
     * this method. */
   private def loadFromSafeConfig(config: Config): EngineConfig =
     EngineConfig(
-      catalog = CatalogConfig(
-        mongoUri       = config.getString(s"${CatalogConfig.configPath}.mongo-uri"),
-        createDatabase = config.getBoolean(s"${CatalogConfig.configPath}.create-database"),
-        defaultPage    = config.getInt(s"${CatalogConfig.configPath}.default-page"),
-        defaultSize    = config.getInt(s"${CatalogConfig.configPath}.default-size"),
-        maxPageSize    = config.getInt(s"${CatalogConfig.configPath}.max-page-size"),
-      ),
-      crawler = CrawlerConfig(
-        workerCount      = config.getInt(s"${CrawlerConfig.configPath}.worker-count"),
-        fetchWebsites    = config.getBoolean(s"${CrawlerConfig.configPath}.fetch-websites"),  // TODO rename to config file
-        downloadTimeout  = config.getInt(s"${CrawlerConfig.configPath}.download-timeout"),    // TODO add to config file
-        downloadMaxBytes = config.getLong(s"${CrawlerConfig.configPath}.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
-      ),
-      index = IndexConfig(
-        luceneIndexPath = config.getString(s"${IndexConfig.configPath}.lucene-index-path"), // TODO add to config file
-        solrUri         = config.getString(s"${IndexConfig.configPath}.solr-uri"),
-        solrQueueSize   = config.getInt(s"${IndexConfig.configPath}.solr-queue-size"),
-        solrThreadCount = config.getInt(s"${IndexConfig.configPath}.solr-thread-count"),
-        createIndex     = config.getBoolean(s"${IndexConfig.configPath}.create-index"),
-        commitInterval  = config.getInt(s"${IndexConfig.configPath}.commit-interval").seconds,
-        workerCount     = config.getInt(s"${IndexConfig.configPath}.handler-count"),
-      ),
-      node = NodeConfig(
-        repl                = config.getBoolean(s"${NodeConfig.configPath}.repl"),
-        internalTimeout     = config.getInt(s"${NodeConfig.configPath}.internal-timeout").seconds,
-        breakerMaxFailures  = config.getInt(s"${NodeConfig.configPath}.breaker-max-failures"),
-        breakerCallTimeout  = config.getInt(s"${NodeConfig.configPath}.breaker-call-timeout").seconds,
-        breakerResetTimeout = config.getInt(s"${NodeConfig.configPath}.breaker-reset-timeout").seconds,
-      ),
-      parser = ParserConfig(
-        workerCount = config.getInt(s"${ParserConfig.configPath}.worker-count"),
-      ),
-      searcher = SearcherConfig(
-        solrUri     = config.getString(s"${SearcherConfig.configPath}.solr-uri"),
-        defaultPage = config.getInt(s"${SearcherConfig.configPath}.default-page"),
-        defaultSize = config.getInt(s"${SearcherConfig.configPath}.default-size"),
-      ),
-      updater = UpdaterConfig(),
+      catalog  = CatalogConfig.fromConfig(config),
+      crawler  = CrawlerConfig.fromConfig(config),
+      index    = IndexConfig.fromConfig(config),
+      node     = NodeConfig.fromConfig(config),
+      parser   = ParserConfig.fromConfig(config),
+      searcher = SearcherConfig.fromConfig(config),
+      updater  = UpdaterConfig.fromConfig(config),
     )
 
 }

@@ -18,10 +18,18 @@ final case class CrawlerConfig (
 }
 
 object CrawlerConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[CrawlerConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${Crawler.name}"
+
+  override def fromConfig(config: Config): CrawlerConfig =
+    CrawlerConfig(
+      workerCount      = config.getInt(s"$configPath.worker-count"),
+      fetchWebsites    = config.getBoolean(s"$configPath.fetch-websites"),  // TODO rename to config file
+      downloadTimeout  = config.getInt(s"$configPath.download-timeout"),    // TODO add to config file
+      downloadMaxBytes = config.getLong(s"$configPath.download-max-bytes"), // = 5  * 1024 * 1024 // TODO add to config file
+    )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.worker-count"       -> 5,

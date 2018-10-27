@@ -7,6 +7,7 @@ import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 import io.hemin.engine.{Engine, node}
 
 import scala.collection.JavaConverters._
+import scala.concurrent.duration._
 
 /** Configuration for [[node.Node]], which extends
   * to [[io.hemin.engine.EngineApp]] when in standalone mode
@@ -22,10 +23,19 @@ final case class NodeConfig(
 }
 
 object NodeConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[NodeConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${Node.name}"
+
+  override def fromConfig(config: Config): NodeConfig =
+    NodeConfig(
+      repl                = config.getBoolean(s"$configPath.repl"),
+      internalTimeout     = config.getInt(s"$configPath.internal-timeout").seconds,
+      breakerMaxFailures  = config.getInt(s"$configPath.breaker-max-failures"),
+      breakerCallTimeout  = config.getInt(s"$configPath.breaker-call-timeout").seconds,
+      breakerResetTimeout = config.getInt(s"$configPath.breaker-reset-timeout").seconds,
+    )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.repl"                  -> true,

@@ -15,10 +15,12 @@ final case class UpdaterConfig (
 }
 
 object UpdaterConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[UpdaterConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${Updater.name}"
+
+  override def fromConfig(config: Config): UpdaterConfig = UpdaterConfig()
 
   override protected[this] val defaultValues: Config = ConfigFactory.empty()
 

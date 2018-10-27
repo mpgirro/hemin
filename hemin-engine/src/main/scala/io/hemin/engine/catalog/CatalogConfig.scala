@@ -19,10 +19,19 @@ final case class CatalogConfig (
 }
 
 object CatalogConfig
-  extends ConfigDefaults
+  extends ConfigDefaults[CatalogConfig]
     with ConfigStandardValues {
 
   override val configPath: String = s"${Engine.name}.${CatalogStore.name}"
+
+  override def fromConfig(config: Config): CatalogConfig =
+    CatalogConfig(
+      mongoUri       = config.getString(s"$configPath.mongo-uri"),
+      createDatabase = config.getBoolean(s"$configPath.create-database"),
+      defaultPage    = config.getInt(s"$configPath.default-page"),
+      defaultSize    = config.getInt(s"$configPath.default-size"),
+      maxPageSize    = config.getInt(s"$configPath.max-page-size"),
+    )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$configPath.mongo-uri"       -> "mongodb://localhost:27017/hemin",
