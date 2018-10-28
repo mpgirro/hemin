@@ -126,8 +126,9 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * @param query The query to search the internal reverse index for.
     * @param page  The page for the [[io.hemin.engine.model.ResultPage]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
-    * @param size  The size (= maximum number of elements in the [[io.hemin.engine.model.ResultPage.results]]
-    *              list) of the [[io.hemin.engine.model.ResultPage]]. If None, then
+    * @param size  The size (= maximum number of elements in the
+    *              [[io.hemin.engine.model.ResultPage.results]] list) of the
+    *              [[io.hemin.engine.model.ResultPage]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
     * @return The [[io.hemin.engine.model.ResultPage]] matching the query/page/size parameters.
     */

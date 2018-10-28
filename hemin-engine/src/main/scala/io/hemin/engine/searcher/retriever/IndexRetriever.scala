@@ -37,8 +37,9 @@ trait IndexRetriever {
     *
     * @param query The query to search the reverse index for.
     * @param page  The page for the [[io.hemin.engine.model.ResultPage]].
-    * @param size  The size (= maximum number of elements in the [[io.hemin.engine.model.ResultPage.results]]
-    *              list) of the [[io.hemin.engine.model.ResultPage]].
+    * @param size  The size (= maximum number of elements in the
+    *              [[io.hemin.engine.model.ResultPage.results]] list) of
+    *              the [[io.hemin.engine.model.ResultPage]].
     * @return The [[io.hemin.engine.model.ResultPage]] matching the query/page/size parameters.
     */
   final def search(query: String, page: Int, size: Int): Future[ResultPage] = Future {
