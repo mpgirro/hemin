@@ -1,4 +1,4 @@
-package io.hemin.engine.util
+package io.hemin.engine.model
 
 import enumeratum._
 

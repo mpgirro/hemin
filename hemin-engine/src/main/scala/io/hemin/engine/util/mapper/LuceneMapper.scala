@@ -1,7 +1,6 @@
 package io.hemin.engine.util.mapper
 
-import io.hemin.engine.model.IndexDoc
-import io.hemin.engine.util.IndexField
+import io.hemin.engine.model.{IndexDoc, IndexField}
 import org.apache.lucene.document.{Field, StringField, TextField}
 
 

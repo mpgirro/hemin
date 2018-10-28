@@ -1,8 +1,7 @@
 package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.EpisodeItunesInfo
-import io.hemin.engine.model.{Episode, IndexDoc}
-import io.hemin.engine.util.IndexField
+import io.hemin.engine.model.{Episode, IndexDoc, IndexField}
 import org.apache.solr.common.SolrDocument
 
 object EpisodeMapper {

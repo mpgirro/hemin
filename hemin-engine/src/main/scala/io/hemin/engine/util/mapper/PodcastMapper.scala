@@ -1,8 +1,7 @@
 package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.PodcastItunesInfo
-import io.hemin.engine.model.{IndexDoc, Podcast}
-import io.hemin.engine.util.IndexField
+import io.hemin.engine.model.{IndexDoc, IndexField, Podcast}
 import org.apache.solr.common.SolrDocument
 
 object PodcastMapper {
