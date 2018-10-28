@@ -65,6 +65,7 @@ ext {
     sttp_version = '1.1.10'
     reactivemongo_version = '0.16.0'
     scrimage_version = '2.1.0'
+    enumeratum_version = '1.5.13'
     junit_vintage_version = '4.12'
     junit_jupiter_version = '5.1.0'
     junit_platform_version = '1.1.0'
@@ -117,6 +118,7 @@ dependencies {
     compile "com.softwaremill.sttp:akka-http-backend_$scala_major_version:$sttp_version"
 
     compile "com.lihaoyi:pprint_$scala_major_version:0.5.3" // http://www.lihaoyi.com/PPrint/
+    compile "com.beachape:enumeratum_$scala_major_version:1.5.13"
 
     compile "com.sksamuel.scrimage:scrimage-core_2.11:$scrimage_version"
     compile "com.sksamuel.scrimage:scrimage-io-extra_2.11:$scrimage_version"

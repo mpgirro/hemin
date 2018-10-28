@@ -4,7 +4,7 @@ import java.util.Date
 
 import com.google.common.collect.Lists
 import io.hemin.engine.model.IndexDoc
-import io.hemin.engine.model.IndexField
+import io.hemin.engine.util.IndexField
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 object SolrMapper {
@@ -12,24 +12,23 @@ object SolrMapper {
   def toSolr(src: IndexDoc): SolrInputDocument = Option(src)
     .map { s =>
       val d = new SolrInputDocument
-      s.docType.foreach        { x => d.addField(IndexField.DOC_TYPE, x) }
-      s.id.foreach             { x => d.addField(IndexField.ID, x) }
-      s.title.foreach          { x => d.addField(IndexField.TITLE, x) }
-      s.link.foreach           { x => d.addField(IndexField.LINK, x) }
-      s.description.foreach    { x => d.addField(IndexField.DESCRIPTION, x) }
-      s.podcastTitle.foreach   { x => d.addField(IndexField.PODCAST_TITLE, x) }
-      s.pubDate.foreach        { x => d.addField(IndexField.PUB_DATE, DateMapper.asString(x).get) }
-      s.image.foreach          { x => d.addField(IndexField.ITUNES_IMAGE, x) }
-      s.itunesAuthor.foreach   { x => d.addField(IndexField.ITUNES_AUTHOR, x) }
-      s.itunesSummary.foreach  { x => d.addField(IndexField.ITUNES_SUMMARY, x) }
-      s.chapterMarks.foreach   { x => d.addField(IndexField.CHAPTER_MARKS, x) }
-      s.contentEncoded.foreach { x => d.addField(IndexField.CONTENT_ENCODED, x) }
-      s.transcript.foreach     { x => d.addField(IndexField.TRANSCRIPT, x) }
-      s.websiteData.foreach    { x => d.addField(IndexField.WEBSITE_DATA, x) }
+      s.docType.foreach        { x => d.addField(IndexField.DocType.entryName, x) }
+      s.id.foreach             { x => d.addField(IndexField.Id.entryName, x) }
+      s.title.foreach          { x => d.addField(IndexField.Title.entryName, x) }
+      s.link.foreach           { x => d.addField(IndexField.Link.entryName, x) }
+      s.description.foreach    { x => d.addField(IndexField.Description.entryName, x) }
+      s.podcastTitle.foreach   { x => d.addField(IndexField.PodcastTitle.entryName, x) }
+      s.pubDate.foreach        { x => d.addField(IndexField.PubDate.entryName, DateMapper.asString(x).get) }
+      s.image.foreach          { x => d.addField(IndexField.ItunesImage.entryName, x) }
+      s.itunesAuthor.foreach   { x => d.addField(IndexField.ItunesAuthor.entryName, x) }
+      s.itunesSummary.foreach  { x => d.addField(IndexField.ItunesSummary.entryName, x) }
+      s.chapterMarks.foreach   { x => d.addField(IndexField.ChapterMarks.entryName, x) }
+      s.contentEncoded.foreach { x => d.addField(IndexField.ContentEncoded.entryName, x) }
+      s.transcript.foreach     { x => d.addField(IndexField.Transcript.entryName, x) }
+      s.websiteData.foreach    { x => d.addField(IndexField.WebsiteData.entryName, x) }
       d
     }
     .orNull
-
 
   def firstMatch(doc: SolrDocument, fieldName: String): Option[Any] = {
     val os = doc.getFieldValues(fieldName)

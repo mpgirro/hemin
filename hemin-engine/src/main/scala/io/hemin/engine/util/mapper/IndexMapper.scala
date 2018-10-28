@@ -2,7 +2,7 @@ package io.hemin.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.hemin.engine.model.{Episode, IndexDoc, Podcast}
-import io.hemin.engine.model.IndexField
+import io.hemin.engine.util.IndexField
 import org.apache.solr.common.SolrDocument
 
 object IndexMapper {
@@ -27,7 +27,6 @@ object IndexMapper {
       )
     }.orNull
 
-
   def toIndexDoc(src: Episode): IndexDoc = Option(src)
     .map { s =>
       IndexDoc(
@@ -48,14 +47,13 @@ object IndexMapper {
       )
     }.orNull
 
-
-
   def toIndexDoc(src: org.apache.lucene.document.Document): IndexDoc = Option(src)
     .map { s =>
-      val docType = s.get(IndexField.DOC_TYPE)
+      val docType = s.get(IndexField.DocType.entryName)
 
-      if (isNullOrEmpty(docType))
+      if (isNullOrEmpty(docType)) {
         throw new RuntimeException("Document type is required but found NULL")
+      }
 
       docType match {
         case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
@@ -65,23 +63,22 @@ object IndexMapper {
     }
     .orNull
 
-
   def toIndexDoc(src: SolrDocument): IndexDoc = Option(src)
     .map { s =>
-      val docType = SolrMapper.firstStringMatch(s, IndexField.DOC_TYPE)
+      val docType = SolrMapper.firstStringMatch(s, IndexField.DocType.entryName)
       docType match {
         case Some(dt) =>
-          if (isNullOrEmpty(dt))
+          if (isNullOrEmpty(dt)) {
             throw new RuntimeException("Document type is required but found NULL")
+          }
 
           dt match {
             case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
             case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
             case _         => throw new RuntimeException("Unsupported document type : " + docType)
           }
-        case None => throw new RuntimeException("Field '" + IndexField.DOC_TYPE + " could not be extracted")
+        case None => throw new RuntimeException("Field '" + IndexField.DocType.entryName + " could not be extracted")
       }
     }.orNull
-
 
 }

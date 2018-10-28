@@ -2,7 +2,7 @@ package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.PodcastItunesInfo
 import io.hemin.engine.model.{IndexDoc, Podcast}
-import io.hemin.engine.model.IndexField
+import io.hemin.engine.util.IndexField
 import org.apache.solr.common.SolrDocument
 
 object PodcastMapper {
@@ -24,16 +24,15 @@ object PodcastMapper {
     }
     .orNull
 
-
   def toPodcast(src: org.apache.lucene.document.Document): Podcast = Option(src)
     .map { s =>
       Podcast(
-        id          = LuceneMapper.get(s, IndexField.ID),
-        title       = LuceneMapper.get(s, IndexField.TITLE),
-        link        = LuceneMapper.get(s, IndexField.LINK),
-        pubDate     = DateMapper.asLocalDateTime(s.get(IndexField.PUB_DATE)),
-        description = LuceneMapper.get(s, IndexField.DESCRIPTION),
-        image       = LuceneMapper.get(s, IndexField.ITUNES_IMAGE),
+        id          = LuceneMapper.get(s, IndexField.Id.entryName),
+        title       = LuceneMapper.get(s, IndexField.Title.entryName),
+        link        = LuceneMapper.get(s, IndexField.Link.entryName),
+        pubDate     = DateMapper.asLocalDateTime(s.get(IndexField.PubDate.entryName)),
+        description = LuceneMapper.get(s, IndexField.Description.entryName),
+        image       = LuceneMapper.get(s, IndexField.ItunesImage.entryName),
       )
     }.orNull
 
@@ -41,14 +40,13 @@ object PodcastMapper {
   def toPodcast(src: SolrDocument): Podcast = Option(src)
     .map { s =>
       Podcast(
-        id          = SolrMapper.firstStringMatch(s, IndexField.ID),
-        title       = SolrMapper.firstStringMatch(s, IndexField.TITLE),
-        link        = SolrMapper.firstStringMatch(s, IndexField.LINK),
-        pubDate     = SolrMapper.firstDateMatch(s, IndexField.PUB_DATE).flatMap(x => DateMapper.asLocalDateTime(x)),
-        description = SolrMapper.firstStringMatch(s, IndexField.DESCRIPTION),
-        image       = SolrMapper.firstStringMatch(s, IndexField.ITUNES_IMAGE),
+        id          = SolrMapper.firstStringMatch(s, IndexField.Id.entryName),
+        title       = SolrMapper.firstStringMatch(s, IndexField.Title.entryName),
+        link        = SolrMapper.firstStringMatch(s, IndexField.Link.entryName),
+        pubDate     = SolrMapper.firstDateMatch(s, IndexField.PubDate.entryName).flatMap(x => DateMapper.asLocalDateTime(x)),
+        description = SolrMapper.firstStringMatch(s, IndexField.Description.entryName),
+        image       = SolrMapper.firstStringMatch(s, IndexField.ItunesImage.entryName),
       )
     }.orNull
-
 
 }
