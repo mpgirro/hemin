@@ -7,7 +7,7 @@
 [![Twitter](https://img.shields.io/badge/Twitter-%40hemin_io-blue.svg)](https://twitter.com/hemin_io)
 
 
-__DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for full productive use.
+:heavy_exclamation_mark: __DISCLAIMER__: The Hemin infrastructure is still in the initial development phase and not yet ready for full productive use.
 
 
 Hemin is a podcast catalog & search engine infrastructure. It's engine is written in [Scala](https://www.scala-lang.org) (with a small compatibility layer in Java), uses [MongoDB](https://www.mongodb.com) to store the podcast/episode/feed catalog, and indexes the data with [Solr](http://lucene.apache.org/solr/). The REST API relies on the [Play](https://www.playframework.com) framework for routing and JSON. The server is fully asynchronous, and makes heavy use of [Akka](https://akka.io) actors and [Scala Futures](https://docs.scala-lang.org/overviews/core/futures.html). The web client is written in [Typescript](https://www.typescriptlang.org) and builds on the [Angular](https://angular.io) framework. 
@@ -29,7 +29,7 @@ Support for the following standards is planned:
 [![Angular version](https://img.shields.io/badge/angular-5-blue.svg)](https://blog.angular.io/version-5-0-0-of-angular-now-available-37e414935ced)
 
 
-TODO
+The WebApp is available at [hemin.io](https://hemin.io)
 
 
 ## REST API
@@ -38,8 +38,7 @@ TODO
 [![Play Framework version](https://img.shields.io/badge/play-2.6-blue.svg)](https://www.playframework.com/documentation/2.6.x/Highlights26)
 
 
-
-TODO
+The REST endpoint to the API is [api.hemin.io](https://api.hemin.io)
 
 
 ## Engine 
