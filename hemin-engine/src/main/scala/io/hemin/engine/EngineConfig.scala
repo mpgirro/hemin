@@ -1,5 +1,6 @@
 package io.hemin.engine
 
+import com.typesafe.config.ConfigFactory.parseString
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.catalog.CatalogConfig
 import io.hemin.engine.crawler.CrawlerConfig
@@ -52,6 +53,8 @@ object EngineConfig {
     * dispatcher and mailbox configuration for every Akka actor. */
   lazy val defaultConfig: Config = ConfigFactory
     .empty()
+    .withFallback(defaultAkkaConfig)
+    .withFallback(defaultMongoConfig)
     .withFallback(CatalogConfig.defaultConfig)
     .withFallback(CrawlerConfig.defaultConfig)
     .withFallback(IndexConfig.defaultConfig)
@@ -64,6 +67,25 @@ object EngineConfig {
     * as a structure-fixed configuration instance. Equivalent to
     * [[io.hemin.engine.EngineConfig.defaultConfig]] */
   lazy val defaultEngineConfig: EngineConfig = loadFromSafeConfig(defaultConfig)
+
+  lazy val defaultAkkaConfig: Config = ConfigFactory.load(parseString(
+    s"""akka {
+      loggers = ["akka.event.slf4j.Slf4jLogger"]
+      loglevel = "DEBUG"
+
+      # filter the log events using the back-end configuration (e.g. logback.xml) before they are published to the event bus.
+      logging-filter = "akka.event.slf4j.Slf4jLoggingFilter"
+      log-dead-letters = 0
+      log-dead-letters-during-shutdown = off
+    }"""))
+
+  lazy val defaultMongoConfig: Config = ConfigFactory.load(parseString(
+    s"""mongo-async-driver {
+      akka {
+        loggers = ["akka.event.slf4j.Slf4jLogger"]
+        loglevel = DEBUG
+      }
+    }"""))
 
   /** All keys are expected and must be present in the config map.
     * Use [[io.hemin.engine.EngineConfig.defaultConfig()]] for the

@@ -32,15 +32,33 @@ object Engine {
 
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the
     * given configuration map. The internal actor system will have
-    * the default Akka configuration. */
+    * the default Akka configuration as it is defined in
+    * [[io.hemin.engine.EngineConfig.defaultAkkaConfig]]. */
   def boot(config: EngineConfig): Try[Engine] = Try(new Engine(config))
 }
 
 class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
-  def this(config: Config) = this(engineConfig = EngineConfig.load(config), akkaConfig = config)
+  /** Instantiates a new Engine for the given configuration. The
+    * configuration property map will be the foudnation of the
+    * internal [[io.hemin.engine.EngineConfig]]. Not specified
+    * parameters will have default values. The configuration map
+    * will be also tried for the internal Akka system configuration,
+    * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    *
+    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system
+    */
+  def this(config: Config) = this(
+    engineConfig = EngineConfig.load(config),
+    akkaConfig = config.withFallback(EngineConfig.defaultAkkaConfig)
+  )
 
-  def this(config: EngineConfig) = this(engineConfig = config, akkaConfig = ConfigFactory.empty)
+  /** Instantiates a new Engine for the given configuration. The
+    * internal Akka system will use the default configuration as
+    * it is defined in [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    * @param config The Engine's configuration. The Akka system will use defaults.
+    */
+  def this(config: EngineConfig) = this(engineConfig = config, akkaConfig = EngineConfig.defaultAkkaConfig)
 
   /** Configuration of the Engine instance */
   val config: EngineConfig = engineConfig
