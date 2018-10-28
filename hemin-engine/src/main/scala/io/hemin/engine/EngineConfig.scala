@@ -14,7 +14,7 @@ import io.hemin.engine.updater.UpdaterConfig
   * @param catalog Configuration for [[io.hemin.engine.catalog.CatalogStore]] subsystem
   * @param crawler Configuration for [[io.hemin.engine.crawler.Crawler]] subsystem
   * @param index Configuration for [[io.hemin.engine.index.IndexStore]] subsystem
-  * @param node Configuration for [[io.hemin.engine.node.Node]] subsystem manager
+  * @param node Configuration for [[io.hemin.engine.node.Node]] subsystem
   * @param parser Configuration for [[io.hemin.engine.parser.Parser]] subsystem
   * @param searcher Configuration for [[io.hemin.engine.searcher.Searcher]] subsystem
   * @param updater Configuration for [[io.hemin.engine.updater.Updater]] subsystem

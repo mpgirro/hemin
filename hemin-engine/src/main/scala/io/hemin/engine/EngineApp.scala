@@ -48,7 +48,7 @@ object EngineApp extends App {
 
   private def repl(): Unit = {
     log.info("CLI is ready to take commands")
-
+    
     while (running.get) {
       blocking {
         val input = StdIn.readLine()
