@@ -2,7 +2,7 @@ package io.hemin.engine.searcher.retriever
 
 import io.hemin.engine.model.{IndexField, ResultPage}
 import io.hemin.engine.searcher.SearcherConfig
-import io.hemin.engine.util.IndexField._
+import io.hemin.engine.model.IndexField._
 import io.hemin.engine.util.mapper.IndexMapper
 import org.apache.solr.client.solrj.impl.HttpSolrClient
 import org.apache.solr.client.solrj.{SolrClient, SolrQuery}
