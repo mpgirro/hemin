@@ -1,6 +1,6 @@
-package io.hemin.engine.model
+package io.hemin.engine
 
-/** The [[io.hemin.engine.model]] package provides the model classes
+/** This package provides the domain model classes
   * that the Hemin Engine uses in it's internal subsystems. The external
   * API [[io.hemin.engine.Engine]] also produces results with these model
   * classes.
@@ -17,11 +17,11 @@ package io.hemin.engine.model
   * [[io.hemin.engine.model.Patchable]] trait. Hence they provide two methods,
   * `patchLeft()` and `patchRight()`, which are used to perform sane updates
   * to the members of a model, with respect to `Option` and `List`. For example,
-  * and `Option` that is `Some(a)` will only be patched if the new value is
+  * an `Option` that is `Some(a)` will only be patched if the new value is
   * `Some(b)`. Otherwise, the old value will be kept.
   *
   * @author Maximilian Irro
   */
-object model {
+package object model {
 
 }

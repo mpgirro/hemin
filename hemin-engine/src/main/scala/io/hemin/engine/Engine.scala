@@ -33,7 +33,8 @@ object Engine {
     * map will be also tried for the internal Akka system configuration,
     * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
     *
-    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system.
+    * @param config The configuration map that is the base for the Engine's
+    *               configuration and the internal Akka system.
     */
   def boot(config: Config): Try[Engine] = Try(new Engine(config))
 
