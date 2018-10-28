@@ -27,43 +27,36 @@ object Engine {
   final val name: String = "hemin"
 
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
-    * configuration map. The internal [[io.hemin.engine.EngineConfig]]
-    * will be instantiated with the values from this map. All unspecified
-    * properties of the `EngineConfig` members will have the internal
-    * defaults. Akka configuration properties in the configuration
-    * map will also be passed to the internal Akka system. */
+    * configuration map. The configuration property map will be the
+    * foundation of the internal [[io.hemin.engine.EngineConfig]]. Not
+    * specified parameters will have default values. The configuration
+    * map will be also tried for the internal Akka system configuration,
+    * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    *
+    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system.
+    */
   def boot(config: Config): Try[Engine] = Try(new Engine(config))
 
-  /** Try to boot an [[io.hemin.engine.Engine]] instance for the
-    * given configuration map. The internal actor system will have
-    * the default Akka configuration as it is defined in
-    * [[io.hemin.engine.EngineConfig.defaultAkkaConfig]]. */
+  /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
+    * configuration. The internal Akka system will use the default configuration
+    * as it is defined in [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    *
+    * @param config The Engine's configuration. The Akka system will use defaults.
+    */
   def boot(config: EngineConfig): Try[Engine] = Try(new Engine(config))
 }
 
 class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
-  /** Instantiates a new Engine for the given configuration. The
-    * configuration property map will be the foudnation of the
-    * internal [[io.hemin.engine.EngineConfig]]. Not specified
-    * parameters will have default values. The configuration map
-    * will be also tried for the internal Akka system configuration,
-    * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
-    *
-    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system.
-    */
-  def this(config: Config) = this(
+  private def this(config: Config) = this(
     engineConfig = EngineConfig.load(config),
-    akkaConfig = config.withFallback(EngineConfig.defaultAkkaConfig)
+    akkaConfig   = config.withFallback(EngineConfig.defaultAkkaConfig)
   )
 
-  /** Instantiates a new Engine for the given configuration. The
-    * internal Akka system will use the default configuration as
-    * it is defined in [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
-    *
-    * @param config The Engine's configuration. The Akka system will use defaults.
-    */
-  def this(config: EngineConfig) = this(engineConfig = config, akkaConfig = EngineConfig.defaultAkkaConfig)
+  private def this(config: EngineConfig) = this(
+    engineConfig = config,
+    akkaConfig   = EngineConfig.defaultAkkaConfig
+  )
 
   /** Configuration of the Engine instance. */
   val config: EngineConfig = engineConfig
