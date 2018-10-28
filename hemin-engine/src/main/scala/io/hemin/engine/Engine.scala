@@ -60,6 +60,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   /** Instantiates a new Engine for the given configuration. The
     * internal Akka system will use the default configuration as
     * it is defined in [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    *
     * @param config The Engine's configuration. The Akka system will use defaults.
     */
   def this(config: EngineConfig) = this(engineConfig = config, akkaConfig = EngineConfig.defaultAkkaConfig)
@@ -90,8 +91,8 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .onHalfOpen(breakerHalfOpen())).get
 
 
-  // Run the startup sequence. This will throw an exception in case a Failure occurred
-  startupSequence() match {
+  // Run the boot sequence. This will throw an exception in case a Failure occurred
+  bootSequence() match {
     case Success(_)  => log.info("ENGINE startup complete ...")
     case Failure(ex) => throw ex // escalate the construction fault, the factory method will wrap it in a Try-Failure
   }
@@ -195,7 +196,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
   /** The call to warmup() will tap the lazy values, and wait until all
     * subsystems in the actor hierarchy report that they are up and running */
-  private def startupSequence(): Try[Unit] = /*synchronized*/ {
+  private def bootSequence(): Try[Unit] = /*synchronized*/ {
     log.info("ENGINE is starting up ...")
     warmup()
   }
