@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
-import com.typesafe.config.{Config, ConfigFactory}
+import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.exception.HeminException
@@ -20,6 +20,10 @@ import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
 object Engine {
+
+  /** The name of the Engine. This value is used for configuration
+    * namespace(s), as well as the default Mongo database name,
+    * and Solr index name. */
   final val name: String = "hemin"
 
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
@@ -46,7 +50,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * will be also tried for the internal Akka system configuration,
     * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
     *
-    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system
+    * @param config The configuration map that is the base for the Engine's configuration and the internal Akka system.
     */
   def this(config: Config) = this(
     engineConfig = EngineConfig.load(config),
@@ -60,7 +64,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     */
   def this(config: EngineConfig) = this(engineConfig = config, akkaConfig = EngineConfig.defaultAkkaConfig)
 
-  /** Configuration of the Engine instance */
+  /** Configuration of the Engine instance. */
   val config: EngineConfig = engineConfig
 
   private val log = Logger(getClass)
@@ -108,13 +112,25 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   }
 
   /** Processes the arguments by the Command Language Interpreter,
-    * and returns the resulting data as text */
+    * and returns the resulting data as text. */
   def cli(args: String): Future[String] = guarded {
     (bus ? CliInput(args))
       .mapTo[CliOutput]
       .map(_.output)
   }
 
+  /** Search the index for the given query parameter. Returns a
+    * [[io.hemin.engine.model.ResultPage]] instance matching the
+    * page and size parameters.
+    *
+    * @param query The query to search the internal reverse index for.
+    * @param page  The page for the [[io.hemin.engine.model.ResultPage]]. If None, then
+    *              [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
+    * @param size  The size (= maximum number of elements in the [[io.hemin.engine.model.ResultPage.results]]
+    *              list) of the [[io.hemin.engine.model.ResultPage]]. If None, then
+    *              [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
+    * @return The [[io.hemin.engine.model.ResultPage]] matching the query/page/size parameters.
+    */
   def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultPage] = guarded {
     (bus ? SearchRequest(query, page, size))
       .mapTo[SearchResults]

@@ -19,9 +19,8 @@ import io.hemin.engine.updater.Updater.UpdaterMessage
 import io.hemin.engine.util.InitializationProgress
 import io.hemin.engine.util.cli.CliProcessor
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
-import scala.util.{Failure, Success}
 
 object Node {
   final val name = "node"

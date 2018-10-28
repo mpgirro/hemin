@@ -10,7 +10,7 @@ import io.hemin.engine.parser.ParserConfig
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.updater.UpdaterConfig
 
-/** Configuration for [[io.hemin.engine.Engine]]
+/** Configuration for [[io.hemin.engine.Engine]].
   *
   * @param catalog Configuration for [[io.hemin.engine.catalog.CatalogStore]] subsystem
   * @param crawler Configuration for [[io.hemin.engine.crawler.Crawler]] subsystem
@@ -50,9 +50,9 @@ object EngineConfig {
 
   /** The default configuration of an [[io.hemin.engine.Engine]], as a
     * `com.typesafe.config.Config` object. This configuration includes
+    * configuration properties for the internal Akka system and
     * dispatcher and mailbox configuration for every Akka actor. */
-  lazy val defaultConfig: Config = ConfigFactory
-    .empty()
+  lazy val defaultConfig: Config = ConfigFactory.empty()
     .withFallback(defaultAkkaConfig)
     .withFallback(defaultMongoConfig)
     .withFallback(CatalogConfig.defaultConfig)
@@ -65,9 +65,10 @@ object EngineConfig {
 
   /** The default configuration of an [[io.hemin.engine.Engine]]
     * as a structure-fixed configuration instance. Equivalent to
-    * [[io.hemin.engine.EngineConfig.defaultConfig]] */
+    * [[io.hemin.engine.EngineConfig.defaultConfig]]. */
   lazy val defaultEngineConfig: EngineConfig = loadFromSafeConfig(defaultConfig)
 
+  /** The default configuration for the interal Akka system. */
   lazy val defaultAkkaConfig: Config = ConfigFactory.load(parseString(
     s"""akka {
       loggers = ["akka.event.slf4j.Slf4jLogger"]
@@ -79,6 +80,7 @@ object EngineConfig {
       log-dead-letters-during-shutdown = off
     }"""))
 
+  /** The default configuration for the asynchronous MongoDB driver. */
   lazy val defaultMongoConfig: Config = ConfigFactory.load(parseString(
     s"""mongo-async-driver {
       akka {

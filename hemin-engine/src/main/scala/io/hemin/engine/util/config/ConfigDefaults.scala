@@ -7,10 +7,10 @@ trait ConfigDefaults[T] {
   /** Defaults for all values of the configuration case class */
   protected[this] val defaultValues: Config
 
-  /** Default actor dispatcher configuration */
+  /** Default Akka actor dispatcher configuration */
   protected[this] val defaultDispatcher: Config
 
-  /** Default actor mailbox configuration */
+  /** Default Akka actor mailbox configuration */
   protected[this] val defaultMailbox: Config
 
   /** Default configuration as a `com.typesafe.config.Config` object.
@@ -23,6 +23,7 @@ trait ConfigDefaults[T] {
     .withFallback(defaultDispatcher)
     .withFallback(defaultMailbox)
 
+  /** Instantiates this configuration from the provided configuration properties map. */
   def fromConfig(config: Config): T
 
 }

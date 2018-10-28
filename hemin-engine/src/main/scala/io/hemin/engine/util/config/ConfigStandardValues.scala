@@ -5,10 +5,10 @@ trait ConfigStandardValues {
   /** Configuration name(space) */
   val namespace: String
 
-  /** Dispatcher name */
+  /** Akka actor dispatcher name */
   final lazy val dispatcher: String = s"$namespace.dispatcher"
 
-  /** Mailbox name */
+  /** Akka actor mailbox name */
   final lazy val mailbox: String = s"$namespace.mailbox"
 
 }

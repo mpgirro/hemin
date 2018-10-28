@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherStartupComplete}
 import io.hemin.engine.model.ResultPage
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import io.hemin.engine.searcher.retriever.SolrRetriever
+import io.hemin.engine.searcher.retriever.{IndexRetriever, SolrRetriever}
 
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
@@ -33,7 +33,7 @@ class Searcher (config: SearcherConfig)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private val solrRetriever = new SolrRetriever(config, executionContext)
+  private val retriever: IndexRetriever = new SolrRetriever(config, executionContext)
 
   private var supervisor: ActorRef = _
 
@@ -52,7 +52,7 @@ class Searcher (config: SearcherConfig)
       log.debug("Received SearchRequest('{}',{},{}) message", query, page, size)
 
       val theSender = sender()
-      solrRetriever.search(query, page, size)
+      retriever.search(query, page, size)
         .onComplete {
           case Success(rs) => theSender ! SearchResults(rs)
           case Failure(ex) =>
