@@ -2,11 +2,14 @@ package io.hemin.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.hemin.engine.model.{Episode, IndexDoc, IndexField, Podcast}
+import io.hemin.engine.util.Errors
 import org.apache.solr.common.SolrDocument
+
+import scala.util.{Failure, Success, Try}
 
 object IndexMapper {
 
-  def toIndexDoc(src: Podcast): IndexDoc = Option(src)
+  def toIndexDoc(src: Podcast): Try[IndexDoc] = Option(src)
     .map { s =>
       IndexDoc(
         docType        = Some("podcast"),
@@ -24,9 +27,11 @@ object IndexMapper {
         transcript     = None,
         websiteData    = None
       )
-    }.orNull
+    }
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailurePodcastToIndexDoc(src))
 
-  def toIndexDoc(src: Episode): IndexDoc = Option(src)
+  def toIndexDoc(src: Episode): Try[IndexDoc] = Option(src)
     .map { s =>
       IndexDoc(
         docType        = Some("episode"),
@@ -44,40 +49,58 @@ object IndexMapper {
         transcript     = None,
         websiteData    = None
       )
-    }.orNull
+    }
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureEpisodeToIndexDoc(src))
 
-  def toIndexDoc(src: org.apache.lucene.document.Document): IndexDoc = Option(src)
-    .map { s =>
-      val docType = s.get(IndexField.DocType.entryName)
-
+  def toIndexDoc(doc: org.apache.lucene.document.Document): Try[IndexDoc] = Option(doc)
+    .map { d =>
+      val docType = d.get(IndexField.DocType.entryName)
       if (isNullOrEmpty(docType)) {
-        throw new RuntimeException("Document type is required but found NULL")
-      }
-
-      docType match {
-        case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
-        case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
-        case _         => throw new RuntimeException("Unsupported document type : " + docType)
+        Errors.mapperFailureUnsupportedIndexDocumentType("NULL")
+      } else {
+        docType match {
+          case "podcast" =>
+            PodcastMapper.toPodcast(doc) match {
+              case Success(p)  => toIndexDoc(p)
+              case Failure(ex) => Errors.mapperFailurePodcastToIndexDoc(ex)
+            }
+          case "episode" =>
+            EpisodeMapper.toEpisode(doc) match {
+              case Success(e)  => toIndexDoc(e)
+              case Failure(ex) => Errors.mapperFailureEpisodeToIndexDoc(ex)
+            }
+          case _ => Errors.mapperFailureUnsupportedIndexDocumentType(docType)
+        }
       }
     }
-    .orNull
+    .getOrElse(Errors.mapperFailureLuceneToIndexDoc(doc))
 
-  def toIndexDoc(src: SolrDocument): IndexDoc = Option(src)
+  def toIndexDoc(src: SolrDocument): Try[IndexDoc] = Option(src)
     .map { s =>
       val docType = SolrMapper.firstStringMatch(s, IndexField.DocType.entryName)
       docType match {
         case Some(dt) =>
           if (isNullOrEmpty(dt)) {
-            throw new RuntimeException("Document type is required but found NULL")
+            Errors.mapperFailureUnsupportedIndexDocumentType(dt)
+          } else {
+            dt match {
+              case "podcast" =>
+                PodcastMapper.toPodcast(src) match {
+                  case Success(p)  => toIndexDoc(p)
+                  case Failure(ex) => Errors.mapperFailurePodcastToIndexDoc(ex)
+                }
+              case "episode" =>
+                EpisodeMapper.toEpisode(src) match {
+                  case Success(e)  => toIndexDoc(e): Try[IndexDoc]
+                  case Failure(ex) => Errors.mapperFailureEpisodeToIndexDoc(ex)
+                }
+              case _ => Errors.mapperFailureUnsupportedIndexDocumentType(dt)
+            }
           }
-
-          dt match {
-            case "podcast" => toIndexDoc(PodcastMapper.toPodcast(src))
-            case "episode" => toIndexDoc(EpisodeMapper.toEpisode(src))
-            case _         => throw new RuntimeException("Unsupported document type : " + docType)
-          }
-        case None => throw new RuntimeException("Field '" + IndexField.DocType.entryName + " could not be extracted")
+        case None => Errors.mapperFailureIndexFieldNotPresent(IndexField.DocType.entryName)
       }
-    }.orNull
+    }
+    .getOrElse(Errors.mapperFailureSolrToIndexDoc(src))
 
 }

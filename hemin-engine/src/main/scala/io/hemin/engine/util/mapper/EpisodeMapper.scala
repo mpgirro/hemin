@@ -2,11 +2,14 @@ package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.EpisodeItunesInfo
 import io.hemin.engine.model.{Episode, IndexDoc, IndexField}
+import io.hemin.engine.util.Errors
 import org.apache.solr.common.SolrDocument
+
+import scala.util.{Success, Try}
 
 object EpisodeMapper {
 
-  def toEpisode(src: IndexDoc): Episode = Option(src)
+  def toEpisode(src: IndexDoc): Try[Episode] = Option(src)
     .map{ s =>
       Episode(
         id          = s.id,
@@ -22,9 +25,10 @@ object EpisodeMapper {
         )
       )
     }
-    .orNull
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureIndexToEpisode(src))
 
-  def toEpisode(src: org.apache.lucene.document.Document): Episode = Option(src)
+  def toEpisode(src: org.apache.lucene.document.Document): Try[Episode] = Option(src)
     .map { s =>
       Episode(
         id           = LuceneMapper.get(s, IndexField.Id.entryName),
@@ -40,9 +44,11 @@ object EpisodeMapper {
           duration = LuceneMapper.get(s, IndexField.ItunesDuration.entryName),
         )
       )
-    }.orNull
+    }
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureLuceneToEpisode(src))
 
-  def toEpisode(src: SolrDocument): Episode = Option(src)
+  def toEpisode(src: SolrDocument): Try[Episode] = Option(src)
     .map { s =>
       Episode(
         id           = SolrMapper.firstStringMatch(s, IndexField.Id.entryName),
@@ -58,6 +64,8 @@ object EpisodeMapper {
           duration = SolrMapper.firstStringMatch(s, IndexField.ItunesDuration.entryName),
         )
       )
-    }.orNull
+    }
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureSolrToEpisode(src))
 
 }

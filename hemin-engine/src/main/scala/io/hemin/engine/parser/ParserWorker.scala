@@ -19,6 +19,7 @@ import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 object ParserWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
@@ -227,9 +228,15 @@ class ParserWorker (config: ParserConfig)
             crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
           }
 
-          val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(p)) // AddDocIndexEvent(indexMapper.toImmutable(p))
-          //emitIndexEvent(indexEvent)
-          index ! indexEvent
+          IndexMapper.toIndexDoc(p) match {
+            case Success(doc) =>
+              val indexEvent = AddDocIndexEvent(doc)
+              //emitIndexEvent(indexEvent)
+              index ! indexEvent
+            case Failure(ex) =>
+              log.error("Failed to map Podcast to IndexDoc; reason : {}", ex.getMessage)
+              ex.printStackTrace()
+          }
 
           // request that the podcasts website will get added to the index as well, if possible
           p.link match {

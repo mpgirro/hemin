@@ -2,50 +2,61 @@ package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.PodcastItunesInfo
 import io.hemin.engine.model.{IndexDoc, IndexField, Podcast}
+import io.hemin.engine.util.Errors
 import org.apache.solr.common.SolrDocument
+
+import scala.util.{Success, Try}
 
 object PodcastMapper {
 
-  def toPodcast(src: IndexDoc): Podcast = Option(src)
-    .map{ s =>
+  def toPodcast(doc: IndexDoc): Try[Podcast] = Option(doc)
+    .map{ d =>
       Podcast(
-        id          = s.id,
-        title       = s.title,
-        link        = s.link,
-        description = s.description,
-        pubDate     = s.pubDate,
-        image       = s.image,
+        id          = d.id,
+        title       = d.title,
+        link        = d.link,
+        description = d.description,
+        pubDate     = d.pubDate,
+        image       = d.image,
         itunes = PodcastItunesInfo(
-          author  = s.itunesAuthor,
-          summary = s.itunesSummary
+          author  = d.itunesAuthor,
+          summary = d.itunesSummary
         )
       )
     }
-    .orNull
+    .map(Success(_))
+    //.getOrElse(Failure(Errors.mapperErrorIndexToPodcast(doc)))
+    .getOrElse(Errors.mapperFailureIndexToPodcast(doc))
 
-  def toPodcast(src: org.apache.lucene.document.Document): Podcast = Option(src)
-    .map { s =>
+  def toPodcast(doc: org.apache.lucene.document.Document): Try[Podcast] = Option(doc)
+    .map { d =>
       Podcast(
-        id          = LuceneMapper.get(s, IndexField.Id.entryName),
-        title       = LuceneMapper.get(s, IndexField.Title.entryName),
-        link        = LuceneMapper.get(s, IndexField.Link.entryName),
-        pubDate     = DateMapper.asLocalDateTime(s.get(IndexField.PubDate.entryName)),
-        description = LuceneMapper.get(s, IndexField.Description.entryName),
-        image       = LuceneMapper.get(s, IndexField.ItunesImage.entryName),
+        id          = LuceneMapper.get(d, IndexField.Id.entryName),
+        title       = LuceneMapper.get(d, IndexField.Title.entryName),
+        link        = LuceneMapper.get(d, IndexField.Link.entryName),
+        pubDate     = DateMapper.asLocalDateTime(d.get(IndexField.PubDate.entryName)),
+        description = LuceneMapper.get(d, IndexField.Description.entryName),
+        image       = LuceneMapper.get(d, IndexField.ItunesImage.entryName),
       )
-    }.orNull
+    }
+    .map(Success(_))
+    //.getOrElse(Failure(Errors.mapperErrorLuceneToPodcast(doc)))
+    .getOrElse(Errors.mapperFailureLuceneToPodcast(doc))
 
 
-  def toPodcast(src: SolrDocument): Podcast = Option(src)
-    .map { s =>
+  def toPodcast(doc: SolrDocument): Try[Podcast] = Option(doc)
+    .map { d =>
       Podcast(
-        id          = SolrMapper.firstStringMatch(s, IndexField.Id.entryName),
-        title       = SolrMapper.firstStringMatch(s, IndexField.Title.entryName),
-        link        = SolrMapper.firstStringMatch(s, IndexField.Link.entryName),
-        pubDate     = SolrMapper.firstDateMatch(s, IndexField.PubDate.entryName).flatMap(x => DateMapper.asLocalDateTime(x)),
-        description = SolrMapper.firstStringMatch(s, IndexField.Description.entryName),
-        image       = SolrMapper.firstStringMatch(s, IndexField.ItunesImage.entryName),
+        id          = SolrMapper.firstStringMatch(d, IndexField.Id.entryName),
+        title       = SolrMapper.firstStringMatch(d, IndexField.Title.entryName),
+        link        = SolrMapper.firstStringMatch(d, IndexField.Link.entryName),
+        pubDate     = SolrMapper.firstDateMatch(d, IndexField.PubDate.entryName).flatMap(x => DateMapper.asLocalDateTime(x)),
+        description = SolrMapper.firstStringMatch(d, IndexField.Description.entryName),
+        image       = SolrMapper.firstStringMatch(d, IndexField.ItunesImage.entryName),
       )
-    }.orNull
+    }
+    .map(Success(_))
+    //.getOrElse(Failure(Errors.mapperErrorSolrToPodcast(doc)))
+    .getOrElse(Errors.mapperFailureSolrToPodcast(doc))
 
 }

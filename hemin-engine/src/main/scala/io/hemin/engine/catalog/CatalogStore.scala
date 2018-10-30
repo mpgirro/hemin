@@ -684,9 +684,16 @@ class CatalogStore(config: CatalogConfig)
                     case Success(_) =>
                       log.info("episode registered : '{}' [p:{},e:{}]", e.title.get, podcastId, e.id.get)
 
-                      val indexEvent = AddDocIndexEvent(IndexMapper.toIndexDoc(e))// AddDocIndexEvent(indexMapper.toImmutable(e))
-                      //emitIndexEvent(indexEvent)
-                      indexStore ! indexEvent
+
+                      IndexMapper.toIndexDoc(e) match {
+                        case Success(doc) =>
+                          val indexEvent = AddDocIndexEvent(doc)
+                          //emitIndexEvent(indexEvent)
+                          indexStore ! indexEvent
+                        case Failure(ex) =>
+                          log.error("Failed to map Episode to IndexDoc; reason : {}", ex.getMessage)
+                          ex.printStackTrace()
+                      }
 
                       /* TODO send an update to all catalogs via the broker, so all other stores will have
                        * the data too (this will of course mean that I will update my own data, which is a

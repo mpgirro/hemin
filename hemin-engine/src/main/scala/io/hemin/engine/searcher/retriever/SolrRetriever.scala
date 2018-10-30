@@ -1,6 +1,7 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.model.{IndexField, ResultPage}
+import com.typesafe.scalalogging.Logger
+import io.hemin.engine.model.{IndexDoc, IndexField, ResultPage}
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.model.IndexField._
 import io.hemin.engine.util.mapper.IndexMapper
@@ -10,9 +11,12 @@ import org.apache.solr.common.SolrDocumentList
 
 import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
+import scala.util.{Failure, Success}
 
 
 class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends IndexRetriever {
+
+  private val log = Logger(getClass)
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
@@ -52,6 +56,25 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
     .map(f => s"${f.entryName}:(${query.trim})")
     .mkString(" ")
 
+  private def toResults(docs: SolrDocumentList): List[IndexDoc] = {
+    val (successes, failures) = docs
+      .asScala
+      .map(IndexMapper.toIndexDoc)
+      .partition(_.isSuccess)
+
+    // report all failures
+    failures
+      .map(_.failed.get) // ensure a Seq[Failure[IndexDoc]]
+      .foreach { ex =>
+        log.error("Failed to map Solr result to IndexDoc; reason : {}", ex.getMessage)
+        ex.printStackTrace()
+      }
+
+    successes
+      .map(_.get)
+      .toList
+  }
+
   private def searchSolr(q: String, p: Int, s: Int, queryOperator: Option[String], minMatch: Option[String], sort: Option[String]): ResultPage = {
 
     // TODO sort is unused (and never set in caller)
@@ -89,7 +112,7 @@ class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends Index
         currPage  = p,
         maxPage   = maxPage, // TODO
         totalHits = rs.getNumFound.toInt,
-        results   = rs.asScala.map(IndexMapper.toIndexDoc).toList,
+        results   = toResults(rs),
       )
     }
 
