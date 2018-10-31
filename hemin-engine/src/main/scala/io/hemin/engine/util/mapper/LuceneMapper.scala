@@ -1,12 +1,15 @@
 package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.{IndexDoc, IndexField}
+import io.hemin.engine.util.Errors
 import org.apache.lucene.document.{Field, StringField, TextField}
+
+import scala.util.{Success, Try}
 
 
 object LuceneMapper {
 
-  def toLucene(src: IndexDoc): org.apache.lucene.document.Document = Option(src)
+  def toLucene(src: IndexDoc): Try[org.apache.lucene.document.Document] = Option(src)
     .map { s =>
       val d = new org.apache.lucene.document.Document
       s.docType.foreach        { x => d.add(new StringField(IndexField.DocType.entryName, x, Field.Store.YES)) }
@@ -25,7 +28,8 @@ object LuceneMapper {
       s.websiteData.foreach    { x => d.add(new TextField(IndexField.WebsiteData.entryName, x, Field.Store.NO)) }
       d
     }
-    .orNull
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureIndexToLucene(src))
 
   def get(doc: org.apache.lucene.document.Document, fieldName: String): Option[String] = Option(doc.get(fieldName))
 

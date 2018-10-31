@@ -2,7 +2,7 @@ package io.hemin.engine.util
 
 import io.hemin.engine.exception.HeminException
 import io.hemin.engine.model.{Episode, IndexDoc, IndexField, Podcast}
-import org.apache.solr.common.SolrDocument
+import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 import scala.util.{Failure, Try}
 
@@ -57,5 +57,13 @@ object Errors {
   def mapperFailureSolrToEpisode(value: SolrDocument): Try[Episode] = Failure(mapperErrorSolrToEpisode(value))
   def mapperErrorSolrToEpisode(value: SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr Document to Episode : $value")
+
+  def mapperFailureIndexToLucene(value: IndexDoc): Try[org.apache.lucene.document.Document] = Failure(mapperErrorIndexToLucene(value))
+  def mapperErrorIndexToLucene(value: IndexDoc): HeminException =
+    new HeminException(s"Error mapping IndexDoc to Lucene Document : $value")
+
+  def mapperFailureIndexToSolr(value: IndexDoc): Try[SolrInputDocument] = Failure(mapperErrorIndexToSolr(value))
+  def mapperErrorIndexToSolr(value: IndexDoc): HeminException =
+    new HeminException(s"Error mapping IndexDoc to Solr Document : $value")
 
 }

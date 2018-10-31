@@ -4,11 +4,14 @@ import java.util.Date
 
 import com.google.common.collect.Lists
 import io.hemin.engine.model.{IndexDoc, IndexField}
+import io.hemin.engine.util.Errors
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
+
+import scala.util.{Success, Try}
 
 object SolrMapper {
 
-  def toSolr(src: IndexDoc): SolrInputDocument = Option(src)
+  def toSolr(src: IndexDoc): Try[SolrInputDocument] = Option(src)
     .map { s =>
       val d = new SolrInputDocument
       s.docType.foreach        { x => d.addField(IndexField.DocType.entryName, x) }
@@ -27,7 +30,8 @@ object SolrMapper {
       s.websiteData.foreach    { x => d.addField(IndexField.WebsiteData.entryName, x) }
       d
     }
-    .orNull
+    .map(Success(_))
+    .getOrElse(Errors.mapperFailureIndexToSolr(src))
 
   def firstMatch(doc: SolrDocument, fieldName: String): Option[Any] = {
     val os = doc.getFieldValues(fieldName)

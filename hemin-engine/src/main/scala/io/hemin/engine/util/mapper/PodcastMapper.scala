@@ -25,7 +25,6 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    //.getOrElse(Failure(Errors.mapperErrorIndexToPodcast(doc)))
     .getOrElse(Errors.mapperFailureIndexToPodcast(doc))
 
   def toPodcast(doc: org.apache.lucene.document.Document): Try[Podcast] = Option(doc)
@@ -40,7 +39,6 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    //.getOrElse(Failure(Errors.mapperErrorLuceneToPodcast(doc)))
     .getOrElse(Errors.mapperFailureLuceneToPodcast(doc))
 
 
@@ -56,7 +54,6 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    //.getOrElse(Failure(Errors.mapperErrorSolrToPodcast(doc)))
     .getOrElse(Errors.mapperFailureSolrToPodcast(doc))
 
 }

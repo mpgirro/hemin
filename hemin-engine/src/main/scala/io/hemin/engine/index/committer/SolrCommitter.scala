@@ -6,9 +6,11 @@ import java.util.concurrent.ExecutorService
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.index.IndexConfig
 import io.hemin.engine.model.IndexDoc
-import io.hemin.engine.util.mapper.SolrMapper.toSolr
+import io.hemin.engine.util.mapper.SolrMapper
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient
 import org.apache.solr.client.solrj.{SolrClient, SolrServerException}
+
+import scala.util.{Failure, Success}
 
 
 class SolrCommitter(config: IndexConfig, executorService: ExecutorService) extends IndexCommitter {
@@ -35,7 +37,13 @@ class SolrCommitter(config: IndexConfig, executorService: ExecutorService) exten
 
     // TODO do not always solr.add (produces duplicates), but update by EXO instead
 
-    solr.add(toSolr(doc))
-    solr.commit()
+    SolrMapper.toSolr(doc) match {
+      case Success(d) =>
+        solr.add(d)
+        solr.commit()
+      case Failure(ex) =>
+        log.error("Failed to map IndexDoc to Solr; reason : {}", ex.getMessage)
+        ex.printStackTrace()
+    }
   }
 }
