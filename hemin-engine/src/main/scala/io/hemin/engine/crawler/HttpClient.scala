@@ -10,10 +10,9 @@ import io.hemin.engine.exception.HeminException
 import scala.concurrent.duration._
 import scala.io.Source
 
-class HttpClient (val timeout: Long,
-                  val DOWNLOAD_MAXBYTES: Long) {
+class HttpClient (timeout: Long, downloadMaxBytes: Long) {
 
-  private val log = Logger(classOf[HttpClient])
+  private val log = Logger(getClass)
 
   private val DOWNLOAD_TIMEOUT = timeout.seconds
 
@@ -48,7 +47,7 @@ class HttpClient (val timeout: Long,
 
   private def headCheckHTTP(url: String): HeadResult = {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
-      .head(uri"${url}")
+      .head(uri"$url")
       .readTimeout(DOWNLOAD_TIMEOUT)
       .acceptEncoding("")
       .send()
@@ -73,17 +72,17 @@ class HttpClient (val timeout: Long,
     }
 
     val mimeType: Option[String] = response.contentType
-      .map(ct => Some(ct.split(";")(0).trim))
-      .getOrElse(None)
+      .map(_.split(";")(0))
+      .map(_.trim)
 
     mimeType match {
       case Some(mime) =>
         if (!isValidMime(mime)) {
           mime match {
             case _@("audio/mpeg" | "application/octet-stream") =>
-              throw new HeminException(s"Invalid MIME-type '${mime}' of '${url}'")
+              throw new HeminException(s"Invalid MIME-type '$mime' of '$url'")
             case _ =>
-              throw new HeminException(s"Unexpected MIME-type '${mime}' of '${url}")
+              throw new HeminException(s"Unexpected MIME-type '$mime' of '$url")
           }
         }
       case None =>
@@ -93,15 +92,15 @@ class HttpClient (val timeout: Long,
 
     // extract the character encoding of the resource if it is returned, to avoid encoding problems
     val encoding: Option[String] = response.contentType
-      .map(ct => ct.split(";")
-        .lift(1)                      // -> charset="UTF-8"
-        .map(_.split("=")
-        .lift(1)                  // -> "UTF-8"
-        .map( _
-        .replaceAll("\"", "") // remove quotation marks if any
-        .trim ))              // remove whitespace
-        .getOrElse(None))
-      .getOrElse(None)
+      .flatMap(_
+        .split(";")
+        .lift(1)
+        .flatMap(_
+          .split("=")
+          .lift(1) // -> "UTF-8"
+          .map(_
+            .replaceAll("\"", "") // remove quotation marks if any
+            .trim)))
 
     //set the etag if existent
     val eTag: Option[String] = response.header("etag")
@@ -153,7 +152,7 @@ class HttpClient (val timeout: Long,
 
   private def fetchContentHTTP(url: String, encoding: Option[String]): String = {
     val request = sttp
-      .get(uri"${url}")
+      .get(uri"$url")
       .readTimeout(DOWNLOAD_TIMEOUT)
       .response(asByteArray) // prevent assuming UTF-8 encoding, because some feeds do not use it
 
@@ -170,14 +169,14 @@ class HttpClient (val timeout: Long,
       val mimeType = ct.split(";")(0).trim
       if (!isValidMime(mimeType)) {
         //log.error("Aborted before downloading a file with invalid MIME-type : '{}' from : '{}'", mimeType, url)
-        throw new HeminException(s"Aborted before downloading a file with invalid MIME-type : '${mimeType}'") // TODO make dedicated exception
+        throw new HeminException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'") // TODO make dedicated exception
       }
     })
 
     response.contentLength.foreach(cl => {
-      if (cl > DOWNLOAD_MAXBYTES) {
+      if (cl > downloadMaxBytes) {
         //log.error("Refusing to download resource because content length exceeds maximum: {} > {}", cl, DOWNLOAD_MAXBYTES)
-        throw new HeminException(s"Refusing to download resource because content length exceeds maximum: ${cl} > ${DOWNLOAD_MAXBYTES}")
+        throw new HeminException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")
       }
     })
 
@@ -185,7 +184,7 @@ class HttpClient (val timeout: Long,
     response.body match {
       case Left(errorMessage) =>
         //log.error("Error collecting download body, message : {}", errorMessage)
-        throw new HeminException(s"Error collecting download body, message : ${errorMessage}") // TODO make dedicated exception
+        throw new HeminException(s"Error collecting download body, message : $errorMessage") // TODO make dedicated exception
       case Right(data) =>
         log.debug("Finished collecting content from GET response : {}", url)
 
