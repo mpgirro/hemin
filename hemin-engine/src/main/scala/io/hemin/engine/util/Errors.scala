@@ -8,60 +8,74 @@ import scala.util.{Failure, Try}
 
 object Errors {
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorIndexToPodcast()]] as a Failure */
   def mapperFailureIndexToPodcast(value: IndexDoc): Try[Podcast] = Failure(mapperErrorIndexToPodcast(value))
   def mapperErrorIndexToPodcast(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Podcast : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorLuceneToPodcast()]] as a Failure */
   def mapperFailureLuceneToPodcast(value: org.apache.lucene.document.Document): Try[Podcast] = Failure(mapperErrorLuceneToPodcast(value))
   def mapperErrorLuceneToPodcast(value: org.apache.lucene.document.Document): HeminException =
     new HeminException(s"Error mapping Lucene Document to Podcast : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorSolrToPodcast()]] as a Failure */
   def mapperFailureSolrToPodcast(value: SolrDocument): Try[Podcast] = Failure(mapperErrorSolrToPodcast(value))
   def mapperErrorSolrToPodcast(value: SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr Document to Podcast : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorLuceneToIndexDoc()]] as a Failure */
   def mapperFailureLuceneToIndexDoc(value: org.apache.lucene.document.Document): Try[IndexDoc] = Failure(mapperErrorLuceneToIndexDoc(value))
   def mapperErrorLuceneToIndexDoc(value: org.apache.lucene.document.Document): HeminException =
     new HeminException(s"Error mapping Lucene Document to IndexDoc : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorSolrToIndexDoc()]] as a Failure */
   def mapperFailureSolrToIndexDoc(value: SolrDocument): Try[IndexDoc] = Failure(mapperErrorSolrToIndexDoc(value))
   def mapperErrorSolrToIndexDoc(value: SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr to IndexDoc : $value")
 
-  def mapperFailurePodcastToIndexDoc(cause: Throwable): Try[IndexDoc] = Failure(cause)
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorPodcastToIndexDoc()]] as a Failure */
   def mapperFailurePodcastToIndexDoc(value: Podcast): Try[IndexDoc] = Failure(mapperErrorPodcastToIndexDoc(value))
+  def mapperFailurePodcastToIndexDoc(cause: Throwable): Try[IndexDoc] = Failure(cause)
   def mapperErrorPodcastToIndexDoc(value: Podcast): HeminException =
     new HeminException(s"Error mapping Podcast to IndexDoc : $value")
 
-  def mapperFailureEpisodeToIndexDoc(cause: Throwable): Try[IndexDoc] = Failure(cause)
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorEpisodeToIndexDoc()]] as a Failure */
   def mapperFailureEpisodeToIndexDoc(value: Episode): Try[IndexDoc] = Failure(mapperErrorEpisodeToIndexDoc(value))
+  def mapperFailureEpisodeToIndexDoc(cause: Throwable): Try[IndexDoc] = Failure(cause)
   def mapperErrorEpisodeToIndexDoc(value: Episode): HeminException =
     new HeminException(s"Error mapping Episode to IndexDoc : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorUnsupportedIndexDocumentType()]] as a Failure */
   def mapperFailureUnsupportedIndexDocumentType(value: String): Try[IndexDoc] = Failure(mapperErrorUnsupportedIndexDocumentType(value))
   def mapperErrorUnsupportedIndexDocumentType(value: String): HeminException =
     new HeminException("Unsupported document type : " + value)
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorIndexFieldNotPresent()]] as a Failure */
   def mapperFailureIndexFieldNotPresent(value: String): Try[IndexDoc] = Failure(mapperErrorIndexFieldNotPresent(value))
   def mapperErrorIndexFieldNotPresent(value: String): HeminException =
     new HeminException(s"Field '$value' could not be extracted")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorIndexToEpisode()]] as a Failure */
   def mapperFailureIndexToEpisode(value: IndexDoc): Try[Episode] = Failure(mapperErrorIndexToEpisode(value))
   def mapperErrorIndexToEpisode(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Episode : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorLuceneToEpisode()]] as a Failure */
   def mapperFailureLuceneToEpisode(value: org.apache.lucene.document.Document): Try[Episode] = Failure(mapperErrorLuceneToEpisode(value))
   def mapperErrorLuceneToEpisode(value: org.apache.lucene.document.Document): HeminException =
     new HeminException(s"Error mapping Lucene Document to Episode : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorSolrToEpisode()]] as a Failure */
   def mapperFailureSolrToEpisode(value: SolrDocument): Try[Episode] = Failure(mapperErrorSolrToEpisode(value))
   def mapperErrorSolrToEpisode(value: SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr Document to Episode : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorIndexToLucene()]] as a Failure */
   def mapperFailureIndexToLucene(value: IndexDoc): Try[org.apache.lucene.document.Document] = Failure(mapperErrorIndexToLucene(value))
   def mapperErrorIndexToLucene(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Lucene Document : $value")
 
+  /** Returns the result of [[io.hemin.engine.util.Errors.mapperErrorIndexToSolr()]] as a Failure */
   def mapperFailureIndexToSolr(value: IndexDoc): Try[SolrInputDocument] = Failure(mapperErrorIndexToSolr(value))
   def mapperErrorIndexToSolr(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Solr Document : $value")
