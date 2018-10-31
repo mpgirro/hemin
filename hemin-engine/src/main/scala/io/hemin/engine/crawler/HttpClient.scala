@@ -1,14 +1,12 @@
 package io.hemin.engine.crawler
 
 import java.nio.file.Paths
-import java.util.Optional
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.model.HeadResult
+import io.hemin.engine.crawler.http.HeadResult
 import io.hemin.engine.exception.HeminException
 
-import scala.compat.java8.OptionConverters._
 import scala.concurrent.duration._
 import scala.io.Source
 
@@ -111,13 +109,13 @@ class HttpClient (val timeout: Long,
     //set the "last modified" header field if existent
     val lastModified: Option[String] = response.header("last-modified")
 
-    new HeadResult(
-      response.code,
-      location.asJava,
-      mimeType.asJava,
-      encoding.asJava,
-      eTag.asJava,
-      lastModified.asJava
+    HeadResult(
+      statusCode = response.code,
+      location,
+      mimeType,
+      contentEncoding = encoding,
+      eTag,
+      lastModified,
     )
   }
 
@@ -128,13 +126,13 @@ class HttpClient (val timeout: Long,
     val file = path.toFile
     val status = if (file.exists()) 200 else 404
 
-    new HeadResult(
-      status,
-      Optional.of(url),
-      Optional.of(Option(mimeType).getOrElse("text/xml")),
-      Optional.of("UTF-8"),
-      Optional.empty(),
-      Optional.empty()
+    HeadResult(
+      statusCode = status,
+      location = Option(url),
+      mimeType = Option(mimeType).orElse(Some("text/xml")),
+      contentEncoding = Option("UTF-8"),
+      eTag = None,
+      lastModified = None,
     )
   }
 
@@ -143,7 +141,7 @@ class HttpClient (val timeout: Long,
   @throws(classOf[java.net.SocketTimeoutException])
   @throws(classOf[java.net.UnknownHostException])
   @throws(classOf[javax.net.ssl.SSLHandshakeException])
-  def fetchContent(url: String, encoding: java.util.Optional[String]): String = {
+  def fetchContent(url: String, encoding: Option[String]): String = {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       fetchContentHTTP(url, encoding)
     } else if (url.startsWith("file:///")) {
@@ -153,13 +151,13 @@ class HttpClient (val timeout: Long,
     }
   }
 
-  private def fetchContentHTTP(url: String, encoding: java.util.Optional[String]): String = {
+  private def fetchContentHTTP(url: String, encoding: Option[String]): String = {
     val request = sttp
       .get(uri"${url}")
       .readTimeout(DOWNLOAD_TIMEOUT)
       .response(asByteArray) // prevent assuming UTF-8 encoding, because some feeds do not use it
 
-    encoding.asScala.foreach(e => request.acceptEncoding(e))
+    encoding.foreach(e => request.acceptEncoding(e))
 
     val response = request.send()
 
@@ -191,11 +189,11 @@ class HttpClient (val timeout: Long,
       case Right(data) =>
         log.debug("Finished collecting content from GET response : {}", url)
 
-        new String(data, encoding.asScala.getOrElse("utf-8"))
+        new String(data, encoding.getOrElse("utf-8"))
     }
   }
 
-  private def fetchContentFILE(url: String, encoding: java.util.Optional[String]): String = {
+  private def fetchContentFILE(url: String, encoding: Option[String]): String = {
     Source.fromURL(url).getLines.mkString
   }
 

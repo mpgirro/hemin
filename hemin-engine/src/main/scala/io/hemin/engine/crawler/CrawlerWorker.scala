@@ -178,9 +178,9 @@ class CrawlerWorker (config: CrawlerConfig)
     blocking {
       val headResult = httpClient.headCheck(url)
 
-      val encoding = headResult.getContentEncoding.asScala
+      val encoding = headResult.contentEncoding
 
-      val location = headResult.getLocation.asScala
+      val location = headResult.location
 
       // TODO check if eTag differs from last known value
 
@@ -241,7 +241,7 @@ class CrawlerWorker (config: CrawlerConfig)
     */
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
-      val data = httpClient.fetchContent(url, encoding.asJava)
+      val data = httpClient.fetchContent(url, encoding)
       job match {
         case NewPodcastFetchJob() =>
           parser ! ParseNewPodcastData(url, id, data)
