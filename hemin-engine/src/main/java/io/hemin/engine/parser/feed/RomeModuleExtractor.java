@@ -1,4 +1,4 @@
-package io.hemin.engine.parse.rss;
+package io.hemin.engine.parser.feed;
 
 
 import com.rometools.modules.atom.modules.AtomLinkModule;
@@ -9,7 +9,7 @@ import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
-import io.hemin.engine.parse.rss.rome.PodloveSimpleChapterModule;
+import io.hemin.engine.parser.feed.rome.PodloveSimpleChapterModule;
 
 import java.util.LinkedList;
 import java.util.List;

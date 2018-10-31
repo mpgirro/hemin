@@ -2,16 +2,14 @@ package io.hemin.engine.util.mapper
 
 import java.net.URL
 
-import io.hemin.engine.exception.HeminException
-
-import scala.util.{Failure, Success, Try}
+import scala.util.Try
 
 object UrlMapper {
 
   def asString(url: URL): Option[String] = Option(url.toExternalForm)
 
-  // - the URL constructor can throw a java.net.MalformedURLException
-  // - the Option.get call can fail also, but handling it cleanly is
+  // + the URL constructor can throw a java.net.MalformedURLException
+  // + the Option.get call can fail also, but handling it cleanly is
   //   just verbose and brings no benefit
   def asUrl(url: String): Try[URL] = Try(Option(url).map(new URL(_)).get)
 

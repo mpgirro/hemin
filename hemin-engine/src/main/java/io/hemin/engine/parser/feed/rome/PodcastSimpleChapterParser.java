@@ -1,4 +1,4 @@
-package io.hemin.engine.parse.rss.rome;
+package io.hemin.engine.parser.feed.rome;
 
 import com.rometools.rome.feed.module.Module;
 import com.rometools.rome.io.ModuleParser;
