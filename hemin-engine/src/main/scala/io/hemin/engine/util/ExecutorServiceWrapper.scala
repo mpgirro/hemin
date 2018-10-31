@@ -12,7 +12,7 @@ import scala.util.control.NonFatal
 
 class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorService {
 
-  def execute(command: Runnable) {
+  def execute(command: Runnable): Unit = {
     ec.execute(() => {
       try command.run() catch {
         case NonFatal(ex) => ec.reportFailure(ex)
@@ -23,7 +23,7 @@ class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorServ
   def isTerminated: Boolean = false
   def isShutdown: Boolean = false
 
-  def shutdown() {
+  def shutdown(): Unit = {
     throw new UnsupportedOperationException("ExecutorServiceWrapper.shutdown")
   }
 
