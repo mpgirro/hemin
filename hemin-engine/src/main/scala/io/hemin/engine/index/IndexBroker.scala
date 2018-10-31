@@ -1,14 +1,13 @@
 package io.hemin.engine.index
 
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, Props, SupervisorStrategy, Terminated}
 import akka.cluster.pubsub.DistributedPubSub
 import akka.cluster.pubsub.DistributedPubSubMediator.{Put, Subscribe, SubscribeAck}
 import akka.routing.{ActorRefRoutee, BroadcastRoutingLogic, RoundRobinRoutingLogic, Router}
 import com.typesafe.config.ConfigFactory
-import io.hemin.engine.node.Node.ActorRefSupervisor
 import io.hemin.engine.index.IndexStore.{IndexCommand, IndexEvent, IndexQuery}
-import io.hemin.engine.exception.SearchException
+import io.hemin.engine.node.Node.ActorRefSupervisor
 
 import scala.concurrent.duration._
 
@@ -58,7 +57,6 @@ class IndexBroker (config: IndexConfig)
   // TODO is this working when running in a cluster setup?
   override val supervisorStrategy: SupervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-      case _: SearchException => Resume
       case _: Exception       => Escalate
     }
 

@@ -1,11 +1,10 @@
 package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
-import io.hemin.engine.exception.SearchException
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter
 import io.hemin.engine.model.{IndexDoc, ResultPage}
+import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
 import io.hemin.engine.util.ExecutorServiceWrapper
 
 import scala.concurrent.ExecutionContext
@@ -59,8 +58,6 @@ class IndexStore (config: IndexConfig)
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
     cause match {
-      case e: SearchException =>
-        log.error("Error trying to search the index; reason: {}", e.getMessage)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
         sender ! IndexSearchResults(ResultPage()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können

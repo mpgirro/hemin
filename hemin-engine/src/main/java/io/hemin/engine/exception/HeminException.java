@@ -2,17 +2,13 @@ package io.hemin.engine.exception;
 
 public class HeminException extends Exception {
 
-//    private static final Logger log = LoggerFactory.getLogger(HeminException.class);
-
-    public HeminException() {
-
-    }
+    public HeminException() { }
 
     public HeminException(String message) {
         super(message);
     }
 
-    public HeminException(final String message, final String errorConstant) {
+    public HeminException(String message, String errorConstant) {
         super(message);
     }
 
@@ -20,7 +16,7 @@ public class HeminException extends Exception {
         super(message, cause);
     }
 
-    public HeminException(final String message, final String errorConstant, final Throwable cause) {
+    public HeminException(String message, String errorConstant, Throwable cause) {
         super(message, cause);
     }
 
