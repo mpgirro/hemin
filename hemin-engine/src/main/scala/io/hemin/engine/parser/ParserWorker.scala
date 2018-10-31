@@ -5,12 +5,11 @@ import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.node.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
-import io.hemin.engine.exception.FeedParsingException
 import io.hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
-import io.hemin.engine.model.{Episode, FeedStatus, Image}
+import io.hemin.engine.model.{Episode, FeedStatus, Image, Podcast}
+import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
 import io.hemin.engine.util.HashUtil
@@ -44,22 +43,9 @@ class ParserWorker (config: ParserConfig)
 
   //private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
 
-  private var currFeedUrl = ""
-  private var currPodcastId = ""
-
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
     cause match {
-      case e: FeedParsingException =>
-        log.error("FeedParsingException occured while processing feed : {}", currFeedUrl)
-        //directoryStore ! FeedStatusUpdate(currPodcastExo, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
-        val catalogEvent = FeedStatusUpdate(currPodcastId, currFeedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
-        //emitCatalogEvent(catalogEvent)
-        catalog ! catalogEvent
-        currPodcastId = ""
-        currFeedUrl = ""
-      case e: java.lang.StackOverflowError =>
-        log.error("StackOverflowError parsing : {} ; reason: {}", currFeedUrl, e.getMessage, e)
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
     }
@@ -110,26 +96,12 @@ class ParserWorker (config: ParserConfig)
 
   private def onParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String): Unit = {
     log.debug("Received ParseNewPodcastData for feed: " + feedUrl)
-
-    currFeedUrl = feedUrl
-    currPodcastId = podcastId
-
     parse(podcastId, feedUrl, feedData, isNewPodcast = true)
-
-    currFeedUrl = ""
-    currPodcastId = ""
   }
 
   private def onParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String): Unit = {
     log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastId)
-
-    currFeedUrl = feedUrl
-    currPodcastId = podcastId
-
     parse(podcastId, feedUrl, episodeFeedData, isNewPodcast = false)
-
-    currFeedUrl = ""
-    currPodcastId = ""
   }
 
   private def onParseWebsiteData(id: String, html: String): Unit = {
@@ -208,16 +180,14 @@ class ParserWorker (config: ParserConfig)
 
   private def parse(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = {
 
-    val parser = new RomeFeedParser(feedData)
-    parser.podcast
-      .map { p =>
-        p.copy(
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val p: Podcast = parser.podcast.copy(
           id          = Some(podcastId),
-          title       = p.title.map(_.trim),
-          description = p.description.map(Jsoup.clean(_, Whitelist.basic())),
+          title       = parser.podcast.title.map(_.trim),
+          description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
         )
-      }
-      .foreach { p =>
+
         if (isNewPodcast) {
 
           // experimental: this works but has terrible performance and assumes we have a GUI app
@@ -249,13 +219,21 @@ class ParserWorker (config: ParserConfig)
         val catalogEvent = UpdatePodcast(podcastId, feedUrl, p)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
-      }
 
-    // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
-    for (e <- parser.episodes) {
-      registerEpisode(podcastId, e)
+        // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
+        for (e <- parser.episodes) {
+          registerEpisode(podcastId, e)
+        }
+
+      case Failure(ex) =>
+        log.error("Error creating a parser for the feed '{}' ; reason : {}", feedUrl, ex.getMessage)
+        ex.printStackTrace()
+
+        // we update the status of the feed, to persist the information that this feed stinks
+        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
+        //emitCatalogEvent(catalogEvent)
+        catalog ! catalogEvent
     }
-
   }
 
   private def registerEpisode(podcastId: String, e: Episode): Unit = {

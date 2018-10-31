@@ -1,10 +1,9 @@
 package io.hemin.engine.parser
 
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import io.hemin.engine.node.Node._
-import io.hemin.engine.exception.FeedParsingException
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -52,7 +51,6 @@ class Parser (config: ParserConfig)
 
   override val supervisorStrategy: SupervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-      case _: FeedParsingException => Resume
       case _: Exception            => Escalate
     }
 

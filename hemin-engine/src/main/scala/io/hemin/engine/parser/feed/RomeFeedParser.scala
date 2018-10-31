@@ -15,10 +15,13 @@ import org.xml.sax.InputSource
 
 import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
+import scala.util.Try
 
+object RomeFeedParser {
+  def parse(xmlData: String): Try[RomeFeedParser] = Try(new RomeFeedParser(xmlData))
+}
 
-// TODO rewrite this class in idiomatic Scala
-class RomeFeedParser(private val xmlData: String) {
+class RomeFeedParser private (private val xmlData: String) {
 
   private val log: Logger = Logger(getClass)
 
@@ -27,20 +30,8 @@ class RomeFeedParser(private val xmlData: String) {
   private val feed: SyndFeed = input.build(inputSource)
   private val feedItunesModule: Option[FeedInformation] = RomeModuleExtractor.getItunesModule(feed).asScala
 
-  lazy val podcast: Option[Podcast] = Option(parseFeed(feed))
-  lazy val episodes: List[Episode] = extractEpisodes(feed)
-
-  /*
-  try {
-
-    // TODO
-
-  } catch {
-    case ex: Exception =>
-      log.error("RomeFeedParser could not parse the feed : {}", ex.getMessage)
-      ex.printStackTrace()
-  }
-  */
+  val podcast: Podcast = parseFeed(feed)
+  val episodes: List[Episode] = extractEpisodes(feed)
 
   private def parseFeed(feed: SyndFeed): Podcast = {
 
@@ -123,7 +114,7 @@ class RomeFeedParser(private val xmlData: String) {
   private def extractEpisode(e: SyndEntry): Episode = Episode(
     id              = None,
     podcastId       = None,
-    podcastTitle    = podcast.flatMap(_.title),
+    podcastTitle    = podcast.title,
     title           = Option(e.getTitle),
     link            = UrlMapper.sanitize(e.getLink),
     pubDate         = DateMapper.asLocalDateTime(e.getPublishedDate),
@@ -216,13 +207,9 @@ class RomeFeedParser(private val xmlData: String) {
       )
     }.getOrElse(PodcastItunesInfo())
 
-  private def podcastFeedpressInfo: PodcastFeedpressInfo = PodcastFeedpressInfo(
-    locale = None
-  )
+  private def podcastFeedpressInfo: PodcastFeedpressInfo = PodcastFeedpressInfo(locale = None)
 
-  private def podcastFyydInfo: PodcastFyydInfo = PodcastFyydInfo(
-    verify = None
-  )
+  private def podcastFyydInfo: PodcastFyydInfo = PodcastFyydInfo(verify = None)
 
   private def episodeImage(e: SyndEntry): Option[String] = RomeModuleExtractor
     .getItunesEntryInformation(e)
