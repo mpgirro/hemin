@@ -7,7 +7,8 @@ object HeminException {
 
 /**
   *
-  * @see The class design follows the recommendation in this post [[https://stackoverflow.com/a/43942163/9812594]]
+  * @see The class design follows the recommendations from this
+  *      post [[https://stackoverflow.com/a/43942163/9812594]]
   */
 class HeminException (message: String)
   extends Exception(message) {

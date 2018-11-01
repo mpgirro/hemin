@@ -110,7 +110,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       val terminate = Await.result(system.terminate(), internalTimeout.duration)
       Try(terminate) match {
         case Success(_)  => Success(Unit)
-        case Failure(ex) => Failure(Errors.engineShutdownError(ex))
+        case Failure(ex) => Errors.engineShutdownFailure(ex)
       }
     } else {
       Errors.engineShutdownFailureNotRunning

@@ -1,8 +1,8 @@
 package io.hemin.engine.model
 
 final case class Chapter(
-  id: Option[String]        = None,
-  episodeId: Option[String] = None,
+  id: Option[String]        = None, // TODO obsolete and remove?
+  episodeId: Option[String] = None, // TODO obsolete and remove?
   start: Option[String]     = None,
   title: Option[String]     = None,
   href: Option[String]      = None,

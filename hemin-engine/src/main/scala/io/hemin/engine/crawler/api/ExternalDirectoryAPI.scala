@@ -32,7 +32,9 @@ trait ExternalDirectoryAPI {
   protected[this] def jsonToMap(json: String): Map[String, AnyRef] = {
     val typ: Type = new TypeToken[util.Map[String, AnyRef]]() {}.getType
     val fromJson: util.Map[String, AnyRef] = gson.fromJson(json, typ)
-    fromJson.asScala.toMap
+    fromJson
+      .asScala
+      .toMap
   }
 
   protected[this] def jsonToListMap(json: String): List[Map[String, AnyRef]] = {
