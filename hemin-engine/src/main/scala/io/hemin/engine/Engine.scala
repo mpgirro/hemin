@@ -76,12 +76,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
   private lazy val running: AtomicBoolean = new AtomicBoolean(false)
 
-  private implicit lazy val internalTimeout: Timeout = config.node.internalTimeout
+  private implicit val internalTimeout: Timeout = config.node.internalTimeout
   private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
   // TODO do I need package private
-  private[engine] val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
-  private[engine] val node: ActorRef = system.actorOf(Props(new Node(config)), Node.name)
+  private val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
+  private val node: ActorRef = system.actorOf(Props(new Node(config)), Node.name)
 
   private lazy val circuitBreaker: CircuitBreaker =
     (for {
@@ -118,7 +118,9 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       Errors.engineShutdownFailureNotRunning
     }
   }
-  
+
+  /** Proposes a feed's URL to the system, which will
+    * process it if the URL is yet unknown to the database. */
   def propose(url: String): Try[Unit] = guarded {
     bus ! ProposeNewFeed(url)
   }
@@ -185,8 +187,13 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.image)
   }
 
-  /** Finds a slice of all [[io.hemin.engine.model.Podcast]]
-    * starting from {@code page} with {@code size} elements */
+  /** Finds a slice of all [[io.hemin.engine.model.Podcast]] starting
+    * from ({@code page} * {@code size}) and with {@code size} elements.
+    *
+    * @param page
+    * @param size
+    * @return
+    */
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = guarded {
     (bus ? GetAllPodcastsRegistrationComplete(page, size))
       .mapTo[AllPodcastsResult]
@@ -234,7 +241,8 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     }
   }
 
-  private[engine] def bus: ActorRef = node // TODO at some point I want to change this to something that distributes a message to the cluster
+  // TODO at some point I want to change this to something that distributes a message to the cluster
+  private[engine] def bus: ActorRef = node
 
   private def guarded[T](body: => Future[T]): Future[T] =
     if (running.get) {
