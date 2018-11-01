@@ -57,6 +57,11 @@ public class PodcastSimpleChapterParser implements ModuleParser {
             chapter.setHref(href);
         }
 
+        final String image = getAttributeValue(eChapter, "image");
+        if (image != null) {
+            chapter.setImage(image);
+        }
+
         return chapter;
     }
 
