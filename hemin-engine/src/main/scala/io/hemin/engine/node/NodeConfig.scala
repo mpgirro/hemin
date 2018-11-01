@@ -50,16 +50,18 @@ object NodeConfig
     s"""$dispatcher {
       type = Dispatcher
       executor = "fork-join-executor"
-      throughput = 1
+      throughput = 10
       fork-join-executor {
         parallelism-min = 4
         parallelism-factor = 2.0
         parallelism-max = 10
-      }
-    }"""))
+    }}"""))
 
   /** The App does not have an actor mailbox */
   override protected[this] val defaultMailbox: Config = load(parseString(
-    s"$mailbox { }"))
+    s"""$mailbox {
+      mailbox-capacity = 100
+      mailbox-push-timeout-time = 1ms
+    }"""))
 
 }

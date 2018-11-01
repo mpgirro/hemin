@@ -81,7 +81,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
   // TODO do I need package private
   private val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
-  private val node: ActorRef = system.actorOf(Props(new Node(config)), Node.name)
+  private val node: ActorRef = system.actorOf(Node.props(config), Node.name)
 
   private lazy val circuitBreaker: CircuitBreaker =
     (for {

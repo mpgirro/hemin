@@ -27,7 +27,7 @@ object Node {
   def props(config: EngineConfig): Props =
     Props(new Node(config))
       .withDispatcher(config.node.dispatcher)
-      .withMailbox(config.node.mailbox)
+      //.withMailbox(config.node.mailbox) // TODO why is this causing chaos and madness on App startup?!
 
   final case class CliInput(input: String)
   final case class CliOutput(output: String)
@@ -94,6 +94,15 @@ class Node(config: EngineConfig)
   private var parser: ActorRef = _
   private var searcher: ActorRef = _
   private var updater: ActorRef = _
+
+  override def postRestart(cause: Throwable): Unit = {
+    log.warning("{} has been restarted or resumed", self.path.name)
+    cause match {
+      case e: Exception =>
+        log.error("Unhandled Exception : {}", e.getMessage, e)
+    }
+    super.postRestart(cause)
+  }
 
   override def preStart(): Unit = {
 
