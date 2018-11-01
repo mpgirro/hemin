@@ -9,11 +9,11 @@ import akka.util.Timeout
 import com.typesafe.config.Config
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.exception.HeminException
 import io.hemin.engine.model._
 import io.hemin.engine.node.Node
 import io.hemin.engine.node.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
+import io.hemin.engine.util.Errors
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -36,7 +36,7 @@ object Engine {
     * @param config The configuration map that is the base for the Engine's
     *               configuration and the internal Akka system.
     */
-  def boot(config: Config): Try[Engine] = Try(new Engine(config))
+  def boot(config: Config): Try[Engine] = safeBoot(new Engine(config))
 
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
     * configuration. The internal Akka system will use the default configuration
@@ -44,7 +44,15 @@ object Engine {
     *
     * @param config The Engine's configuration. The Akka system will use defaults.
     */
-  def boot(config: EngineConfig): Try[Engine] = Try(new Engine(config))
+  def boot(config: EngineConfig): Try[Engine] = safeBoot(new Engine(config))
+
+  // Try-wrap the instantiation of an Engine, and ensure that a homogeneous
+  // top-exception in the stack is returned in case of an error
+  private def safeBoot(danger: => Engine): Try[Engine] = Try(danger)
+    .recoverWith {
+      case ex: Throwable => Errors.engineStartupFailure(ex)
+    }
+
 }
 
 class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
@@ -96,9 +104,16 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * It will produce a `Failure` if the Engine is not running. */
   def shutdown(): Try[Unit] = synchronized {
     if (running.get) {
-      shutdownOnWarm()
+      log.info("ENGINE is shutting down ...")
+      //bus ! ShutdownSystem // TODO does system.terminate() work better?
+      running.set(false) // we always set running to false, because on error the engine is still screwed up
+      val terminate = Await.result(system.terminate(), internalTimeout.duration)
+      Try(terminate) match {
+        case Success(_)  => Success(Unit)
+        case Failure(ex) => Failure(Errors.engineShutdownError(ex))
+      }
     } else {
-      shutdownOnCold()
+      Errors.engineShutdownFailureNotRunning
     }
   }
 
@@ -207,47 +222,21 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     }
   }
 
-  private def shutdownOnWarm(): Try[Unit] = {
-    log.info("ENGINE is shutting down ...")
-    //bus ! ShutdownSystem // TODO does system.terminate() work better?
-    running.set(false) // we always set running to false, because on error the engine is still screwed up
-    val terminate = Await.result(system.terminate(), internalTimeout.duration)
-    Try(terminate) match {
-      case Success(_)  => Success(Unit)
-      case Failure(ex) => Failure(shutdownError(ex))
-    }
-  }
-
-  private def shutdownOnCold(): Try[Unit] = Failure(shutdownErrorEngineNotRunning)
-
   private[engine] def bus: ActorRef = node // TODO at some point I want to change this to something that distributes a message to the cluster
 
   private def guarded[T](body: => Future[T]): Future[T] =
     if (running.get) {
       circuitBreaker.withCircuitBreaker(body)
     } else {
-      Future.failed(guardErrorEngineNotRunning)
+      Future.failed(Errors.engineGuardErrorNotRunning)
     }
 
   private def guarded[T](body: => T): Try[T] =
     if (running.get) {
       Try(circuitBreaker.withSyncCircuitBreaker(body))
     } else {
-      Failure(guardErrorEngineNotRunning)
+      Errors.engineGuardFailureNotRunning[T]
     }
-
-  // TODO unused?
-  private def startupError(ex: Throwable): HeminException =
-    new HeminException(s"Engine startup failed; reason : ${ex.getMessage}", ex)
-
-  private lazy val guardErrorEngineNotRunning: HeminException =
-    new HeminException("Guard prevented call; reason: Engine not running")
-
-  private lazy val shutdownErrorEngineNotRunning: HeminException =
-    new HeminException("Engine shutdown failed; reason: not running")
-
-  private def shutdownError(ex: Throwable): HeminException =
-    new HeminException(s"Engine shutdown failed; reason : ${ex.getMessage}", ex)
 
   private def breakerOpen(): Unit = log.info("Circuit Breaker is open")
 

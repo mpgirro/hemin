@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
+import io.hemin.engine.crawler.api.{FyydAPI, GpodderAPI, PanoptikumAPI}
 import io.hemin.engine.crawler.http.HttpClient
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.model.FeedStatus
@@ -40,8 +41,12 @@ class CrawlerWorker (config: CrawlerConfig)
   private var parser: ActorRef = _
   private var supervisor: ActorRef = _
 
-  //private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
-  private var httpClient: HttpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
+  private val httpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
+
+  // TODO implement the API's and allow them to be trigger by the CLI with respective messages
+  private val fyyd = new FyydAPI()
+  private val gpodder = new GpodderAPI()
+  private val panoptikum = new PanoptikumAPI()
 
   override def postStop: Unit = {
     httpClient.close()
