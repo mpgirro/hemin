@@ -19,7 +19,7 @@ The Hemin system supports the following standards:
 Support for the following standards is planned:
 
 * Pages Feeds ([RFC 5005](https://tools.ietf.org/html/rfc5005))
-* [json:api](https://jsonapi.org)
+* [JSON:API](https://jsonapi.org)
 
 
 ## WebApp
