@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
-import com.typesafe.config.Config
+import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.model._
@@ -59,12 +59,14 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
   private def this(config: Config) = this(
     engineConfig = EngineConfig.load(config),
-    akkaConfig   = config.withFallback(EngineConfig.defaultAkkaConfig)
+    akkaConfig   = Option(config)
+      .getOrElse(ConfigFactory.empty())
+      .withFallback(EngineConfig.defaultAkkaConfig),
   )
 
   private def this(config: EngineConfig) = this(
-    engineConfig = config,
-    akkaConfig   = EngineConfig.defaultAkkaConfig
+    engineConfig = Option(config).getOrElse(EngineConfig.defaultEngineConfig),
+    akkaConfig   = EngineConfig.defaultAkkaConfig,
   )
 
   /** Configuration of the Engine instance. */
@@ -116,7 +118,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       Errors.engineShutdownFailureNotRunning
     }
   }
-
+  
   def propose(url: String): Try[Unit] = guarded {
     bus ! ProposeNewFeed(url)
   }
@@ -155,56 +157,66 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.podcast)
   }
 
+  /** Finds an [[io.hemin.engine.model.Episode]] by ID */
   def findEpisode(id: String): Future[Option[Episode]] = guarded {
     (bus ? GetEpisode(id))
       .mapTo[EpisodeResult]
       .map(_.episode)
   }
 
+  /** Finds a [[io.hemin.engine.model.Feed]] by ID */
   def findFeed(id: String): Future[Option[Feed]] = guarded {
     (bus ? GetFeed(id))
       .mapTo[FeedResult]
       .map(_.feed)
   }
 
+  /** Finds an [[io.hemin.engine.model.Image]] by ID */
   def findImage(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImage(id))
       .mapTo[ImageResult]
       .map(_.image)
   }
 
+  /** Finds an [[io.hemin.engine.model.Image]] by its associate's ID */
   def findImageByAssociate(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImageByAssociate(id))
       .mapTo[ImageResult]
       .map(_.image)
   }
 
+  /** Finds a slice of all [[io.hemin.engine.model.Podcast]]
+    * starting from {@code page} with {@code size} elements */
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = guarded {
     (bus ? GetAllPodcastsRegistrationComplete(page, size))
       .mapTo[AllPodcastsResult]
       .map(_.podcasts)
   }
 
+  /** Finds an [[io.hemin.engine.model.Episode]] by its belonging Podcast's ID */
   def findEpisodesByPodcast(id: String): Future[List[Episode]] = guarded {
     (bus ? GetEpisodesByPodcast(id))
       .mapTo[EpisodesByPodcastResult]
       .map(_.episodes)
   }
 
+  /** Finds an [[io.hemin.engine.model.Feed]] by its belonging Podcast's ID */
   def findFeedsByPodcast(id: String): Future[List[Feed]] = guarded {
     (bus ? GetFeedsByPodcast(id))
       .mapTo[FeedsByPodcastResult]
       .map(_.feeds)
   }
 
+  // TODO unused and deprecated, since Chapters are embedded directly into Episode's
+  /** Finds all [[io.hemin.engine.model.Chapter]] by their belonging Episode's ID */
   def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
     (bus ? GetChaptersByEpisode(id))
       .mapTo[ChaptersByEpisodeResult]
       .map(_.chapters)
   }
 
-  /** The call to warmup() will tap the lazy values, and wait until all
-    * subsystems in the actor hierarchy report that they are up and running */
+  // The call to warmup() will tap the lazy values, and wait until all
+  // subsystems in the actor hierarchy report that they are up and running
   private def bootSequence(): Try[Unit] = {
     log.info("ENGINE is starting up ...")
     warmup()

@@ -38,7 +38,10 @@ object EngineConfig {
     * [[io.hemin.engine.EngineConfig.defaultConfig]] as the fallback
     * values for all keys that are not set in the argument config.
     */
-  def load(config: Config): EngineConfig = loadFromSafeConfig(config.withFallback(defaultConfig))
+  def load(config: Config): EngineConfig = Option(config)
+    .map(_.withFallback(defaultConfig))
+    .map(loadFromSafeConfig)
+    .getOrElse(defaultEngineConfig)
 
   /** Loads the config file `application.conf` and initializes a
     * structure-fixed configuration instance. To be used from `main()`
