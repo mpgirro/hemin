@@ -6,6 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
+import io.hemin.engine.crawler.http.HttpClient
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.model.FeedStatus
 import io.hemin.engine.node.Node._

@@ -1,10 +1,9 @@
-package io.hemin.engine.crawler
+package io.hemin.engine.crawler.http
 
 import java.nio.file.Paths
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.crawler.http.HeadResult
 import io.hemin.engine.exception.HeminException
 
 import scala.concurrent.duration._

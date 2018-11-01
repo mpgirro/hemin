@@ -42,41 +42,31 @@ class RomeFeedParser private (private val xmlData: String) {
       .foreach { atomLink =>
         if (atomLink.getRel == "http://podlove.org/deep-link") {
           // TODO this should be a link to the episode website (but is it always though?!)
-        }
-        else if (atomLink.getRel == "payment") {
+        } else if (atomLink.getRel == "payment") {
           // TODO
-        }
-        else if (atomLink.getRel == "self") {
+        } else if (atomLink.getRel == "self") {
           // TODO
-        }
-        else if (atomLink.getRel == "alternate") {
+        } else if (atomLink.getRel == "alternate") {
           // TODO
-        }
-        else if (atomLink.getRel == "first") {
+        } else if (atomLink.getRel == "first") {
           // TODO
-        }
-        else if (atomLink.getRel == "next") {
+        } else if (atomLink.getRel == "next") {
           // TODO
-        }
-        else if (atomLink.getRel == "last") {
+        } else if (atomLink.getRel == "last") {
           // TODO
-        }
-        else if (atomLink.getRel == "hub") {
+        } else if (atomLink.getRel == "hub") {
           // TODO
-        }
-        else if (atomLink.getRel == "search") {
+        } else if (atomLink.getRel == "search") {
           // TODO
-        }
-        else if (atomLink.getRel == "via") {
+        } else if (atomLink.getRel == "via") {
           // TODO
-        }
-        else if (atomLink.getRel == "related") {
+        } else if (atomLink.getRel == "related") {
           // TODO
-        }
-        else if (atomLink.getRel == "prev-archive") {
+        } else if (atomLink.getRel == "prev-archive") {
           // TODO
+        } else {
+          log.warn("Came across an <atom:link> with a relation I do not handle : '{}'", atomLink.getRel)
         }
-        else log.warn("Came across an <atom:link> with a relation I do not handle : '{}'", atomLink.getRel)
       }
 
     Podcast(
