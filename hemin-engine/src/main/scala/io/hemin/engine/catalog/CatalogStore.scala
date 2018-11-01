@@ -655,7 +655,9 @@ class CatalogStore(config: CatalogConfig)
                 .findOneByEnclosure(episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
             })
             .map {
-              case Some(e) => log.debug("Episode is already registered : ('{}', {}, '{}')", episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
+              case Some(e) =>
+                log.debug("Episode is already registered : ('{}', {}, '{}')", episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
+                // TODO I should update the episode (and embedded chapters!), just in case stuff changed
               case None =>
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
@@ -672,7 +674,9 @@ class CatalogStore(config: CatalogConfig)
                     podcastTitle = p.title,
                     registration = EpisodeRegistrationInfo(
                       timestamp = Some(LocalDateTime.now())
-                    ))
+                    ),
+                    chapters = episode.chapters.map(_.copy(episodeId = Some(episodeId))), // TODO are chapters now embedded, remove episodeId
+                  )
                   .patchLeft(Episode(
                     image = p.image
                   ))
@@ -683,7 +687,6 @@ class CatalogStore(config: CatalogConfig)
                   .onComplete {
                     case Success(_) =>
                       log.info("episode registered : '{}' [p:{},e:{}]", e.title.get, podcastId, e.id.get)
-
 
                       IndexMapper.toIndexDoc(e) match {
                         case Success(doc) =>

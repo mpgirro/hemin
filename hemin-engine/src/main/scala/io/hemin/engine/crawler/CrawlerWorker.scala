@@ -4,17 +4,16 @@ import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
-import io.hemin.engine.node.Node._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
-import io.hemin.engine.exception.HeminException
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.model.FeedStatus
+import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
 
-import scala.compat.java8.OptionConverters._
 import scala.concurrent.{ExecutionContext, blocking}
 import scala.language.postfixOps
+import scala.util.{Failure, Success}
 
 object CrawlerWorker {
   def name(workerIndex: Int): String = "worker-" + workerIndex
@@ -43,9 +42,6 @@ class CrawlerWorker (config: CrawlerConfig)
   //private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
   private var httpClient: HttpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
 
-  private var currUrl: String = _
-  private var currJob: FetchJob = _
-
   override def postStop: Unit = {
     httpClient.close()
   }
@@ -53,20 +49,9 @@ class CrawlerWorker (config: CrawlerConfig)
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
     cause match {
-      case e: HeminException =>
-        log.error("HEAD response prevented fetching resource : {} [reason : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: java.net.ConnectException =>
-        log.error("java.net.ConnectException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: java.net.SocketTimeoutException =>
-        log.error("java.net.SocketTimeoutException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: java.net.UnknownHostException =>
-        log.error("java.net.UnknownHostException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: javax.net.ssl.SSLHandshakeException =>
-        log.error("javax.net.ssl.SSLHandshakeException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: java.io.UnsupportedEncodingException =>
-        log.error("java.io.UnsupportedEncodingException on : {} [msg : {}]", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"))
-      case e: Exception =>
-        log.error("Unhandled Exception on {} : {}", currUrl, Option(e.getMessage).getOrElse("NO REASON GIVEN IN EXCEPTION"), e)
+      case ex: Exception =>
+        log.error("Unhandled Exception : {}", ex.getMessage)
+        ex.printStackTrace()
     }
     super.postRestart(cause)
   }
@@ -88,10 +73,6 @@ class CrawlerWorker (config: CrawlerConfig)
 
     case DownloadWithHeadCheck(id, url, job) =>
       log.debug("Received Download({},'{}',{},_)", id, url, job.getClass.getSimpleName)
-
-      this.currUrl = url
-      this.currJob = job
-
       job match {
         case WebsiteFetchJob() =>
           if (config.fetchWebsites) {
@@ -106,10 +87,6 @@ class CrawlerWorker (config: CrawlerConfig)
 
     case DownloadContent(id, url, job, encoding) =>
       log.debug("Received Download({},'{}',{},{},_)", id, url, job.getClass.getSimpleName, encoding)
-
-      this.currUrl = url
-      this.currJob = job
-
       fetchContent(id, url, job, encoding) // TODO send encoding via message
 
     case CrawlFyyd(count) =>
@@ -176,57 +153,59 @@ class CrawlerWorker (config: CrawlerConfig)
 
   private def headCheck(id: String, url: String, job: FetchJob): Unit = {
     blocking {
-      val headResult = httpClient.headCheck(url)
+      httpClient.headCheck(url) match {
+        case Success(headResult) =>
+          val encoding = headResult.contentEncoding
 
-      val encoding = headResult.contentEncoding
+          val location = headResult.location
 
-      val location = headResult.location
+          // TODO check if eTag differs from last known value
 
-      // TODO check if eTag differs from last known value
+          // TODO check if lastMod differs from last known value
 
-      // TODO check if lastMod differs from last known value
+          location match {
+            case Some(href) =>
+              log.debug("Sending message to download content : {}", href)
+              job match {
+                case WebsiteFetchJob() =>
+                  // if the link in the feed is redirected (which is often the case due
+                  // to some feed analytic tools, we set our records to the new location
+                  if (!url.equals(href)) {
+                    //directoryStore ! UpdateLinkByExo(exo, href)
+                    val catalogEvent = UpdateLinkById(id, href)
+                    //emitCatalogEvent(catalogEvent)
+                    catalog ! catalogEvent
 
-      location match {
-        case Some(href) =>
-          log.debug("Sending message to download content : {}", href)
-          job match {
-            case WebsiteFetchJob() =>
-              // if the link in the feed is redirected (which is often the case due
-              // to some feed analytic tools, we set our records to the new location
-              if (!url.equals(href)) {
-                //directoryStore ! UpdateLinkByExo(exo, href)
-                val catalogEvent = UpdateLinkById(id, href)
-                //emitCatalogEvent(catalogEvent)
-                catalog ! catalogEvent
+                    val indexEvent = UpdateDocLinkIndexEvent(id, href)
+                    //emitIndexEvent(indexEvent)
+                    index ! indexEvent
+                  }
 
-                val indexEvent = UpdateDocLinkIndexEvent(id, href)
-                //emitIndexEvent(indexEvent)
-                index ! indexEvent
+                  // we always download websites, because we only do it once anyway
+                  self ! DownloadContent(id, href, job, encoding) // TODO
+                //fetchContent(exo, href, job, encoding)
+
+                case _ =>
+                  // if the feed moved to a new URL, we will inform the directory, so
+                  // it will use the new location starting with the next update cycle
+                  if (!url.equals(href)) {
+                    val catalogEvent = UpdateFeedUrl(url, href)
+                    //emitCatalogEvent(catalogEvent)
+                    catalog ! catalogEvent
+                  }
+
+                  /*
+                   * TODO
+                   * here I have to do some voodoo with etag/lastMod to
+                   * determine weither the feed changed and I really need to redownload
+                   */
+                  self ! DownloadContent(id, href, job, encoding) // TODO
               }
-
-              // we always download websites, because we only do it once anyway
-              self ! DownloadContent(id, href, job, encoding) // TODO
-            //fetchContent(exo, href, job, encoding)
-
-            case _ =>
-              // if the feed moved to a new URL, we will inform the directory, so
-              // it will use the new location starting with the next update cycle
-              if (!url.equals(href)) {
-                val catalogEvent = UpdateFeedUrl(url, href)
-                //emitCatalogEvent(catalogEvent)
-                catalog ! catalogEvent
-              }
-
-              /*
-               * TODO
-               * here I have to do some voodoo with etag/lastMod to
-               * determine weither the feed changed and I really need to redownload
-               */
-              self ! DownloadContent(id, href, job, encoding) // TODO
+            case None =>
+              log.error("We did not get any location-url after evaluating response --> cannot proceed download without one")
+              sendErrorNotificationIfFeasable(id, url, job)
           }
-        case None =>
-          log.error("We did not get any location-url after evaluating response --> cannot proceed download without one")
-          sendErrorNotificationIfFeasable(id, url, job)
+        case Failure(ex) => log.error("Error on HEAD check on URL '{}' ; reason : {}", url, ex.getMessage)
       }
     }
   }
@@ -241,29 +220,33 @@ class CrawlerWorker (config: CrawlerConfig)
     */
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
-      val data = httpClient.fetchContent(url, encoding)
-      job match {
-        case NewPodcastFetchJob() =>
-          parser ! ParseNewPodcastData(url, id, data)
-          val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
-          //emitCatalogEvent(catalogEvent)
-          catalog ! catalogEvent
+      httpClient.fetchContent(url, encoding) match {
+        case Success(data) =>
+          job match {
+            case NewPodcastFetchJob() =>
+              parser ! ParseNewPodcastData(url, id, data)
+              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+              //emitCatalogEvent(catalogEvent)
+              catalog ! catalogEvent
 
-        case UpdateEpisodesFetchJob(etag, lastMod) =>
-          parser ! ParseUpdateEpisodeData(url, id, data)
-          val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
-          //emitCatalogEvent(catalogEvent)
-          catalog ! catalogEvent
+            case UpdateEpisodesFetchJob(etag, lastMod) =>
+              parser ! ParseUpdateEpisodeData(url, id, data)
+              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+              //emitCatalogEvent(catalogEvent)
+              catalog ! catalogEvent
 
-        case WebsiteFetchJob() =>
-          parser ! ParseWebsiteData(id, data)
+            case WebsiteFetchJob() => parser ! ParseWebsiteData(id, data)
 
-        case PodcastImageFetchJob() =>
-          parser ! ParsePodcastImage(id, data)
+            case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, data)
 
-        case EpisodeImageFetchJob() =>
-          parser ! ParseEpisodeImage(id, data)
+            case EpisodeImageFetchJob() => parser ! ParseEpisodeImage(id, data)
+          }
+        case Failure(ex) =>
+          log.error("Error fetching content from URL '{}' ; reason : {}", url, ex.getMessage)
+          ex.printStackTrace()
+          // TODO send a notification to catalogstore for a feed status update?
       }
+
     }
   }
 

@@ -242,7 +242,7 @@ class ParserWorker (config: ParserConfig)
     val episode = e.copy(
       title          = e.title.map(_.trim),
       description    = e.description.map(Jsoup.clean(_, Whitelist.basic())),
-      contentEncoded = e.contentEncoded.map(Jsoup.clean(_, Whitelist.basic()))
+      contentEncoded = e.contentEncoded.map(Jsoup.clean(_, Whitelist.basic())),
     )
 
     val catalogCommand = RegisterEpisodeIfNew(podcastId, episode)

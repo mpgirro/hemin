@@ -9,25 +9,21 @@ import io.hemin.engine.exception.HeminException
 
 import scala.concurrent.duration._
 import scala.io.Source
+import scala.util.Try
 
 class HttpClient (timeout: Long, downloadMaxBytes: Long) {
 
   private val log = Logger(getClass)
 
-  private val DOWNLOAD_TIMEOUT = timeout.seconds
+  private val downloadTimeout = timeout.seconds
 
-  private implicit val sttpBackend = HttpURLConnectionBackend(options = SttpBackendOptions.connectionTimeout(DOWNLOAD_TIMEOUT))
+  private implicit val sttpBackend = HttpURLConnectionBackend(options = SttpBackendOptions.connectionTimeout(downloadTimeout))
 
   def close(): Unit = {
     sttpBackend.close()
   }
 
-  @throws(classOf[HeminException])
-  @throws(classOf[java.net.ConnectException])
-  @throws(classOf[java.net.SocketTimeoutException])
-  @throws(classOf[java.net.UnknownHostException])
-  @throws(classOf[javax.net.ssl.SSLHandshakeException])
-  def headCheck(url: String): HeadResult = {
+  def headCheck(url: String): Try[HeadResult] = Try {
 
     // we will ensure that the protocol will be lower case, otherwise further stuff will fail
     val parts = url.split("://")
@@ -48,7 +44,7 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
   private def headCheckHTTP(url: String): HeadResult = {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
       .head(uri"$url")
-      .readTimeout(DOWNLOAD_TIMEOUT)
+      .readTimeout(downloadTimeout)
       .acceptEncoding("")
       .send()
 
@@ -102,22 +98,17 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
             .replaceAll("\"", "") // remove quotation marks if any
             .trim)))
 
-    //set the etag if existent
-    val eTag: Option[String] = response.header("etag")
-
-    //set the "last modified" header field if existent
-    val lastModified: Option[String] = response.header("last-modified")
-
     HeadResult(
-      statusCode = response.code,
+      statusCode      = response.code,
       location,
       mimeType,
       contentEncoding = encoding,
-      eTag,
-      lastModified,
+      eTag            = response.header("etag"),
+      lastModified    = response.header("last-modified"),
     )
   }
 
+  // this method is a remnant from the past and has become obsolete
   private def headCheckFILE(url: String): HeadResult = {
 
     val path = Paths.get(url)
@@ -135,12 +126,7 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     )
   }
 
-  @throws(classOf[HeminException])
-  @throws(classOf[java.net.ConnectException])
-  @throws(classOf[java.net.SocketTimeoutException])
-  @throws(classOf[java.net.UnknownHostException])
-  @throws(classOf[javax.net.ssl.SSLHandshakeException])
-  def fetchContent(url: String, encoding: Option[String]): String = {
+  def fetchContent(url: String, encoding: Option[String]): Try[String] = Try {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       fetchContentHTTP(url, encoding)
     } else if (url.startsWith("file:///")) {
@@ -153,7 +139,7 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
   private def fetchContentHTTP(url: String, encoding: Option[String]): String = {
     val request = sttp
       .get(uri"$url")
-      .readTimeout(DOWNLOAD_TIMEOUT)
+      .readTimeout(downloadTimeout)
       .response(asByteArray) // prevent assuming UTF-8 encoding, because some feeds do not use it
 
     encoding.foreach(e => request.acceptEncoding(e))

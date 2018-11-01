@@ -1,15 +1,9 @@
 package io.hemin.engine.crawler
 
-import java.io.UnsupportedEncodingException
-import java.net.{ConnectException, SocketTimeoutException, UnknownHostException}
-import java.nio.charset.{IllegalCharsetNameException, MalformedInputException}
-
-import akka.actor.SupervisorStrategy.{Escalate, Resume}
+import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import io.hemin.engine.node.Node._
-import io.hemin.engine.exception.HeminException
-import javax.net.ssl.SSLHandshakeException
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
@@ -59,14 +53,6 @@ class Crawler (config: CrawlerConfig)
 
   override val supervisorStrategy: SupervisorStrategy =
     OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-      case _: HeminException                => Resume
-      case _: ConnectException             => Resume
-      case _: SocketTimeoutException       => Resume
-      case _: UnknownHostException         => Resume
-      case _: SSLHandshakeException        => Resume
-      case _: IllegalCharsetNameException  => Resume
-      case _: UnsupportedEncodingException => Resume
-      case _: MalformedInputException      => Resume
       case e: Exception                    =>
         log.error("A Worker due to an unhandled exception of class : {}", e.getClass)
         Escalate

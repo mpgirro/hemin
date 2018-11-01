@@ -69,7 +69,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   private implicit lazy val internalTimeout: Timeout = config.node.internalTimeout
   private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
-  // lazy init the actor system and local bus for this node
+  // TODO do I need package private
   private[engine] val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
   private[engine] val node: ActorRef = system.actorOf(Props(new Node(config)), Node.name)
 
@@ -190,12 +190,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
 
   /** The call to warmup() will tap the lazy values, and wait until all
     * subsystems in the actor hierarchy report that they are up and running */
-  private def bootSequence(): Try[Unit] = /*synchronized*/ {
+  private def bootSequence(): Try[Unit] = {
     log.info("ENGINE is starting up ...")
     warmup()
   }
 
-  private def warmup(): Try[Unit] = /*blocking*/ {
+  private def warmup(): Try[Unit] = {
     val startup = bus ? EngineOperational
     Await.result(startup, internalTimeout.duration) match {
       case StartupStatus(true) =>
