@@ -4,7 +4,7 @@ import java.nio.file.Paths
 
 import com.softwaremill.sttp._
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.exception.HeminException
+import io.hemin.engine.EngineException
 
 import scala.concurrent.duration._
 import scala.io.Source
@@ -58,9 +58,9 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
           log.debug("Redirecting {} to {}", url, location.getOrElse("NON PROVIDED"))
         case 302 => // odd, but ok
         case 404 => // not found: nothing there worth processing
-          throw new HeminException(s"HEAD request reported status ${response.code} : ${response.statusText}")
+          throw new EngineException(s"HEAD request reported status ${response.code} : ${response.statusText}")
         case 503 => // service unavailable
-          throw new HeminException(s"HEAD request reported status ${response.code} : ${response.statusText}")
+          throw new EngineException(s"HEAD request reported status ${response.code} : ${response.statusText}")
         case _   =>
           log.warn("Received unexpected status from HEAD request : {} {} on {}", response.code, response.statusText, url)
       }
@@ -75,9 +75,9 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
         if (!isValidMime(mime)) {
           mime match {
             case _@("audio/mpeg" | "application/octet-stream") =>
-              throw new HeminException(s"Invalid MIME-type '$mime' of '$url'")
+              throw new EngineException(s"Invalid MIME-type '$mime' of '$url'")
             case _ =>
-              throw new HeminException(s"Unexpected MIME-type '$mime' of '$url")
+              throw new EngineException(s"Unexpected MIME-type '$mime' of '$url")
           }
         }
       case None =>
@@ -147,21 +147,21 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
 
     if (!response.isSuccess) {
       //log.error("Download resulted in a non-success response code : {}", response.code)
-      throw new HeminException(s"Download resulted in a non-success response code : ${response.code}") // TODO make dedicated exception
+      throw new EngineException(s"Download resulted in a non-success response code : ${response.code}") // TODO make dedicated exception
     }
 
     response.contentType.foreach(ct => {
       val mimeType = ct.split(";")(0).trim
       if (!isValidMime(mimeType)) {
         //log.error("Aborted before downloading a file with invalid MIME-type : '{}' from : '{}'", mimeType, url)
-        throw new HeminException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'") // TODO make dedicated exception
+        throw new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'") // TODO make dedicated exception
       }
     })
 
     response.contentLength.foreach(cl => {
       if (cl > downloadMaxBytes) {
         //log.error("Refusing to download resource because content length exceeds maximum: {} > {}", cl, DOWNLOAD_MAXBYTES)
-        throw new HeminException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")
+        throw new EngineException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")
       }
     })
 
@@ -169,7 +169,7 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     response.body match {
       case Left(errorMessage) =>
         //log.error("Error collecting download body, message : {}", errorMessage)
-        throw new HeminException(s"Error collecting download body, message : $errorMessage") // TODO make dedicated exception
+        throw new EngineException(s"Error collecting download body, message : $errorMessage") // TODO make dedicated exception
       case Right(data) =>
         log.debug("Finished collecting content from GET response : {}", url)
 

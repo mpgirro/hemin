@@ -2,7 +2,6 @@ package io.hemin.engine
 
 import com.github.simplyscala.{MongoEmbedDatabase, MongodProps}
 import com.typesafe.config.{Config, ConfigFactory}
-import io.hemin.engine.exception.HeminException
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.tagobjects.Slow
 import org.scalatest.{BeforeAndAfter, FlatSpec, Ignore, Matchers}
@@ -65,7 +64,7 @@ class EngineSpec
 
     val f: Future[String] = engine.cli("ping")
     ScalaFutures.whenReady(f.failed) { ex =>
-      ex shouldBe a [HeminException]
+      ex shouldBe a [EngineException]
     }
   }
 

@@ -1,8 +1,8 @@
-package io.hemin.engine.exception
+package io.hemin.engine
 
-object HeminException {
+object EngineException {
   /** Allows to access the message and the cause via pattern-matching */
-  def unapply(e: HeminException): Option[(String,Throwable)] = Some((e.getMessage, e.getCause))
+  def unapply(e: EngineException): Option[(String,Throwable)] = Some((e.getMessage, e.getCause))
 }
 
 /**
@@ -10,7 +10,7 @@ object HeminException {
   * @see The class design follows the recommendations from this
   *      post [[https://stackoverflow.com/a/43942163/9812594]]
   */
-class HeminException (message: String)
+class EngineException(message: String)
   extends Exception(message) {
 
   def this(message: String, cause: Throwable) = {
