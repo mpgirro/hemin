@@ -79,7 +79,6 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
   private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
-  // TODO do I need package private
   private val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
   private val node: ActorRef = system.actorOf(Node.props(config), Node.name)
 
@@ -242,7 +241,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   }
 
   // TODO at some point I want to change this to something that distributes a message to the cluster
-  private[engine] def bus: ActorRef = node
+  private def bus: ActorRef = node
 
   private def guarded[T](body: => Future[T]): Future[T] =
     if (running.get) {
