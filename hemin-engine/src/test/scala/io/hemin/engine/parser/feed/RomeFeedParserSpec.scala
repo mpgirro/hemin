@@ -65,11 +65,12 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
   }
 
   it should "extract 2 Episodes" in {
+    val expected = 2
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
         val es = parser.episodes
         es should not be empty
-        assert(es.size == 2, s"The Parser extracted ${es.size} Episodes instead of 2")
+        assert(es.size == expected, s"The Parser extracted ${es.size} Episodes instead of $expected")
       case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
     }
   }
@@ -104,6 +105,46 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
             e.enclosure.length shouldBe Some(78589133)
             e.enclosure.typ shouldBe Some("audio/mp4")
             e.registration.timestamp shouldBe empty
+        }
+      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+    }
+  }
+
+  it should "extract 3 Chapters" in {
+    val expected = 3
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val es = parser.episodes
+        es.headOption match {
+          case None => fail("Parser failed to extract an Episode")
+          case Some(e) =>
+            val cs = e.chapters
+            cs should not be empty
+            assert(cs.size == expected, s"The Parser extracted ${cs.size} Chapters instead of $expected")
+        }
+      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+    }
+  }
+
+  it should "extract all Chapter metadata fields correctly" in {
+    val expected = 3
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val es = parser.episodes
+        es.headOption match {
+          case None => fail("Parser failed to extract an Episode")
+          case Some(e) =>
+            val cs = e.chapters
+            cs.headOption match {
+              case None => fail("Parser failed to extract a Chapter")
+              case Some(c) =>
+                //c.id shouldBe Some("")
+                //c.episodeId shouldBe Some("")
+                c.start shouldBe Some("00:00:00.000")
+                c.title shouldBe Some("Lorem Ipsum")
+                c.href shouldBe Some("http://example.org")
+                c.image shouldBe Some("http://example.org/cover") // TODO this is None for some reason
+            }
         }
       case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
     }

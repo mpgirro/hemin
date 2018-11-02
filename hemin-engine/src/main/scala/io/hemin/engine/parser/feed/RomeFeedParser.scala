@@ -249,6 +249,7 @@ class RomeFeedParser private (private val xmlData: String) {
         null
       }
     }
+    .flatMap(Option(_)) // re-wrap, because we produce null in the map above
 
   private def episodeChapters(e: SyndEntry): List[Chapter] = RomeModuleExtractor
     .getPodloveSimpleChapterModule(e)
