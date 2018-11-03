@@ -36,12 +36,12 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
             p.description shouldBe Some("Lorem Ipsum")
             p.pubDate shouldBe testDate
             p.image shouldBe Some("http://example.org/cover.jpg")
-            p.meta.lastBuildDate shouldEqual None // TODO why is it not equal to testDate ?! --> unexpected behavior of ROME?!
-            p.meta.language shouldBe Some("de-DE")
-            p.meta.generator shouldBe Some("Lorem Ipsum")
-            p.meta.copyright shouldBe Some("Lorem Ipsum")
-            p.meta.docs shouldBe Some("Lorem Ipsum")
-            p.meta.managingEditor shouldBe empty // TODO add to testfeed.xml
+            p.lastBuildDate shouldEqual None // TODO why is it not equal to testDate ?! --> unexpected behavior of ROME?!
+            p.language shouldBe Some("de-DE")
+            p.generator shouldBe Some("Lorem Ipsum")
+            p.copyright shouldBe Some("Lorem Ipsum")
+            p.docs shouldBe Some("Lorem Ipsum")
+            p.managingEditor shouldBe empty // TODO add to testfeed.xml
             p.registration.timestamp shouldBe empty
             p.registration.complete shouldEqual None
             p.itunes.summary shouldBe Some("Lorem Ipsum")

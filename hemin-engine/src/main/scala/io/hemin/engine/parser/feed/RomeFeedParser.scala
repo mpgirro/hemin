@@ -76,14 +76,12 @@ class RomeFeedParser private (private val xmlData: String) {
       description     = podcastDescriptionWithImageFallback,
       pubDate         = DateMapper.asLocalDateTime(feed.getPublishedDate),
       image           = podcastImageWithItunesFallback,
-      meta = PodcastMetadata(
-        lastBuildDate  = None,  // TODO the parser does not yet produce this
-        language       = Option(feed.getLanguage),
-        generator      = Option(feed.getGenerator),
-        copyright      = Option(feed.getCopyright),
-        docs           = Option(feed.getDocs),
-        managingEditor = Option(feed.getManagingEditor),
-      ),
+      lastBuildDate   = None,  // TODO the parser does not yet produce this
+      language        = Option(feed.getLanguage),
+      generator       = Option(feed.getGenerator),
+      copyright       = Option(feed.getCopyright),
+      docs            = Option(feed.getDocs),
+      managingEditor  = Option(feed.getManagingEditor),
       registration = PodcastRegistrationInfo(
         timestamp = None,
         complete  = None,

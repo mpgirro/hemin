@@ -2,6 +2,7 @@ package io.hemin.engine.model.info
 
 import java.time.LocalDateTime
 
+@Deprecated
 final case class PodcastMetadata(
   lastBuildDate: Option[LocalDateTime] = None,
   language: Option[String]             = None,
