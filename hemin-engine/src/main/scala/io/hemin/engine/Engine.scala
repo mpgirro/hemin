@@ -3,7 +3,7 @@ package io.hemin.engine
 import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
@@ -124,8 +124,8 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     bus ! ProposeNewFeed(url)
   }
 
-  /** Processes the arguments by the Command Language Interpreter,
-    * and returns the resulting data as text. */
+  /** Eventually returns the data resulting from processing the
+    * arguments by the Command Language Interpreter as text */
   def cli(args: String): Future[String] = guarded {
     (bus ? CliInput(args))
       .mapTo[CliOutput]
@@ -187,7 +187,7 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   }
 
   /** Finds a slice of all [[io.hemin.engine.model.Podcast]] starting
-    * from ({@code page} * {@code size}) and with {@code size} elements.
+    * from (`page` * `size`) and with `size` elements.
     *
     * @param page
     * @param size

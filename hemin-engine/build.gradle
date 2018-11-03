@@ -47,28 +47,27 @@ compileJava {
 }
 
 ext {
-    scala_major_version = '2.12'
-    scala_minor_version = '4'
-    scalatest_version = '3.0.5'
-    akka_version = '2.5.11'
-    akka_http_version = '10.0.11'
-    slf4j_version = '1.7.25'
-    logback_version = '1.2.3'
-    lucene_version = '7.2.0'
-    solr_version = '7.5.0'
-    jackson_version = '2.9.4'
-    guava_version = '24.1-jre'
-    gson_version = '2.8.2'
-    hasids_version = '1.0.3'
-    rome_version = '1.9.0'
-    jsoup_version = '1.11.2'
-    sttp_version = '1.1.10'
-    reactivemongo_version = '0.16.0'
-    scrimage_version = '2.1.0'
-    enumeratum_version = '1.5.13'       // see https://github.com/lloydmeta/enumeratum
-    junit_vintage_version = '4.12'
-    junit_jupiter_version = '5.1.0'
-    junit_platform_version = '1.1.0'
+    scalaMajorVersion = '2.12'
+    scalaMinorVersion = '4'
+    scalatestVersion = '3.0.5'
+    akkaVersion = '2.5.11'
+    akkaHttpVersion = '10.0.11'
+    slf4jVersion = '1.7.25'
+    logbackVersion = '1.2.3'
+    luceneVersion = '7.2.0'
+    solrVersion = '7.5.0'
+    guavaVersion = '24.1-jre'
+    gsonVersion = '2.8.2'
+    hasidsVersion = '1.0.3'
+    romeVersion = '1.9.0'
+    jsoupVersion = '1.11.2'
+    sttpVersion = '1.1.10'
+    reactivemongoVersion = '0.16.0'
+    scrimageVersion = '2.1.0'
+    enumeratumVersion = '1.5.13'       // see https://github.com/lloydmeta/enumeratum
+    //junitVintageVersion = '4.12'
+    //junitJupiterVersion = '5.1.0'
+    //junitPlatformVersion = '1.1.0'
 }
 
 repositories {
@@ -78,67 +77,62 @@ repositories {
 
 dependencies {
 
-    compile group: 'org.scala-lang', name: 'scala-compiler', version: "${scala_major_version}.${scala_minor_version}"
-    compile group: 'org.scala-lang', name: 'scala-library', version: "${scala_major_version}.${scala_minor_version}"
+    compile "org.scala-lang:scala-compiler:$scalaMajorVersion.$scalaMinorVersion"
+    compile "org.scala-lang:scala-library:$scalaMajorVersion.$scalaMinorVersion"
 
-    compile group: 'org.scala-lang.modules', name: "scala-java8-compat_${scala_major_version}", version: '0.8.0'
+    compile "org.scala-lang.modules:scala-java8-compat_$scalaMajorVersion:0.8.0" // https://github.com/scala/scala-java8-compat
 
-    compile "com.typesafe.akka:akka-actor_$scala_major_version:$akka_version"
-    compile "com.typesafe.akka:akka-slf4j_$scala_major_version:$akka_version"
-    compile "com.typesafe.akka:akka-stream_$scala_major_version:$akka_version"
-    compile "com.typesafe.akka:akka-http_$scala_major_version:$akka_http_version"
-    compile "com.typesafe.akka:akka-http-spray-json_$scala_major_version:$akka_http_version"
-    compile "com.typesafe.akka:akka-cluster_$scala_major_version:$akka_version"
-    compile "com.typesafe.akka:akka-cluster-tools_$scala_major_version:$akka_version"
+    compile "com.typesafe.akka:akka-actor_$scalaMajorVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-slf4j_$scalaMajorVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-stream_$scalaMajorVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-http_$scalaMajorVersion:$akkaHttpVersion"
+    compile "com.typesafe.akka:akka-http-spray-json_$scalaMajorVersion:$akkaHttpVersion"
+    compile "com.typesafe.akka:akka-cluster_$scalaMajorVersion:$akkaVersion"
+    compile "com.typesafe.akka:akka-cluster-tools_$scalaMajorVersion:$akkaVersion"
 
-    compile group: 'com.typesafe.scala-logging', name: "scala-logging_${scala_major_version}", version: '3.8.0'
-    compile "ch.qos.logback:logback-classic:${logback_version}"
+    compile "com.typesafe.scala-logging:scala-logging_$scalaMajorVersion:3.8.0" // https://github.com/lightbend/scala-logging
+    compile "ch.qos.logback:logback-classic:$logbackVersion"                    // https://github.com/qos-ch/logback
 
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: jackson_version
-    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: jackson_version
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-json-org', version: jackson_version
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: jackson_version
-    compile group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-guava', version: jackson_version
 
-    compile "org.reactivemongo:reactivemongo_$scala_major_version:$reactivemongo_version"
+    compile "org.reactivemongo:reactivemongo_$scalaMajorVersion:$reactivemongoVersion"   // https://github.com/ReactiveMongo/ReactiveMongo
 
-    compile "org.apache.lucene:lucene-core:$lucene_version"
-    compile "org.apache.lucene:lucene-queryparser:$lucene_version"
-    compile "org.apache.lucene:lucene-analyzers-common:$lucene_version"
+    compile "org.apache.lucene:lucene-core:$luceneVersion"                      // https://github.com/apache/lucene-solr
+    compile "org.apache.lucene:lucene-queryparser:$luceneVersion"
+    compile "org.apache.lucene:lucene-analyzers-common:$luceneVersion"
 
-    compile "org.apache.solr:solr-solrj:$solr_version"
+    compile "org.apache.solr:solr-solrj:$solrVersion"
 
-    compile "org.jsoup:jsoup:$jsoup_version"                    // HTTP parser
-    compile "com.google.code.gson:gson:$gson_version"           // gson parser
-    compile "com.google.guava:guava:$guava_version"
-    compile "com.rometools:rome:$rome_version"
-    compile "com.rometools:rome-modules:$rome_version"
-    compile "org.hashids:hashids:$hasids_version"
-    compile "com.softwaremill.sttp:core_$scala_major_version:$sttp_version"
-    compile "com.softwaremill.sttp:akka-http-backend_$scala_major_version:$sttp_version"
+    compile "org.jsoup:jsoup:$jsoupVersion"                                     // https://github.com/jhy/jsoup
+    compile "com.google.code.gson:gson:$gsonVersion"
+    compile "com.google.guava:guava:$guavaVersion"                              // https://github.com/google/guava
+    compile "com.rometools:rome:$romeVersion"                                   // https://github.com/rometools/rome
+    compile "com.rometools:rome-modules:$romeVersion"
+    compile "org.hashids:hashids:$hasidsVersion"                                // https://github.com/10cella/hashids-java
+    compile "com.softwaremill.sttp:core_$scalaMajorVersion:$sttpVersion"        // https://github.com/softwaremill/sttp
+    compile "com.softwaremill.sttp:akka-http-backend_$scalaMajorVersion:$sttpVersion"
 
-    compile "com.lihaoyi:pprint_$scala_major_version:0.5.3" // http://www.lihaoyi.com/PPrint/
-    compile "com.beachape:enumeratum_$scala_major_version:1.5.13"
+    compile "com.lihaoyi:pprint_$scalaMajorVersion:0.5.3"                       // http://www.lihaoyi.com/PPrint/
+    compile "com.beachape:enumeratum_$scalaMajorVersion:1.5.13"                 // https://github.com/lloydmeta/enumeratum
 
-    compile "com.sksamuel.scrimage:scrimage-core_2.11:$scrimage_version"
-    compile "com.sksamuel.scrimage:scrimage-io-extra_2.11:$scrimage_version"
-    compile "com.sksamuel.scrimage:scrimage-filters_2.11:$scrimage_version"
+    compile "com.sksamuel.scrimage:scrimage-core_2.11:$scrimageVersion"         // https://github.com/sksamuel/scrimage
+    compile "com.sksamuel.scrimage:scrimage-io-extra_2.11:$scrimageVersion"
+    compile "com.sksamuel.scrimage:scrimage-filters_2.11:$scrimageVersion"
 
     /*
     // TODO remove? since we fully use scalatest now?
     // JUnit Jupiter API and TestEngine implementation
     //test.useJUnitPlatform()
-    testImplementation "org.junit.jupiter:junit-jupiter-api:$junit_jupiter_version"
-    testRuntimeOnly    "org.junit.jupiter:junit-jupiter-engine:$junit_jupiter_version"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion"
+    testRuntimeOnly    "org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion"
     //testCompile("junit:junit:4.12")
     //testRuntime("org.junit.vintage:junit-vintage-engine:4.12.0") //Support JUnit 3 and JUnit 4 tests
-    testCompile "org.junit.platform:junit-platform-runner:$junit_platform_version" // Enable use of the JUnitPlatform Runner within the IDE
+    testCompile "org.junit.platform:junit-platform-runner:$junitPlatformVersion" // Enable use of the JUnitPlatform Runner within the IDE
     */
 
-    testCompile "org.scalatest:scalatest_$scala_major_version:$scalatest_version"
+    testCompile "org.scalatest:scalatest_$scalaMajorVersion:$scalatestVersion"
     testRuntime 'org.pegdown:pegdown:1.4.2' // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
 
-    testCompile "com.github.simplyscala:scalatest-embedmongo_$scala_major_version:0.2.4"
+    testCompile "com.github.simplyscala:scalatest-embedmongo_$scalaMajorVersion:0.2.4"
 }
 
 jar {
@@ -166,27 +160,5 @@ task wrapper(type: Wrapper) {
 run {
     standardInput = System.in
 }
-
-run.doFirst {
-    // Environment variables go here.
-}
-
-
-/*
-test {
-
-    // Always run tests, even when nothing changed.
-    dependsOn 'cleanTest'
-
-    // Show test results.
-    testLogging {
-        events "passed", "skipped", "failed"
-    }
-}
-
-junitPlatform {
-    details 'tree'
-}
-*/
 
 

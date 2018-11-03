@@ -41,10 +41,6 @@
 
     <logger name="io.hemin.engine" level="INFO" />
     <logger name="ch.qos.logback" level="WARN"/>
-    <logger name="liquibase" level="WARN"/>
-    <logger name="org.hibernate" level="WARN"/>
-    <logger name="org.springframework.jdbc" level="WARN"/>
-    <logger name="org.springframework.orm" level="WARN"/>
     <logger name="com.rometools.modules.mediarss.io" level="ERROR"/>
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 
