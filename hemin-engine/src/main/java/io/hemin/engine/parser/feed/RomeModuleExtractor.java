@@ -9,7 +9,7 @@ import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
 import io.hemin.engine.parser.feed.rome.PodloveSimpleChapterModule;
 
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +28,16 @@ public class RomeModuleExtractor {
             .map(f -> f.getModule(AtomLinkModule.URI))
             .map(f -> (AtomLinkModule) f)
             .map(AtomLinkModule::getLinks)
-            .orElse(new LinkedList<>());
+            .orElse(Collections.emptyList());
+    }
+
+    public static List<Link> getAtomLinks(SyndEntry entry) {
+        return Optional
+            .ofNullable(entry)
+            .map(f -> f.getModule(AtomLinkModule.URI))
+            .map(f -> (AtomLinkModule) f)
+            .map(AtomLinkModule::getLinks)
+            .orElse(Collections.emptyList());
     }
 
     public static Optional<ContentModule> getContentModule(SyndEntry entry) {

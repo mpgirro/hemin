@@ -69,10 +69,12 @@ object BsonConversion {
 
   implicit val implicitPodcastItunesInfoWriter: BSONDocumentWriter[PodcastItunesInfo] = Macros.writer[PodcastItunesInfo]
   implicit val implicitPodcastItunesInfoReader: BSONDocumentReader[PodcastItunesInfo] = Macros.reader[PodcastItunesInfo]
-  
+
   implicit val implicitPodcastRegistrationInfoWriter: BSONDocumentWriter[PodcastRegistrationInfo] = Macros.writer[PodcastRegistrationInfo]
   implicit val implicitPodcastRegistrationInfoReader: BSONDocumentReader[PodcastRegistrationInfo] = Macros.reader[PodcastRegistrationInfo]
 
+  implicit val implicitAtomLinkWriter: BSONDocumentWriter[AtomLink] = Macros.writer[AtomLink]
+  implicit val implicitAtomLinkReader: BSONDocumentReader[AtomLink] = Macros.reader[AtomLink]
 
   val podcastWriter: BSONDocumentWriter[Podcast] = Macros.writer[Podcast]
   val podcastReader: BSONDocumentReader[Podcast] = Macros.reader[Podcast]

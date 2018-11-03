@@ -16,6 +16,7 @@ final case class Episode(
   description: Option[String]           = None,
   image: Option[String]                 = None,
   contentEncoded: Option[String]        = None,
+  atomLinks: List[AtomLink]             = Nil,
   chapters: List[Chapter]               = Nil,
   itunes: EpisodeItunesInfo             = EpisodeItunesInfo(),
   enclosure: EpisodeEnclosureInfo       = EpisodeEnclosureInfo(),
@@ -36,6 +37,7 @@ final case class Episode(
       description     = reduceLeft(this.description, that.description),
       image           = reduceLeft(this.image, that.image),
       contentEncoded  = reduceLeft(this.contentEncoded, that.contentEncoded),
+      atomLinks       = reduceLeft(this.atomLinks, that.atomLinks),
       chapters        = reduceLeft(this.chapters, that.chapters),
       itunes = EpisodeItunesInfo(
         duration    = reduceLeft(this.itunes.duration, that.itunes.duration),
@@ -71,6 +73,7 @@ final case class Episode(
       description     = reduceRight(this.description, that.description),
       image           = reduceRight(this.image, that.image),
       contentEncoded  = reduceRight(this.contentEncoded, that.contentEncoded),
+      atomLinks       = reduceRight(this.atomLinks, that.atomLinks),
       chapters        = reduceLeft(this.chapters, that.chapters),
       itunes = EpisodeItunesInfo(
         duration    = reduceRight(this.itunes.duration, that.itunes.duration),
