@@ -22,25 +22,25 @@ object AtomLink {
 
   /** Instantiates an AtomLink from a ROME Link object */
   def fromRome(link: Link): AtomLink = AtomLink(
-    title = link.getTitle,
-    href = link.getHref,
-    hrefResolved = link.getHrefResolved,
-    hrefLang = link.getHreflang,
-    rel = link.getRel,
-    typ = link.getType,
-    length = link.getLength,
+    title = Option(link.getTitle),
+    href = Option(link.getHref),
+    hrefResolved = Option(link.getHrefResolved),
+    hrefLang = Option(link.getHreflang),
+    rel = Option(link.getRel),
+    typ = Option(link.getType),
+    length = Option(link.getLength),
   )
 
 }
 
 case class AtomLink (
-  title: String,
-  href: String,
-  hrefResolved: String,
-  hrefLang: String,
-  rel: String,
-  typ: String,
-  length: Long,
+  title: Option[String],
+  href: Option[String],
+  hrefResolved: Option[String],
+  hrefLang: Option[String],
+  rel: Option[String],
+  typ: Option[String],
+  length: Option[Long],
 )
 
 
