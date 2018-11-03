@@ -82,21 +82,9 @@ object BsonConversion {
   val chapterWriter: BSONDocumentWriter[Chapter] = Macros.writer[Chapter]
   val chapterReader: BSONDocumentReader[Chapter] = Macros.reader[Chapter]
 
-
-  implicit object ChapterListReader extends BSONDocumentReader[List[Chapter]] {
-    override def read(bson: BSONDocument): List[Chapter] = {
-      //asChapterList("chapters")(bson)
-      bson.getAs[List[Chapter]]("chapters").toList.flatten
-    }
-  }
-
-  implicit object ChapterListWriter extends BSONDocumentWriter[List[Chapter]] {
-    override def write(chapters: List[Chapter]): BSONDocument =
-      chapters match {
-        case Nil => BSONDocument()
-        case cs  => BSONDocument("chapters" -> cs.map(c => chapterWriter.write(c)))
-      }
-  }
+  // ensure implicit versions in this scope in order to have chapters written and read from/to MongoDB
+  private implicit val implicitChapterWriter: BSONDocumentWriter[Chapter] = chapterWriter
+  private implicit val implicitChapterReader: BSONDocumentReader[Chapter] = chapterReader
 
   val episodeWriter: BSONDocumentWriter[Episode] = Macros.writer[Episode]
   val episodeReader: BSONDocumentReader[Episode] = Macros.reader[Episode]
