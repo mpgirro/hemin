@@ -45,7 +45,7 @@ object JsonWrites {
   private def toJson(l: Long): JsNumber = JsNumber(l)
   private def toJson(s: String): JsString = JsString(s)
   private def toJson(d: LocalDateTime): JsValue = DateMapper.asString(d).map(x => toJson(x)).getOrElse(JsNull)
-  private def toJson(f: FeedStatus): JsString = JsString(f.getName)
+  private def toJson(f: FeedStatus): JsString = JsString(f.entryName)
   private def toJson(ss: java.util.Set[String]): JsArray = jsonFromStringIterable(ss.asScala)
   private def toJson(is: java.util.List[IndexDoc]): JsArray = jsonFromDocumentIterable(is.asScala)
 
@@ -98,9 +98,9 @@ object JsonWrites {
       "itunesExplicit"        -> toNullB(p.itunes.explicit),
       "itunesBlock"           -> toNullB(p.itunes.block),
       "itunesType"            -> toNullS(p.itunes.podcastType),
-      "language"              -> toNullS(p.meta.language),
-      "generator"             -> toNullS(p.meta.generator),
-      "copyright"             -> toNullS(p.meta.copyright),
+      "language"              -> toNullS(p.language),
+      "generator"             -> toNullS(p.generator),
+      "copyright"             -> toNullS(p.copyright),
       "registrationTimestamp" -> toNullD(p.registration.timestamp),
       "registrationComplete"  -> toNullB(p.registration.complete)
     ))

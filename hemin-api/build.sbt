@@ -15,7 +15,7 @@ def gatlingVersion(scalaBinVer: String): String = scalaBinVer match {
 
 libraryDependencies += guice
 
-libraryDependencies += "io.hemin" % "hemin-engine" % "1.0-SNAPSHOT"
+libraryDependencies += "io.hemin" %% "hemin-engine" % "1.0-SNAPSHOT"
 
 libraryDependencies += "org.joda" % "joda-convert" % "1.9.2"
 libraryDependencies += "net.logstash.logback" % "logstash-logback-encoder" % "4.11"
