@@ -2,10 +2,10 @@ package io.hemin.engine.catalog.repository
 
 import java.time.LocalDateTime
 
-import io.hemin.engine.model.{FeedStatus, _}
+import io.hemin.engine.model._
 import io.hemin.engine.model.info._
 import io.hemin.engine.util.mapper.DateMapper
-import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONValue, BSONWriter, Macros}
+import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONWriter, Macros}
 
 
 object BsonConversion {
@@ -45,11 +45,11 @@ object BsonConversion {
   }
 
   implicit object FeedStatusWriter extends BSONWriter[FeedStatus,BSONString] {
-    def write(value: FeedStatus): BSONString = BSONString(value.getName)
+    def write(value: FeedStatus): BSONString = BSONString(value.entryName)
   }
 
   implicit object FeedStatusReader extends BSONReader[BSONString,FeedStatus] {
-    def read(status: BSONString): FeedStatus = FeedStatus.getByName(status.value)
+    def read(status: BSONString): FeedStatus = FeedStatus.withName(status.value)
   }
 
   implicit val implicitEpisodeEnclosureInfoWriter: BSONDocumentWriter[EpisodeEnclosureInfo] = Macros.writer[EpisodeEnclosureInfo]

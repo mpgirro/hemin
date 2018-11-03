@@ -279,7 +279,7 @@ class CatalogStore(config: CatalogConfig)
               podcastId             = Some(podcastId),
               url                   = Some(url),
               lastChecked           = Some(now),
-              lastStatus            = Some(FeedStatus.NEVER_CHECKED),
+              lastStatus            = Some(FeedStatus.NeverChecked),
               registrationTimestamp = Some(now),
             )
 

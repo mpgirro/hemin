@@ -10,7 +10,7 @@ object IndexField
   extends Enum[IndexField] {
 
   /* `findValues` is a protected method that invokes a macro to
-   * find all `Greeting` object declarations inside an `Enum`.
+   * find all `IndexField` object declarations inside an `Enum`.
    * We use it to implement the `val values` member */
   val values: immutable.IndexedSeq[IndexField] = findValues
 

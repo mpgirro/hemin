@@ -151,7 +151,7 @@ class CrawlerWorker (config: CrawlerConfig)
     job match {
       case WebsiteFetchJob() => // do nothing...
       case _ =>
-        val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_ERROR)
+        val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DownloadError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }
@@ -231,13 +231,13 @@ class CrawlerWorker (config: CrawlerConfig)
           job match {
             case NewPodcastFetchJob() =>
               parser ! ParseNewPodcastData(url, id, data)
-              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
             case UpdateEpisodesFetchJob(etag, lastMod) =>
               parser ! ParseUpdateEpisodeData(url, id, data)
-              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DOWNLOAD_SUCCESS)
+              val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 

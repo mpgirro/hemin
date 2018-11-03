@@ -8,7 +8,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
 import io.hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
-import io.hemin.engine.model.{Episode, FeedStatus, Image, Podcast}
+import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
@@ -230,7 +230,7 @@ class ParserWorker (config: ParserConfig)
         ex.printStackTrace()
 
         // we update the status of the feed, to persist the information that this feed stinks
-        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, LocalDateTime.now(), FeedStatus.PARSE_ERROR)
+        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, LocalDateTime.now(), FeedStatus.ParserError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }
