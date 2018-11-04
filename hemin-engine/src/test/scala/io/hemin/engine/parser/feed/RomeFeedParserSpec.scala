@@ -92,7 +92,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
             e.guid shouldBe Some("1fa609024fdf097")
             e.guidIsPermalink shouldEqual None
             e.description shouldBe Some("Lorem Ipsum")
-            e.image shouldEqual None // shouldBe Some("http://example.org/cover.jpg")
+            e.image shouldBe Some("http://example.org/cover.jpg")
             e.contentEncoded shouldBe Some("Lorem Ipsum")
             // TODO test the values from e.atomLinks
             //e.chapters should not be empty // TODO test chapter fields as well

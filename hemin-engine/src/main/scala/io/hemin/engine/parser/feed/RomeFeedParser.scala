@@ -177,9 +177,10 @@ class RomeFeedParser private (private val xmlData: String) {
   private def episodeImage(e: SyndEntry): Option[String] = RomeModuleExtractor
     .getItunesEntryInformation(e)
     .asScala
-    .flatMap { itunes =>
-      Option(itunes.getImage).map(_.toExternalForm)
-    }
+    .flatMap(itunes => Option(itunes.getImage))
+    //.map(_.getImage) // TODO why is this line not working, but the above?
+    .map(_.toExternalForm)
+    .orElse(podcast.image) // fallback is the podcast's image
 
   private def episodeItunesInfo(e: SyndEntry): EpisodeItunesInfo = RomeModuleExtractor
     .getItunesEntryInformation(e)
