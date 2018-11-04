@@ -5,33 +5,38 @@ import java.time.LocalDateTime
 import io.hemin.engine.model._
 import io.hemin.engine.model.info._
 import io.hemin.engine.util.mapper.DateMapper
-import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONWriter, Macros}
-
+import reactivemongo.bson._
 
 object BsonConversion {
 
   def toBsonI(value: Option[Int]): Option[BSONInteger] = value.flatMap(toBsonI)
-  def toBsonI(value: Int): Option[BSONInteger] = Option(value).flatMap(i => Option(BSONInteger(i)))
+  def toBsonI(value: Int): Option[BSONInteger] = Option(value).map(BSONInteger)
 
   def toBsonL(value: Option[Long]): Option[BSONLong] = value.flatMap(toBsonL)
-  def toBsonL(value: Long): Option[BSONLong] = Option(value).flatMap(l => Option(BSONLong(l)))
+  def toBsonL(value: Long): Option[BSONLong] = Option(value).map(BSONLong)
 
   def toBsonS(value: Option[String]): Option[BSONString] = value.flatMap(toBsonS)
-  def toBsonS(value: String): Option[BSONString] = Option(value).flatMap(s => Option(BSONString(s)))
+  def toBsonS(value: String): Option[BSONString] = Option(value).map(BSONString)
 
   def toBsonB(value: Option[Boolean]): Option[BSONBoolean] = value.flatMap(toBsonB)
-  def toBsonB(value: Boolean): Option[BSONBoolean] = Option(value).flatMap(b => Option(BSONBoolean(b)))
+  def toBsonB(value: Boolean): Option[BSONBoolean] = Option(value).map(BSONBoolean)
 
   def toBsonD(value: Option[LocalDateTime]): Option[BSONDateTime] = value.flatMap(toBsonD)
-  def toBsonD(value: LocalDateTime): Option[BSONDateTime] = Option(value).flatMap(DateMapper.asMilliseconds).map(BSONDateTime)
+  def toBsonD(value: LocalDateTime): Option[BSONDateTime] = DateMapper.asMilliseconds(value).map(BSONDateTime)
 
 
-  def asInt(key: String)(implicit bson: BSONDocument): Option[Int] = bson.getAs[BSONNumberLike](key).map(_.toInt)
-  def asLong(key: String)(implicit bson: BSONDocument): Option[Long] = bson.getAs[BSONNumberLike](key).map(_.toLong)
+  def asInt(key: String)(implicit bson: BSONDocument): Option[Int] = bson
+    .getAs[BSONNumberLike](key)
+    .map(_.toInt)
+  def asLong(key: String)(implicit bson: BSONDocument): Option[Long] = bson
+    .getAs[BSONNumberLike](key)
+    .map(_.toLong)
   def asString(key: String)(implicit bson: BSONDocument): Option[String] = bson.getAs[String](key)
   def asBoolean(key: String)(implicit bson: BSONDocument): Option[Boolean] = bson.getAs[Boolean](key)
-  def asLocalDateTime(key: String)(implicit bson: BSONDocument): Option[LocalDateTime] =
-    bson.getAs[BSONDateTime](key).flatMap(dt => DateMapper.asLocalDateTime(dt.value))
+  def asLocalDateTime(key: String)(implicit bson: BSONDocument): Option[LocalDateTime] = bson
+    .getAs[BSONDateTime](key)
+    .map(_.value)
+    .flatMap(DateMapper.asLocalDateTime)
 
   def asStringSet(key: String)(implicit bson: BSONDocument): Option[Set[String]] = bson.getAs[Set[String]](key)
 
