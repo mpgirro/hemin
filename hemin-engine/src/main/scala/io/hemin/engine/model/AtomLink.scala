@@ -22,13 +22,13 @@ object AtomLink {
 
   /** Instantiates an AtomLink from a ROME Link object */
   def fromRome(link: Link): AtomLink = AtomLink(
-    title = Option(link.getTitle),
-    href = Option(link.getHref),
+    title        = Option(link.getTitle),
+    href         = Option(link.getHref),
     hrefResolved = Option(link.getHrefResolved),
-    hrefLang = Option(link.getHreflang),
-    rel = Option(link.getRel),
-    typ = Option(link.getType),
-    length = Option(link.getLength),
+    hrefLang     = Option(link.getHreflang),
+    rel          = Option(link.getRel),
+    typ          = Option(link.getType),
+    length       = Option(link.getLength),
   )
 
 }
