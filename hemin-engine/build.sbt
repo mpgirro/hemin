@@ -12,8 +12,6 @@ scalaVersion := "2.12.6"
 
 sbtVersion := "1.1.6"
 
-//akkaVersion := "2.5.11"
-
 initialize := {
     assert(
         Integer.parseInt(sys.props("java.specification.version").split("\\.")(1))
@@ -39,45 +37,46 @@ resolvers ++= Seq(
 )
 
 //val scalaVersion = "2.12.6" // TODO extract stuff from above
-val akkaVersion = "2.5.11"
+val akkaVersion = "2.5.17"
 val luceneVersion = "7.5.0"
-val romeVersion = "1.9.0"
-val sttpVersion = "1.1.10"
+val romeVersion = "1.10.0"
+val sttpVersion = "1.4.2"
 val scrimageVersion = "2.1.8"
 
-libraryDependencies += "org.scala-lang" % "scala-compiler" % "2.12.6"
-libraryDependencies += "org.scala-lang" % "scala-library" % "2.12.6"
-libraryDependencies += "org.scala-lang.modules" %% "scala-java8-compat" % "0.8.0"       // https://github.com/scala/scala-java8-compat
-libraryDependencies += "com.typesafe.scala-logging" %% "scala-logging" % "3.8.0"        // https://github.com/lightbend/scala-logging
-libraryDependencies += "com.typesafe.akka" %% "akka-actor" % akkaVersion
-libraryDependencies += "com.typesafe.akka" %% "akka-slf4j" % akkaVersion
-libraryDependencies += "com.typesafe.akka" %% "akka-stream" % akkaVersion
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster" % akkaVersion
-libraryDependencies += "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3"                   // https://github.com/qos-ch/logback
-libraryDependencies += "org.reactivemongo" %% "reactivemongo" % "0.16.0"                // https://github.com/ReactiveMongo/ReactiveMongo
-libraryDependencies += "org.apache.lucene" % "lucene-core" % luceneVersion              // https://github.com/apache/lucene-solr
-libraryDependencies += "org.apache.lucene" % "lucene-queryparser" % luceneVersion
-libraryDependencies += "org.apache.lucene" % "lucene-analyzers-common" % luceneVersion
-libraryDependencies += "org.apache.solr" % "solr-solrj" % luceneVersion
-libraryDependencies += "org.jsoup" % "jsoup" % "1.11.2"                                 // https://github.com/jhy/jsoup
-libraryDependencies += "com.google.code.gson" % "gson" % "2.8.2"                        // https://github.com/google/gson
-libraryDependencies += "com.google.guava" % "guava" % "24.1.1-jre"                      // https://github.com/google/guava
-libraryDependencies += "com.rometools" % "rome" % romeVersion                           // https://github.com/rometools/rome
-libraryDependencies += "com.rometools" % "rome-modules" % romeVersion
-libraryDependencies += "org.hashids" % "hashids" % "1.0.3"                              // https://github.com/10cella/hashids-java
-libraryDependencies += "com.softwaremill.sttp" %% "core" % sttpVersion                  // https://github.com/softwaremill/sttp
-libraryDependencies += "com.softwaremill.sttp" %% "akka-http-backend" % sttpVersion
-libraryDependencies += "com.lihaoyi" %% "pprint" % "0.5.3"                              // http://www.lihaoyi.com/PPrint/
-libraryDependencies += "com.beachape" %% "enumeratum" % "1.5.13"                        // https://github.com/lloydmeta/enumeratum
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-core" % scrimageVersion     // https://github.com/sksamuel/scrimage
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-filters" % scrimageVersion
-libraryDependencies += "com.sksamuel.scrimage" %% "scrimage-io-extra" % scrimageVersion
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % Test                  // https://github.com/scalatest/scalatest
-libraryDependencies += "junit" % "junit" % "4.12" % Test                // not sure why I would need this
-libraryDependencies += "org.pegdown" % "pegdown" % "1.6.0" % Test // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
-libraryDependencies += "com.github.simplyscala" %% "scalatest-embedmongo" % "0.2.4" % Test  // https://github.com/SimplyScala/scalatest-embedmongo
-
+libraryDependencies ++= Seq(
+    "org.scala-lang"             %  "scala-compiler"          % "2.12.6",        // https://github.com/scala/scala
+    "org.scala-lang"             %  "scala-library"           % "2.12.6",
+    "org.scala-lang.modules"     %% "scala-java8-compat"      % "0.8.0",         // https://github.com/scala/scala-java8-compat
+    "com.typesafe.scala-logging" %% "scala-logging"           % "3.9.0",         // https://github.com/lightbend/scala-logging
+    "com.typesafe.akka"          %% "akka-actor"              % akkaVersion,
+    "com.typesafe.akka"          %% "akka-slf4j"              % akkaVersion,
+    "com.typesafe.akka"          %% "akka-stream"             % akkaVersion,
+    "com.typesafe.akka"          %% "akka-cluster"            % akkaVersion,
+    "com.typesafe.akka"          %% "akka-cluster-tools"      % akkaVersion,
+    "ch.qos.logback"             %  "logback-classic"         % "1.2.3",         // https://github.com/qos-ch/logback
+    "org.reactivemongo"          %% "reactivemongo"           % "0.16.0",        // https://github.com/ReactiveMongo/ReactiveMongo
+    "org.apache.lucene"          %  "lucene-core"             % luceneVersion,   // https://github.com/apache/lucene-solr
+    "org.apache.lucene"          %  "lucene-queryparser"      % luceneVersion,
+    "org.apache.lucene"          %  "lucene-analyzers-common" % luceneVersion,
+    "org.apache.solr"            %  "solr-solrj"              % luceneVersion,
+    "org.jsoup"                  %  "jsoup"                   % "1.11.3",        // https://github.com/jhy/jsoup
+    "com.google.code.gson"       %  "gson"                    % "2.8.5",         // https://github.com/google/gson
+    "com.google.guava"           %  "guava"                   % "27.0-jre",      // https://github.com/google/guava
+    "com.rometools"              %  "rome"                    % romeVersion,     // https://github.com/rometools/rome
+    "com.rometools"              %  "rome-modules"            % romeVersion,
+    "org.hashids"                %  "hashids"                 % "1.0.3",         // https://github.com/10cella/hashids-java
+    "com.softwaremill.sttp"      %% "core"                    % sttpVersion,     // https://github.com/softwaremill/sttp
+    "com.softwaremill.sttp"      %% "akka-http-backend"       % sttpVersion,
+    "com.lihaoyi"                %% "pprint"                  % "0.5.3",         // http://www.lihaoyi.com/PPrint/
+    "com.beachape"               %% "enumeratum"              % "1.5.13",        // https://github.com/lloydmeta/enumeratum
+    "com.sksamuel.scrimage"      %% "scrimage-core"           % scrimageVersion, // https://github.com/sksamuel/scrimage
+    "com.sksamuel.scrimage"      %% "scrimage-filters"        % scrimageVersion,
+    "com.sksamuel.scrimage"      %% "scrimage-io-extra"       % scrimageVersion,
+    "org.scalatest"              %% "scalatest"               % "3.0.5" % Test,  // https://github.com/scalatest/scalatest
+    "junit"                      %  "junit"                   % "4.12" % Test,   // not sure why I would need this
+    "org.pegdown"                %  "pegdown"                 % "1.6.0" % Test,  // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
+    "com.github.simplyscala"     %% "scalatest-embedmongo"    % "0.2.4" % Test,  // https://github.com/SimplyScala/scalatest-embedmongo
+)
 
 // Initial commands to be run in your REPL.  I like to import various project-specific things here.
 initialCommands := """
