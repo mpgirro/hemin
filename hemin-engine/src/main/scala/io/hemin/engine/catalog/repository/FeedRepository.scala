@@ -3,6 +3,7 @@ package io.hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Feed
+import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -30,9 +31,9 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
       .update(query, feed, upsert = true)
       .flatMap { _ =>
         findOne(feed.id)
-          .map {
-            case Some(f) => f
-            case None => throw new RuntimeException("Saving Feed to database was unsuccessful : " + feed)
+          .flatMap {
+            case Some(f) => Future.successful(f)
+            case None    => Future.failed(Errors.mongoErrorSaveFeed(feed))
           }
       }
     }

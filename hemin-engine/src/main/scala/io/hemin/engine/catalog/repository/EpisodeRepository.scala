@@ -3,6 +3,7 @@ package io.hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Episode
+import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -30,9 +31,9 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
       .update(query, episode, upsert = true)
       .flatMap { _ =>
         findOne(episode.id)
-          .map {
-            case Some(e) => e
-            case None => throw new RuntimeException("Saving Episode to database was unsuccessful : " + episode)
+          .flatMap {
+            case Some(e) => Future.successful(e)
+            case None    => Future.failed(Errors.mongoErrorSaveEpisode(episode))
           }
       }
     }

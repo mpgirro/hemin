@@ -1,7 +1,7 @@
 package io.hemin.engine.util
 
 import io.hemin.engine.{Engine, EngineException}
-import io.hemin.engine.model.{Episode, IndexDoc, Podcast}
+import io.hemin.engine.model._
 
 import scala.util.{Failure, Try}
 
@@ -105,5 +105,17 @@ object Errors {
     Failure(mapperErrorIndexToSolr(value))
   def mapperErrorIndexToSolr(value: IndexDoc): EngineException =
     new EngineException(s"Error mapping IndexDoc to Solr Document : $value")
+
+  def mongoErrorSavePodcast(value: Podcast): EngineException =
+    new EngineException(s"Saving Podcast to database was unsuccessful : $value")
+
+  def mongoErrorSaveEpisode(value: Episode): EngineException =
+    new EngineException(s"Saving Episode to database was unsuccessful : $value")
+
+  def mongoErrorSaveFeed(value: Feed): EngineException =
+    new EngineException(s"Saving Feed to database was unsuccessful : $value")
+
+  def mongoErrorSaveImage(value: Image): EngineException =
+    new EngineException(s"Saving Image to database was unsuccessful : $value")
 
 }

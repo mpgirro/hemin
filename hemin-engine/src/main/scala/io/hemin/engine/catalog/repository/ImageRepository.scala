@@ -3,6 +3,7 @@ package io.hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Image
+import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
@@ -31,9 +32,9 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
       .update(query, image, upsert = true)
       .flatMap { _ =>
         findOne(image.id)
-          .map {
-            case Some(i) => i
-            case None => throw new RuntimeException("Saving Image to database was unsuccessful : " + image)
+          .flatMap {
+            case Some(i) => Future.successful(i)
+            case None    => Future.failed(Errors.mongoErrorSaveImage(image))
           }
       }
     }
