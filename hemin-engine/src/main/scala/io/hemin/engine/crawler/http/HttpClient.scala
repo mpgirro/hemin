@@ -2,7 +2,7 @@ package io.hemin.engine.crawler.http
 
 import java.nio.file.Paths
 
-import com.softwaremill.sttp._
+import com.softwaremill.sttp.{Response, _}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineException
 
@@ -43,53 +43,22 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
       }
     }
 
-  private def headCheckHTTP(url: String): Try[HeadResult] = Try {
+  private def sendHeadRequest(url: String): Try[Response[String]] = Try {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
       .head(uri"$url")
       .readTimeout(downloadTimeout)
       .acceptEncoding("")
       .send()
+    response // Note: because the result type of .send() is weired, be need to actually assign the result to a reference
+  }
 
-    // we assume we will use the known URL to download later, but maybe this changes...
-    var location: Option[String] = Some(url)
-
-    if (!response.isSuccess) {
-      response.code match {
-        case 200 => // all fine
-        case 301 => // Moved Permanently
-          location = response.header("location")
-          log.debug("Redirecting {} to {}", url, location.getOrElse("NON PROVIDED"))
-        case 302 => // odd, but ok
-        case 404 => // not found: nothing there worth processing
-          throw new EngineException(s"HEAD request reported status ${response.code} : ${response.statusText}")
-        case 503 => // service unavailable
-          throw new EngineException(s"HEAD request reported status ${response.code} : ${response.statusText}")
-        case _   =>
-          log.warn("Received unexpected status from HEAD request : {} {} on {}", response.code, response.statusText, url)
-      }
-    }
-
-    val mimeType: Option[String] = response.contentType
+  private def mimeType(response: Response[String]): Option[String] =
+    response.contentType
       .map(_.split(";")(0))
       .map(_.trim)
 
-    mimeType match {
-      case Some(mime) =>
-        if (!isValidMime(mime)) {
-          mime match {
-            case _@("audio/mpeg" | "application/octet-stream") =>
-              throw new EngineException(s"Invalid MIME-type '$mime' of '$url'")
-            case _ =>
-              throw new EngineException(s"Unexpected MIME-type '$mime' of '$url")
-          }
-        }
-      case None =>
-        // got no content type from HEAD request, therefore I'll just have to download the whole thing and look for myself
-        log.warn("Did not get a Content-Type from HEAD request : {}", url)
-    }
-
-    // extract the character encoding of the resource if it is returned, to avoid encoding problems
-    val encoding: Option[String] = response.contentType
+  private def contentType(response: Response[String]): Option[String] =
+    response.contentType
       .flatMap(_
         .split(";")
         .lift(1)
@@ -97,18 +66,69 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
           .split("=")
           .lift(1) // -> "UTF-8"
           .map(_
-            .replaceAll("\"", "") // remove quotation marks if any
-            .trim)))
+          .replaceAll("\"", "") // remove quotation marks if any
+          .trim)))
 
-    HeadResult(
-      statusCode      = response.code,
-      location,
-      mimeType,
-      contentEncoding = encoding,
-      eTag            = response.header("etag"),
-      lastModified    = response.header("last-modified"),
-    )
-  }
+  private def headCheckHTTP(url: String): Try[HeadResult] = sendHeadRequest(url)
+    .flatMap { response =>
+      if (!response.isSuccess) {
+        val code = response.code
+        val text = response.statusText
+        response.code match {
+          case 200 => Success(response) // all fine
+          case 302 => Success(response) // odd, but ok
+          case 404 => Success(response) // not found: nothing there worth processing
+            Failure(new EngineException(s"HEAD request reported status $code : '$text'"))
+          case 503 => // service unavailable
+            Failure(new EngineException(s"HEAD request reported status $code : '$text'"))
+          case _   =>
+            log.warn("Received unexpected status from HEAD request : {} {} on {}", code, text, url)
+            Success(response)
+        }
+      } else {
+        Success(response)
+      }
+    }
+    .map { response =>
+      HeadResult(
+        statusCode      = response.code,
+        location        = response.header("location"),
+        mimeType        = mimeType(response),
+        contentEncoding = contentType(response),
+        eTag            = response.header("etag"),
+        lastModified    = response.header("last-modified"),
+      )
+    }
+    .map { head =>
+      head.statusCode match {
+        case 301 => // Moved Permanently
+          log.debug("Redirecting {} to {}", url, head.location.getOrElse("NON PROVIDED"))
+          head
+        case _ =>
+          // Note: We set the URL back to our original information, because that what we know from the DB
+          // TODO: is this the smart thing to do?
+          head.copy(location = Option(url).orElse(head.location))
+      }
+    }
+    .flatMap { head =>
+      head.mimeType match {
+        case Some(mime) =>
+          if (!isValidMime(mime)) {
+            mime match {
+              case _@("audio/mpeg" | "application/octet-stream") =>
+                Failure(new EngineException(s"Invalid MIME-type '$mime' of '$url'"))
+              case _ =>
+                Failure(new EngineException(s"Unexpected MIME-type '$mime' of '$url'"))
+            }
+          } else {
+            Success(head)
+          }
+        case None =>
+          // got no content type from HEAD request, therefore I'll just have to download the whole thing and look for myself
+          log.warn("Did not get a Content-Type from HEAD request : {}", url)
+          Success(head)
+      }
+    }
 
   // this method is a remnant from the past and has become obsolete
   private def headCheckFILE(url: String): Try[HeadResult] = Try {
@@ -119,12 +139,12 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     val status = if (file.exists()) 200 else 404
 
     HeadResult(
-      statusCode = status,
-      location = Option(url),
-      mimeType = Option(mimeType).orElse(Some("text/xml")),
+      statusCode      = status,
+      location        = Option(url),
+      mimeType        = Option(mimeType).orElse(Some("text/xml")),
       contentEncoding = Option("UTF-8"),
-      eTag = None,
-      lastModified = None,
+      eTag            = None,
+      lastModified    = None,
     )
   }
 
