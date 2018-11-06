@@ -16,11 +16,7 @@ Hemin is a podcast catalog & search engine infrastructure. It's engine is writte
 
 The Hemin infrastructure is still in the early development phase and not yet ready for full productive use.
 
-
-## Roadmap & Standard Support
-
-
-The Hemin system supports the following standards:
+The system currently supports the following standards:
 
 * [Podlove Simple Chapter](https://podlove.org/simple-chapters/)
 
@@ -28,6 +24,8 @@ Support for the following standards is planned:
 
 * Paged Feeds ([RFC 5005](https://tools.ietf.org/html/rfc5005))
 * [JSON:API](https://jsonapi.org)
+
+Further roadmap information for the subprojects is documented in their respective [GitHub projects](https://github.com/mpgirro/hemin/projects) board.
 
 
 ## WebApp ([hemin.io](https://hemin.io))
