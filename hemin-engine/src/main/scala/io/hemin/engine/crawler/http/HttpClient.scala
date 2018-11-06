@@ -8,7 +8,7 @@ import io.hemin.engine.EngineException
 
 import scala.concurrent.duration._
 import scala.io.Source
-import scala.util.Try
+import scala.util.{Failure, Success, Try}
 
 class HttpClient (timeout: Long, downloadMaxBytes: Long) {
 
@@ -22,25 +22,28 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     sttpBackend.close()
   }
 
-  def headCheck(url: String): Try[HeadResult] = Try {
-
-    // we will ensure that the protocol will be lower case, otherwise further stuff will fail
-    val parts = url.split("://")
-    if (parts.size != 2) {
-      throw new IllegalArgumentException("No valid URL provided : " + url)
+  def headCheck(url: String): Try[HeadResult] = Option(url)
+    .map(_.split("://"))
+    .map(Success(_))
+    .getOrElse(Failure(new EngineException("Cannot run HEAD check; reason : URL was NULL")))
+    .flatMap { parts =>
+      if (parts.length != 2) {
+        Failure(new EngineException("Cannot run HEAD check; reason : no valid URL provided : " + url))
+      } else {
+        Success(parts(0).toLowerCase + "://" + parts(1))
+      }
     }
-    val cleanUrl = parts(0).toLowerCase + "://" + parts(1)
-
-    if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
-      headCheckHTTP(cleanUrl)
-    } else if (cleanUrl.startsWith("file:///")) {
-      headCheckFILE(cleanUrl)
-    } else {
-      throw new IllegalArgumentException("URL points neither to local nor remote resource : " + url)
+    .flatMap { ref =>
+      if (ref.startsWith("http://") || ref.startsWith("https://")) {
+        headCheckHTTP(ref)
+      } else if (ref.startsWith("file:///")) {
+        headCheckFILE(ref)
+      } else {
+        Failure(new EngineException("Cannot run HEAD check; reason : URL points neither to local nor remote resource : " + url))
+      }
     }
-  }
 
-  private def headCheckHTTP(url: String): HeadResult = {
+  private def headCheckHTTP(url: String): Try[HeadResult] = Try {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
       .head(uri"$url")
       .readTimeout(downloadTimeout)
@@ -108,7 +111,7 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
   }
 
   // this method is a remnant from the past and has become obsolete
-  private def headCheckFILE(url: String): HeadResult = {
+  private def headCheckFILE(url: String): Try[HeadResult] = Try {
 
     val path = Paths.get(url)
     val mimeType = java.nio.file.Files.probeContentType(path)
