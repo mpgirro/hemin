@@ -18,7 +18,8 @@ The Hemin infrastructure is still in the early development phase and not yet rea
 
 The system currently supports the following standards:
 
-* XML syndication feeds in [RSS 2.0](https://cyber.harvard.edu/rss/rss.html) or Atom ([RFC 4287](https://tools.ietf.org/html/rfc4287)) formats
+* XML syndication feeds in [RSS 2.0](https://cyber.harvard.edu/rss/rss.html) or Atom ([RFC 4287](https://tools.ietf.org/html/rfc4287)) format
+* XML tags of Apple's [Podcasts Connect](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) namespace ("iTunes Tags")
 * [Podlove Simple Chapter](https://podlove.org/simple-chapters/)
 
 Support for the following standards is planned:
