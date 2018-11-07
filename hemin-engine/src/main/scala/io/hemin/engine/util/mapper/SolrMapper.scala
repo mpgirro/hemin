@@ -4,7 +4,7 @@ import java.util.Date
 
 import com.google.common.collect.Lists
 import io.hemin.engine.model.{IndexDoc, IndexField}
-import io.hemin.engine.util.Errors
+import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.{SolrDocument, SolrInputDocument}
 
 import scala.util.{Success, Try}
@@ -31,7 +31,7 @@ object SolrMapper {
       d
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureIndexToSolr(src))
+    .getOrElse(mapperFailureIndexToSolr(src))
 
   def firstMatch(doc: SolrDocument, fieldName: String): Option[Any] = {
     val os = doc.getFieldValues(fieldName)

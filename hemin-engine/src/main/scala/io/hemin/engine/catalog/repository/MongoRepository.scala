@@ -1,6 +1,7 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
+import io.hemin.engine.EngineException
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONValue}
@@ -18,6 +19,8 @@ trait MongoRepository[T] {
   protected[this] val sort: BSONDocument
 
   protected[this] def collection: Future[BSONCollection]
+
+  protected[this] def saveError(value: T): EngineException
 
   /** Save entity to database collection
     *

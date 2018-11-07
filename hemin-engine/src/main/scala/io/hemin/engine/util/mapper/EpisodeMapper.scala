@@ -2,7 +2,7 @@ package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.EpisodeItunesInfo
 import io.hemin.engine.model.{Episode, IndexDoc, IndexField}
-import io.hemin.engine.util.Errors
+import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
 import scala.util.{Success, Try}
@@ -26,7 +26,7 @@ object EpisodeMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureIndexToEpisode(src))
+    .getOrElse(mapperFailureIndexToEpisode(src))
 
   def toEpisode(src: org.apache.lucene.document.Document): Try[Episode] = Option(src)
     .map { s =>
@@ -46,7 +46,7 @@ object EpisodeMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureLuceneToEpisode(src))
+    .getOrElse(mapperFailureLuceneToEpisode(src))
 
   def toEpisode(src: SolrDocument): Try[Episode] = Option(src)
     .map { s =>
@@ -66,6 +66,6 @@ object EpisodeMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureSolrToEpisode(src))
+    .getOrElse(mapperFailureSolrToEpisode(src))
 
 }

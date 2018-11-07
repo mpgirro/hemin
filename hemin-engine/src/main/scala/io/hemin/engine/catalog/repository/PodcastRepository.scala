@@ -1,9 +1,9 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
+import io.hemin.engine.EngineException
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Podcast
-import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -25,6 +25,9 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
 
+  override protected[this] def saveError(value: Podcast): EngineException =
+    new EngineException(s"Saving Podcast to database was unsuccessful : $value")
+
   override def save(podcast: Podcast): Future[Podcast] = {
     val query = BSONDocument("id" -> podcast.id)
     collection.flatMap { _
@@ -32,7 +35,7 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
       .flatMap { _ => findOne(podcast.id)
         .flatMap {
           case Some(p) => Future.successful(p)
-          case None    => Future.failed(Errors.mongoErrorSavePodcast(podcast))
+          case None    => Future.failed(saveError(podcast))
         }
       }
     }

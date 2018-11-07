@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
-import io.hemin.engine.crawler.api.{FyydAPI, GpodderAPI, PanoptikumAPI}
+import io.hemin.engine.crawler.api._
 import io.hemin.engine.crawler.http.HttpClient
 import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.model.FeedStatus
@@ -47,6 +47,8 @@ class CrawlerWorker (config: CrawlerConfig)
   private val fyyd = new FyydAPI()
   private val gpodder = new GpodderAPI()
   private val panoptikum = new PanoptikumAPI()
+  private val podbay = new PodbayFmAPI()
+  private val podcastpedia = new PodcastpediaAPI()
 
   override def postStop: Unit = {
     httpClient.close()

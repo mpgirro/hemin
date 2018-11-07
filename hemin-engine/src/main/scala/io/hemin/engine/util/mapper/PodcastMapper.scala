@@ -2,7 +2,7 @@ package io.hemin.engine.util.mapper
 
 import io.hemin.engine.model.info.PodcastItunesInfo
 import io.hemin.engine.model.{IndexDoc, IndexField, Podcast}
-import io.hemin.engine.util.Errors
+import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
 import scala.util.{Success, Try}
@@ -25,7 +25,7 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureIndexToPodcast(doc))
+    .getOrElse(mapperFailureIndexToPodcast(doc))
 
   def toPodcast(doc: org.apache.lucene.document.Document): Try[Podcast] = Option(doc)
     .map { d =>
@@ -39,7 +39,7 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureLuceneToPodcast(doc))
+    .getOrElse(mapperFailureLuceneToPodcast(doc))
 
 
   def toPodcast(doc: SolrDocument): Try[Podcast] = Option(doc)
@@ -54,6 +54,6 @@ object PodcastMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureSolrToPodcast(doc))
+    .getOrElse(mapperFailureSolrToPodcast(doc))
 
 }

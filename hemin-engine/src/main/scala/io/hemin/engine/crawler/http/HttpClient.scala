@@ -12,11 +12,14 @@ import scala.util.{Failure, Success, Try}
 
 class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
 
+  import io.hemin.engine.crawler.http.HttpClient._ // import the failures
+
   private val log = Logger(getClass)
 
   private val downloadTimeout = timeout.seconds
 
-  private implicit val sttpBackend = HttpURLConnectionBackend(options = SttpBackendOptions.connectionTimeout(downloadTimeout))
+  private implicit val sttpBackend: SttpBackend[Id, Nothing] =
+    HttpURLConnectionBackend(options = SttpBackendOptions.connectionTimeout(downloadTimeout))
 
   def close(): Unit = {
     sttpBackend.close()
@@ -25,10 +28,10 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
   def headCheck(url: String): Try[HeadResult] = Option(url)
     .map(_.split("://"))
     .map(Success(_))
-    .getOrElse(Failure(new EngineException("Cannot run HEAD check; reason : URL was NULL")))
+    .getOrElse(headFailureUrlNull)
     .flatMap { parts =>
       if (parts.length != 2) {
-        Failure(new EngineException("Cannot run HEAD check; reason : no valid URL provided : " + url))
+        headFailureInvalidUrl(url)
       } else {
         Success(parts(0).toLowerCase + "://" + parts(1))
       }
@@ -39,9 +42,19 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       } else if (ref.startsWith("file:///")) {
         headCheckFILE(ref)
       } else {
-        Failure(new EngineException("Cannot run HEAD check; reason : URL points neither to local nor remote resource : " + url))
+        headFailureInvalidLocation(url)
       }
     }
+
+  def fetchContent(url: String, encoding: Option[String]): Try[String] = {
+    if (url.startsWith("http://") || url.startsWith("https://")) {
+      fetchContentHTTP(url, encoding)
+    } else if (url.startsWith("file:///")) {
+      fetchContentFILE(url, encoding)
+    } else {
+      fetchFailureInvalidLocation(url)
+    }
+  }
 
   private def sendHeadRequest(url: String): Try[Response[String]] = Try {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
@@ -49,6 +62,18 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       .readTimeout(downloadTimeout)
       .acceptEncoding("")
       .send()
+    response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
+  }
+
+  private def sendGetRequest(url: String, encoding: Option[String]): Try[Response[Array[Byte]]] = Try {
+    val request = sttp
+      .get(uri"$url")
+      .readTimeout(downloadTimeout)
+      .response(asByteArray) // prevent assuming UTF-8 encoding, because some feeds do not use it
+
+    encoding.foreach(e => request.acceptEncoding(e))
+
+    val response = request.send()
     response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
   }
 
@@ -79,11 +104,11 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
           case 200 => Success(response) // all fine
           case 302 => Success(response) // odd, but ok
           case 404 => Success(response) // not found: nothing there worth processing
-            Failure(new EngineException(s"HEAD request reported status $code : '$text'"))
+            headFailureInvalidStatus(code, text)
           case 503 => // service unavailable
-            Failure(new EngineException(s"HEAD request reported status $code : '$text'"))
+            headFailureInvalidStatus(code, text)
           case _   =>
-            log.warn("Received unexpected status from HEAD request : {} {} on {}", code, text, url)
+            log.warn("Received unexpected status from HEAD request : '{} {}' on '{}'", code, text, url)
             Success(response)
         }
       } else {
@@ -115,12 +140,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       head.mimeType match {
         case Some(mime) =>
           if (!isValidMime(mime)) {
-            mime match {
-              case _@("audio/mpeg" | "application/octet-stream") =>
-                Failure(new EngineException(s"Invalid MIME-type '$mime' of '$url'"))
-              case _ =>
-                Failure(new EngineException(s"Unexpected MIME-type '$mime' of '$url'"))
-            }
+            headFailureUnexpectedMime(mime, url)
           } else {
             Success(head)
           }
@@ -149,55 +169,34 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     )
   }
 
-  def fetchContent(url: String, encoding: Option[String]): Try[String] = {
-    if (url.startsWith("http://") || url.startsWith("https://")) {
-      fetchContentHTTP(url, encoding)
-    } else if (url.startsWith("file:///")) {
-      fetchContentFILE(url, encoding)
-    } else {
-      Failure(new IllegalArgumentException("URL points neither to local nor remote resource : " + url))
-    }
-  }
-
-  private def sendGetRequest(url: String, encoding: Option[String]): Try[Response[Array[Byte]]] = Try {
-    val request = sttp
-      .get(uri"$url")
-      .readTimeout(downloadTimeout)
-      .response(asByteArray) // prevent assuming UTF-8 encoding, because some feeds do not use it
-
-    encoding.foreach(e => request.acceptEncoding(e))
-
-    val response = request.send()
-    response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
-  }
-
-  private def fetchContentHTTP(url: String, encoding: Option[String]): Try[String] = sendGetRequest(url, encoding)
-    .flatMap { response =>
-      if (response.isSuccess) {
-        Success(response)
-      } else {
-        Failure(new EngineException(s"Download resulted in a non-success response code : ${response.code}"))
+  private def fetchContentHTTP(url: String, encoding: Option[String]): Try[String] =
+    sendGetRequest(url, encoding)
+      .flatMap { response =>
+        if (response.isSuccess) {
+          Success(response)
+        } else {
+          fetchFailureNonSuccessResponse(response.code)
+        }
       }
-    }
-    .flatMap { response =>
-      response.contentType
-        .map(_.split(";")(0).trim) // get the mime type
-        .filter(!isValidMime(_))
-        .map(mimeType => Failure(new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'")))
-        .getOrElse(Success(response))
-    }
-    .flatMap { response =>
-      response.contentLength
-        .filter(_ > downloadMaxBytes)
-        .map(cl => Failure(new EngineException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")))
-        .getOrElse(Success(response))
-    }
-    .flatMap { response =>
-      response.body match {
-        case Left(error) => Failure(new EngineException(s"Error collecting download body; message : $error"))
-        case Right(data) => Success(new String(data, encoding.getOrElse("utf-8")))
+      .flatMap { response =>
+        response.contentType
+          .map(_.split(";")(0).trim) // get the mime type
+          .filter(!isValidMime(_))
+          .map(fetchFailureInvalidMime)
+          .getOrElse(Success(response))
       }
-    }
+      .flatMap { response =>
+        response.contentLength
+          .filter(_ > downloadMaxBytes)
+          .map(fetchFailureExceedingLength)
+          .getOrElse(Success(response))
+      }
+      .flatMap { response =>
+        response.body match {
+          case Left(error) => fetchFailureWithError(error)
+          case Right(data) => Success(new String(data, encoding.getOrElse("utf-8")))
+        }
+      }
 
   private def fetchContentFILE(url: String, encoding: Option[String]): Try[String] = Try {
     Source.fromURL(url).getLines.mkString
@@ -234,4 +233,36 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     }
   }
 
+}
+
+object HttpClient {
+  private def headFailureUrlNull: Try[Nothing] =
+    Failure(new EngineException("Cannot run HEAD check; reason: URL was NULL"))
+
+  private def headFailureInvalidUrl(url: String): Try[Nothing] =
+    Failure(new EngineException(s"Cannot run HEAD check; reason: no valid URL provided : '$url'"))
+
+  private def headFailureInvalidLocation(url: String): Try[Nothing] =
+    Failure(new EngineException(s"Cannot run HEAD check; reason: URL points neither to local nor remote resource : '$url'"))
+
+  private def headFailureInvalidStatus(code: Int, text: String): Try[Nothing] =
+    Failure(new EngineException(s"HEAD check reported status $code : '$text'"))
+
+  private def headFailureUnexpectedMime(mime: String, url: String): Try[Nothing] =
+    Failure(new EngineException(s"HEAD check received unexpected MIME-type '$mime' of '$url'"))
+
+  private def fetchFailureInvalidLocation(url: String): Try[Nothing] =
+    Failure(new EngineException(s"Cannot GET content; reason: URL points neither to local nor remote resource : '$url'"))
+
+  private def fetchFailureWithError(error: String): Try[String] =
+    Failure(new EngineException(s"Error collecting download body; message: $error"))
+
+  private def fetchFailureNonSuccessResponse(code: Int): Try[Nothing] =
+    Failure(new EngineException(s"Download resulted in a non-success response code : $code"))
+
+  private def fetchFailureInvalidMime(mime: String): Try[Nothing] =
+    Failure(new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mime'"))
+
+  private def fetchFailureExceedingLength(length: Long): Try[Nothing] =
+    Failure(new EngineException(s"Refusing to download resource because content length is too much: $length"))
 }

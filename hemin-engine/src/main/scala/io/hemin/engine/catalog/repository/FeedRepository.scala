@@ -1,9 +1,9 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
+import io.hemin.engine.EngineException
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Feed
-import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -25,6 +25,9 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
+  override protected[this] def saveError(value: Feed): EngineException =
+    new EngineException(s"Saving Feed to database was unsuccessful : $value")
+
   override def save(feed: Feed): Future[Feed] = {
     val query = BSONDocument("id" -> feed.id)
     collection.flatMap { _
@@ -33,7 +36,7 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
         findOne(feed.id)
           .flatMap {
             case Some(f) => Future.successful(f)
-            case None    => Future.failed(Errors.mongoErrorSaveFeed(feed))
+            case None    => Future.failed(saveError(feed))
           }
       }
     }

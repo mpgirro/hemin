@@ -13,7 +13,7 @@ import io.hemin.engine.model._
 import io.hemin.engine.node.Node
 import io.hemin.engine.node.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import io.hemin.engine.util.Errors
+import io.hemin.engine.util.mapper.MapperErrors
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -36,7 +36,7 @@ object Engine {
     * @param config The configuration map that is the base for the Engine's
     *               configuration and the internal Akka system.
     */
-  def boot(config: Config): Try[Engine] = safeBoot(new Engine(config))
+  def boot(config: Config): Try[Engine] = Try(new Engine(config))
 
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
     * configuration. The internal Akka system will use the default configuration
@@ -44,18 +44,26 @@ object Engine {
     *
     * @param config The Engine's configuration. The Akka system will use defaults.
     */
-  def boot(config: EngineConfig): Try[Engine] = safeBoot(new Engine(config))
+  def boot(config: EngineConfig): Try[Engine] = Try(new Engine(config))
 
-  // Try-wrap the instantiation of an Engine, and ensure that a homogeneous
-  // top-exception in the stack is returned in case of an error
-  private def safeBoot(danger: => Engine): Try[Engine] = Try(danger)
-    .recoverWith {
-      case ex: Throwable => Errors.engineStartupFailure(ex)
-    }
+  private lazy val engineShutdownFailureNotRunning: Try[Unit] =
+    Failure(new EngineException("Engine shutdown failed; reason: not running"))
+
+  private lazy val engineGuardErrorNotRunning: EngineException =
+    new EngineException("Guard prevented call; reason: Engine not running")
+
+  private def engineGuardFailureNotRunning[A]: Try[A] = Failure(engineGuardErrorNotRunning)
+
+  private def engineShutdownFailure(ex: Throwable): Try[Unit] = Failure(engineShutdownError(ex))
+
+  private def engineShutdownError(ex: Throwable): EngineException =
+    new EngineException(s"Engine shutdown failed; reason: ${ex.getMessage}", ex)
 
 }
 
 class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
+
+  import io.hemin.engine.Engine._ // import the failures
 
   private def this(config: Config) = this(
     engineConfig = EngineConfig.load(config),
@@ -111,10 +119,10 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       val terminate = Await.result(system.terminate(), internalTimeout.duration)
       Try(terminate) match {
         case Success(_)  => Success(Unit)
-        case Failure(ex) => Errors.engineShutdownFailure(ex)
+        case Failure(ex) => engineShutdownFailure(ex)
       }
     } else {
-      Errors.engineShutdownFailureNotRunning
+      engineShutdownFailureNotRunning
     }
   }
 
@@ -247,14 +255,14 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     if (running.get) {
       circuitBreaker.withCircuitBreaker(body)
     } else {
-      Future.failed(Errors.engineGuardErrorNotRunning)
+      Future.failed(engineGuardErrorNotRunning)
     }
 
   private def guarded[T](body: => T): Try[T] =
     if (running.get) {
       Try(circuitBreaker.withSyncCircuitBreaker(body))
     } else {
-      Errors.engineGuardFailureNotRunning[T]
+      engineGuardFailureNotRunning[T]
     }
 
   private def breakerOpen(): Unit = log.info("Circuit Breaker is open")

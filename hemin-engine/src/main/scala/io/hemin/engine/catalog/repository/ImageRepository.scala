@@ -1,9 +1,9 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
+import io.hemin.engine.EngineException
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Image
-import io.hemin.engine.util.Errors
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
@@ -26,6 +26,9 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 
+  override protected[this] def saveError(value: Image): EngineException =
+    new EngineException(s"Saving Image to database was unsuccessful : $value")
+
   override def save(image: Image): Future[Image] = {
     val query = BSONDocument("id" -> image.id)
     collection.flatMap { _
@@ -34,7 +37,7 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
         findOne(image.id)
           .flatMap {
             case Some(i) => Future.successful(i)
-            case None    => Future.failed(Errors.mongoErrorSaveImage(image))
+            case None    => Future.failed(saveError(image))
           }
       }
     }

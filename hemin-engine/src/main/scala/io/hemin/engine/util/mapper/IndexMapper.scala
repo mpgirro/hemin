@@ -2,7 +2,7 @@ package io.hemin.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
 import io.hemin.engine.model.{Episode, IndexDoc, IndexField, Podcast}
-import io.hemin.engine.util.Errors
+import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
 import scala.util.{Failure, Success, Try}
@@ -29,7 +29,7 @@ object IndexMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailurePodcastToIndexDoc(src))
+    .getOrElse(mapperFailurePodcastToIndexDoc(src))
 
   def toIndexDoc(src: Episode): Try[IndexDoc] = Option(src)
     .map { s =>
@@ -51,30 +51,30 @@ object IndexMapper {
       )
     }
     .map(Success(_))
-    .getOrElse(Errors.mapperFailureEpisodeToIndexDoc(src))
+    .getOrElse(mapperFailureEpisodeToIndexDoc(src))
 
   def toIndexDoc(doc: org.apache.lucene.document.Document): Try[IndexDoc] = Option(doc)
     .map { d =>
       val docType = d.get(IndexField.DocType.entryName)
       if (isNullOrEmpty(docType)) {
-        Errors.mapperFailureUnsupportedIndexDocumentType("NULL")
+        mapperFailureUnsupportedIndexDocumentType("NULL")
       } else {
         docType match {
           case "podcast" =>
             PodcastMapper.toPodcast(doc) match {
               case Success(p)  => toIndexDoc(p)
-              case Failure(ex) => Errors.mapperFailurePodcastToIndexDoc(ex)
+              case Failure(ex) => mapperFailurePodcastToIndexDoc(ex)
             }
           case "episode" =>
             EpisodeMapper.toEpisode(doc) match {
               case Success(e)  => toIndexDoc(e)
-              case Failure(ex) => Errors.mapperFailureEpisodeToIndexDoc(ex)
+              case Failure(ex) => mapperFailureEpisodeToIndexDoc(ex)
             }
-          case _ => Errors.mapperFailureUnsupportedIndexDocumentType(docType)
+          case _ => mapperFailureUnsupportedIndexDocumentType(docType)
         }
       }
     }
-    .getOrElse(Errors.mapperFailureLuceneToIndexDoc(doc))
+    .getOrElse(mapperFailureLuceneToIndexDoc(doc))
 
   def toIndexDoc(src: SolrDocument): Try[IndexDoc] = Option(src)
     .map { s =>
@@ -82,25 +82,25 @@ object IndexMapper {
       docType match {
         case Some(dt) =>
           if (isNullOrEmpty(dt)) {
-            Errors.mapperFailureUnsupportedIndexDocumentType(dt)
+            mapperFailureUnsupportedIndexDocumentType(dt)
           } else {
             dt match {
               case "podcast" =>
                 PodcastMapper.toPodcast(src) match {
                   case Success(p)  => toIndexDoc(p)
-                  case Failure(ex) => Errors.mapperFailurePodcastToIndexDoc(ex)
+                  case Failure(ex) => mapperFailurePodcastToIndexDoc(ex)
                 }
               case "episode" =>
                 EpisodeMapper.toEpisode(src) match {
                   case Success(e)  => toIndexDoc(e): Try[IndexDoc]
-                  case Failure(ex) => Errors.mapperFailureEpisodeToIndexDoc(ex)
+                  case Failure(ex) => mapperFailureEpisodeToIndexDoc(ex)
                 }
-              case _ => Errors.mapperFailureUnsupportedIndexDocumentType(dt)
+              case _ => mapperFailureUnsupportedIndexDocumentType(dt)
             }
           }
-        case None => Errors.mapperFailureIndexFieldNotPresent(IndexField.DocType.entryName)
+        case None => mapperFailureIndexFieldNotPresent(IndexField.DocType.entryName)
       }
     }
-    .getOrElse(Errors.mapperFailureSolrToIndexDoc(src))
+    .getOrElse(mapperFailureSolrToIndexDoc(src))
 
 }
