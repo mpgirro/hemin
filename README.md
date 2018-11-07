@@ -18,6 +18,7 @@ The Hemin infrastructure is still in the early development phase and not yet rea
 
 The system currently supports the following standards:
 
+* XML syndication feeds in [RSS 2.0](https://cyber.harvard.edu/rss/rss.html) or Atom ([RFC 4287](https://tools.ietf.org/html/rfc4287)) formats
 * [Podlove Simple Chapter](https://podlove.org/simple-chapters/)
 
 Support for the following standards is planned:
