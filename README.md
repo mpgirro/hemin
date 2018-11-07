@@ -19,7 +19,7 @@ The Hemin infrastructure is still in the early development phase and not yet rea
 The system currently supports the following standards:
 
 * Syndication feeds in [RSS 2.0](https://cyber.harvard.edu/rss/rss.html) or Atom ([RFC 4287](https://tools.ietf.org/html/rfc4287)) format
-* Metadata from Apple's [Podcasts Connect](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) XML namespace ("iTunes Tags")
+* Metadata from Apple's [Podcasts Connect](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) XML namespace ("iTunes tags")
 * Chapter marks in [Podlove Simple Chapter](https://podlove.org/simple-chapters/) format
 
 Support for the following standards is planned:
@@ -36,8 +36,6 @@ Further roadmap information for the subprojects is documented in their respectiv
 [![Node version](https://img.shields.io/badge/node-9.11-blue.svg)](https://nodejs.org/en/blog/release/v9.11.2/)
 [![Angular version](https://img.shields.io/badge/angular-5-blue.svg)](https://blog.angular.io/version-5-0-0-of-angular-now-available-37e414935ced)
 
-📂 [/hemin-web/](hemin-web/)
-
 
 The WebApp is available at [hemin.io](https://hemin.io)
 
@@ -47,8 +45,6 @@ The WebApp is available at [hemin.io](https://hemin.io)
 
 [![Play Framework version](https://img.shields.io/badge/play-2.6-blue.svg)](https://www.playframework.com/documentation/2.6.x/Highlights26)
 [![Scala version](https://img.shields.io/badge/scala-2.12-blue.svg)](https://www.scala-lang.org/download/2.12.0.html)
-
-📂 [/hemin-api/](hemin-api/)
 
 
 The REST endpoint to the API is [api.hemin.io](https://api.hemin.io)
@@ -61,8 +57,6 @@ The REST endpoint to the API is [api.hemin.io](https://api.hemin.io)
 [![Akka version](https://img.shields.io/badge/akka-2.5-blue.svg)](https://akka.io/blog/news/2017/04/13/akka-2.5.0-released)
 [![Solr version](https://img.shields.io/badge/solr-7.5-blue.svg)](https://lucene.apache.org/solr/guide/7_5/index.html)
 [![Mongo version](https://img.shields.io/badge/mongo-4.0-blue.svg)](https://docs.mongodb.com/manual/release-notes/4.0/)
-
-📂 [/hemin-engine/](hemin-engine/)
 
 
 The Hemin engine can be started as a standalone command line application that feature a REPL. Alternatively, it can be used embedded within another Scala/Java (or other compatible JVM language) application. This second way is how the Hemin API server integrates the Hemin engine.
