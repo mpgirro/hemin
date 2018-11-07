@@ -42,7 +42,7 @@ Further roadmap information for the subprojects is documented in their respectiv
 The WebApp is available at [hemin.io](https://hemin.io)
 
 
-## REST API ([api.hemin.io](https://api.hemin.io))
+## RESTful API ([api.hemin.io](https://api.hemin.io))
 
 
 [![Play Framework version](https://img.shields.io/badge/play-2.6-blue.svg)](https://www.playframework.com/documentation/2.6.x/Highlights26)
