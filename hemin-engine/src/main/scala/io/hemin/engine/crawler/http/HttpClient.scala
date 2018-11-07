@@ -10,7 +10,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class HttpClient (timeout: Long, downloadMaxBytes: Long) {
+class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
 
   private val log = Logger(getClass)
 
@@ -49,13 +49,14 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
       .readTimeout(downloadTimeout)
       .acceptEncoding("")
       .send()
-    response // Note: because the result type of .send() is weired, be need to actually assign the result to a reference
+    response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
   }
 
   private def mimeType(response: Response[String]): Option[String] =
     response.contentType
-      .map(_.split(";")(0))
-      .map(_.trim)
+      .map(_.split(";"))
+      .map(_(0))    // the first element of the array is the mimeType
+      .map(_.trim)  // we've experienced to much whitespace in the strings
 
   private def contentType(response: Response[String]): Option[String] =
     response.contentType
@@ -148,17 +149,17 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     )
   }
 
-  def fetchContent(url: String, encoding: Option[String]): Try[String] = Try {
+  def fetchContent(url: String, encoding: Option[String]): Try[String] = {
     if (url.startsWith("http://") || url.startsWith("https://")) {
       fetchContentHTTP(url, encoding)
     } else if (url.startsWith("file:///")) {
       fetchContentFILE(url, encoding)
     } else {
-      throw new IllegalArgumentException("URL points neither to local nor remote resource : " + url)
+      Failure(new IllegalArgumentException("URL points neither to local nor remote resource : " + url))
     }
   }
 
-  private def fetchContentHTTP(url: String, encoding: Option[String]): String = {
+  private def sendGetRequest(url: String, encoding: Option[String]): Try[Response[Array[Byte]]] = Try {
     val request = sttp
       .get(uri"$url")
       .readTimeout(downloadTimeout)
@@ -167,64 +168,58 @@ class HttpClient (timeout: Long, downloadMaxBytes: Long) {
     encoding.foreach(e => request.acceptEncoding(e))
 
     val response = request.send()
-
-    if (!response.isSuccess) {
-      //log.error("Download resulted in a non-success response code : {}", response.code)
-      throw new EngineException(s"Download resulted in a non-success response code : ${response.code}") // TODO make dedicated exception
-    }
-
-    response.contentType.foreach(ct => {
-      val mimeType = ct.split(";")(0).trim
-      if (!isValidMime(mimeType)) {
-        //log.error("Aborted before downloading a file with invalid MIME-type : '{}' from : '{}'", mimeType, url)
-        throw new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'") // TODO make dedicated exception
-      }
-    })
-
-    response.contentLength.foreach(cl => {
-      if (cl > downloadMaxBytes) {
-        //log.error("Refusing to download resource because content length exceeds maximum: {} > {}", cl, DOWNLOAD_MAXBYTES)
-        throw new EngineException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")
-      }
-    })
-
-    // TODO
-    response.body match {
-      case Left(errorMessage) =>
-        //log.error("Error collecting download body, message : {}", errorMessage)
-        throw new EngineException(s"Error collecting download body, message : $errorMessage") // TODO make dedicated exception
-      case Right(data) =>
-        log.debug("Finished collecting content from GET response : {}", url)
-
-        new String(data, encoding.getOrElse("utf-8"))
-    }
+    response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
   }
 
-  private def fetchContentFILE(url: String, encoding: Option[String]): String = {
+  private def fetchContentHTTP(url: String, encoding: Option[String]): Try[String] = sendGetRequest(url, encoding)
+    .flatMap { response =>
+      if (response.isSuccess) {
+        Success(response)
+      } else {
+        Failure(new EngineException(s"Download resulted in a non-success response code : ${response.code}"))
+      }
+    }
+    .flatMap { response =>
+      response.contentType
+        .map(_.split(";")(0).trim) // get the mime type
+        .filter(!isValidMime(_))
+        .map(mimeType => Failure(new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mimeType'")))
+        .getOrElse(Success(response))
+    }
+    .flatMap { response =>
+      response.contentLength
+        .filter(_ > downloadMaxBytes)
+        .map(cl => Failure(new EngineException(s"Refusing to download resource because content length exceeds maximum: $cl > $downloadMaxBytes")))
+        .getOrElse(Success(response))
+    }
+    .flatMap { response =>
+      response.body match {
+        case Left(error) => Failure(new EngineException(s"Error collecting download body; message : $error"))
+        case Right(data) => Success(new String(data, encoding.getOrElse("utf-8")))
+      }
+    }
+
+  private def fetchContentFILE(url: String, encoding: Option[String]): Try[String] = Try {
     Source.fromURL(url).getLines.mkString
   }
 
-  private def analyzeUrl(url: String): (String, String) = {
-
-    // http, https, ftp if provided
-    val protocol = if (url.indexOf("://") > -1) {
+  // http, https, ftp if provided
+  private def protocol(url: String): String =
+    if (url.indexOf("://") > -1) {
       url.split("://")(0)
     } else {
       ""
     }
 
-    val hostname = {
-      if (url.indexOf("://") > -1)
-        url.split('/')(2)
-      else
-        url.split('/')(0)
-    }
-      .split(':')(0) // find & remove port number
-      .split('?')(0) // find & remove "?"
-    // .split('/')(0) // find & remove the "/" that might still stick at the end of the hostname
-
-    (hostname, protocol)
+  private def hostname(url: String): String = {
+    if (url.indexOf("://") > -1)
+      url.split('/')(2)
+    else
+      url.split('/')(0)
   }
+    .split(':')(0) // find & remove port number
+    .split('?')(0) // find & remove "?"
+  // .split('/')(0) // find & remove the "/" that might still stick at the end of the hostname
 
   private def isValidMime(mime: String): Boolean = {
     mime match {
