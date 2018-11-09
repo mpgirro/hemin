@@ -10,7 +10,11 @@ jdk:
 
 sudo: false
 
-install: cd hemin-engine && sbt "set test in assembly := {}" clean compile publishM2
+install: cd hemin-engine && sbt clean compile publishM2
+
+cache:
+  directories:
+  - $HOME/.m2
 
 matrix:
     include:
