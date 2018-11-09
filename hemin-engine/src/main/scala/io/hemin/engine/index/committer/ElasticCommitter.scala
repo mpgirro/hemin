@@ -2,7 +2,8 @@ package io.hemin.engine.index.committer
 
 import io.hemin.engine.model.IndexDoc
 
-class ElasticCommitter extends IndexCommitter {
+class ElasticCommitter
+  extends IndexCommitter {
 
   override def save(doc: IndexDoc): Unit = {
     // TODO implement!

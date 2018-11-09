@@ -14,7 +14,9 @@ import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 
-class SolrRetriever (config: SearcherConfig, ec: ExecutionContext) extends IndexRetriever {
+class SolrRetriever (config: SearcherConfig,
+                     ec: ExecutionContext)
+  extends IndexRetriever {
 
   private val log = Logger(getClass)
 

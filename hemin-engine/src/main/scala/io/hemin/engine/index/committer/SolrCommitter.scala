@@ -13,7 +13,9 @@ import org.apache.solr.client.solrj.{SolrClient, SolrServerException}
 import scala.util.{Failure, Success}
 
 
-class SolrCommitter(config: IndexConfig, executorService: ExecutorService) extends IndexCommitter {
+class SolrCommitter(config: IndexConfig,
+                    executorService: ExecutorService)
+  extends IndexCommitter {
 
   private val log: Logger = Logger(getClass)
 
@@ -29,14 +31,11 @@ class SolrCommitter(config: IndexConfig, executorService: ExecutorService) exten
     solr.commit()
   } catch {
     case ex@(_: SolrServerException | _: IOException) =>
-      log.error("Error deleting all old document from Solr collection")
+      log.error("Error deleting all old documents from Solr collection")
       ex.printStackTrace()
   }
 
   override def save(doc: IndexDoc): Unit = {
-
-    // TODO do not always solr.add (produces duplicates), but update by EXO instead
-
     SolrMapper.toSolr(doc) match {
       case Success(d) =>
         solr.add(d)

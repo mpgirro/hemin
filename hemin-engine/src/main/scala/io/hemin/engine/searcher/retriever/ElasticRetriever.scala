@@ -6,7 +6,9 @@ import io.hemin.engine.searcher.SearcherConfig
 import scala.concurrent.ExecutionContext
 
 
-class ElasticRetriever (config: SearcherConfig, ec: ExecutionContext) extends IndexRetriever {
+class ElasticRetriever (config: SearcherConfig,
+                        ec: ExecutionContext)
+  extends IndexRetriever {
 
   override protected[this] implicit def executionContext: ExecutionContext = ec
 
