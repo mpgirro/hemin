@@ -1,0 +1,21 @@
+language: scala
+
+scala:
+  - 2.12.6
+  - 2.11.8
+
+jdk:
+  - oraclejdk8
+  - openjdk8
+
+sudo: false
+
+install: cd hemin-engine && sbt "set test in assembly := {}" clean compile publishM2
+
+matrix:
+    include:
+        - env: PROJECT=hemin-engine
+        - env: PROJECT=hemin-api
+
+script: cd $PROJECT && sbt test
+#script: if .travis/build-condition.sh $TRAVIS_COMMIT_RANGE $PROJECT; then echo "$PROJECT is being built"; else echo "$PROJECT is NOT being built"; fi
