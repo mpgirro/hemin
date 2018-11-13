@@ -37,6 +37,7 @@ class SolrRetriever (config: SearcherConfig,
     case Title          => 1
     case Description    => 1e-13
     case Link           => 0
+    case LinkKeywords   => 1
     case PubDate        => 0
     case PodcastTitle   => 1
     case ItunesImage    => 0

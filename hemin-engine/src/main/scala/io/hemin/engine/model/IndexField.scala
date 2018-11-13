@@ -19,6 +19,7 @@ object IndexField
   final case object Title          extends IndexField("title")
   final case object Description    extends IndexField("description")
   final case object Link           extends IndexField("link")
+  final case object LinkKeywords   extends IndexField("link_keywords")
   final case object PubDate        extends IndexField("pub_date")
   final case object PodcastTitle   extends IndexField("podcast_title")
   final case object ItunesImage    extends IndexField("itunes_image")

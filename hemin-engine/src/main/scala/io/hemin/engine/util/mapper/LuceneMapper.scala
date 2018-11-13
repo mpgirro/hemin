@@ -14,7 +14,10 @@ object LuceneMapper {
       s.docType.foreach        { x => d.add(new StringField(IndexField.DocType.entryName, x, Field.Store.YES)) }
       s.id.foreach             { x => d.add(new StringField(IndexField.Id.entryName, x, Field.Store.YES)) }
       s.title.foreach          { x => d.add(new TextField(IndexField.Title.entryName, x, Field.Store.YES)) }
-      s.link.foreach           { x => d.add(new TextField(IndexField.Link.entryName, x, Field.Store.YES)) }
+      s.link.foreach           { x =>
+        d.add(new TextField(IndexField.Link.entryName, x, Field.Store.YES))
+        d.add(new TextField(IndexField.LinkKeywords.entryName, UrlMapper.keywords(x), Field.Store.NO))
+      }
       s.description.foreach    { x => d.add(new TextField(IndexField.Description.entryName, x, Field.Store.YES)) }
       s.podcastTitle.foreach   { x => d.add(new TextField(IndexField.PodcastTitle.entryName, x, Field.Store.YES)) }
       s.pubDate.foreach        { x => d.add(new StringField(IndexField.PubDate.entryName, DateMapper.asString(x).get, Field.Store.YES)) }

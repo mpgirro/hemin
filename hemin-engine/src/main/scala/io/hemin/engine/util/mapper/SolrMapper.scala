@@ -17,7 +17,10 @@ object SolrMapper {
       s.docType.foreach        { x => d.addField(IndexField.DocType.entryName, x) }
       s.id.foreach             { x => d.addField(IndexField.Id.entryName, x) }
       s.title.foreach          { x => d.addField(IndexField.Title.entryName, x) }
-      s.link.foreach           { x => d.addField(IndexField.Link.entryName, x) }
+      s.link.foreach           { x =>
+        d.addField(IndexField.Link.entryName, x)
+        d.addField(IndexField.LinkKeywords.entryName, UrlMapper.keywords(x))
+      }
       s.description.foreach    { x => d.addField(IndexField.Description.entryName, x) }
       s.podcastTitle.foreach   { x => d.addField(IndexField.PodcastTitle.entryName, x) }
       s.pubDate.foreach        { x => d.addField(IndexField.PubDate.entryName, DateMapper.asString(x).get) }
