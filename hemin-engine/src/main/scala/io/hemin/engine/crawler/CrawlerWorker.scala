@@ -80,18 +80,12 @@ class CrawlerWorker (config: CrawlerConfig)
       supervisor ! ReportWorkerStartupComplete
 
     case DownloadWithHeadCheck(id, url, job) =>
-      log.debug("Received Download({},'{}',{},_)", id, url, job.getClass.getSimpleName)
-      job match {
-        case WebsiteFetchJob() =>
-          if (config.fetchWebsites) {
-            log.info("Received DownloadWithHeadCheck({}, '{}', {})", id, url, job.getClass.getSimpleName)
-            headCheck(id, url, job)
-          }
-        case _ =>
+      (job, config.fetchWebsites) match {
+        case (WebsiteFetchJob(), false) => // do nothing
+        case (_, _) =>
           log.info("Received DownloadWithHeadCheck({}, '{}', {})", id, url, job.getClass.getSimpleName)
           headCheck(id, url, job)
       }
-
 
     case DownloadContent(id, url, job, encoding) =>
       log.debug("Received Download({},'{}',{},{},_)", id, url, job.getClass.getSimpleName, encoding)
@@ -161,7 +155,7 @@ class CrawlerWorker (config: CrawlerConfig)
 
   private def headCheck(id: String, url: String, job: FetchJob): Unit = {
     blocking {
-      httpClient.headCheck(url) match {
+      httpClient.headCheck(url, job.mimeCheck) match {
         case Success(headResult) =>
           val encoding = headResult.contentEncoding
 
@@ -228,7 +222,7 @@ class CrawlerWorker (config: CrawlerConfig)
     */
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
-      httpClient.fetchContent(url, encoding) match {
+      httpClient.fetchContent(url, encoding, job.mimeCheck) match {
         case Success(data) =>
           job match {
             case NewPodcastFetchJob() =>

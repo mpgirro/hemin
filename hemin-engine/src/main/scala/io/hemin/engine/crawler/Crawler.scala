@@ -3,6 +3,7 @@ package io.hemin.engine.crawler
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
+import io.hemin.engine.crawler.http.HttpClient
 import io.hemin.engine.node.Node._
 
 import scala.concurrent.ExecutionContext
@@ -16,12 +17,24 @@ object Crawler {
       .withMailbox(config.mailbox)
 
   trait CrawlerMessage
-  trait FetchJob extends CrawlerMessage
-  final case class NewPodcastFetchJob() extends FetchJob
-  final case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob
-  final case class WebsiteFetchJob() extends FetchJob
-  final case class PodcastImageFetchJob() extends FetchJob
-  final case class EpisodeImageFetchJob() extends FetchJob
+  trait FetchJob extends CrawlerMessage {
+    def mimeCheck(mime: String): Boolean
+  }
+  final case class NewPodcastFetchJob() extends FetchJob {
+    def mimeCheck(mime: String): Boolean = HttpClient.isFeedMime(mime)
+  }
+  final case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob {
+    def mimeCheck(mime: String): Boolean = HttpClient.isFeedMime(mime)
+  }
+  final case class WebsiteFetchJob() extends FetchJob {
+    def mimeCheck(mime: String): Boolean = HttpClient.isHtmlMime(mime)
+  }
+  final case class PodcastImageFetchJob() extends FetchJob {
+    def mimeCheck(mime: String): Boolean = HttpClient.isImageMime(mime)
+  }
+  final case class EpisodeImageFetchJob() extends FetchJob {
+    def mimeCheck(mime: String): Boolean = HttpClient.isImageMime(mime)
+  }
 
   final case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage
   final case class DownloadContent(id: String, url: String, job: FetchJob, encoding: Option[String]) extends CrawlerMessage
