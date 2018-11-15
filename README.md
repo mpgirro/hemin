@@ -34,8 +34,8 @@ Further roadmap information for the subprojects is documented in their respectiv
 ## WebApp ([hemin.io](https://hemin.io))
 
 
-[![Node version](https://img.shields.io/badge/node-9.11-blue.svg)](https://nodejs.org/en/blog/release/v9.11.2/)
-[![Angular version](https://img.shields.io/badge/angular-5-blue.svg)](https://blog.angular.io/version-5-0-0-of-angular-now-available-37e414935ced)
+[![Node version](https://img.shields.io/badge/node-10.10-blue.svg)](https://nodejs.org/en/blog/release/v10.10.0/)
+[![Angular version](https://img.shields.io/badge/angular-7-blue.svg)](https://blog.angular.io/version-7-of-angular-cli-prompts-virtual-scroll-drag-and-drop-and-more-c594e22e7b8c)
 
 
 The WebApp is available at [hemin.io](https://hemin.io)
