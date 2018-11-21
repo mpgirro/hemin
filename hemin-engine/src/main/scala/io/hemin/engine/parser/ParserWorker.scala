@@ -1,6 +1,6 @@
 package io.hemin.engine.parser
 
-import java.io.{ByteArrayInputStream, InputStream}
+import java.io.{ByteArrayInputStream, File, InputStream, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 
@@ -14,6 +14,7 @@ import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
 import io.hemin.engine.util.HashUtil
 import io.hemin.engine.util.mapper.IndexMapper
+import javax.imageio.ImageIO
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
@@ -40,8 +41,6 @@ class ParserWorker (config: ParserConfig)
   private var index: ActorRef = _
   private var crawler: ActorRef = _
   private var supervisor: ActorRef = _
-
-  //private val fyydAPI: FyydDirectoryAPI = new FyydDirectoryAPI()
 
   override def postRestart(cause: Throwable): Unit = {
     log.warning("{} has been restarted or resumed", self.path.name)
@@ -145,8 +144,17 @@ class ParserWorker (config: ParserConfig)
   }
 
   private def imageFromData(associateId: String, imageData: String): Image = {
-    val image = com.sksamuel.scrimage.Image.fromStream(inputStreamFromString(imageData))
+
+    val imgBytes: Array[Byte] = imageData.getBytes(StandardCharsets.UTF_8.name)
+    val imgFile: File = strToFile(imageData)
+    //val imgFile: File = bytesToFile(imgBytes)
+
+    val image = com.sksamuel.scrimage.Image.fromFile(imgFile)
+    //val image = com.sksamuel.scrimage.Image.apply(imgBytes)
+    //val image = com.sksamuel.scrimage.Image.fromStream(inputStreamFromString(imageData))
     val data = transform(image)
+
+    // TODO transform data to base64?
 
     // TODO set more fields of following instance!
     Image(
@@ -154,6 +162,30 @@ class ParserWorker (config: ParserConfig)
       data        = Some(data),
       hash        = Some(HashUtil.sha1(data)),
     )
+  }
+
+  private def strToFile(imageStr: String): File = {
+
+    val path = "/Users/max/Desktop/img_tmp"
+
+    val out = new PrintWriter(path)
+    out.println(imageStr)
+    out.close()
+
+    new File(path)
+  }
+
+  private def bytesToFile(imageByteArray: Array[Byte]): File = {
+    import java.io.FileOutputStream
+
+    val path = "/Users/max/Desktop/img_tmp"
+
+    val imageOutFile = new FileOutputStream(path)
+
+    imageOutFile.write(imageByteArray)
+    imageOutFile.close()
+
+    new File(path)
   }
 
   private def inputStreamFromString(data: String): InputStream =
