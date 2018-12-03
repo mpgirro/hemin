@@ -11,9 +11,10 @@ import scala.collection.JavaConverters._
 final case class CatalogConfig (
   mongoUri: String,
   createDatabase: Boolean,
+  storeImages: Boolean,
   defaultPage: Int,
   defaultSize: Int,
-  maxPageSize: Int
+  maxPageSize: Int,
 ) extends ConfigStandardValues {
   override val namespace: String = CatalogConfig.namespace
 }
@@ -28,6 +29,7 @@ object CatalogConfig
     CatalogConfig(
       mongoUri       = config.getString(s"$namespace.mongo-uri"),
       createDatabase = config.getBoolean(s"$namespace.create-database"),
+      storeImages    = config.getBoolean(s"$namespace.store-images"),
       defaultPage    = config.getInt(s"$namespace.default-page"),
       defaultSize    = config.getInt(s"$namespace.default-size"),
       maxPageSize    = config.getInt(s"$namespace.max-page-size"),
@@ -36,6 +38,7 @@ object CatalogConfig
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$namespace.mongo-uri"       -> "mongodb://localhost:27017/hemin",
     s"$namespace.create-database" -> true,
+    s"$namespace.store-images"  -> false,
     s"$namespace.default-page"    -> 1,
     s"$namespace.default-size"    -> 20,
     s"$namespace.max-page-size"   -> 10000,

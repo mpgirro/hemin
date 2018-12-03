@@ -321,7 +321,6 @@ class CatalogStore(config: CatalogConfig)
       }
   }
 
-  @Deprecated
   private def onUpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast): Unit = {
     log.debug("Received UpdatePodcast({},{},{})", podcastId, feedUrl, podcast.id)
 
@@ -334,7 +333,16 @@ class CatalogStore(config: CatalogConfig)
     podcasts
       .findOne(podcastId)
       .map {
-        case Some(p) => podcast.patchRight(p)  //podcastMapper.update(podcast, p)
+        case Some(p) =>
+
+          // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
+          if (config.storeImages && !p.image.equals(podcast.image)) {
+            podcast.image.foreach { img =>
+              crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
+            }
+          }
+
+          podcast.patchRight(p)
         case None =>
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           podcast
@@ -353,7 +361,16 @@ class CatalogStore(config: CatalogConfig)
     episodes
       .findOne(episode.id)
       .map {
-        case Some(e) => episode.patchRight(e) // episodeMapper.update(episode, e)
+        case Some(e: Episode) =>
+
+          // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
+          if (config.storeImages && !e.image.equals(episode.image)) {
+            episode.image.foreach { img =>
+              crawler ! DownloadWithHeadCheck(e.podcastId.get, img, EpisodeImageFetchJob())
+            }
+          }
+
+          episode.patchRight(e) // episodeMapper.update(episode, e)
         case None =>
           log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
           episode
@@ -655,16 +672,23 @@ class CatalogStore(config: CatalogConfig)
                 .findOneByEnclosure(episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
             })
             .map {
-              case Some(e) =>
+              case Some(e: Episode) =>
                 log.debug("Episode is already registered : ('{}', {}, '{}')", episode.enclosure.url, episode.enclosure.length, episode.enclosure.typ)
-                // TODO I should update the episode (and embedded chapters!), just in case stuff changed
+
+                val catalogEvent = CatalogStore.UpdateEpisode(episode)
+                //emitCatalogEvent(catalogEvent)
+                self ! catalogEvent
+
               case None =>
 
                 // generate a new episode exo - the generator is (almost) ensuring uniqueness
                 val episodeId = idGenerator.newId
 
-                episode.image.foreach { img =>
-                  crawler ! DownloadWithHeadCheck(podcastId, img, EpisodeImageFetchJob())
+                // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
+                if (config.storeImages) {
+                  episode.image.foreach { img =>
+                    crawler ! DownloadWithHeadCheck(podcastId, img, EpisodeImageFetchJob())
+                  }
                 }
 
                 val e = episode

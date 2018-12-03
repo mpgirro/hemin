@@ -130,8 +130,7 @@ class ParserWorker (config: ParserConfig)
   private def onParsePodcastImage(podcastId: String, imageData: String): Unit = {
     log.debug("Received ParsePodcastImage({},_)", podcastId)
 
-    // TODO fix image processing
-    //val image = imageFromData(podcastId, imageData)
+    val image = imageFromData(podcastId, imageData)
 
     // TODO send message to Catalog
   }
@@ -139,8 +138,7 @@ class ParserWorker (config: ParserConfig)
   private def onParseEpisodeImage(episodeId: String, imageData: String): Unit = {
     log.debug("Received ParseEpisodeImage({},_)", episodeId)
 
-    // TODO fix image processing
-    // val image = imageFromData(episodeId, imageData)
+    val image = imageFromData(episodeId, imageData)
 
     // TODO send message to Catalog
   }
@@ -223,14 +221,6 @@ class ParserWorker (config: ParserConfig)
         )
 
         if (isNewPodcast) {
-
-          // experimental: this works but has terrible performance and assumes we have a GUI app
-          // Option(p.getItunesImage).foreach(img => {
-          //     p.setItunesImage(base64Image(img))
-          // })
-          p.image.foreach { img =>
-            crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
-          }
 
           IndexMapper.toIndexDoc(p) match {
             case Success(doc) =>
