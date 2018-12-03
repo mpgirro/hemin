@@ -52,7 +52,7 @@ class ParserWorker (config: ParserConfig)
   }
 
   override def postStop: Unit = {
-    log.info("shutting down")
+    log.debug("shutting down")
   }
 
   override def receive: Receive = {
@@ -130,7 +130,8 @@ class ParserWorker (config: ParserConfig)
   private def onParsePodcastImage(podcastId: String, imageData: String): Unit = {
     log.debug("Received ParsePodcastImage({},_)", podcastId)
 
-    val image = imageFromData(podcastId, imageData)
+    // TODO fix image processing
+    //val image = imageFromData(podcastId, imageData)
 
     // TODO send message to Catalog
   }
@@ -138,7 +139,8 @@ class ParserWorker (config: ParserConfig)
   private def onParseEpisodeImage(episodeId: String, imageData: String): Unit = {
     log.debug("Received ParseEpisodeImage({},_)", episodeId)
 
-    val image = imageFromData(episodeId, imageData)
+    // TODO fix image processing
+    // val image = imageFromData(episodeId, imageData)
 
     // TODO send message to Catalog
   }

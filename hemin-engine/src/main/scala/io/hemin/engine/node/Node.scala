@@ -142,7 +142,7 @@ class Node(config: EngineConfig)
   }
 
   override def postStop: Unit = {
-    log.info("{} subsystem shutting down", Node.name.toUpperCase)
+    log.info("{} shutting down", Node.name.toUpperCase)
   }
 
   override def receive: Receive = {

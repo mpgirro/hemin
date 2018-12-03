@@ -51,6 +51,8 @@ class CrawlerWorker (config: CrawlerConfig)
   private val podcastpedia = new PodcastpediaAPI()
 
   override def postStop: Unit = {
+    log.debug("shutting down")
+
     httpClient.close()
   }
 
