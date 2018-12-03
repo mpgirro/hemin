@@ -225,21 +225,21 @@ class CrawlerWorker (config: CrawlerConfig)
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
       httpClient.fetchContent(url, encoding, job.mimeCheck) match {
-        case Success(data) =>
+        case Success((data, enc)) =>
           job match {
             case NewPodcastFetchJob() =>
-              parser ! ParseNewPodcastData(url, id, data)
+              parser ! ParseNewPodcastData(url, id, asString(data, enc))
               val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
             case UpdateEpisodesFetchJob(etag, lastMod) =>
-              parser ! ParseUpdateEpisodeData(url, id, data)
+              parser ! ParseUpdateEpisodeData(url, id, asString(data, enc))
               val catalogEvent = FeedStatusUpdate(id, url, LocalDateTime.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
-            case WebsiteFetchJob() => parser ! ParseWebsiteData(id, data)
+            case WebsiteFetchJob() => parser ! ParseWebsiteData(id, asString(data, enc))
 
             case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, data)
 
@@ -253,5 +253,7 @@ class CrawlerWorker (config: CrawlerConfig)
 
     }
   }
+
+  private def asString(data: Array[Byte], encoding: Option[String]): String = new String(data, encoding.getOrElse("utf-8"))
 
 }

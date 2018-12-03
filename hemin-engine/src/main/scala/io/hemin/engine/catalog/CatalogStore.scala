@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.node.Node._
-import io.hemin.engine.catalog.CatalogStore._
+import io.hemin.engine.catalog.CatalogStore.{CatalogEvent, _}
 import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.model._
@@ -42,6 +42,7 @@ object CatalogStore {
   final case class UpdatePodcast(podcastId: String, feedUrl: String, podcast: Podcast) extends CatalogEvent
   final case class UpdateEpisode(episode: Episode) extends CatalogEvent
   final case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
+  final case class UpdateImage(image: Image) extends CatalogEvent
   // CatalogQueries
   final case class GetPodcast(id: String) extends CatalogQuery
   final case class GetAllPodcasts(page: Option[Int], size: Option[Int]) extends CatalogQuery
@@ -191,6 +192,8 @@ class CatalogStore(config: CatalogConfig)
     case UpdatePodcast(id, url, podcast) => onUpdatePodcast(id, url, podcast)
 
     case UpdateEpisode(episode) => onUpdateEpisode(episode)
+
+    case UpdateImage(image) => onUpdateImage(image)
 
     // TODO
     //case UpdateFeed(podcastExo, feed) =>  ...
@@ -347,8 +350,9 @@ class CatalogStore(config: CatalogConfig)
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           podcast
       }
+      .map(_.copy(registration = PodcastRegistrationInfo(complete = Some(true))))
       .foreach(p => {
-        podcasts.save(p.copy(registration = PodcastRegistrationInfo(complete = Some(true))))
+        podcasts.save(p)
 
         // TODO we will fetch feeds for checking new episodes, but not because we updated podcast metadata
         // crawler ! FetchFeedForUpdateEpisodes(feedUrl, podcastId)
@@ -380,6 +384,27 @@ class CatalogStore(config: CatalogConfig)
       })
   }
 
+  private def onUpdateImage(image: Image): Unit = {
+    log.debug("Received AddOrUpdateImage(associate = {})", image.associateId)
+
+    image.associateId match {
+      case Some(associateId) =>
+        images
+          .findOneByAssociate(associateId)
+          .map {
+            case Some(i) => // update existing
+              image.patchRight(i)
+            case None => // add as new
+              log.debug("Image to update is not yet in database, therefore it will be added : {} (associateId)", image.associateId)
+              val id = idGenerator.newId
+              image.copy(id = Some(id))
+          }
+          .foreach(i => {
+            images.save(i)
+          })
+      case None => log.error("Could not add-or-update image; reason: associateId was None (this should not be possible and is a programmer error)")
+    }
+  }
 
   private def onUpdateFeedMetadataUrl(oldUrl: String, newUrl: String): Unit = {
     log.debug("Received UpdateFeedUrl('{}','{}')", oldUrl, newUrl)

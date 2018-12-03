@@ -46,7 +46,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       }
     }
 
-  def fetchContent(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[String] = {
+  def fetchContent(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] =
     if (url.startsWith("http://") || url.startsWith("https://")) {
       fetchContentHTTP(url, encoding, isValidMime)
     } else if (url.startsWith("file:///")) {
@@ -54,7 +54,6 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     } else {
       fetchFailureInvalidLocation(url)
     }
-  }
 
   private def sendHeadRequest(url: String): Try[Response[String]] = Try {
     val response = emptyRequest // use empty request, because standard req uses header "Accept-Encoding: gzip" which can cause problems with HEAD requests
@@ -173,7 +172,14 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     }
   }
 
-  private def fetchContentHTTP(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[String] =
+  /**
+    *
+    * @param url
+    * @param encoding
+    * @param isValidMime
+    * @return Tuple with 1) data (as array of bytes) and 2) encoding if the bytes respresent a string
+    */
+  private def fetchContentHTTP(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] =
     sendGetRequest(url, encoding)
       .flatMap { response =>
         if (response.isSuccess) {
@@ -198,14 +204,20 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       .flatMap { response =>
         response.body match {
           case Left(error) => fetchFailureWithError(error)
-          case Right(data) => Success(new String(data, encoding.getOrElse("utf-8")))
+          case Right(data) => Success((data,encoding)) // new String(data, encoding.getOrElse("utf-8"))
         }
       }
 
-  private def fetchContentFILE(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[String] =
-    Try {
-      Source.fromURL(url).getLines.mkString
-    }
+  private def fetchContentFILE(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] = Try {
+    val enc = encoding.orElse(Some("utf-8"))
+    val data = Source
+      .fromURL(url)
+      .getLines
+      .mkString
+      .getBytes(enc.get)
+    (data, enc)
+  }
+
 
   // http, https, ftp if provided
   private def protocol(url: String): String =
@@ -269,7 +281,7 @@ object HttpClient {
   private def fetchFailureInvalidLocation(url: String): Try[Nothing] =
     Failure(new EngineException(s"Cannot GET content; reason: URL points neither to local nor remote resource : '$url'"))
 
-  private def fetchFailureWithError(error: String): Try[String] =
+  private def fetchFailureWithError(error: String): Try[Nothing] =
     Failure(new EngineException(s"Error collecting download body; message: $error"))
 
   private def fetchFailureNonSuccessResponse(code: Int): Try[Nothing] =

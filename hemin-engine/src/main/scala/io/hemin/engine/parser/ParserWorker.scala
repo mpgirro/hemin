@@ -127,30 +127,29 @@ class ParserWorker (config: ParserConfig)
     throw new UnsupportedOperationException("currently not implemented")
   }
 
-  private def onParsePodcastImage(podcastId: String, imageData: String): Unit = {
+  private def onParsePodcastImage(podcastId: String, imageData: Array[Byte]): Unit = {
     log.debug("Received ParsePodcastImage({},_)", podcastId)
-
-    val image = imageFromData(podcastId, imageData)
-
-    // TODO send message to Catalog
+    processImageData(podcastId, imageData)
   }
 
-  private def onParseEpisodeImage(episodeId: String, imageData: String): Unit = {
+  private def onParseEpisodeImage(episodeId: String, imageData: Array[Byte]): Unit = {
     log.debug("Received ParseEpisodeImage({},_)", episodeId)
-
-    val image = imageFromData(episodeId, imageData)
-
-    // TODO send message to Catalog
+    processImageData(episodeId, imageData)
   }
 
-  private def imageFromData(associateId: String, imageData: String): Image = {
+  private def processImageData(associateId: String, data: Array[Byte]): Unit = {
+    val image = imageFromData(associateId, data)
+    catalog ! UpdateImage(image)
+  }
 
-    val imgBytes: Array[Byte] = imageData.getBytes(StandardCharsets.UTF_8.name)
-    val imgFile: File = strToFile(imageData)
+  private def imageFromData(associateId: String, imageData: Array[Byte]): Image = {
+
+    //val imgBytes: Array[Byte] = imageData.getBytes(StandardCharsets.UTF_8.name)
+    //val imgFile: File = strToFile(imageData)
     //val imgFile: File = bytesToFile(imgBytes)
 
-    val image = com.sksamuel.scrimage.Image.fromFile(imgFile)
-    //val image = com.sksamuel.scrimage.Image.apply(imgBytes)
+    //val image = com.sksamuel.scrimage.Image.fromFile(imgFile)
+    val image = com.sksamuel.scrimage.Image.apply(imageData)
     //val image = com.sksamuel.scrimage.Image.fromStream(inputStreamFromString(imageData))
     val data = transform(image)
 
