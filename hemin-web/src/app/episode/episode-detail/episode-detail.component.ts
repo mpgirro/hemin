@@ -8,6 +8,7 @@ import { DomainService } from '../../domain.service';
 import {Chapter} from '../shared/chapter.model';
 import {ImageService} from '../../image.service';
 import {Image} from '../../image.model';
+import {DomSanitizer} from '@angular/platform-browser';
 
 @Component({
   selector: 'app-episode-detail',
@@ -26,6 +27,7 @@ export class EpisodeDetailComponent implements OnInit {
               private episodeService: EpisodeService,
               private imageService: ImageService,
               private domainService: DomainService,
+              private DomSanitizationService: DomSanitizer,
               private location: Location) { }
 
   ngOnInit() {
@@ -80,7 +82,6 @@ export class EpisodeDetailComponent implements OnInit {
           .get(episode.image)
           .subscribe(image => {
             this.image = image;
-            console.log(image);
           });
         this.episodeService
           .getChapters(id)

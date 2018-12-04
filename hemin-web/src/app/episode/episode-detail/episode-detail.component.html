@@ -12,7 +12,7 @@
 
     <div *ngIf="episode.image" class="text-center mb-4">
       <img class="w-100"
-           src="{{image.data}}"
+           [src]="DomSanitizationService.bypassSecurityTrustUrl(image.data)"
            alt="cover image">
     </div>
 

@@ -1,6 +1,7 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Location } from '@angular/common';
+import { DomSanitizer } from '@angular/platform-browser';
 
 import { Podcast } from '../shared/podcast.model';
 import { Episode } from '../../episode/shared/episode.model';
@@ -29,6 +30,7 @@ export class PodcastDetailComponent implements OnInit {
               private podcastService: PodcastService,
               private imageService: ImageService,
               private domainService: DomainService,
+              private DomSanitizationService: DomSanitizer,
               private location: Location) { }
 
   ngOnInit() {
@@ -85,7 +87,6 @@ export class PodcastDetailComponent implements OnInit {
           .get(podcast.image)
           .subscribe(image => {
             this.image = image;
-            console.log(image);
           });
       });
     this.podcastService
