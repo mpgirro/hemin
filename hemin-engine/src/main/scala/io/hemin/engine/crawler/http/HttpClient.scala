@@ -1,5 +1,6 @@
 package io.hemin.engine.crawler.http
 
+import java.nio.charset.StandardCharsets
 import java.nio.file.{Path, Paths}
 
 import com.softwaremill.sttp.{Response, _}
@@ -17,6 +18,8 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
   private val log = Logger(getClass)
 
   private val downloadTimeout = timeout.seconds
+
+  private val defaultCharset: String = StandardCharsets.UTF_8.name()
 
   private implicit val sttpBackend: SttpBackend[Id, Nothing] =
     HttpURLConnectionBackend(options = SttpBackendOptions.connectionTimeout(downloadTimeout))
@@ -46,7 +49,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       }
     }
 
-  def fetchContent(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] =
+  def fetchContent(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String],String)] =
     if (url.startsWith("http://") || url.startsWith("https://")) {
       fetchContentHTTP(url, encoding, isValidMime)
     } else if (url.startsWith("file:///")) {
@@ -76,11 +79,14 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     response // Note: because the result type of .send() is weird, be need to actually assign the result to a reference
   }
 
-  private def mimeType(response: Response[String]): Option[String] =
-    response.contentType
-      .map(_.split(";"))
-      .map(_(0))    // the first element of the array is the mimeType
-      .map(_.trim)  // we've experienced to much whitespace in the strings
+  private def mimeType[T](response: Response[T]): Option[String] = mimeType(response.contentType)
+
+  //private def mimeType(response: Response[Array[Byte]]): Option[String] = mimeType(response.contentType)
+
+  private def mimeType(contentType: Option[String]): Option[String] = contentType
+    .map(_.split(";"))
+    .map(_(0))    // the first element of the array is the mimeType
+    .map(_.trim)  // we've experienced too much whitespace in these strings
 
   private def contentType(response: Response[String]): Option[String] =
     response.contentType
@@ -179,7 +185,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     * @param isValidMime
     * @return Tuple with 1) data (as array of bytes) and 2) encoding if the bytes respresent a string
     */
-  private def fetchContentHTTP(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] =
+  private def fetchContentHTTP(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String],String)] =
     sendGetRequest(url, encoding)
       .flatMap { response =>
         if (response.isSuccess) {
@@ -189,33 +195,43 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
         }
       }
       .flatMap { response =>
-        response.contentType
-          .map(_.split(";")(0).trim) // get the mime type
-          .filter(!isValidMime(_))
-          .map(fetchFailureInvalidMime)
-          .getOrElse(Success(response))
-      }
-      .flatMap { response =>
         response.contentLength
           .filter(_ > downloadMaxBytes)
           .map(fetchFailureExceedingLength)
           .getOrElse(Success(response))
       }
       .flatMap { response =>
+        mimeType(response)
+          .filter(!isValidMime(_))
+          .map(fetchFailureInvalidMime)
+          .getOrElse(Success(response))
+      }
+      .flatMap { response =>
         response.body match {
           case Left(error) => fetchFailureWithError(error)
-          case Right(data) => Success((data,encoding)) // new String(data, encoding.getOrElse("utf-8"))
+          case Right(data) =>
+            val mime = mimeType(response)
+            val enc = encoding.getOrElse(defaultCharset)
+            Success((data, mime, enc))
         }
       }
 
-  private def fetchContentFILE(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String])] = Try {
-    val enc = encoding.orElse(Some("utf-8"))
+  //private def mimeType(contentType: Option[String]): Option[String] = contentType.map(_.split(";")(0).trim)
+
+  private def fetchContentFILE(url: String, encoding: Option[String], isValidMime: String => Boolean): Try[(Array[Byte],Option[String],String)] = Try {
+    import java.nio.file.{Files, Paths}
+
+    val mime: Option[String] = Try {
+      Some(Files.probeContentType(Paths.get(url)))
+    }.getOrElse(None)
+
+    val enc: String = encoding.getOrElse(defaultCharset)
     val data = Source
       .fromURL(url)
       .getLines
       .mkString
-      .getBytes(enc.get)
-    (data, enc)
+      .getBytes(enc)
+    (data, mime, enc)
   }
 
 

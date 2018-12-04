@@ -55,8 +55,8 @@ object CatalogStore {
   final case class GetFeed(id: String) extends CatalogQuery
   final case class GetImage(id: String) extends CatalogQuery
   final case class GetImageByUrl(url: String) extends CatalogQuery
-  final case class GetImageByPodcast(id: String) extends CatalogQuery
-  final case class GetImageByEpisode(id: String) extends CatalogQuery
+  //final case class GetImageByPodcast(id: String) extends CatalogQuery
+  //final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
   final case class CheckFeed(id: String) extends CatalogQuery
   //case class CheckAllPodcasts() extends CatalogQuery
@@ -225,9 +225,11 @@ class CatalogStore(config: CatalogConfig)
 
     case GetImage(id) => onGetImage(id)
 
+    /*
     case GetImageByPodcast(id) => onGetImageByPodcast(id)
 
     case GetImageByEpisode(id) => onGetImageByEpisode(id)
+    */
 
     case GetImageByUrl(url) => onGetImageByUrl(url)
 
@@ -684,6 +686,7 @@ class CatalogStore(config: CatalogConfig)
       .foreach(i => theSender ! ImageResult(i))
   }
 
+  /*
   private def onGetImageByPodcast(id: String): Unit = {
     log.debug("Received GetImageByPodcast('{}')", id)
     val theSender = sender()
@@ -713,6 +716,7 @@ class CatalogStore(config: CatalogConfig)
       .mapTo[Option[Image]]
       .foreach(i => theSender ! ImageResult(i))
   }
+  */
 
   private def onCheckPodcast(podcastId: String): Unit = {
     log.debug("Received CheckPodcast({})", podcastId)

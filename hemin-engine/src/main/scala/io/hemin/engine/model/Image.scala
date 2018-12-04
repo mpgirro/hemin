@@ -5,7 +5,7 @@ import java.time.LocalDateTime
 final case class Image (
   id: Option[String]               = None,
   url: Option[String]              = None,
-  data: Option[Array[Byte]]        = None, // TODO to base64, frontend expects it
+  data: Option[String]             = None,
   hash: Option[String]             = None,
   name: Option[String]             = None,
   contentType: Option[String]      = None,

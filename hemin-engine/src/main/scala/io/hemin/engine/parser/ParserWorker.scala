@@ -3,6 +3,7 @@ package io.hemin.engine.parser
 import java.io.{ByteArrayInputStream, File, InputStream, PrintWriter}
 import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
+import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
@@ -82,9 +83,9 @@ class ParserWorker (config: ParserConfig)
 
     case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
-    case ParsePodcastImage(podcastId, url, bytes) => onParsePodcastImage(podcastId, url, bytes)
+    case ParsePodcastImage(podcastId, url, mime, encoding, bytes) => onParsePodcastImage(podcastId, url, mime, encoding, bytes)
 
-    case ParseEpisodeImage(episodeId, url, bytes) => onParseEpisodeImage(episodeId, url, bytes)
+    case ParseEpisodeImage(episodeId, url, mime, encoding, bytes) => onParseEpisodeImage(episodeId, url, mime, encoding, bytes)
 
   }
 
@@ -127,64 +128,43 @@ class ParserWorker (config: ParserConfig)
     throw new UnsupportedOperationException("currently not implemented")
   }
 
-  private def onParsePodcastImage(podcastId: String, url: String, bytes: Array[Byte]): Unit = {
+  private def onParsePodcastImage(podcastId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
     log.debug("Received ParsePodcastImage({},_)", podcastId)
-    processImageData(podcastId, url, bytes)
+    processImageData(podcastId, url, mime, encoding, bytes)
   }
 
-  private def onParseEpisodeImage(episodeId: String, url: String, bytes: Array[Byte]): Unit = {
+  private def onParseEpisodeImage(episodeId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
     log.debug("Received ParseEpisodeImage({},_)", episodeId)
-    processImageData(episodeId, url, bytes)
+    processImageData(episodeId, url, mime, encoding, bytes)
   }
 
-  private def processImageData(associateId: String, url: String, bytes: Array[Byte]): Unit = {
-    val image = imageFromData(associateId, url, bytes)
+  private def processImageData(associateId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
+    val image = imageFromData(associateId, url, mime, encoding, bytes)
     catalog ! UpdateImage(image)
   }
 
-  private def imageFromData(associateId: String, url: String, bytes: Array[Byte]): Image = {
+  private def imageFromData(associateId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Image = {
     val image = com.sksamuel.scrimage.Image.apply(bytes)
     val data = transform(image)
 
     // TODO set more fields of following instance!
     Image(
-      url         = Some(url),
-      data        = Some(data),
-      hash        = Some(HashUtil.sha1(data)),
+      url  = Some(url),
+      data = Some(base64(data,mime,encoding)),
+      hash = Some(HashUtil.sha1(data)),
     )
   }
-
-  private def strToFile(imageStr: String): File = {
-
-    val path = "/Users/max/Desktop/img_tmp"
-
-    val out = new PrintWriter(path)
-    out.println(imageStr)
-    out.close()
-
-    new File(path)
-  }
-
-  private def bytesToFile(imageByteArray: Array[Byte]): File = {
-    import java.io.FileOutputStream
-
-    val path = "/Users/max/Desktop/img_tmp"
-
-    val imageOutFile = new FileOutputStream(path)
-
-    imageOutFile.write(imageByteArray)
-    imageOutFile.close()
-
-    new File(path)
-  }
-
-  private def inputStreamFromString(data: String): InputStream =
-    new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8.name))
 
   private def transform(image: com.sksamuel.scrimage.Image): Array[Byte] = image
     .cover(500, 500)
     .bound(500, 500)
     .bytes
+
+  private def base64(bytes: Array[Byte], mimeType: Option[String], encoding: String): String = {
+    val mime: String = mimeType.map(_ + ";").getOrElse("")
+    val base64: String = Base64.getEncoder.encodeToString(bytes)
+    s"data:${mime}charset=$encoding;base64,$base64"
+  }
 
   /*
   private def sendCatalogCommand(command: CatalogCommand): Unit = {
@@ -263,23 +243,5 @@ class ParserWorker (config: ParserConfig)
     //sendCatalogCommand(catalogCommand)
     catalog ! catalogCommand
   }
-
-  /* TODO this code works but produces bad output and is super slow!
-  private def base64Image(imageUrl: String): String = {
-      try {
-          val sourceImage: BufferedImage = ImageIO.read(new URL(imageUrl))
-          if(sourceImage == null) return null
-          val resampleOp: ResampleOp = new ResampleOp(400,400)
-          val scaledImage = resampleOp.filter(sourceImage, null)
-          val outputStream: ByteArrayOutputStream = new ByteArrayOutputStream()
-          ImageIO.write(scaledImage, "jpg", outputStream)
-          val base64 = Base64.getEncoder.encodeToString(outputStream.toByteArray)
-          "data:image/png;base64," + base64
-      } catch {
-          case e: IOException =>
-              null
-      }
-  }
-  */
 
 }

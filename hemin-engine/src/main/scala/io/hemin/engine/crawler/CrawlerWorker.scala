@@ -225,7 +225,7 @@ class CrawlerWorker (config: CrawlerConfig)
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
       httpClient.fetchContent(url, encoding, job.mimeCheck) match {
-        case Success((data, enc)) =>
+        case Success((data, mime, enc)) =>
           job match {
             case NewPodcastFetchJob() =>
               parser ! ParseNewPodcastData(url, id, asString(data, enc))
@@ -241,9 +241,9 @@ class CrawlerWorker (config: CrawlerConfig)
 
             case WebsiteFetchJob() => parser ! ParseWebsiteData(id, asString(data, enc))
 
-            case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, url, data)
+            case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, url, mime, enc, data)
 
-            case EpisodeImageFetchJob() => parser ! ParseEpisodeImage(id, url, data)
+            case EpisodeImageFetchJob() => parser ! ParseEpisodeImage(id, url, mime, enc, data)
           }
         case Failure(ex) =>
           log.error("Error fetching content from URL '{}' ; reason : {}", url, ex.getMessage)
@@ -254,6 +254,6 @@ class CrawlerWorker (config: CrawlerConfig)
     }
   }
 
-  private def asString(data: Array[Byte], encoding: Option[String]): String = new String(data, encoding.getOrElse("utf-8"))
+  private def asString(data: Array[Byte], encoding: String): String = new String(data, encoding)
 
 }

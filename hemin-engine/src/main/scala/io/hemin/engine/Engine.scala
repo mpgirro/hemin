@@ -187,19 +187,19 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.image)
   }
 
-  /** Finds an [[io.hemin.engine.model.Image]] by a Podcast ID */
+  /*
   def findImageByPodcast(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImageByPodcast(id))
       .mapTo[ImageResult]
       .map(_.image)
   }
 
-  /** Finds an [[io.hemin.engine.model.Image]] by an Episode ID */
   def findImageByEpisode(id: String): Future[Option[Image]] = guarded {
     (bus ? GetImageByEpisode(id))
       .mapTo[ImageResult]
       .map(_.image)
   }
+  */
 
   /** Finds a slice of all [[io.hemin.engine.model.Podcast]] starting
     * from (`page` * `size`) and with `size` elements.
