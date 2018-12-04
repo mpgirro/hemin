@@ -1,3 +1,5 @@
+import {PodcastItunes} from './podcast-itunes.model';
+
 export class Podcast {
   docType: string;
   id: string;
@@ -5,18 +7,10 @@ export class Podcast {
   link: string;
   description: string;
   pubDate: string;
+  lastBuildDate: string;
   image: string;
-  itunesCategories: string[];
-  itunesSummary: string;
-  itunesAuthor: string;
-  itunesKeywords: string;
-  itunesExplicit: boolean;
-  itunesBlock: boolean;
-  itunesType: string;
   language: string;
   generator: string;
   copyright: string;
-  episodeCount: number;
-  registrationTimestamp: string;
-  registrationComplete: boolean;
+  itunes: PodcastItunes;
 }

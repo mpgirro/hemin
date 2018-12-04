@@ -1,3 +1,6 @@
+import {EpisodeEnclosure} from './episode-enclosure.model';
+import {EpisodeItunes} from './episode-itunes.model';
+
 export class Episode {
   docType: string;
   id: string;
@@ -7,13 +10,8 @@ export class Episode {
   link: string;
   description: string;
   pubDate: string;
-  contentEncoded: string;
-  enclosureUrl: string;
-  enclosureType: string;
-  enclosureLength: number;
   image: string;
-  itunesDuration: string;
-  itunesSubtitle: string;
-  itunesAuthor: string;
-  itunesSummary: string;
+  contentEncoded: string;
+  enclosure: EpisodeEnclosure;
+  itunes: EpisodeItunes;
 }

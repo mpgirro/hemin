@@ -27,10 +27,12 @@ export class SearchService {
     const request = this.baseUrl + q + p + s;
 
     console.log('GET ' + request);
-    return this.http.get<ResultWrapper>(request).pipe(
-      tap(_ => console.log(`found results matching GET "${request}"`)),
-      catchError(this.handleError<ResultWrapper>(`GET ${request}`, new ResultWrapper()))
-    );
+    return this.http
+      .get<ResultWrapper>(request)
+      .pipe(
+        tap(_ => console.log(`found results matching GET "${request}"`)),
+        catchError(this.handleError<ResultWrapper>(`GET ${request}`, new ResultWrapper()))
+      );
   }
 
   /**

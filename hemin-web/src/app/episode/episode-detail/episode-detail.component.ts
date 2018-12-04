@@ -37,12 +37,13 @@ export class EpisodeDetailComponent implements OnInit {
   }
 
   initPodlovePlayer(): void {
+    console.log(this.episode);
     const podlovePlayerJS = `podlovePlayer('#podlove-player',{
-      "duration" : "${this.episode.itunesDuration}",
+      "duration" : "${this.episode.itunes.duration}",
       "audio" : [{
-        "url" : "${this.episode.enclosureUrl}",
-        "size" : ${this.episode.enclosureLength},
-        "mimeType" :"${this.episode.enclosureType}"
+        "url" : "${this.episode.enclosure.url}",
+        "size" : ${this.episode.enclosure.length},
+        "mimeType" :"${this.episode.enclosure.typ}"
       }],
       "chapters" : ${JSON.stringify(this.chapters)},
       "theme" : {

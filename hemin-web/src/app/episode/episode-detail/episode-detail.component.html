@@ -27,16 +27,16 @@
 
     <div class="mb-3">
       <small>
-    <span *ngIf="episode.pubDate">
-      <!--<span class="oi oi-calendar"></span>-->
-      <i class="fa fa-calendar"></i>
-      <span class="mr-2">{{episode.pubDate | date: 'd MMM yyyy' }}</span>
-    </span>
-        <span *ngIf="episode.itunesDuration">
-      <!--<span class="oi oi-timer"></span>-->
-      <i class="fa fa-clock-o"></i>
-      <span class="mr-2">{{episode.itunesDuration}}</span>
-    </span>
+        <span *ngIf="episode.pubDate">
+          <!--<span class="oi oi-calendar"></span>-->
+          <i class="fa fa-calendar"></i>
+          <span class="mr-2">{{episode.pubDate | date: 'd MMM yyyy' }}</span>
+        </span>
+        <span *ngIf="episode.itunes.duration">
+          <!--<span class="oi oi-timer"></span>-->
+          <i class="fa fa-clock-o"></i>
+          <span class="mr-2">{{episode.itunes.duration}}</span>
+        </span>
       </small>
     </div>
 
@@ -78,7 +78,7 @@
     <p *ngIf="!episode.contentEncoded"
        [innerHTML]="episode.description"></p>
     <p *ngIf="!episode.contentEncoded && !episode.description"
-       [innerHTML]="episode.itunesSummary"></p>
+       [innerHTML]="episode.itunes.summary"></p>
 
   </div>
 </div>
