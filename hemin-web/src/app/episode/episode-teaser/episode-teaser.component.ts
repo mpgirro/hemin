@@ -1,5 +1,6 @@
 import {Component, Input, OnInit} from '@angular/core';
 import { Episode } from '../shared/episode.model';
+import {ImageService} from '../../image.service';
 
 @Component({
   selector: 'app-episode-teaser',
@@ -10,7 +11,7 @@ export class EpisodeTeaserComponent implements OnInit {
 
   @Input() episode: Episode;
 
-  constructor() { }
+  constructor(private imageService: ImageService) { }
 
   ngOnInit() {
   }

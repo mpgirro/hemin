@@ -31,6 +31,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { Angular2FontawesomeModule } from 'angular2-fontawesome/angular2-fontawesome';
 import { DirectoryListComponent } from './directory/directory-list/directory-list.component';
 import { LoginComponent } from './login/login.component';
+import {ImageService} from './image.service';
 
 @NgModule({
   declarations: [
@@ -58,7 +59,7 @@ import { LoginComponent } from './login/login.component';
     HttpClientModule,
     Angular2FontawesomeModule
   ],
-  providers: [SearchService, DomainService],
+  providers: [SearchService, DomainService, ImageService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

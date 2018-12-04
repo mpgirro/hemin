@@ -6,6 +6,8 @@ import { Episode } from '../shared/episode.model';
 import { EpisodeService } from '../shared/episode.service';
 import { DomainService } from '../../domain.service';
 import {Chapter} from '../shared/chapter.model';
+import {ImageService} from '../../image.service';
+import {Image} from '../../image.model';
 
 @Component({
   selector: 'app-episode-detail',
@@ -15,12 +17,14 @@ import {Chapter} from '../shared/chapter.model';
 export class EpisodeDetailComponent implements OnInit {
 
   @Input() episode: Episode;
+  image: Image;
   chapters: Chapter[];
 
   HIGHLIGHT_COLOR = '#007bff';
 
   constructor(private route: ActivatedRoute,
               private episodeService: EpisodeService,
+              private imageService: ImageService,
               private domainService: DomainService,
               private location: Location) { }
 
@@ -68,20 +72,29 @@ export class EpisodeDetailComponent implements OnInit {
 
   getEpisode(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.episodeService.get(id)
+    this.episodeService
+      .get(id)
       .subscribe(episode => {
         this.episode = episode;
-        this.episodeService.getChapters(id).subscribe(chapters => {
-          this.chapters = chapters.results;
-          this.chapters.sort((a: Chapter, b: Chapter) => {
-            if (a.start < b.start) {
-              return -1;
-            } else if (a.start > b.start) {
-              return 1;
-            } else {
-              return 0;
-            }
+        this.imageService
+          .get(episode.image)
+          .subscribe(image => {
+            this.image = image;
+            console.log(image);
           });
+        this.episodeService
+          .getChapters(id)
+          .subscribe(chapters => {
+            this.chapters = chapters.results;
+            this.chapters.sort((a: Chapter, b: Chapter) => {
+              if (a.start < b.start) {
+                return -1;
+              } else if (a.start > b.start) {
+                return 1;
+              } else {
+                return 0;
+              }
+            });
           this.initPodlovePlayer();
         });
       });

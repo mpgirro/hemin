@@ -7,6 +7,7 @@ import {catchError, tap} from 'rxjs/operators';
 import {of} from 'rxjs/observable/of';
 import {ArrayWrapper} from '../../arraywrapper.model';
 import {Feed} from './feed.model';
+import {Image} from '../../image.model';
 
 @Injectable()
 export class PodcastService {

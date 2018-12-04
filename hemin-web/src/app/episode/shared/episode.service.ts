@@ -6,6 +6,7 @@ import {of} from 'rxjs/observable/of';
 import { Episode } from './episode.model';
 import {Chapter} from './chapter.model';
 import {ArrayWrapper} from '../../arraywrapper.model';
+import {Image} from '../../image.model';
 
 @Injectable()
 export class EpisodeService {

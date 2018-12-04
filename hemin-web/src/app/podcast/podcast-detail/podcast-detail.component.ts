@@ -7,6 +7,8 @@ import { Episode } from '../../episode/shared/episode.model';
 import { PodcastService } from '../shared/podcast.service';
 import { DomainService } from '../../domain.service';
 import {Feed} from '../shared/feed.model';
+import {ImageService} from '../../image.service';
+import {Image} from '../../image.model';
 
 @Component({
   selector: 'app-podcast-detail',
@@ -17,6 +19,7 @@ export class PodcastDetailComponent implements OnInit {
 
   // TODO warum habe ich hier @Input davor stehen?
   @Input() podcast: Podcast;
+  image: Image;
   @Input() episodes: Array<Episode>;
   feeds: Feed[];
 
@@ -24,6 +27,7 @@ export class PodcastDetailComponent implements OnInit {
 
   constructor(private route: ActivatedRoute,
               private podcastService: PodcastService,
+              private imageService: ImageService,
               private domainService: DomainService,
               private location: Location) { }
 
@@ -73,11 +77,19 @@ export class PodcastDetailComponent implements OnInit {
 
   getPodcast(): void {
     const id = this.route.snapshot.paramMap.get('id');
-    this.podcastService.get(id)
+    this.podcastService
+      .get(id)
       .subscribe(podcast => {
         this.podcast = podcast;
+        this.imageService
+          .get(podcast.image)
+          .subscribe(image => {
+            this.image = image;
+            console.log(image);
+          });
       });
-    this.podcastService.getEpisodes(id)
+    this.podcastService
+      .getEpisodes(id)
       .subscribe(episodes => {
 
         this.episodes = episodes.results;
@@ -100,7 +112,8 @@ export class PodcastDetailComponent implements OnInit {
           }
         });
       });
-    this.podcastService.getFeeds(id)
+    this.podcastService
+      .getFeeds(id)
       .subscribe(feeds => {
         this.feeds = feeds.results;
         this.initPodloveSubscribeButton();
