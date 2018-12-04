@@ -21,8 +21,8 @@ class FeedBaseController @Inject()(cc: FeedControllerComponents)
 
   protected implicit val executionContext: ExecutionContext = cc.executionContext
 
-  protected implicit val feedWriter: Writes[Feed] = JsonWrites.implicitFeedWrites
-  protected implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
+  protected implicit val feedWriter: Writes[Feed] = JsonWrites.feedWrites
+  protected implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.arrayWrites[Feed]
 
   def FeedAction: FeedActionBuilder = cc.actionBuilder
 

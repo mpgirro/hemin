@@ -21,11 +21,11 @@ class EpisodeBaseController @Inject()(cc: EpisodeControllerComponents)
 
   protected implicit val executionContext: ExecutionContext = cc.executionContext
 
-  protected implicit val episodeWriter: Writes[Episode] = JsonWrites.implicitEpisodeWrites
-  protected implicit val chapterWriter: Writes[Chapter] = JsonWrites.implicitChapterWrites
-  protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
-  protected implicit val chapterArrayWriter: Writes[ArrayWrapper[Chapter]] = JsonWrites.implicitArrayWrites[Chapter]
-  protected implicit val imageWriter: Writes[Image] = JsonWrites.implicitImageWrites
+  protected implicit val episodeWriter: Writes[Episode] = JsonWrites.episodeWrites
+  protected implicit val chapterWriter: Writes[Chapter] = JsonWrites.chapterWrites
+  protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.arrayWrites[Episode]
+  protected implicit val chapterArrayWriter: Writes[ArrayWrapper[Chapter]] = JsonWrites.arrayWrites[Chapter]
+  protected implicit val imageWriter: Writes[Image] = JsonWrites.imageWrites
 
   protected def EpisodeAction: EpisodeActionBuilder = cc.actionBuilder
 

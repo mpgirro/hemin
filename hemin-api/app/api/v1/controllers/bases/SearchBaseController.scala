@@ -21,7 +21,7 @@ class SearchBaseController @Inject() (cc: SearchControllerComponents)
 
   protected implicit val executionContext: ExecutionContext = cc.executionContext
 
-  protected implicit val searchWriter: Writes[ResultPage] = JsonWrites.implicitWrapperWrites
+  protected implicit val searchWriter: Writes[ResultPage] = JsonWrites.resultPageWrites
 
   def SearchAction: SearchActionBuilder = cc.actionBuilder
 

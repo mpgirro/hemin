@@ -21,7 +21,7 @@ class ImageBaseController @Inject()(cc: ImageControllerComponents)
 
   protected implicit val executionContext: ExecutionContext = cc.executionContext
 
-  protected implicit val imageWriter: Writes[Image] = JsonWrites.implicitImageWrites
+  protected implicit val imageWriter: Writes[Image] = JsonWrites.imageWrites
 
   def ImageAction: ImageActionBuilder = cc.actionBuilder
 

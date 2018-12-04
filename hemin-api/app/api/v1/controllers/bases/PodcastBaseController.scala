@@ -21,13 +21,13 @@ class PodcastBaseController @Inject()(cc: PodcastControllerComponents)
 
   protected implicit val executionContext: ExecutionContext = cc.executionContext
 
-  protected implicit val podcastWriter: Writes[Podcast] = JsonWrites.implicitPodcastWrites
-  protected implicit val episodeWriter: Writes[Episode] = JsonWrites.implicitEpisodeWrites
-  protected implicit val feedWriter: Writes[Feed] = JsonWrites.implicitFeedWrites
-  protected implicit val podcastArrayWriter: Writes[ArrayWrapper[Podcast]] = JsonWrites.implicitArrayWrites[Podcast]
-  protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.implicitArrayWrites[Episode]
-  protected implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.implicitArrayWrites[Feed]
-  protected implicit val imageWriter: Writes[Image] = JsonWrites.implicitImageWrites
+  protected implicit val podcastWriter: Writes[Podcast] = JsonWrites.podcastWrites
+  protected implicit val episodeWriter: Writes[Episode] = JsonWrites.episodeWrites
+  protected implicit val feedWriter: Writes[Feed] = JsonWrites.feedWrites
+  protected implicit val podcastArrayWriter: Writes[ArrayWrapper[Podcast]] = JsonWrites.arrayWrites[Podcast]
+  protected implicit val episodeArrayWriter: Writes[ArrayWrapper[Episode]] = JsonWrites.arrayWrites[Episode]
+  protected implicit val feedArrayWriter: Writes[ArrayWrapper[Feed]] = JsonWrites.arrayWrites[Feed]
+  protected implicit val imageWriter: Writes[Image] = JsonWrites.imageWrites
 
   def PodcastAction: PodcastActionBuilder = cc.actionBuilder
 
