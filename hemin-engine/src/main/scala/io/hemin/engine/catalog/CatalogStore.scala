@@ -54,7 +54,9 @@ object CatalogStore {
   final case class GetChaptersByEpisode(episodeId: String) extends CatalogQuery
   final case class GetFeed(id: String) extends CatalogQuery
   final case class GetImage(id: String) extends CatalogQuery
-  final case class GetImageByAssociate(id: String) extends CatalogQuery
+  final case class GetImageByUrl(url: String) extends CatalogQuery
+  final case class GetImageByPodcast(id: String) extends CatalogQuery
+  final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
   final case class CheckFeed(id: String) extends CatalogQuery
   //case class CheckAllPodcasts() extends CatalogQuery
@@ -223,7 +225,11 @@ class CatalogStore(config: CatalogConfig)
 
     case GetImage(id) => onGetImage(id)
 
-    case GetImageByAssociate(id) => onGetImageByAssociate(id)
+    case GetImageByPodcast(id) => onGetImageByPodcast(id)
+
+    case GetImageByEpisode(id) => onGetImageByEpisode(id)
+
+    case GetImageByUrl(url) => onGetImageByUrl(url)
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -384,23 +390,74 @@ class CatalogStore(config: CatalogConfig)
       })
   }
 
-  private def onUpdateImage(image: Image): Unit = {
-    log.debug("Received AddOrUpdateImage(associate = {})", image.associateId)
+  private def updateImageReferenceOfPodcasts(url: Option[String], id: Option[String]): Unit = {
+    log.debug("Updating the Image reference of Podcasts from URL = '{}' to ID = {}", url, id)
 
-    image.associateId match {
-      case Some(associateId) =>
+    (url, id) match {
+      case (None, None) => log.warning("Cannot update image reference in Podcast; reason: provided URL and ID are None")
+      case (None, _)    => log.warning("Cannot update image reference in Podcast; reason: provided URL is None")
+      case (_, None)    => log.warning("Cannot update image reference in Podcast; reason: provided ID is None")
+      case (Some(u), Some(i)) =>
+        podcasts
+          .findAllByImage(u)
+          .andThen {
+            case Success(ps) => ps
+            case Failure(ex) =>
+              onError(s"Could not get all Podcasts by image=$u", ex)
+              Nil // we have no results to return
+          }
+          .map { _
+            .foreach { p =>
+              podcasts.save(p.copy(image = id))
+            }
+          }
+    }
+  }
+
+  private def updateImageReferenceOfEpisodes(url: Option[String], id: Option[String]): Unit = {
+    log.debug("Updating the Image reference of Episodes from URL = '{}' to ID = {}", url, id)
+
+    (url, id) match {
+      case (None, None) => log.warning("Cannot update image reference in Episode; reason: provided URL and ID are None")
+      case (None, _)    => log.warning("Cannot update image reference in Episode; reason: provided URL is None")
+      case (_, None)    => log.warning("Cannot update image reference in Episode; reason: provided ID is None")
+      case (Some(u), Some(i)) =>
+        episodes
+          .findAllByImage(u)
+          .andThen {
+            case Success(es) => es
+            case Failure(ex) =>
+              onError(s"Could not get all Episodes by image=$u", ex)
+              Nil // we have no results to return
+          }
+          .map { _
+            .foreach { e =>
+              episodes.save(e.copy(image = id))
+            }
+          }
+    }
+  }
+
+  private def onUpdateImage(image: Image): Unit = {
+    log.debug("Received UpdateImage(url = '{}')", image.url)
+
+    image.url match {
+      case Some(url) =>
         images
-          .findOneByAssociate(associateId)
+          .findOneByUrl(url)
           .map {
             case Some(i) => // update existing
               image.patchRight(i)
             case None => // add as new
-              log.debug("Image to update is not yet in database, therefore it will be added : {} (associateId)", image.associateId)
+              log.debug("Image to update is not yet in database, therefore it will be added : {} (URL)", url)
               val id = idGenerator.newId
               image.copy(id = Some(id))
           }
           .foreach(i => {
             images.save(i)
+
+            updateImageReferenceOfPodcasts(i.url, i.id)
+            updateImageReferenceOfEpisodes(i.url, i.id)
           })
       case None => log.error("Could not add-or-update image; reason: associateId was None (this should not be possible and is a programmer error)")
     }
@@ -610,25 +667,51 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Image (ID=$id) from database : ", ex)
           None // we have no results to return
       }
-      .map { i =>
-        theSender ! ImageResult(i)
-      }
+      .foreach(i => theSender ! ImageResult(i))
   }
 
-  private def onGetImageByAssociate(id: String): Unit = {
-    log.debug("Received GetImageByAssociate('{}')", id)
+  private def onGetImageByUrl(url: String): Unit = {
+    log.debug("Received GetImageByUrl('{}')", url)
     val theSender = sender()
     images
-      .findOneByAssociate(id)
+      .findOneByUrl(url)
       .andThen {
         case Success(i)  => i
         case Failure(ex) =>
-          onError(s"Error on retrieving Image by AssociateID = $id from database : ", ex)
+          onError(s"Error on retrieving Image by URL = '$url' from database : ", ex)
           None // we have no results to return
       }
-      .map { i =>
-        theSender ! ImageResult(i)
+      .foreach(i => theSender ! ImageResult(i))
+  }
+
+  private def onGetImageByPodcast(id: String): Unit = {
+    log.debug("Received GetImageByPodcast('{}')", id)
+    val theSender = sender()
+    podcasts
+      .findOne(id)
+      .map {
+        case Some(p) => images.findOne(p.image)
+        case None    =>
+          log.warning("No image found for podcast : {}", id)
+          None // no podcast not image
       }
+      .mapTo[Option[Image]]
+      .foreach(i => theSender ! ImageResult(i))
+  }
+
+  private def onGetImageByEpisode(id: String): Unit = {
+    log.debug("Received GetImageByEpisode('{}')", id)
+    val theSender = sender()
+    episodes
+      .findOne(id)
+      .map {
+        case Some(e) => images.findOne(e.image)
+        case None    =>
+          log.warning("No image found for episode : {}", id)
+          None // no episode not image
+      }
+      .mapTo[Option[Image]]
+      .foreach(i => theSender ! ImageResult(i))
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {

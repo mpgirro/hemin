@@ -4,8 +4,8 @@ import java.time.LocalDateTime
 
 final case class Image (
   id: Option[String]               = None,
-  associateId: Option[String]      = None,
-  data: Option[Array[Byte]]        = None,
+  url: Option[String]              = None,
+  data: Option[Array[Byte]]        = None, // TODO to base64, frontend expects it
   hash: Option[String]             = None,
   name: Option[String]             = None,
   contentType: Option[String]      = None,
@@ -17,7 +17,7 @@ final case class Image (
     case None => this
     case Some(that) => Image(
       id          = reduceLeft(this.id, that.id),
-      associateId = reduceLeft(this.associateId, that.associateId),
+      url         = reduceLeft(this.url, that.url),
       data        = reduceLeft(this.data, that.data),
       hash        = reduceLeft(this.hash, that.hash),
       name        = reduceLeft(this.name, that.name),
@@ -31,7 +31,7 @@ final case class Image (
     case None => this
     case Some(that) => Image(
       id          = reduceRight(this.id, that.id),
-      associateId = reduceRight(this.associateId, that.associateId),
+      url         = reduceRight(this.url, that.url),
       data        = reduceRight(this.data, that.data),
       hash        = reduceRight(this.hash, that.hash),
       name        = reduceRight(this.name, that.name),

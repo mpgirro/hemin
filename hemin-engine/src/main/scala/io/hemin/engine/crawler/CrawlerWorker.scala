@@ -241,9 +241,9 @@ class CrawlerWorker (config: CrawlerConfig)
 
             case WebsiteFetchJob() => parser ! ParseWebsiteData(id, asString(data, enc))
 
-            case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, data)
+            case PodcastImageFetchJob() => parser ! ParsePodcastImage(id, url, data)
 
-            case EpisodeImageFetchJob() => parser ! ParseEpisodeImage(id, data)
+            case EpisodeImageFetchJob() => parser ! ParseEpisodeImage(id, url, data)
           }
         case Failure(ex) =>
           log.error("Error fetching content from URL '{}' ; reason : {}", url, ex.getMessage)

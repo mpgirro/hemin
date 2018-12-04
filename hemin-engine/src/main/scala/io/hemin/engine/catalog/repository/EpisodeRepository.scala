@@ -3,7 +3,7 @@ package io.hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineException
 import io.hemin.engine.catalog.repository.BsonConversion._
-import io.hemin.engine.model.Episode
+import io.hemin.engine.model.{Episode, Podcast}
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -69,6 +69,18 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
       "enclosureLength" -> toBsonL(enclosureLength),
       "enclosureType"   -> toBsonS(enclosureType)
     )
+  }
+
+  /** Finds all Episodes by the reference they currently hold to an image. Depending
+    * on their current processing state, this reference is either the URL of the image
+    * file, or the ID of the already processed image in our database.
+    *
+    * @param image Reference as String to an image (URL, ID)
+    * @return All Episodes holding the reference to the Image
+    */
+  def findAllByImage(image: String): Future[List[Episode]] = {
+    log.debug("Request to get all Episodes where image is : {}", image)
+    findAll(Query("image" -> toBsonS(image)))
   }
 
 }

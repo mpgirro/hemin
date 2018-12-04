@@ -20,8 +20,8 @@ object Parser {
   final case class ParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String) extends ParserMessage
   final case class ParseWebsiteData(id: String, html: String) extends ParserMessage
   final case class ParseFyydEpisodes(podcastId: String, episodesData: String) extends ParserMessage
-  final case class ParsePodcastImage(podcastId: String, imageData: Array[Byte]) extends ParserMessage
-  final case class ParseEpisodeImage(episodeId: String, imageData: Array[Byte]) extends ParserMessage
+  final case class ParsePodcastImage(podcastId: String, url: String, imageData: Array[Byte]) extends ParserMessage
+  final case class ParseEpisodeImage(episodeId: String, url: String, imageData: Array[Byte]) extends ParserMessage
 }
 
 class Parser (config: ParserConfig)

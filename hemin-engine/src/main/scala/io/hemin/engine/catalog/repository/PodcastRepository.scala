@@ -51,4 +51,16 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
     findAll(Query("registrationComplete" -> toBsonB(true)), page, size)
   }
 
+  /** Finds all Podcasts by the reference they currently hold to an image. Depending
+    * on their current processing state, this reference is either the URL of the image
+    * file, or the ID of the already processed image in our database.
+    *
+    * @param image Reference as String to an image (URL, ID)
+    * @return All Podcasts holding the reference to the Image
+    */
+  def findAllByImage(image: String): Future[List[Podcast]] = {
+    log.debug("Request to get all Podcasts where image is : {}", image)
+    findAll(Query("image" -> toBsonS(image)))
+  }
+
 }

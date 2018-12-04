@@ -48,9 +48,16 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
     findOne("id" -> toBsonS(id))
   }
 
+  /*
   def findOneByAssociate(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
     findOne("associateId" -> toBsonS(id))
+  }
+  */
+
+  def findOneByUrl(url: String): Future[Option[Image]] = {
+    log.debug("Request to get Image by URL : {}", url)
+    findOne("url" -> toBsonS(url))
   }
 
 }

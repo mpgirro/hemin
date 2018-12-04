@@ -82,9 +82,9 @@ class ParserWorker (config: ParserConfig)
 
     case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
-    case ParsePodcastImage(podcastId, imageData) => onParsePodcastImage(podcastId, imageData)
+    case ParsePodcastImage(podcastId, url, bytes) => onParsePodcastImage(podcastId, url, bytes)
 
-    case ParseEpisodeImage(episodeId, imageData) => onParseEpisodeImage(episodeId, imageData)
+    case ParseEpisodeImage(episodeId, url, bytes) => onParseEpisodeImage(episodeId, url, bytes)
 
   }
 
@@ -127,37 +127,28 @@ class ParserWorker (config: ParserConfig)
     throw new UnsupportedOperationException("currently not implemented")
   }
 
-  private def onParsePodcastImage(podcastId: String, imageData: Array[Byte]): Unit = {
+  private def onParsePodcastImage(podcastId: String, url: String, bytes: Array[Byte]): Unit = {
     log.debug("Received ParsePodcastImage({},_)", podcastId)
-    processImageData(podcastId, imageData)
+    processImageData(podcastId, url, bytes)
   }
 
-  private def onParseEpisodeImage(episodeId: String, imageData: Array[Byte]): Unit = {
+  private def onParseEpisodeImage(episodeId: String, url: String, bytes: Array[Byte]): Unit = {
     log.debug("Received ParseEpisodeImage({},_)", episodeId)
-    processImageData(episodeId, imageData)
+    processImageData(episodeId, url, bytes)
   }
 
-  private def processImageData(associateId: String, data: Array[Byte]): Unit = {
-    val image = imageFromData(associateId, data)
+  private def processImageData(associateId: String, url: String, bytes: Array[Byte]): Unit = {
+    val image = imageFromData(associateId, url, bytes)
     catalog ! UpdateImage(image)
   }
 
-  private def imageFromData(associateId: String, imageData: Array[Byte]): Image = {
-
-    //val imgBytes: Array[Byte] = imageData.getBytes(StandardCharsets.UTF_8.name)
-    //val imgFile: File = strToFile(imageData)
-    //val imgFile: File = bytesToFile(imgBytes)
-
-    //val image = com.sksamuel.scrimage.Image.fromFile(imgFile)
-    val image = com.sksamuel.scrimage.Image.apply(imageData)
-    //val image = com.sksamuel.scrimage.Image.fromStream(inputStreamFromString(imageData))
+  private def imageFromData(associateId: String, url: String, bytes: Array[Byte]): Image = {
+    val image = com.sksamuel.scrimage.Image.apply(bytes)
     val data = transform(image)
-
-    // TODO transform data to base64?
 
     // TODO set more fields of following instance!
     Image(
-      associateId = Some(associateId),
+      url         = Some(url),
       data        = Some(data),
       hash        = Some(HashUtil.sha1(data)),
     )
