@@ -56,15 +56,4 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
         }
     }
 
-  def image(id: String): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
-      log.trace(s"GET image of podcast: id = $id")
-      podcastService
-        .image(id)
-        .map {
-          case Some(i) => Ok(Json.toJson(i))
-          case None    => NotFound
-        }
-    }
-
 }

@@ -1,19 +1,15 @@
 package api.v1.utils
 
 import io.hemin.engine.model.info._
-import io.hemin.engine.model.{FeedStatus, _}
+import io.hemin.engine.model._
 import play.api.libs.json._
 
 object JsonWrites {
 
-  /**
-    * Mapping to write a IndexDoc out as a JSON value.
-    */
+  /** Mapping to write a IndexDoc out as a JSON value. */
   implicit val indexDocWrites: Writes[IndexDoc] = Json.writes[IndexDoc]
 
-  /**
-    * Mapping to write a ResultWrapper out as a JSON value.
-    */
+  /** Mapping to write a ResultWrapper out as a JSON value. */
   implicit val resultPageWrites: Writes[ResultPage] = Json.writes[ResultPage]
 
   implicit val atomLinkWrites: Writes[AtomLink] = Json.writes[AtomLink]
