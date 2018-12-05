@@ -1,13 +1,11 @@
 package io.hemin.engine.parser
 
-import java.io.{ByteArrayInputStream, File, InputStream, PrintWriter}
-import java.nio.charset.StandardCharsets
 import java.time.LocalDateTime
 import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, PodcastImageFetchJob, WebsiteFetchJob}
+import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
 import io.hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
 import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
@@ -15,7 +13,6 @@ import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
 import io.hemin.engine.util.HashUtil
 import io.hemin.engine.util.mapper.IndexMapper
-import javax.imageio.ImageIO
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 
@@ -83,9 +80,7 @@ class ParserWorker (config: ParserConfig)
 
     case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
-    case ParsePodcastImage(podcastId, url, mime, encoding, bytes) => onParsePodcastImage(podcastId, url, mime, encoding, bytes)
-
-    case ParseEpisodeImage(episodeId, url, mime, encoding, bytes) => onParseEpisodeImage(episodeId, url, mime, encoding, bytes)
+    case ParseImage(url, mime, encoding, bytes) => onParseImage(url, mime, encoding, bytes)
 
   }
 
@@ -128,22 +123,13 @@ class ParserWorker (config: ParserConfig)
     throw new UnsupportedOperationException("currently not implemented")
   }
 
-  private def onParsePodcastImage(podcastId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
-    log.debug("Received ParsePodcastImage({},_)", podcastId)
-    processImageData(podcastId, url, mime, encoding, bytes)
-  }
-
-  private def onParseEpisodeImage(episodeId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
-    log.debug("Received ParseEpisodeImage({},_)", episodeId)
-    processImageData(episodeId, url, mime, encoding, bytes)
-  }
-
-  private def processImageData(associateId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
-    val image = imageFromData(associateId, url, mime, encoding, bytes)
+  private def onParseImage(url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
+    log.debug("Received ParseImage({})", url)
+    val image = imageFromBytes(url, mime, encoding, bytes)
     catalog ! UpdateImage(image)
   }
 
-  private def imageFromData(associateId: String, url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Image = {
+  private def imageFromBytes(url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Image = {
     val image = com.sksamuel.scrimage.Image.apply(bytes)
     val data = transform(image)
 

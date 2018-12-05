@@ -3,19 +3,19 @@ package io.hemin.engine.catalog
 import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
-import io.hemin.engine.node.Node._
-import io.hemin.engine.catalog.CatalogStore.{CatalogEvent, _}
+import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
 import io.hemin.engine.crawler.Crawler._
+import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
 import io.hemin.engine.model.info.{EpisodeRegistrationInfo, PodcastRegistrationInfo}
-import io.hemin.engine.index.IndexStore.AddDocIndexEvent
+import io.hemin.engine.node.Node._
 import io.hemin.engine.updater.Updater.ProcessFeed
 import io.hemin.engine.util.IdGenerator
 import io.hemin.engine.util.mapper.IndexMapper
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
 object CatalogStore {
@@ -349,7 +349,7 @@ class CatalogStore(config: CatalogConfig)
           // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
           if (config.storeImages && !p.image.equals(podcast.image)) {
             podcast.image.foreach { img =>
-              crawler ! DownloadWithHeadCheck(podcastId, img, PodcastImageFetchJob())
+              crawler ! DownloadWithHeadCheck(podcastId, img, ImageFetchJob())
             }
           }
 
@@ -378,7 +378,7 @@ class CatalogStore(config: CatalogConfig)
           // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
           if (config.storeImages && !e.image.equals(episode.image)) {
             episode.image.foreach { img =>
-              crawler ! DownloadWithHeadCheck(e.podcastId.get, img, EpisodeImageFetchJob())
+              crawler ! DownloadWithHeadCheck(e.podcastId.get, img, ImageFetchJob())
             }
           }
 
@@ -799,7 +799,7 @@ class CatalogStore(config: CatalogConfig)
                 // TODO once we support cluster mode, we only want to dispatch this message once, not on all nodes
                 if (config.storeImages) {
                   episode.image.foreach { img =>
-                    crawler ! DownloadWithHeadCheck(podcastId, img, EpisodeImageFetchJob())
+                    crawler ! DownloadWithHeadCheck(podcastId, img, ImageFetchJob())
                   }
                 }
 

@@ -29,10 +29,7 @@ object Crawler {
   final case class WebsiteFetchJob() extends FetchJob {
     def mimeCheck(mime: String): Boolean = HttpClient.isHtmlMime(mime)
   }
-  final case class PodcastImageFetchJob() extends FetchJob {
-    def mimeCheck(mime: String): Boolean = HttpClient.isImageMime(mime)
-  }
-  final case class EpisodeImageFetchJob() extends FetchJob {
+  final case class ImageFetchJob() extends FetchJob {
     def mimeCheck(mime: String): Boolean = HttpClient.isImageMime(mime)
   }
 
