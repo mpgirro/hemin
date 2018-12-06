@@ -38,27 +38,10 @@ final case class Podcast(
       managingEditor  = reduceLeft(this.managingEditor, that.managingEditor),
       image           = reduceLeft(this.image, that.image),
       atomLinks       = reduceLeft(this.atomLinks, that.atomLinks),
-      registration = PodcastRegistration(
-        timestamp = reduceLeft(this.registration.timestamp, that.registration.timestamp),
-        complete  = reduceLeft(this.registration.complete, that.registration.complete),
-      ),
-      itunes = PodcastItunes(
-        summary     = reduceLeft(this.itunes.summary, that.itunes.summary),
-        author      = reduceLeft(this.itunes.author, that.itunes.author),
-        keywords    = reduceLeft(this.itunes.keywords, that.itunes.keywords),
-        categories  = reduceLeft(this.itunes.categories, that.itunes.categories),
-        explicit    = reduceLeft(this.itunes.explicit, that.itunes.explicit),
-        block       = reduceLeft(this.itunes.block, that.itunes.block),
-        podcastType = reduceLeft(this.itunes.podcastType, that.itunes.podcastType),
-        ownerName   = reduceLeft(this.itunes.ownerName, that.itunes.ownerName),
-        ownerEmail  = reduceLeft(this.itunes.ownerEmail, that.itunes.ownerEmail),
-      ),
-      feedpress = PodcastFeedpress(
-        locale = reduceLeft(this.feedpress.locale, that.feedpress.locale),
-      ),
-      fyyd = PodcastFyyd(
-        verify = reduceLeft(this.fyyd.verify, that.fyyd.verify),
-      )
+      registration    = this.registration.patchLeft(that.registration),
+      itunes          = this.itunes.patchLeft(that.itunes),
+      feedpress       = this.feedpress.patchLeft(that.feedpress),
+      fyyd            = this.fyyd.patchLeft(that.fyyd),
     )
   }
 
@@ -78,27 +61,10 @@ final case class Podcast(
       managingEditor  = reduceRight(this.managingEditor, that.managingEditor),
       image           = reduceRight(this.image, that.image),
       atomLinks       = reduceRight(this.atomLinks, that.atomLinks),
-      registration = PodcastRegistration(
-        timestamp = reduceRight(this.registration.timestamp, that.registration.timestamp),
-        complete  = reduceRight(this.registration.complete, that.registration.complete),
-      ),
-      itunes = PodcastItunes(
-        summary     = reduceRight(this.itunes.summary, that.itunes.summary),
-        author      = reduceRight(this.itunes.author, that.itunes.author),
-        keywords    = reduceRight(this.itunes.keywords, that.itunes.keywords),
-        categories  = reduceRight(this.itunes.categories, that.itunes.categories),
-        explicit    = reduceRight(this.itunes.explicit, that.itunes.explicit),
-        block       = reduceRight(this.itunes.block, that.itunes.block),
-        podcastType = reduceRight(this.itunes.podcastType, that.itunes.podcastType),
-        ownerName   = reduceRight(this.itunes.ownerName, that.itunes.ownerName),
-        ownerEmail  = reduceRight(this.itunes.ownerEmail, that.itunes.ownerEmail),
-      ),
-      feedpress = PodcastFeedpress(
-        locale = reduceRight(this.feedpress.locale, that.feedpress.locale),
-      ),
-      fyyd = PodcastFyyd(
-        verify = reduceRight(this.fyyd.verify, that.fyyd.verify),
-      )
+      registration    = this.registration.patchRight(that.registration),
+      itunes          = this.itunes.patchRight(that.itunes),
+      feedpress       = this.feedpress.patchRight(that.feedpress),
+      fyyd            = this.fyyd.patchRight(that.fyyd),
     )
   }
 }

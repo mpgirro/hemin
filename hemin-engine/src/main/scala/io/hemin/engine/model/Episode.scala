@@ -37,23 +37,9 @@ final case class Episode(
       contentEncoded  = reduceLeft(this.contentEncoded, that.contentEncoded),
       atomLinks       = reduceLeft(this.atomLinks, that.atomLinks),
       chapters        = reduceLeft(this.chapters, that.chapters),
-      itunes = EpisodeItunes(
-        duration    = reduceLeft(this.itunes.duration, that.itunes.duration),
-        subtitle    = reduceLeft(this.itunes.subtitle, that.itunes.subtitle),
-        author      = reduceLeft(this.itunes.author, that.itunes.author),
-        summary     = reduceLeft(this.itunes.summary, that.itunes.summary),
-        season      = reduceLeft(this.itunes.season, that.itunes.season),
-        episode     = reduceLeft(this.itunes.episode, that.itunes.episode),
-        episodeType = reduceLeft(this.itunes.episodeType, that.itunes.episodeType),
-      ),
-      enclosure = EpisodeEnclosure(
-        url    = reduceLeft(this.enclosure.url, that.enclosure.url),
-        length = reduceLeft(this.enclosure.length, that.enclosure.length),
-        typ    = reduceLeft(this.enclosure.typ, that.enclosure.typ),
-      ),
-      registration = EpisodeRegistration(
-        timestamp = reduceLeft(this.registration.timestamp, that.registration.timestamp)
-      )
+      itunes          = this.itunes.patchLeft(that.itunes),
+      enclosure       = this.enclosure.patchLeft(that.enclosure),
+      registration    = this.registration.patchLeft(that.registration),
     )
   }
 
@@ -73,23 +59,9 @@ final case class Episode(
       contentEncoded  = reduceRight(this.contentEncoded, that.contentEncoded),
       atomLinks       = reduceRight(this.atomLinks, that.atomLinks),
       chapters        = reduceLeft(this.chapters, that.chapters),
-      itunes = EpisodeItunes(
-        duration    = reduceRight(this.itunes.duration, that.itunes.duration),
-        subtitle    = reduceRight(this.itunes.subtitle, that.itunes.subtitle),
-        author      = reduceRight(this.itunes.author, that.itunes.author),
-        summary     = reduceRight(this.itunes.summary, that.itunes.summary),
-        season      = reduceRight(this.itunes.season, that.itunes.season),
-        episode     = reduceRight(this.itunes.episode, that.itunes.episode),
-        episodeType = reduceRight(this.itunes.episodeType, that.itunes.episodeType),
-      ),
-      enclosure = EpisodeEnclosure(
-        url    = reduceRight(this.enclosure.url, that.enclosure.url),
-        length = reduceRight(this.enclosure.length, that.enclosure.length),
-        typ    = reduceRight(this.enclosure.typ, that.enclosure.typ),
-      ),
-      registration = EpisodeRegistration(
-        timestamp = reduceRight(this.registration.timestamp, that.registration.timestamp)
-      )
+      itunes          = this.itunes.patchRight(that.itunes),
+      enclosure       = this.enclosure.patchRight(that.enclosure),
+      registration    = this.registration.patchRight(that.registration),
     )
   }
 }
