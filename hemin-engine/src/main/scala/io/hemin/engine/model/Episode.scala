@@ -3,22 +3,22 @@ package io.hemin.engine.model
 import java.time.LocalDateTime
 
 final case class Episode(
-                          id: Option[String]                    = None,
-                          podcastId: Option[String]             = None,
-                          podcastTitle: Option[String]          = None,
-                          title: Option[String]                 = None,
-                          link: Option[String]                  = None,
-                          pubDate: Option[LocalDateTime]        = None,
-                          guid: Option[String]                  = None,
-                          guidIsPermalink: Option[Boolean]      = None,
-                          description: Option[String]           = None,
-                          image: Option[String]                 = None,
-                          contentEncoded: Option[String]        = None,
-                          atomLinks: List[AtomLink]             = Nil,
-                          chapters: List[Chapter]               = Nil,
-                          itunes: EpisodeItunes             = EpisodeItunes(),
-                          enclosure: EpisodeEnclosure       = EpisodeEnclosure(),
-                          registration: EpisodeRegistration = EpisodeRegistration(),
+  id: Option[String]                = None,
+  podcastId: Option[String]         = None,
+  podcastTitle: Option[String]      = None,
+  title: Option[String]             = None,
+  link: Option[String]              = None,
+  pubDate: Option[LocalDateTime]    = None,
+  guid: Option[String]              = None,
+  guidIsPermalink: Option[Boolean]  = None,
+  description: Option[String]       = None,
+  image: Option[String]             = None,
+  contentEncoded: Option[String]    = None,
+  atomLinks: List[AtomLink]         = Nil,
+  chapters: List[Chapter]           = Nil,
+  itunes: EpisodeItunes             = EpisodeItunes(),
+  enclosure: EpisodeEnclosure       = EpisodeEnclosure(),
+  registration: EpisodeRegistration = EpisodeRegistration(),
 ) extends Patchable[Episode] {
 
   override def patchLeft(diff: Episode): Episode = Option(diff) match {
