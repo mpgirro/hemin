@@ -1,7 +1,7 @@
 package api.v1.controllers.components
 
 import api.v1.actions.CliActionBuilder
-import api.v1.concurrent.CliExecutionContext
+import api.v1.utils.concurrent.CliExecutionContext
 import api.v1.services.CliService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes

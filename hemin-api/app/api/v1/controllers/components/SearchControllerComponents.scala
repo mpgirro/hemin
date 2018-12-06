@@ -1,7 +1,7 @@
 package api.v1.controllers.components
 
 import api.v1.actions.SearchActionBuilder
-import api.v1.concurrent.SearchExecutionContext
+import api.v1.utils.concurrent.SearchExecutionContext
 import api.v1.services.SearchService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes

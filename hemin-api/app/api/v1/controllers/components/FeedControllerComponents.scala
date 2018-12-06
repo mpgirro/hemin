@@ -1,7 +1,7 @@
 package api.v1.controllers.components
 
 import api.v1.actions.FeedActionBuilder
-import api.v1.concurrent.FeedExecutionContext
+import api.v1.utils.concurrent.FeedExecutionContext
 import api.v1.services.FeedService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes

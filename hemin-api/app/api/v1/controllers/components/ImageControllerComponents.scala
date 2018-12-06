@@ -1,7 +1,7 @@
 package api.v1.controllers.components
 
 import api.v1.actions.ImageActionBuilder
-import api.v1.concurrent.ImageExecutionContext
+import api.v1.utils.concurrent.ImageExecutionContext
 import api.v1.services.ImageService
 import javax.inject.Inject
 import play.api.http.FileMimeTypes

@@ -1,4 +1,4 @@
-package api.v1.concurrent
+package api.v1.utils.concurrent
 
 import akka.actor.ActorSystem
 import javax.inject.Inject
