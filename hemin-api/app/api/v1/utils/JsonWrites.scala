@@ -1,6 +1,5 @@
 package api.v1.utils
 
-import io.hemin.engine.model.info._
 import io.hemin.engine.model._
 import play.api.libs.json._
 
@@ -14,23 +13,23 @@ object JsonWrites {
 
   implicit val atomLinkWrites: Writes[AtomLink] = Json.writes[AtomLink]
 
-  implicit val podcastRegistrationWrites: Writes[PodcastRegistrationInfo] = Json.writes[PodcastRegistrationInfo]
+  implicit val podcastRegistrationWrites: Writes[PodcastRegistration] = Json.writes[PodcastRegistration]
 
-  implicit val podcastItunesWrites: Writes[PodcastItunesInfo] = Json.writes[PodcastItunesInfo]
+  implicit val podcastItunesWrites: Writes[PodcastItunes] = Json.writes[PodcastItunes]
 
-  implicit val podcastFeedpressWrites: Writes[PodcastFeedpressInfo] = Json.writes[PodcastFeedpressInfo]
+  implicit val podcastFeedpressWrites: Writes[PodcastFeedpress] = Json.writes[PodcastFeedpress]
 
-  implicit val podcastFyydWrites: Writes[PodcastFyydInfo] = Json.writes[PodcastFyydInfo]
+  implicit val podcastFyydWrites: Writes[PodcastFyyd] = Json.writes[PodcastFyyd]
 
   implicit val podcastWrites: Writes[Podcast] = Json.writes[Podcast]
 
   implicit val chapterWrites: Writes[Chapter] = Json.writes[Chapter]
 
-  implicit val episodeItunesWrites: Writes[EpisodeItunesInfo] = Json.writes[EpisodeItunesInfo]
+  implicit val episodeItunesWrites: Writes[EpisodeItunes] = Json.writes[EpisodeItunes]
 
-  implicit val episodeEnclosureWrites: Writes[EpisodeEnclosureInfo] = Json.writes[EpisodeEnclosureInfo]
+  implicit val episodeEnclosureWrites: Writes[EpisodeEnclosure] = Json.writes[EpisodeEnclosure]
 
-  implicit val episodeRegistrationWrites: Writes[EpisodeRegistrationInfo] = Json.writes[EpisodeRegistrationInfo]
+  implicit val episodeRegistrationWrites: Writes[EpisodeRegistration] = Json.writes[EpisodeRegistration]
 
   implicit val episodeWrites: Writes[Episode] = Json.writes[Episode]
 
