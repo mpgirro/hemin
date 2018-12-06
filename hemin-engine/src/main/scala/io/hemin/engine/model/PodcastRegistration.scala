@@ -8,7 +8,7 @@ final case class PodcastRegistration(
 ) extends Patchable[PodcastRegistration] {
 
   override def patchLeft(diff: PodcastRegistration): PodcastRegistration = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastRegistration(
       timestamp = reduceLeft(this.timestamp, that.timestamp),
       complete  = reduceLeft(this.complete, that.complete),
@@ -16,7 +16,7 @@ final case class PodcastRegistration(
   }
 
   override def patchRight(diff: PodcastRegistration): PodcastRegistration = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastRegistration(
       timestamp = reduceRight(this.timestamp, that.timestamp),
       complete  = reduceRight(this.complete, that.complete),

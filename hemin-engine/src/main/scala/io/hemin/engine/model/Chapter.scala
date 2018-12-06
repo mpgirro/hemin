@@ -10,7 +10,7 @@ final case class Chapter(
 ) extends Patchable[Chapter] {
 
   override def patchLeft(diff: Chapter): Chapter = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => Chapter(
       id        = reduceLeft(this.id, that.id),
       episodeId = reduceLeft(this.episodeId, that.episodeId),
@@ -22,7 +22,7 @@ final case class Chapter(
   }
 
   override def patchRight(diff: Chapter): Chapter = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => Chapter(
       id        = reduceRight(this.id, that.id),
       episodeId = reduceRight(this.episodeId, that.episodeId),

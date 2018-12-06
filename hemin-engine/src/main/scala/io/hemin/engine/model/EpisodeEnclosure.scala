@@ -7,7 +7,7 @@ final case class EpisodeEnclosure(
 ) extends Patchable[EpisodeEnclosure] {
 
   override def patchLeft(diff: EpisodeEnclosure): EpisodeEnclosure = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => EpisodeEnclosure(
       url    = reduceLeft(this.url, that.url),
       length = reduceLeft(this.length, that.length),
@@ -16,7 +16,7 @@ final case class EpisodeEnclosure(
   }
 
   override def patchRight(diff: EpisodeEnclosure): EpisodeEnclosure = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => EpisodeEnclosure(
       url    = reduceRight(this.url, that.url),
       length = reduceRight(this.length, that.length),

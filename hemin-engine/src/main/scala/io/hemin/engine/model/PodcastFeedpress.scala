@@ -5,14 +5,14 @@ final case class PodcastFeedpress(
 ) extends Patchable[PodcastFeedpress] {
 
   override def patchLeft(diff: PodcastFeedpress): PodcastFeedpress = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastFeedpress(
       locale = reduceLeft(this.locale, that.locale),
     )
   }
 
   override def patchRight(diff: PodcastFeedpress): PodcastFeedpress = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastFeedpress(
       locale = reduceRight(this.locale, that.locale),
     )

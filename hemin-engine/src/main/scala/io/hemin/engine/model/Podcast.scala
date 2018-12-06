@@ -23,7 +23,7 @@ final case class Podcast(
 ) extends Patchable[Podcast] {
 
   override def patchLeft(diff: Podcast): Podcast = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => Podcast(
       id              = reduceLeft(this.id, that.id),
       title           = reduceLeft(this.title, that.title),

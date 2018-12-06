@@ -20,7 +20,7 @@ final case class IndexDoc(
 ) extends Patchable[IndexDoc] {
 
   override def patchLeft(diff: IndexDoc): IndexDoc = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => IndexDoc(
       docType        = reduceLeft(this.docType, that.docType),
       id             = reduceLeft(this.id, that.id),
@@ -40,7 +40,7 @@ final case class IndexDoc(
   }
 
   override def patchRight(diff: IndexDoc): IndexDoc = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => IndexDoc(
       docType        = reduceRight(this.docType, that.docType),
       id             = reduceRight(this.id, that.id),

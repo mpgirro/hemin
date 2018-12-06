@@ -13,7 +13,7 @@ final case class PodcastItunes(
 ) extends Patchable[PodcastItunes] {
 
   override def patchLeft(diff: PodcastItunes): PodcastItunes = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastItunes(
       summary     = reduceLeft(this.summary, that.summary),
       author      = reduceLeft(this.author, that.author),
@@ -28,7 +28,7 @@ final case class PodcastItunes(
   }
 
   override def patchRight(diff: PodcastItunes): PodcastItunes = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => PodcastItunes(
       summary     = reduceRight(this.summary, that.summary),
       author      = reduceRight(this.author, that.author),

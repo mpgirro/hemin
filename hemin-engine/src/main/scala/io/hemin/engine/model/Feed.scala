@@ -12,7 +12,7 @@ final case class Feed(
 ) extends Patchable[Feed] {
 
   override def patchLeft(diff: Feed): Feed = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => Feed(
       id                    = reduceLeft(this.id, that.id),
       podcastId             = reduceLeft(this.podcastId, that.podcastId),
@@ -24,7 +24,7 @@ final case class Feed(
   }
 
   override def patchRight(diff: Feed): Feed = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => Feed(
       id                    = reduceRight(this.id, that.id),
       podcastId             = reduceRight(this.podcastId, that.podcastId),

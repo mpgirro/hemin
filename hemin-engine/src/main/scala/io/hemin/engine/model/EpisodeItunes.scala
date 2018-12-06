@@ -11,7 +11,7 @@ final case class EpisodeItunes(
 ) extends Patchable[EpisodeItunes] {
 
   override def patchLeft(diff: EpisodeItunes): EpisodeItunes = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => EpisodeItunes(
       duration    = reduceLeft(this.duration, that.duration),
       subtitle    = reduceLeft(this.subtitle, that.subtitle),
@@ -24,7 +24,7 @@ final case class EpisodeItunes(
   }
 
   override def patchRight(diff: EpisodeItunes): EpisodeItunes = Option(diff) match {
-    case None => this
+    case None       => this
     case Some(that) => EpisodeItunes(
       duration    = reduceRight(this.duration, that.duration),
       subtitle    = reduceRight(this.subtitle, that.subtitle),
