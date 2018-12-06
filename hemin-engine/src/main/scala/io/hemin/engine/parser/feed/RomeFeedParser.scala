@@ -7,7 +7,6 @@ import com.rometools.modules.itunes.FeedInformation
 import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.model.info._
 import io.hemin.engine.model._
 import io.hemin.engine.util.mapper.{DateMapper, UrlMapper}
 import org.xml.sax.InputSource

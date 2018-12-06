@@ -2,8 +2,6 @@ package io.hemin.engine.model
 
 import java.time.LocalDateTime
 
-import io.hemin.engine.model.info.EpisodeRegistration
-
 final case class Episode(
                           id: Option[String]                    = None,
                           podcastId: Option[String]             = None,

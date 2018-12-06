@@ -2,8 +2,6 @@ package io.hemin.engine.model
 
 import java.time.LocalDateTime
 
-import io.hemin.engine.model.info._
-
 final case class Podcast(
                           id: Option[String]                    = None,
                           title: Option[String]                 = None,

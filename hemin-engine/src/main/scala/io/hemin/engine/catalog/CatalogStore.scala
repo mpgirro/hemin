@@ -8,7 +8,6 @@ import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, Im
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
-import io.hemin.engine.model.info.PodcastRegistration
 import io.hemin.engine.node.Node._
 import io.hemin.engine.updater.Updater.ProcessFeed
 import io.hemin.engine.util.IdGenerator
