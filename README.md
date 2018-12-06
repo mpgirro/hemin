@@ -40,6 +40,13 @@ Further roadmap information for the subprojects is documented in their respectiv
 
 The WebApp is available at [hemin.io](https://hemin.io)
 
+There are several different frontend variant implementations for the HEMIN system. These exist primarily for experimentational and educational reasons. The webapps are named after the letters in the greek alphabet. Currently there are these:
+
+* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). Currently the primary frontend.
+* [Beta](hemin-web/beta) &ndash; written in [Elm](https://elm-lang.org). At an early stage.
+* [Gamma](hemin-web/gamma) &ndash; proposition of a [React](https://reactjs.org) based implementation.  
+* [Delta](hemin-web/delta) &ndash; proposition of a [VueJS](https://vuejs.org) based implementation. 
+
 
 ## RESTful API ([api.hemin.io](https://api.hemin.io))
 
