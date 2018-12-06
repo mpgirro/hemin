@@ -1,8 +1,11 @@
-package io.hemin.engine.model.info
+package io.hemin.engine.model
 
 import java.time.LocalDateTime
 
-final case class PodcastRegistrationInfo(
+/**
+  * @author max
+  */
+final case class PodcastRegistration(
   timestamp: Option[LocalDateTime] = None,
   complete: Option[Boolean]        = None,
 )

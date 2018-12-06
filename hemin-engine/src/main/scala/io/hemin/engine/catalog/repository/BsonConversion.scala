@@ -57,26 +57,26 @@ object BsonConversion {
     def read(status: BSONString): FeedStatus = FeedStatus.withName(status.value)
   }
 
-  implicit val implicitEpisodeEnclosureInfoWriter: BSONDocumentWriter[EpisodeEnclosureInfo] = Macros.writer[EpisodeEnclosureInfo]
-  implicit val implicitEpisodeEnclosureInfoReader: BSONDocumentReader[EpisodeEnclosureInfo] = Macros.reader[EpisodeEnclosureInfo]
+  implicit val implicitEpisodeEnclosureInfoWriter: BSONDocumentWriter[EpisodeEnclosure] = Macros.writer[EpisodeEnclosure]
+  implicit val implicitEpisodeEnclosureInfoReader: BSONDocumentReader[EpisodeEnclosure] = Macros.reader[EpisodeEnclosure]
 
-  implicit val implicitEpisodeItunesInfoWriter: BSONDocumentWriter[EpisodeItunesInfo] = Macros.writer[EpisodeItunesInfo]
-  implicit val implicitEpisodeItunesInfoReader: BSONDocumentReader[EpisodeItunesInfo] = Macros.reader[EpisodeItunesInfo]
+  implicit val implicitEpisodeItunesInfoWriter: BSONDocumentWriter[EpisodeItunes] = Macros.writer[EpisodeItunes]
+  implicit val implicitEpisodeItunesInfoReader: BSONDocumentReader[EpisodeItunes] = Macros.reader[EpisodeItunes]
 
-  implicit val implicitEpisodeRegistrationInfoWriter: BSONDocumentWriter[EpisodeRegistrationInfo] = Macros.writer[EpisodeRegistrationInfo]
-  implicit val implicitEpisodeRegistrationInfoReader: BSONDocumentReader[EpisodeRegistrationInfo] = Macros.reader[EpisodeRegistrationInfo]
+  implicit val implicitEpisodeRegistrationInfoWriter: BSONDocumentWriter[EpisodeRegistration] = Macros.writer[EpisodeRegistration]
+  implicit val implicitEpisodeRegistrationInfoReader: BSONDocumentReader[EpisodeRegistration] = Macros.reader[EpisodeRegistration]
 
-  implicit val implicitPodcastFeedpressInfoWriter: BSONDocumentWriter[PodcastFeedpressInfo] = Macros.writer[PodcastFeedpressInfo]
-  implicit val implicitPodcastFeedpressInfoReader: BSONDocumentReader[PodcastFeedpressInfo] = Macros.reader[PodcastFeedpressInfo]
+  implicit val implicitPodcastFeedpressInfoWriter: BSONDocumentWriter[PodcastFeedpress] = Macros.writer[PodcastFeedpress]
+  implicit val implicitPodcastFeedpressInfoReader: BSONDocumentReader[PodcastFeedpress] = Macros.reader[PodcastFeedpress]
 
-  implicit val implicitPodcastFyydInfoWriter: BSONDocumentWriter[PodcastFyydInfo] = Macros.writer[PodcastFyydInfo]
-  implicit val implicitPodcastFyydInfoReader: BSONDocumentReader[PodcastFyydInfo] = Macros.reader[PodcastFyydInfo]
+  implicit val implicitPodcastFyydInfoWriter: BSONDocumentWriter[PodcastFyyd] = Macros.writer[PodcastFyyd]
+  implicit val implicitPodcastFyydInfoReader: BSONDocumentReader[PodcastFyyd] = Macros.reader[PodcastFyyd]
 
-  implicit val implicitPodcastItunesInfoWriter: BSONDocumentWriter[PodcastItunesInfo] = Macros.writer[PodcastItunesInfo]
-  implicit val implicitPodcastItunesInfoReader: BSONDocumentReader[PodcastItunesInfo] = Macros.reader[PodcastItunesInfo]
+  implicit val implicitPodcastItunesInfoWriter: BSONDocumentWriter[PodcastItunes] = Macros.writer[PodcastItunes]
+  implicit val implicitPodcastItunesInfoReader: BSONDocumentReader[PodcastItunes] = Macros.reader[PodcastItunes]
 
-  implicit val implicitPodcastRegistrationInfoWriter: BSONDocumentWriter[PodcastRegistrationInfo] = Macros.writer[PodcastRegistrationInfo]
-  implicit val implicitPodcastRegistrationInfoReader: BSONDocumentReader[PodcastRegistrationInfo] = Macros.reader[PodcastRegistrationInfo]
+  implicit val implicitPodcastRegistrationInfoWriter: BSONDocumentWriter[PodcastRegistration] = Macros.writer[PodcastRegistration]
+  implicit val implicitPodcastRegistrationInfoReader: BSONDocumentReader[PodcastRegistration] = Macros.reader[PodcastRegistration]
 
   implicit val implicitAtomLinkWriter: BSONDocumentWriter[AtomLink] = Macros.writer[AtomLink]
   implicit val implicitAtomLinkReader: BSONDocumentReader[AtomLink] = Macros.reader[AtomLink]

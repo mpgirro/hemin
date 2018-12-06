@@ -8,7 +8,7 @@ import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.model.info._
-import io.hemin.engine.model.{AtomLink, Chapter, Episode, Podcast}
+import io.hemin.engine.model._
 import io.hemin.engine.util.mapper.{DateMapper, UrlMapper}
 import org.xml.sax.InputSource
 
@@ -46,7 +46,7 @@ class RomeFeedParser private (private val xmlData: String) {
     docs            = Option(feed.getDocs),
     managingEditor  = Option(feed.getManagingEditor),
     atomLinks       = podcastAtomLinks,
-    registration = PodcastRegistrationInfo(
+    registration = PodcastRegistration(
       timestamp = None,
       complete  = None,
     ),
@@ -77,7 +77,7 @@ class RomeFeedParser private (private val xmlData: String) {
     chapters        = episodeChapters(e),
     itunes          = episodeItunesInfo(e),
     enclosure       = episodeEnclosureInfo(e),
-    registration = EpisodeRegistrationInfo(
+    registration = EpisodeRegistration(
       timestamp = None,
     )
   )
@@ -137,9 +137,9 @@ class RomeFeedParser private (private val xmlData: String) {
     }
   }
 
-  private lazy val podcastItunesInfo: PodcastItunesInfo = feedItunesModule
+  private lazy val podcastItunesInfo: PodcastItunes = feedItunesModule
     .map { itunes =>
-      PodcastItunesInfo(
+      PodcastItunes(
         summary     = Option(itunes.getSummary),
         author      = Option(itunes.getAuthor),
         keywords    = Option(itunes.getKeywords)
@@ -156,11 +156,11 @@ class RomeFeedParser private (private val xmlData: String) {
         ownerName   = Option(itunes.getOwnerName),
         ownerEmail  = Option(itunes.getOwnerEmailAddress),
       )
-    }.getOrElse(PodcastItunesInfo())
+    }.getOrElse(PodcastItunes())
 
-  private lazy val podcastFeedpressInfo: PodcastFeedpressInfo = PodcastFeedpressInfo(locale = None)
+  private lazy val podcastFeedpressInfo: PodcastFeedpress = PodcastFeedpress(locale = None)
 
-  private lazy val podcastFyydInfo: PodcastFyydInfo = PodcastFyydInfo(verify = None)
+  private lazy val podcastFyydInfo: PodcastFyyd = PodcastFyyd(verify = None)
 
   private lazy val podcastAtomLinks: List[AtomLink] = RomeModuleExtractor
     .getAtomLinks(feed)
@@ -182,11 +182,11 @@ class RomeFeedParser private (private val xmlData: String) {
     .map(_.toExternalForm)
     .orElse(podcast.image) // fallback is the podcast's image
 
-  private def episodeItunesInfo(e: SyndEntry): EpisodeItunesInfo = RomeModuleExtractor
+  private def episodeItunesInfo(e: SyndEntry): EpisodeItunes = RomeModuleExtractor
     .getItunesEntryInformation(e)
     .asScala
     .map { itunes =>
-      EpisodeItunesInfo(
+      EpisodeItunes(
         duration    = Option(itunes.getDuration).map(_.toString),
         subtitle    = Option(itunes.getSubtitle),
         author      = Option(itunes.getAuthor),
@@ -195,22 +195,22 @@ class RomeFeedParser private (private val xmlData: String) {
         episode     = Option(itunes.getEpisode),
         episodeType = Option(itunes.getEpisodeType),
       )
-    }.getOrElse(EpisodeItunesInfo())
+    }.getOrElse(EpisodeItunes())
 
-  private def episodeEnclosureInfo(entry: SyndEntry): EpisodeEnclosureInfo = Option(entry.getEnclosures)
+  private def episodeEnclosureInfo(entry: SyndEntry): EpisodeEnclosure = Option(entry.getEnclosures)
     .map { es =>
       if (es.size > 1) log.warn("Encountered multiple <enclosure> elements in <item> element")
       if (es.size > 0) {
         val e = entry.getEnclosures.get(0)
-        EpisodeEnclosureInfo(
+        EpisodeEnclosure(
           url    = Option(e.getUrl),
           length = Option(e.getLength),
           typ    = Option(e.getType),
         )
       } else {
-        EpisodeEnclosureInfo()
+        EpisodeEnclosure()
       }
-    }.getOrElse(EpisodeEnclosureInfo())
+    }.getOrElse(EpisodeEnclosure())
 
   private def episodeContentEncoded(e: SyndEntry): Option[String] = RomeModuleExtractor
     .getContentModule(e)

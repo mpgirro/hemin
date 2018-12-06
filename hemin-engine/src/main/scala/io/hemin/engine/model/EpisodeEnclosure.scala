@@ -1,6 +1,9 @@
-package io.hemin.engine.model.info
+package io.hemin.engine.model
 
-final case class EpisodeEnclosureInfo(
+/**
+  * @author max
+  */
+final case class EpisodeEnclosure(
   url: Option[String]  = None,
   length: Option[Long] = None,
   typ: Option[String]  = None,

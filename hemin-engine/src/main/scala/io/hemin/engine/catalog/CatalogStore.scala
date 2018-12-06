@@ -8,7 +8,7 @@ import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, Im
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
-import io.hemin.engine.model.info.{EpisodeRegistrationInfo, PodcastRegistrationInfo}
+import io.hemin.engine.model.info.PodcastRegistration
 import io.hemin.engine.node.Node._
 import io.hemin.engine.updater.Updater.ProcessFeed
 import io.hemin.engine.util.IdGenerator
@@ -278,7 +278,7 @@ class CatalogStore(config: CatalogConfig)
               id          = Some(podcastId),
               //title       = Some(podcastId),
               //description = Some(url),
-              registration = PodcastRegistrationInfo(
+              registration = PodcastRegistration(
                 complete  = Some(false),
                 timestamp = Some(now)
               )
@@ -358,7 +358,7 @@ class CatalogStore(config: CatalogConfig)
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           podcast
       }
-      .map(_.copy(registration = PodcastRegistrationInfo(complete = Some(true))))
+      .map(_.copy(registration = PodcastRegistration(complete = Some(true))))
       .foreach(p => {
         podcasts.save(p)
 
@@ -808,7 +808,7 @@ class CatalogStore(config: CatalogConfig)
                     id           = Some(episodeId),
                     podcastId    = Some(podcastId),
                     podcastTitle = p.title,
-                    registration = EpisodeRegistrationInfo(
+                    registration = EpisodeRegistration(
                       timestamp = Some(LocalDateTime.now())
                     ),
                     chapters = episode.chapters.map(_.copy(episodeId = Some(episodeId))), // TODO are chapters now embedded, remove episodeId

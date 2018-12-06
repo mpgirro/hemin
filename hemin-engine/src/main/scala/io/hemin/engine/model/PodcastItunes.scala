@@ -1,6 +1,9 @@
-package io.hemin.engine.model.info
+package io.hemin.engine.model
 
-final case class PodcastItunesInfo(
+/**
+  * @author max
+  */
+final case class PodcastItunes(
   summary: Option[String]     = None,
   author: Option[String]      = None,
   keywords: List[String]      = Nil,

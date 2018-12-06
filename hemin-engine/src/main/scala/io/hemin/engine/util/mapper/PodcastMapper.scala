@@ -1,7 +1,6 @@
 package io.hemin.engine.util.mapper
 
-import io.hemin.engine.model.info.PodcastItunesInfo
-import io.hemin.engine.model.{IndexDoc, IndexField, Podcast}
+import io.hemin.engine.model.{IndexDoc, IndexField, Podcast, PodcastItunes}
 import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -18,7 +17,7 @@ object PodcastMapper {
         description = d.description,
         pubDate     = d.pubDate,
         image       = d.image,
-        itunes = PodcastItunesInfo(
+        itunes = PodcastItunes(
           author  = d.itunesAuthor,
           summary = d.itunesSummary
         )

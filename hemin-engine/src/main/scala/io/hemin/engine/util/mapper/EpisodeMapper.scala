@@ -1,7 +1,6 @@
 package io.hemin.engine.util.mapper
 
-import io.hemin.engine.model.info.EpisodeItunesInfo
-import io.hemin.engine.model.{Episode, IndexDoc, IndexField}
+import io.hemin.engine.model.{Episode, EpisodeItunes, IndexDoc, IndexField}
 import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -18,7 +17,7 @@ object EpisodeMapper {
         description = s.description,
         pubDate     = s.pubDate,
         image       = s.image,
-        itunes = EpisodeItunesInfo(
+        itunes = EpisodeItunes(
           author  = s.itunesAuthor,
           summary = s.itunesSummary,
           //duration = s.itunesDuration,
@@ -38,7 +37,7 @@ object EpisodeMapper {
         pubDate      = DateMapper.asLocalDateTime(s.get(IndexField.PubDate.entryName)),
         description  = LuceneMapper.get(s, IndexField.Description.entryName),
         image        = LuceneMapper.get(s, IndexField.ItunesImage.entryName),
-        itunes = EpisodeItunesInfo(
+        itunes = EpisodeItunes(
           author   = LuceneMapper.get(s, IndexField.ItunesAuthor.entryName),
           summary  = LuceneMapper.get(s, IndexField.ItunesSummary.entryName),
           duration = LuceneMapper.get(s, IndexField.ItunesDuration.entryName),
@@ -58,7 +57,7 @@ object EpisodeMapper {
         pubDate      = SolrMapper.firstDateMatch(s, IndexField.PubDate.entryName).flatMap(x => DateMapper.asLocalDateTime(x)),
         description  = SolrMapper.firstStringMatch(s, IndexField.Description.entryName),
         image        = SolrMapper.firstStringMatch(s, IndexField.ItunesImage.entryName),
-        itunes = EpisodeItunesInfo(
+        itunes = EpisodeItunes(
           author   = SolrMapper.firstStringMatch(s, IndexField.ItunesAuthor.entryName),
           summary  = SolrMapper.firstStringMatch(s, IndexField.ItunesSummary.entryName),
           duration = SolrMapper.firstStringMatch(s, IndexField.ItunesDuration.entryName),

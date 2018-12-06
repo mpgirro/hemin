@@ -1,6 +1,9 @@
-package io.hemin.engine.model.info
+package io.hemin.engine.model
 
-final case class EpisodeItunesInfo(
+/**
+  * @author max
+  */
+final case class EpisodeItunes(
   duration: Option[String]    = None,
   subtitle: Option[String]    = None,
   author: Option[String]      = None,

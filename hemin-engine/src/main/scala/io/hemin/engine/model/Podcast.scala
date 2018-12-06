@@ -5,23 +5,23 @@ import java.time.LocalDateTime
 import io.hemin.engine.model.info._
 
 final case class Podcast(
-  id: Option[String]                    = None,
-  title: Option[String]                 = None,
-  link: Option[String]                  = None,
-  description: Option[String]           = None,
-  pubDate: Option[LocalDateTime]        = None,
-  lastBuildDate: Option[LocalDateTime]  = None,
-  language: Option[String]              = None,
-  generator: Option[String]             = None,
-  copyright: Option[String]             = None,
-  docs: Option[String]                  = None,
-  managingEditor: Option[String]        = None,
-  image: Option[String]                 = None,
-  atomLinks: List[AtomLink]             = Nil,
-  registration: PodcastRegistrationInfo = PodcastRegistrationInfo(),
-  itunes: PodcastItunesInfo             = PodcastItunesInfo(),
-  feedpress: PodcastFeedpressInfo       = PodcastFeedpressInfo(),
-  fyyd: PodcastFyydInfo                 = PodcastFyydInfo(),
+                          id: Option[String]                    = None,
+                          title: Option[String]                 = None,
+                          link: Option[String]                  = None,
+                          description: Option[String]           = None,
+                          pubDate: Option[LocalDateTime]        = None,
+                          lastBuildDate: Option[LocalDateTime]  = None,
+                          language: Option[String]              = None,
+                          generator: Option[String]             = None,
+                          copyright: Option[String]             = None,
+                          docs: Option[String]                  = None,
+                          managingEditor: Option[String]        = None,
+                          image: Option[String]                 = None,
+                          atomLinks: List[AtomLink]             = Nil,
+                          registration: PodcastRegistration = PodcastRegistration(),
+                          itunes: PodcastItunes             = PodcastItunes(),
+                          feedpress: PodcastFeedpress       = PodcastFeedpress(),
+                          fyyd: PodcastFyyd                 = PodcastFyyd(),
 ) extends Patchable[Podcast] {
 
   override def patchLeft(diff: Podcast): Podcast = Option(diff) match {
@@ -40,11 +40,11 @@ final case class Podcast(
       managingEditor  = reduceLeft(this.managingEditor, that.managingEditor),
       image           = reduceLeft(this.image, that.image),
       atomLinks       = reduceLeft(this.atomLinks, that.atomLinks),
-      registration = PodcastRegistrationInfo(
+      registration = PodcastRegistration(
         timestamp = reduceLeft(this.registration.timestamp, that.registration.timestamp),
         complete  = reduceLeft(this.registration.complete, that.registration.complete),
       ),
-      itunes = PodcastItunesInfo(
+      itunes = PodcastItunes(
         summary     = reduceLeft(this.itunes.summary, that.itunes.summary),
         author      = reduceLeft(this.itunes.author, that.itunes.author),
         keywords    = reduceLeft(this.itunes.keywords, that.itunes.keywords),
@@ -55,10 +55,10 @@ final case class Podcast(
         ownerName   = reduceLeft(this.itunes.ownerName, that.itunes.ownerName),
         ownerEmail  = reduceLeft(this.itunes.ownerEmail, that.itunes.ownerEmail),
       ),
-      feedpress = PodcastFeedpressInfo(
+      feedpress = PodcastFeedpress(
         locale = reduceLeft(this.feedpress.locale, that.feedpress.locale),
       ),
-      fyyd = PodcastFyydInfo(
+      fyyd = PodcastFyyd(
         verify = reduceLeft(this.fyyd.verify, that.fyyd.verify),
       )
     )
@@ -80,11 +80,11 @@ final case class Podcast(
       managingEditor  = reduceRight(this.managingEditor, that.managingEditor),
       image           = reduceRight(this.image, that.image),
       atomLinks       = reduceRight(this.atomLinks, that.atomLinks),
-      registration = PodcastRegistrationInfo(
+      registration = PodcastRegistration(
         timestamp = reduceRight(this.registration.timestamp, that.registration.timestamp),
         complete  = reduceRight(this.registration.complete, that.registration.complete),
       ),
-      itunes = PodcastItunesInfo(
+      itunes = PodcastItunes(
         summary     = reduceRight(this.itunes.summary, that.itunes.summary),
         author      = reduceRight(this.itunes.author, that.itunes.author),
         keywords    = reduceRight(this.itunes.keywords, that.itunes.keywords),
@@ -95,10 +95,10 @@ final case class Podcast(
         ownerName   = reduceRight(this.itunes.ownerName, that.itunes.ownerName),
         ownerEmail  = reduceRight(this.itunes.ownerEmail, that.itunes.ownerEmail),
       ),
-      feedpress = PodcastFeedpressInfo(
+      feedpress = PodcastFeedpress(
         locale = reduceRight(this.feedpress.locale, that.feedpress.locale),
       ),
-      fyyd = PodcastFyydInfo(
+      fyyd = PodcastFyyd(
         verify = reduceRight(this.fyyd.verify, that.fyyd.verify),
       )
     )
