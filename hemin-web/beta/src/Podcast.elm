@@ -1,62 +1,33 @@
-import Browser
-import Html exposing (..)
-import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
+module Podcast exposing (..)
 
+import Json.Decode exposing (Decoder, field, string)
 
-
--- MAIN
-
-
-main =
-  Browser.sandbox { init = init, update = update, view = view }
-
-
-
--- MODEL
-
-
-type alias Podcast =
-  { 
+type alias Podcast = 
+  {
     id : String,
     title : String,
     link : String,
-    description : String
+    description : String,
+    itunes : PodcastItunes
   }
 
-
-init : Podcast
-init =
-  { 
-    id = "test id", 
-    title = "test title" ,
-    link = "test link",
-    description = "test description"
+type alias PodcastItunes =
+  {
+    summary : String,
+    author : String
   }
 
+podcastDecoder : Decoder Podcast
+podcastDecoder =
+  Json.Decode.map5 Podcast
+    (field "id" string)
+    (field "title" string)
+    (field "link" string)
+    (field "description" string)
+    (field "itunes" podcastItunesDecoder)
 
-
--- UPDATE
-
-
-type Msg
-  = Change Podcast
-
-
-update : Msg -> Podcast -> Podcast
-update msg p =
-  case msg of
-    Change newP ->
-      { p | id = newP.id, title = newP.title, link = newP.link, description = newP.description }
-
-
--- VIEW
-
-
-view : Podcast -> Html Msg
-view podcast =
-  div []
-    [ h1 [] [ text podcast.title ]
-    , a [ href podcast.link ] [ text podcast.link ]
-    , p [] [ text podcast.description ]
-    ]
+podcastItunesDecoder : Decoder PodcastItunes
+podcastItunesDecoder = 
+  Json.Decode.map2 PodcastItunes
+    (field "summary" string)
+    (field "author" string)
