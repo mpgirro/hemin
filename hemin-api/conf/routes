@@ -9,6 +9,9 @@ GET   /docs/*file                     controllers.Assets.at(path="/public/swagge
 # Map static resources from the /public folder to the /assets URL path
 #GET   /assets/*file                   controllers.Assets.at(path="/public/assets", file)
 
+# JSON example files
+GET   /json-examples/*file            controllers.Assets.at(path="/public/json-examples",file)
+
 # API resources
 GET   /api/v1/search                  api.v1.controllers.SearchController.search(q: String, p: Option[Int], s: Option[Int])
 GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p: Option[Int], s: Option[Int])

@@ -1,0 +1,43 @@
+{
+    "id": "p1",
+    "title": "Podcast title",
+    "link": "http://example.com",
+    "description": "Podcast description",
+    "language": "de-de",
+    "copyright": "cc-by-nc-sa",
+    "image": "i1",
+    "atomLinks": [{
+        "title": "mp3 Audio",
+        "href": "http://example.com",
+        "hrefResolved": "http://example.com",
+        "rel": "self",
+        "typ": "application/rss+xml",
+        "length": 0
+    },
+        {
+            "href": "http://example.com",
+            "hrefResolved": "http://example.com",
+            "rel": "payment",
+            "typ": "text/html",
+            "length": 0
+        }
+    ],
+    "registration": {
+        "complete": true
+    },
+    "itunes": {
+        "summary": "Podcast summary",
+        "author": "Podcast author",
+        "keywords": [],
+        "categories": [
+            "Technology"
+        ],
+        "explicit": false,
+        "block": false,
+        "podcastType": "episodic",
+        "ownerName": "Podcast owner name",
+        "ownerEmail": "podcast@example.com"
+    },
+    "feedpress": {},
+    "fyyd": {}
+}

@@ -1,0 +1,90 @@
+{
+    "results":[
+        {
+            "id":"e1",
+            "podcastId":"p1",
+            "podcastTitle":"Podcast title",
+            "title":"Episode title",
+            "pubDate":"2018-12-05T23:08:04",
+            "guid":"Episode GUID",
+            "description":"Episode description",
+            "image":"i1",
+            "atomLinks":[
+                {
+                    "href":"http://example.com",
+                    "hrefResolved":"http://example.com",
+                    "rel":"payment",
+                    "typ":"text/html",
+                    "length":0,
+                }, {
+                    "href":"http://example.com",
+                    "hrefResolved":"http://example.com",
+                    "rel":"http://podlove.org/deep-link",
+                    "length":0,
+                }
+            ],
+            "chapters":[
+                {"episodeId":"e1","start":"00:02:52","title":"Chaptermark 1","href":"https://example.com"},
+                {"episodeId":"e1","start":"00:17:43","title":"Chaptermark 2","href":"https://example.com"},
+            ],
+            "itunes":{
+                "duration":"01:54:08",
+                "subtitle":"Example subtitle",
+                "author":"Example author",
+                "season":1,
+                "episode":1,
+            },
+            "enclosure":{
+                "url":"http://example.com/file.mp3",
+                "length":109568417,
+                "typ":"audio/mpeg",
+            },
+            "registration":{
+                "timestamp":"2018-12-06T23:32:38.92",
+            },
+        },
+        {
+            "id":"e2",
+            "podcastId":"p1",
+            "podcastTitle":"Podcast title",
+            "title":"Episode title",
+            "pubDate":"2018-12-05T23:08:04",
+            "guid":"Episode GUID",
+            "description":"Episode description",
+            "image":"i1",
+            "atomLinks":[
+                {
+                    "href":"http://example.com",
+                    "hrefResolved":"http://example.com",
+                    "rel":"payment",
+                    "typ":"text/html",
+                    "length":0,
+                }, {
+                    "href":"http://example.com",
+                    "hrefResolved":"http://example.com",
+                    "rel":"http://podlove.org/deep-link",
+                    "length":0,
+                }
+            ],
+            "chapters":[
+                {"episodeId":"e1","start":"00:02:52","title":"Chaptermark 1","href":"https://example.com"},
+                {"episodeId":"e1","start":"00:17:43","title":"Chaptermark 2","href":"https://example.com"},
+            ],
+            "itunes":{
+                "duration":"01:54:08",
+                "subtitle":"Example subtitle",
+                "author":"Example author",
+                "season":1,
+                "episode":1,
+            },
+            "enclosure":{
+                "url":"http://example.com/file.mp3",
+                "length":109568417,
+                "typ":"audio/mpeg",
+            },
+            "registration":{
+                "timestamp":"2018-12-06T23:32:38.92",
+            },
+        },
+    ],
+}
