@@ -70,26 +70,30 @@ view : Model -> Html Msg
 view model =
   case model of
     Failure cause ->
-      processHttpFailure cause
+      viewHttpFailure cause
 
     Loading ->
       text "Loading..."
 
     Success podcast ->
-      div []
-        [ h1 [] [ text podcast.title ]
-        , a [ href podcast.link ] [ text podcast.link ]
-        , p [] [ text podcast.description ]
-        ]
+      viewPodcast podcast
 
-processHttpFailure : Http.Error -> Html Msg
-processHttpFailure cause =
+viewHttpFailure : Http.Error -> Html Msg
+viewHttpFailure cause =
   case cause of 
     Http.BadUrl msg       -> text ("Unable to load the podcast; reason: " ++ msg)
     Http.Timeout          -> text "Unable to load the podcast; reason: timeout"
     Http.NetworkError     -> text "Unable to load the podcast; reason: network error"
     Http.BadStatus status -> text ("Unable to load the podcast; reason: status " ++ (String.fromInt status))
     Http.BadBody msg      -> text ("Unable to load the podcast; reason: " ++ msg)
+
+viewPodcast : Podcast -> Html Msg
+viewPodcast podcast =
+  div []
+    [ h1 [] [ text podcast.title ]
+    , a [ href podcast.link ] [ text podcast.link ]
+    , p [] [ text podcast.description ]
+    ]
 
 -- HTTP
 

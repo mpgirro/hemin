@@ -1,43 +1,53 @@
 module Episode exposing (..)
 
 import Json.Decode exposing (Decoder, field, string, int, nullable)
+import Json.Decode.Pipeline exposing (required, optional, hardcoded)
 
 type alias Episode =
-  {
-    id : String,
-    title : String,
-    link : String,
-    description : String,
-    itunes : EpisodeItunes
+  { id : String
+  , title : String
+  , link : String
+  , description : String
+  , itunes : EpisodeItunes
   }
 
 type alias EpisodeItunes =
-  {
-    duration : String,
-    subtitle : String,
-    author : String,
-    summary : String,
-    season : Int,
-    episode : Int,
-    episodeType : String
+  { duration : String
+  , subtitle : String
+  , author : String
+  , summary : String
+  , season : Int
+  , episode : Int
+  , episodeType : String
+  }
+
+emptyEpisodeItunes : EpisodeItunes
+emptyEpisodeItunes = 
+  { duration = ""
+  , subtitle = ""
+  , author = ""
+  , summary = ""
+  , season = 0
+  , episode = 0
+  , episodeType = ""
   }
 
 episodeDecoder : Decoder Episode
 episodeDecoder =
-  Json.Decode.map5 Episode
-    (field "id" string)
-    (field "title" string)
-    (field "link" string)
-    (field "description" string)
-    (field "itunes" episodeItunesDecoder)
+  Json.Decode.succeed Episode
+    |> required "id" string
+    |> optional "title" string "" -- 2nd string is fallback
+    |> optional "link" string ""
+    |> optional "description" string ""
+    |> optional "itunes" episodeItunesDecoder emptyEpisodeItunes
 
 episodeItunesDecoder : Decoder EpisodeItunes
 episodeItunesDecoder = 
-  Json.Decode.map7 EpisodeItunes
-    (field "duration" string)
-    (field "subtitle" string)
-    (field "author" string)
-    (field "summary" string)
-    (field "season" int)
-    (field "episode" int)
-    (field "episodeType" string)
+  Json.Decode.succeed EpisodeItunes
+    |> optional "duration" string ""
+    |> optional "subtitle" string ""
+    |> optional "author" string ""
+    |> optional "summary" string ""
+    |> optional "season" int 0
+    |> optional "episode" int 0
+    |> optional "episodeType" string ""
