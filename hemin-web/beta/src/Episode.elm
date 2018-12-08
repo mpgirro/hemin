@@ -32,6 +32,8 @@ emptyEpisodeItunes =
   , episodeType = ""
   }
 
+-- JSON
+
 episodeDecoder : Decoder Episode
 episodeDecoder =
   Json.Decode.succeed Episode

@@ -1,3 +1,5 @@
+module Page.PodcastDetail exposing (Model, Msg(..), init, view, update)
+
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
