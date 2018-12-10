@@ -6,6 +6,7 @@ import Episode
 import EpisodePage
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Http
 import Podcast
 import PodcastPage
 import Router exposing (..)
@@ -37,12 +38,18 @@ type alias Model =
     { key : Browser.Navigation.Key
     , url : Url.Url
     , route : Route
+    , content : Content
     }
+
+type Content
+  = StartContent
+  | PodcastContent PodcastPage.Model
+  | EpisodeContent EpisodePage.Model
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url Router.NotFound, Cmd.none )
+    ( Model key url Router.NotFound StartContent, Cmd.none )
 
 
 
@@ -52,11 +59,14 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | PodcastMsg PodcastPage.Msg
+    | EpisodeMsg EpisodePage.Msg
+--    | SearchMsg SearchPage.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
+update message model =
+    case message of
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
@@ -68,6 +78,25 @@ update msg model =
         UrlChanged url ->
             ( { model | route = fromUrl url }, Cmd.none )
 
+        PodcastMsg msg ->
+          case model.content of
+            PodcastContent content -> stepPodcast model (PodcastPage.update msg content)
+            _                      -> ( model, Cmd.none )
+
+        EpisodeMsg msg ->
+          case model.content of
+            EpisodeContent content -> stepEpisode model (EpisodePage.update msg content)
+            _                      -> ( model, Cmd.none )
+
+
+stepPodcast : Model -> ( PodcastPage.Model, Cmd PodcastPage.Msg ) -> ( Model, Cmd Msg )
+stepPodcast model (content, cmd) =
+  ( { model | content = PodcastContent content }, Cmd.map PodcastMsg cmd )
+
+
+stepEpisode : Model -> ( EpisodePage.Model, Cmd EpisodePage.Msg ) -> ( Model, Cmd Msg )
+stepEpisode model (content, cmd) =
+  ( { model | content = EpisodeContent content }, Cmd.map EpisodeMsg cmd )
 
 
 -- SUBSCRIPTIONS
@@ -94,14 +123,16 @@ view model =
         Router.RootPage ->
             viewHomePage model
 
-        Router.PodcastPage id ->
-            viewPodcastPage id
+        Router.PodcastPage _ ->
+            viewPodcastPage model
 
-        Router.EpisodePage id ->
-            viewEpisodePage id
+        Router.EpisodePage _ ->
+            viewEpisodePage model
 
         Router.SearchPage query pageNumber pageSize ->
-            viewSearchPage query pageNumber pageSize
+            viewSearchPage model
+
+
 
 
 type alias Page msg =
@@ -144,7 +175,6 @@ template content =
     , footer
     ]
 
-
 viewNotFound : Model -> Page msg
 viewNotFound model =
     buildPage "Not Found"
@@ -165,28 +195,28 @@ viewHomePage model =
         )
 
 
-viewPodcastPage : String -> Page msg
-viewPodcastPage id =
-    buildPage "Podcast"
-        (template
-            (div []
-                [ p [] [ text "Podcast Page" ] ]
-            )
-        )
+viewPodcastPage : Model -> Page msg
+viewPodcastPage model =
+  case model.content of
+    PodcastContent content ->
+      buildPage "Podcast" (template (PodcastPage.view content) )
+
+    _ ->
+      viewNotFound model
 
 
-viewEpisodePage : String -> Page msg
-viewEpisodePage id =
-    buildPage "Episode"
-        (template
-            (div []
-                [ p [] [ text "Episode Page" ] ]
-            )
-        )
+viewEpisodePage : Model -> Page msg
+viewEpisodePage model =
+  case model.content of
+    EpisodeContent content ->
+      buildPage "Episode" (template (EpisodePage.view content) )
+
+    _ ->
+      viewNotFound model
 
 
-viewSearchPage : Maybe String -> Maybe Int -> Maybe Int -> Page msg
-viewSearchPage query pageNumber pageSize =
+viewSearchPage : Model -> Page msg
+viewSearchPage model =
     buildPage "Search"
         (template
             (div []
@@ -200,3 +230,21 @@ viewLink path =
     li []
         [ a [ href path ] [ text path ]
         ]
+
+viewHttpFailure : Http.Error -> Html Msg
+viewHttpFailure cause =
+    case cause of
+        Http.BadUrl msg ->
+            text ("Unable to load the data; reason: " ++ msg)
+
+        Http.Timeout ->
+            text "Unable to load the data; reason: timeout"
+
+        Http.NetworkError ->
+            text "Unable to load the data; reason: network error"
+
+        Http.BadStatus status ->
+            text ("Unable to load the data; reason: status " ++ String.fromInt status)
+
+        Http.BadBody msg ->
+            text ("Unable to load the data; reason: " ++ msg)
