@@ -1,4 +1,4 @@
-module Page.Search exposing (IndexDoc, ResultPage, emptyResultPage)
+module Page.Search exposing (..)
 
 import Browser
 import Html exposing (Html, Attribute, div, input, text)

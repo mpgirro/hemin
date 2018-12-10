@@ -1,4 +1,4 @@
-module Page.EpisodeDetail exposing (Model, Msg(..), init, view, update)
+module Page.Episode exposing (Model, Msg(..), init, view, update)
 
 import Browser
 import Html exposing (..)
