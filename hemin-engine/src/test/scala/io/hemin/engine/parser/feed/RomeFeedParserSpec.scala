@@ -50,7 +50,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
             p.itunes.keywords should contain ("Lorem Ipsum")
             p.itunes.categories.exists(_.equals("Technology")) // TODO nested stuff, and more tests
             p.itunes.explicit shouldBe Some(false)
-            p.itunes.block shouldBe Some(true) // TODO is this false or inversion by ROME? it is set as "no" in feed!
+            p.itunes.block shouldBe Some(false)
             p.itunes.podcastType shouldBe Some("episodic")
             p.itunes.ownerName shouldBe Some("Lorem Ipsum")
             p.itunes.ownerEmail shouldBe Some("test@example.org")
