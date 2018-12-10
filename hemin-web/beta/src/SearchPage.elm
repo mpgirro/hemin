@@ -1,14 +1,13 @@
-module SearchPage exposing (..)
+module SearchPage exposing (Model(..), Msg(..), getResults, init, main, subscriptions, update, view, viewHttpFailure, viewResultPage)
 
 import Browser
-import Html exposing (Html, Attribute, div, input, text, h1)
+import Episode exposing (..)
+import Html exposing (Attribute, Html, div, h1, input, text)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
-import Json.Decode exposing (Decoder, field, string, bool, list)
-import Json.Decode.Pipeline exposing (required, optional, hardcoded)
-
-import Episode exposing (..)
+import Json.Decode exposing (Decoder, bool, field, list, string)
+import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Podcast exposing (..)
 import SearchResult exposing (..)
 
@@ -18,26 +17,28 @@ import SearchResult exposing (..)
 
 
 main =
-  Browser.element
-    { init = init
-    , update = update
-    , subscriptions = subscriptions
-    , view = view
-    }
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
 
 
 -- MODEL
 
+
 type Model
-  = Failure Http.Error
-  | Empty
-  | Loading
-  | Success ResultPage
+    = Failure Http.Error
+    | Empty
+    | Loading
+    | Success ResultPage
 
 
-init : () -> (Model, Cmd Msg)
+init : () -> ( Model, Cmd Msg )
 init _ =
-  ( Loading , getResults "" Nothing Nothing )
+    ( Loading, getResults "" Nothing Nothing )
 
 
 
@@ -45,21 +46,25 @@ init _ =
 
 
 type Msg
-  = SendSearchRequest String Int Int
-  | GotSearchResult (Result Http.Error ResultPage)
+    = SendSearchRequest String Int Int
+    | GotSearchResult (Result Http.Error ResultPage)
 
-update : Msg -> Model -> (Model, Cmd Msg)
+
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-  case msg of
-    SendSearchRequest query page size ->
-      (Empty, Cmd.none) -- TODO send HTTP request! 
-    GotSearchResult result ->
-      case result of
-        Ok resultPage ->
-          (Success resultPage, Cmd.none)
+    case msg of
+        SendSearchRequest query page size ->
+            ( Empty, Cmd.none )
 
-        Err cause ->
-          (Failure cause, Cmd.none)
+        -- TODO send HTTP request!
+        GotSearchResult result ->
+            case result of
+                Ok resultPage ->
+                    ( Success resultPage, Cmd.none )
+
+                Err cause ->
+                    ( Failure cause, Cmd.none )
+
 
 
 -- SUBSCRIPTIONS
@@ -67,7 +72,8 @@ update msg model =
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
-  Sub.none
+    Sub.none
+
 
 
 -- VIEW
@@ -75,41 +81,54 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-  case model of
-    Failure cause ->
-      viewHttpFailure cause
+    case model of
+        Failure cause ->
+            viewHttpFailure cause
 
-    Empty ->
-      text "Ready to search:"
+        Empty ->
+            text "Ready to search:"
 
-    Loading ->
-      text "Loading..."
+        Loading ->
+            text "Loading..."
 
-    Success resultPage ->
-      viewResultPage resultPage
+        Success resultPage ->
+            viewResultPage resultPage
+
 
 viewHttpFailure : Http.Error -> Html Msg
 viewHttpFailure cause =
-  case cause of 
-    Http.BadUrl msg       -> text ("Unable to load the search results; reason: " ++ msg)
-    Http.Timeout          -> text "Unable to load the search results; reason: timeout"
-    Http.NetworkError     -> text "Unable to load the search results; reason: network error"
-    Http.BadStatus status -> text ("Unable to load the search results; reason: status " ++ (String.fromInt status))
-    Http.BadBody msg      -> text ("Unable to load the search results; reason: " ++ msg)
+    case cause of
+        Http.BadUrl msg ->
+            text ("Unable to load the search results; reason: " ++ msg)
+
+        Http.Timeout ->
+            text "Unable to load the search results; reason: timeout"
+
+        Http.NetworkError ->
+            text "Unable to load the search results; reason: network error"
+
+        Http.BadStatus status ->
+            text ("Unable to load the search results; reason: status " ++ String.fromInt status)
+
+        Http.BadBody msg ->
+            text ("Unable to load the search results; reason: " ++ msg)
+
 
 viewResultPage : ResultPage -> Html Msg
 viewResultPage page =
-  div []
-    [ text "Add results here"
-    ]
+    div []
+        [ text "Add results here"
+        ]
 
-  
+
+
 -- HTTP
 
 
 getResults : String -> Maybe Int -> Maybe Int -> Cmd Msg
-getResults query pageNumber pageSize = -- TODO arguments are currently ignored
-  Http.get
-    { url = "https://api.hemin.io/json-examples/search.json"
-    , expect = Http.expectJson GotSearchResult resultPageDecoder
-    }
+getResults query pageNumber pageSize =
+    -- TODO arguments are currently ignored
+    Http.get
+        { url = "https://api.hemin.io/json-examples/search.json"
+        , expect = Http.expectJson GotSearchResult resultPageDecoder
+        }
