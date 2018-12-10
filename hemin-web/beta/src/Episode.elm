@@ -4,6 +4,10 @@ import Json.Decode exposing (Decoder, field, int, nullable, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
+
+-- TYPES
+
+
 type alias Episode =
     { id : String
     , title : String
@@ -22,6 +26,10 @@ type alias EpisodeItunes =
     , episode : Int
     , episodeType : String
     }
+
+
+
+-- DEFAULTS
 
 
 emptyEpisodeItunes : EpisodeItunes

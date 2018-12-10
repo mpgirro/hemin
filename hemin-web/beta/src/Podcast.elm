@@ -4,6 +4,10 @@ import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
+
+-- TYPES
+
+
 type alias Podcast =
     { id : String
     , title : String
@@ -26,6 +30,10 @@ type alias PodcastItunes =
     }
 
 
+
+-- DEFAULTS
+
+
 emptyPodcastItunes : PodcastItunes
 emptyPodcastItunes =
     { summary = ""
@@ -40,12 +48,15 @@ emptyPodcastItunes =
     }
 
 
+
+-- JSON
+
+
 podcastDecoder : Decoder Podcast
 podcastDecoder =
     Json.Decode.succeed Podcast
         |> required "id" string
         |> optional "title" string ""
-        -- 2nd string is fallback
         |> optional "link" string ""
         |> optional "description" string ""
         |> optional "itunes" podcastItunesDecoder emptyPodcastItunes
@@ -56,7 +67,6 @@ podcastItunesDecoder =
     Json.Decode.succeed PodcastItunes
         |> optional "summary" string ""
         |> optional "author" string ""
-        -- 2nd string is fallback
         |> optional "keywords" (list string) []
         |> optional "categories" (list string) []
         |> optional "explicit" bool False
