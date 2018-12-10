@@ -4,10 +4,10 @@ import com.rometools.modules.atom.modules.AtomLinkModule;
 import com.rometools.modules.content.ContentModule;
 import com.rometools.modules.itunes.EntryInformation;
 import com.rometools.modules.itunes.FeedInformation;
+import com.rometools.modules.psc.modules.PodloveSimpleChapterModule;
 import com.rometools.rome.feed.atom.Link;
 import com.rometools.rome.feed.synd.SyndEntry;
 import com.rometools.rome.feed.synd.SyndFeed;
-import io.hemin.engine.parser.feed.rome.PodloveSimpleChapterModule;
 
 import java.util.Collections;
 import java.util.List;

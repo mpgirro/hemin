@@ -59,7 +59,7 @@ ext {
     guavaVersion = '24.1-jre'
     gsonVersion = '2.8.2'
     hasidsVersion = '1.0.3'
-    romeVersion = '1.9.0'
+    romeVersion = '1.12.0'
     jsoupVersion = '1.11.2'
     sttpVersion = '1.1.10'
     reactivemongoVersion = '0.16.0'

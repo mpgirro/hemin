@@ -39,7 +39,7 @@ resolvers ++= Seq(
 //val scalaVersion = "2.12.6" // TODO extract stuff from above
 val akkaVersion = "2.5.17"
 val luceneVersion = "7.5.0"
-val romeVersion = "1.10.0"
+val romeVersion = "1.12.0"
 val sttpVersion = "1.4.2"
 val scrimageVersion = "2.1.8"
 
