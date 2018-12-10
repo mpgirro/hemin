@@ -1,13 +1,16 @@
-module Page.Search exposing (..)
+module SearchPage exposing (..)
 
 import Browser
-import Html exposing (Html, Attribute, div, input, text)
+import Html exposing (Html, Attribute, div, input, text, h1)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
 import Json.Decode exposing (Decoder, field, string, bool, list)
 import Json.Decode.Pipeline exposing (required, optional, hardcoded)
 
+import Episode exposing (..)
+import Podcast exposing (..)
+import SearchResult exposing (..)
 
 
 
@@ -25,35 +28,6 @@ main =
 
 -- MODEL
 
-type alias IndexDoc =
-  { docType : String
-  , id : String
-  , title : String
-  , link : String
-  , description : String
-  , pubDate : String
-  , image : String
-  , itunesAuthor : String
-  , itunesSummary : String
-  , podcastTitle : String
-  }
-
-type alias ResultPage =
-  { currPage : Int
-  , maxPage : Int
-  , totalHits : Int
-  , results : List IndexDoc
-  }
-
-emptyResultPage : ResultPage
-emptyResultPage =
-  { currPage = 0
-  , maxPage = 0
-  , totalHits = 0
-  , results = []
-  }
-
-
 type Model
   = Failure Http.Error
   | Empty
@@ -61,9 +35,9 @@ type Model
   | Success ResultPage
 
 
-init : Model
-init =
-  Empty
+init : () -> (Model, Cmd Msg)
+init _ =
+  ( Loading , getResults "" Nothing Nothing )
 
 
 
@@ -126,7 +100,16 @@ viewHttpFailure cause =
 viewResultPage : ResultPage -> Html Msg
 viewResultPage page =
   div []
-    [ h1 [] [ text episode.title ]
-    , a [ href episode.link ] [ text episode.link ]
-    , p [] [ text episode.description ]
+    [ text "Add results here"
     ]
+
+  
+-- HTTP
+
+
+getResults : String -> Maybe Int -> Maybe Int -> Cmd Msg
+getResults query pageNumber pageSize = -- TODO arguments are currently ignored
+  Http.get
+    { url = "https://api.hemin.io/json-examples/search.json"
+    , expect = Http.expectJson GotSearchResult resultPageDecoder
+    }

@@ -1,4 +1,4 @@
-module Page.Podcast exposing (Model, Msg(..), init, view, update)
+module PodcastPage exposing (Model, Msg(..), init, view, update)
 
 import Browser
 import Html exposing (..)
@@ -31,8 +31,11 @@ type Model
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Loading , getPodcast )
+  ( Loading , getPodcast "" )
 
+initWithId : String -> (Model, Cmd Msg)
+initWithId id =
+  ( Loading , getPodcast id )
 
 
 -- UPDATE
@@ -100,8 +103,8 @@ viewPodcast podcast =
 -- HTTP
 
 
-getPodcast : Cmd Msg
-getPodcast = 
+getPodcast : String -> Cmd Msg
+getPodcast id = -- TODO id is currently ignored
   Http.get
     { url = "https://api.hemin.io/json-examples/podcast.json"
     , expect = Http.expectJson GotPodcast podcastDecoder

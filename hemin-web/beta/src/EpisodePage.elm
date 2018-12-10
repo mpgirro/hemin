@@ -1,4 +1,4 @@
-module Page.Episode exposing (Model, Msg(..), init, view, update)
+module EpisodePage exposing (Model, Msg(..), init, view, update)
 
 import Browser
 import Html exposing (..)
@@ -31,7 +31,7 @@ type Model
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Loading , getEpisode )
+  ( Loading , getEpisode "" )
 
 
 
@@ -100,8 +100,8 @@ viewEpisode episode =
 -- HTTP
 
 
-getEpisode : Cmd Msg
-getEpisode = 
+getEpisode : String -> Cmd Msg
+getEpisode id = -- TODO id is currently ignored
   Http.get
     { url = "https://api.hemin.io/json-examples/episode.json" -- "http://localhost:9000/api/v1/episode/8DTKUxDwRO991"
     , expect = Http.expectJson GotEpisode episodeDecoder
