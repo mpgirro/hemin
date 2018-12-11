@@ -1,17 +1,20 @@
-module App exposing (Model, Msg(..), Page, buildPage, footer, header, init, main, subscriptions, template, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewSearchPage)
+module App exposing (Model, Msg(..), Page, buildPage, footer, header, init, main, subscriptions, template, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
 
 import Browser
 import Browser.Navigation
-import Episode
+import Episode exposing (Episode, episodeDecoder)
 import EpisodePage
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Podcast
+import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
-import Router exposing (..)
+--import Router exposing (..)
 import SearchPage
-import Url
+import SearchResult exposing (ResultPage, resultPageDecoder)
+import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>), (<?>), Parser, oneOf, s, string)
+import Url.Parser.Query as Query
 
 
 
@@ -41,32 +44,42 @@ type alias Model =
     , content : Content
     }
 
-type Content
-  = StartContent
-  | PodcastContent PodcastPage.Model
-  | EpisodeContent EpisodePage.Model
+type Content 
+  = Failure Http.Error
+  | Loading
+  | NotFound
+  | HomeContent
+  | PodcastContent Podcast
+  | EpisodeContent Episode
+  | SearchResultContent ResultPage
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url Router.NotFound StartContent, Cmd.none )
+    ( Model key url HomePage HomeContent, Cmd.none )
 
 
 
 -- UPDATE
 
-
-type Msg
-    = LinkClicked Browser.UrlRequest
+type Msg 
+    = NoOp -- Unused?
+    | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | PodcastMsg PodcastPage.Msg
-    | EpisodeMsg EpisodePage.Msg
---    | SearchMsg SearchPage.Msg
+    | LoadPodcast String
+    | LoadedPodcast (Result Http.Error Podcast)
+    | LoadEpisode String
+    | LoadedEpisode (Result Http.Error Episode)
+    | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
+    | LoadedResultPage (Result Http.Error ResultPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
+        NoOp ->
+            ( model, Cmd.none )
+
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
@@ -76,36 +89,69 @@ update message model =
                     ( model, Browser.Navigation.load href )
 
         UrlChanged url ->
-            ( { model | route = fromUrl url }, Cmd.none )
+            let 
+                route = fromUrl url
+            in 
+                updateUrlChanged { model | route = route }
+                --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
 
-        PodcastMsg msg ->
-          case model.content of
-            PodcastContent content -> stepPodcast model (PodcastPage.update msg content)
-            _                      -> ( model, Cmd.none )
+        LoadPodcast id ->
+          ( model, getPodcast id )
 
-        EpisodeMsg msg ->
-          case model.content of
-            EpisodeContent content -> stepEpisode model (EpisodePage.update msg content)
-            _                      -> ( model, Cmd.none )
+        LoadedPodcast result ->
+            case result of
+                Ok podcast ->
+                    ( { model | content = PodcastContent podcast }, Cmd.none )
+
+                Err cause ->
+                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
+
+        LoadEpisode id ->
+            ( model, getEpisode id )
+
+        LoadedEpisode result ->
+            case result of
+                Ok episode ->
+                    ( { model | content = EpisodeContent episode }, Cmd.none )
+
+                Err cause ->
+                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
+
+        LoadResultPage query pageNumber pageSize ->
+            ( model, getSearchResults query pageNumber pageSize )
+
+        LoadedResultPage result ->
+            case result of
+                Ok resultPage ->
+                    ( { model | content = SearchResultContent resultPage }, Cmd.none )
+
+                Err cause ->
+                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
 
 
-stepPodcast : Model -> ( PodcastPage.Model, Cmd PodcastPage.Msg ) -> ( Model, Cmd Msg )
-stepPodcast model (content, cmd) =
-  ( { model | content = PodcastContent content }, Cmd.map PodcastMsg cmd )
+updateUrlChanged : Model -> (Model, Cmd Msg)
+updateUrlChanged model =
+    case model.route of 
+        HomePage ->
+            ( { model | content = HomeContent }, Cmd.none )
 
+        PodcastPage id ->
+            ( { model | content = Loading }, getPodcast id )
 
-stepEpisode : Model -> ( EpisodePage.Model, Cmd EpisodePage.Msg ) -> ( Model, Cmd Msg )
-stepEpisode model (content, cmd) =
-  ( { model | content = EpisodeContent content }, Cmd.map EpisodeMsg cmd )
+        EpisodePage id ->
+            ( { model | content = Loading }, getEpisode id )
+
+        SearchPage query pageNumber pageSize ->
+            ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
+
 
 
 -- SUBSCRIPTIONS
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
+subscriptions model =
     Sub.none
-
 
 
 -- VIEW
@@ -113,26 +159,27 @@ subscriptions _ =
 
 view : Model -> Browser.Document Msg
 view model =
-    case model.route of
-        Router.NotFound ->
-            viewNotFound model
+    case model.content of
+        Failure cause ->
+            viewHttpFailurePage cause
+            
+        Loading ->
+            viewLoadingPage
 
-        Router.HomePage ->
-            viewHomePage model
+        NotFound ->
+            viewNotFound
 
-        Router.RootPage ->
-            viewHomePage model
+        HomeContent ->
+            viewHomePage
 
-        Router.PodcastPage _ ->
-            viewPodcastPage model
+        PodcastContent podcast ->
+            viewPodcastPage podcast
 
-        Router.EpisodePage _ ->
-            viewEpisodePage model
+        EpisodeContent episode ->
+            viewEpisodePage episode
 
-        Router.SearchPage query pageNumber pageSize ->
-            viewSearchPage model
-
-
+        SearchResultContent resultPage ->
+            viewResultPage resultPage
 
 
 type alias Page msg =
@@ -175,8 +222,17 @@ template content =
     , footer
     ]
 
-viewNotFound : Model -> Page msg
-viewNotFound model =
+viewLoadingPage : Page msg
+viewLoadingPage =
+    buildPage "Loading"
+        (template
+            (div []
+                [ p [] [ text "Loading..." ] ]
+            )
+        )
+
+viewNotFound : Page msg
+viewNotFound =
     buildPage "Not Found"
         (template
             (div []
@@ -185,8 +241,8 @@ viewNotFound model =
         )
 
 
-viewHomePage : Model -> Page msg
-viewHomePage model =
+viewHomePage : Page msg
+viewHomePage =
     buildPage "Home Page"
         (template
             (div []
@@ -194,31 +250,39 @@ viewHomePage model =
             )
         )
 
-viewPodcastPage : Model -> Page msg
-viewPodcastPage model =
-  case model.content of
-    PodcastContent content ->
-      let 
-        body = PodcastPage.view content
-      in 
-        buildPage "Podcast" (template body)
+viewPodcast : Podcast -> Html msg
+viewPodcast podcast =
+    div []
+        [ h1 [] [ text podcast.title ]
+        , a [ href podcast.link ] [ text podcast.link ]
+        , p [] [ text podcast.description ]
+        ]
 
-    _ ->
-      viewNotFound model
+viewPodcastPage : Podcast -> Page msg
+viewPodcastPage podcast =
+  let 
+    body = viewPodcast podcast -- PodcastPage.view podcast
+  in 
+    buildPage "Podcast" (template body)
 
+viewEpisode : Episode -> Html msg
+viewEpisode episode =
+    div []
+        [ h1 [] [ text episode.title ]
+        , a [ href episode.link ] [ text episode.link ]
+        , p [] [ text episode.description ]
+        ]
 
-viewEpisodePage : Model -> Page msg
-viewEpisodePage model =
-  case model.content of
-    EpisodeContent content ->
-      buildPage "Episode" (template (EpisodePage.view content) )
+viewEpisodePage : Episode -> Page msg
+viewEpisodePage episode =
+  let 
+    body = viewEpisode episode -- EpisodePage.view episode
+  in 
+    buildPage "Episode" (template body)
 
-    _ ->
-      viewNotFound model
-
-
-viewSearchPage : Model -> Page msg
-viewSearchPage model =
+-- TODO replace with propper impl.
+viewResultPage : ResultPage -> Page msg
+viewResultPage resultPage =
     buildPage "Search"
         (template
             (div []
@@ -226,14 +290,13 @@ viewSearchPage model =
             )
         )
 
-
 viewLink : String -> Html msg
 viewLink path =
     li []
         [ a [ href path ] [ text path ]
         ]
 
-viewHttpFailure : Http.Error -> Html Msg
+viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure cause =
     case cause of
         Http.BadUrl msg ->
@@ -250,3 +313,61 @@ viewHttpFailure cause =
 
         Http.BadBody msg ->
             text ("Unable to load the data; reason: " ++ msg)
+
+viewHttpFailurePage : Http.Error -> Page msg
+viewHttpFailurePage cause =
+  let 
+    body = viewHttpFailure cause 
+  in 
+    buildPage "Error" (template body)
+
+
+-- ROUTER
+
+
+type Route
+  = HomePage
+  | PodcastPage String
+  | EpisodePage String
+  | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
+
+parser : Parser (Route -> a) a
+parser =
+    oneOf
+        [ Parser.map HomePage Parser.top
+        , Parser.map PodcastPage (s "p" </> string)
+        , Parser.map EpisodePage (s "e" </> string)
+        , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
+        ]
+
+fromUrl : Url.Url -> Route
+fromUrl url =
+    Maybe.withDefault HomePage (Parser.parse parser url)
+
+
+-- HTTP
+
+
+getPodcast : String -> Cmd Msg
+getPodcast id =
+    -- TODO id is currently ignored
+    Http.get
+        { url = "https://api.hemin.io/json-examples/podcast.json"
+        , expect = Http.expectJson LoadedPodcast podcastDecoder
+        }
+
+getEpisode : String -> Cmd Msg
+getEpisode id =
+    -- TODO id is currently ignored
+    Http.get
+        { url = "https://api.hemin.io/json-examples/episode.json" -- "http://localhost:9000/api/v1/episode/8DTKUxDwRO991"
+        , expect = Http.expectJson LoadedEpisode episodeDecoder
+        }
+
+getSearchResults : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> Cmd Msg
+getSearchResults query pageNumber pageSize =
+    -- TODO args are currently ignored
+    Http.get
+        { url = "https://api.hemin.io/json-examples/search.json"
+        , expect = Http.expectJson LoadedResultPage resultPageDecoder
+        }
