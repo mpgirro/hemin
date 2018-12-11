@@ -49,7 +49,7 @@ template content =
 navbar : Html msg
 navbar =
     -- the model is currently ignored! (we neither hold state nor provide functionality)
-    nav [ class "navbar" ]
+    nav [ class "navbar", class "navbar-expand-lg" ]
         [ a [ class "navbar-brand", href "/" ] [ text "HEMIN" ]
         , ul [ class "navbar-nav" ]
             [ li [ class "nav-item" ]

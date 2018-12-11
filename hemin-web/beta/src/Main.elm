@@ -57,7 +57,17 @@ type Content
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
 --    ( Model key url HomePage HomeContent, Cmd.none )
-    update (UrlChanged url) (Model key url HomePage HomeContent)
+--    update (UrlChanged url) (Model key url (Router.fromUrl url) HomeContent)
+    let
+        model = 
+            { key = key
+            , url = url
+            , route = Router.fromUrl url
+            , content = Loading
+            }
+        --    Model key url (Router.fromUrl url) Loading
+    in
+    ( model, Browser.Navigation.pushUrl key (Url.toString url) )
 
 
 
