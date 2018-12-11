@@ -56,7 +56,10 @@ type Content
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url HomePage HomeContent, Cmd.none )
+--    ( Model key url HomePage HomeContent, Cmd.none )
+    update (UrlChanged url) (Model key url HomePage HomeContent)
+
+
 
 
 
