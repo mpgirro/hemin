@@ -32,11 +32,14 @@ buildPage title body =
 
 template : Html msg -> List (Html msg)
 template content =
-    [ header
-    , content
-    , footer
+    [ div [ class "container" ] 
+        [ navbar
+        , header
+        , content
+        , footer
+        ]
     ]
-
+    
 navbar : Html msg
 navbar =
     -- the model is currently ignored! (we neither hold state nor provide functionality)

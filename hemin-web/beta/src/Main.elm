@@ -1,4 +1,4 @@
-module App exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
 
 import Browser
 import Browser.Navigation
@@ -60,8 +60,7 @@ init flags url key =
 -- UPDATE
 
 type Msg 
-    = NoOp -- Unused?
-    | LinkClicked Browser.UrlRequest
+    = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | LoadPodcast String
     | LoadedPodcast (Result Http.Error Podcast)
@@ -74,9 +73,6 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        NoOp ->
-            ( model, Cmd.none )
-
         LinkClicked urlRequest ->
             case urlRequest of
                 Browser.Internal url ->
