@@ -72,7 +72,7 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
@@ -85,7 +85,7 @@ view model =
             viewEpisode episode
 
 
-viewHttpFailure : Http.Error -> Html Msg
+viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure cause =
     case cause of
         Http.BadUrl msg ->
@@ -104,7 +104,7 @@ viewHttpFailure cause =
             text ("Unable to load the episode; reason: " ++ msg)
 
 
-viewEpisode : Episode -> Html Msg
+viewEpisode : Episode -> Html msg
 viewEpisode episode =
     div []
         [ h1 [] [ text episode.title ]

@@ -77,7 +77,7 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
@@ -90,7 +90,7 @@ view model =
             viewPodcast podcast
 
 
-viewHttpFailure : Http.Error -> Html Msg
+viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure cause =
     case cause of
         Http.BadUrl msg ->
@@ -109,7 +109,7 @@ viewHttpFailure cause =
             text ("Unable to load the podcast; reason: " ++ msg)
 
 
-viewPodcast : Podcast -> Html Msg
+viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
     div []
         [ h1 [] [ text podcast.title ]

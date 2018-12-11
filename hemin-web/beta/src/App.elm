@@ -194,12 +194,14 @@ viewHomePage model =
             )
         )
 
-
 viewPodcastPage : Model -> Page msg
 viewPodcastPage model =
   case model.content of
     PodcastContent content ->
-      buildPage "Podcast" (template (PodcastPage.view content) )
+      let 
+        body = PodcastPage.view content
+      in 
+        buildPage "Podcast" (template body)
 
     _ ->
       viewNotFound model
