@@ -6,7 +6,7 @@ Try out:
 
 Compile the webapp with:
 
-    elm make src/Main.elm --output=elm.js
+    elm make src/Main.elm --output=public/elm.js
 
 Test in a local HTTP server like [http-server](https://www.npmjs.com/package/http-server)
 
