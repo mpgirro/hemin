@@ -9,10 +9,12 @@ import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
-import Router exposing (..)
+--import Router exposing (..)
 import SearchPage
 import SearchResult exposing (ResultPage, resultPageDecoder)
-import Url
+import Url exposing (Url)
+import Url.Parser as Parser exposing ((</>), (<?>), Parser, oneOf, s, string)
+import Url.Parser.Query as Query
 
 
 
@@ -46,7 +48,7 @@ type Content
   = Failure Http.Error
   | Loading
   | NotFound
-  | StartContent
+  | HomeContent
   | PodcastContent Podcast
   | EpisodeContent Episode
   | SearchResultContent ResultPage
@@ -54,14 +56,14 @@ type Content
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
-    ( Model key url Router.NotFound StartContent, Cmd.none )
+    ( Model key url HomePage HomeContent, Cmd.none )
 
 
 
 -- UPDATE
 
 type Msg 
-    = NoOp
+    = NoOp -- Unused?
     | LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | LoadPodcast String
@@ -90,7 +92,8 @@ update message model =
             let 
                 route = fromUrl url
             in 
-                ( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
+                updateUrlChanged { model | route = route }
+                --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
 
         LoadPodcast id ->
           ( model, getPodcast id )
@@ -125,6 +128,24 @@ update message model =
                 Err cause ->
                     ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
 
+
+updateUrlChanged : Model -> (Model, Cmd Msg)
+updateUrlChanged model =
+    case model.route of 
+        HomePage ->
+            ( { model | content = HomeContent }, Cmd.none )
+
+        PodcastPage id ->
+            ( { model | content = Loading }, getPodcast id )
+
+        EpisodePage id ->
+            ( { model | content = Loading }, getEpisode id )
+
+        SearchPage query pageNumber pageSize ->
+            ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
+
+
+
 -- SUBSCRIPTIONS
 
 
@@ -148,7 +169,7 @@ view model =
         NotFound ->
             viewNotFound
 
-        StartContent ->
+        HomeContent ->
             viewHomePage
 
         PodcastContent podcast ->
@@ -300,28 +321,28 @@ viewHttpFailurePage cause =
   in 
     buildPage "Error" (template body)
 
--- UTILITIES
 
-cmdFromRoute : Route -> Msg -- Cmd Msg
-cmdFromRoute route =
-    case route of
-        Router.NotFound ->
-            NoOp -- TODO 
+-- ROUTER
 
-        Router.HomePage ->
-            NoOp  -- TODO 
 
-        Router.RootPage ->
-            NoOp  -- TODO 
+type Route
+  = HomePage
+  | PodcastPage String
+  | EpisodePage String
+  | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
 
-        Router.PodcastPage id ->
-            LoadPodcast id
+parser : Parser (Route -> a) a
+parser =
+    oneOf
+        [ Parser.map HomePage Parser.top
+        , Parser.map PodcastPage (s "p" </> string)
+        , Parser.map EpisodePage (s "e" </> string)
+        , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
+        ]
 
-        Router.EpisodePage id ->
-            LoadEpisode id
-
-        Router.SearchPage query pageNumber pageSize ->
-            LoadResultPage query pageNumber pageSize
+fromUrl : Url.Url -> Route
+fromUrl url =
+    Maybe.withDefault HomePage (Parser.parse parser url)
 
 
 -- HTTP
