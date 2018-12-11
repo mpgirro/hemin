@@ -15,6 +15,8 @@ import SearchResult exposing (ResultPage, resultPageDecoder)
 import Skeleton exposing (Page)
 import Url exposing (Url)
 
+
+
 -- MAIN
 
 
@@ -41,14 +43,15 @@ type alias Model =
     , content : Content
     }
 
-type Content 
-  = Failure Http.Error
-  | Loading
-  | NotFound
-  | HomeContent
-  | PodcastContent Podcast
-  | EpisodeContent Episode
-  | SearchResultContent ResultPage
+
+type Content
+    = Failure Http.Error
+    | Loading
+    | NotFound
+    | HomeContent
+    | PodcastContent Podcast
+    | EpisodeContent Episode
+    | SearchResultContent ResultPage
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
@@ -59,7 +62,8 @@ init flags url key =
 
 -- UPDATE
 
-type Msg 
+
+type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | LoadPodcast String
@@ -82,14 +86,15 @@ update message model =
                     ( model, Browser.Navigation.load href )
 
         UrlChanged url ->
-            let 
-                route = Router.fromUrl url
-            in 
-                updateUrlChanged { model | route = route }
-                --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
+            let
+                route =
+                    Router.fromUrl url
+            in
+            updateUrlChanged { model | route = route }
 
+        --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
         LoadPodcast id ->
-          ( model, getPodcast id )
+            ( model, getPodcast id )
 
         LoadedPodcast result ->
             case result of
@@ -97,8 +102,9 @@ update message model =
                     ( { model | content = PodcastContent podcast }, Cmd.none )
 
                 Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
+                    ( { model | content = Failure cause }, Cmd.none )
 
+        -- TODO outsource to utility func
         LoadEpisode id ->
             ( model, getEpisode id )
 
@@ -108,8 +114,9 @@ update message model =
                     ( { model | content = EpisodeContent episode }, Cmd.none )
 
                 Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
+                    ( { model | content = Failure cause }, Cmd.none )
 
+        -- TODO outsource to utility func
         LoadResultPage query pageNumber pageSize ->
             ( model, getSearchResults query pageNumber pageSize )
 
@@ -119,12 +126,16 @@ update message model =
                     ( { model | content = SearchResultContent resultPage }, Cmd.none )
 
                 Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none ) -- TODO outsource to utility func
+                    ( { model | content = Failure cause }, Cmd.none )
 
 
-updateUrlChanged : Model -> (Model, Cmd Msg)
+
+-- TODO outsource to utility func
+
+
+updateUrlChanged : Model -> ( Model, Cmd Msg )
 updateUrlChanged model =
-    case model.route of 
+    case model.route of
         HomePage ->
             ( { model | content = HomeContent }, Cmd.none )
 
@@ -147,6 +158,7 @@ subscriptions model =
     Sub.none
 
 
+
 -- VIEW
 
 
@@ -155,7 +167,7 @@ view model =
     case model.content of
         Failure cause ->
             viewHttpFailurePage cause
-            
+
         Loading ->
             viewLoadingPage
 
@@ -175,30 +187,32 @@ view model =
             viewResultPage resultPage
 
 
-
-
-
 viewLoadingPage : Page msg
 viewLoadingPage =
-  let 
-    body = (div [] [ p [] [ text "Loading..." ] ] )
-  in
+    let
+        body =
+            div [] [ p [] [ text "Loading..." ] ]
+    in
     Skeleton.view "Loading" body
+
 
 viewNotFound : Page msg
 viewNotFound =
-  let 
-    body = (div [] [ p [] [ text "Not Found" ] ] )
-  in
+    let
+        body =
+            div [] [ p [] [ text "Not Found" ] ]
+    in
     Skeleton.view "Not Found" body
 
 
 viewHomePage : Page msg
 viewHomePage =
-  let 
-    body = (div [] [ p [] [ text "Homepage" ] ] )
-  in
+    let
+        body =
+            div [] [ p [] [ text "Homepage" ] ]
+    in
     Skeleton.view "Home Page" body
+
 
 viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
@@ -208,12 +222,17 @@ viewPodcast podcast =
         , p [] [ text podcast.description ]
         ]
 
+
 viewPodcastPage : Podcast -> Page msg
 viewPodcastPage podcast =
-  let 
-    body = viewPodcast podcast -- PodcastPage.view podcast
-  in 
+    let
+        body =
+            viewPodcast podcast
+
+        -- PodcastPage.view podcast
+    in
     Skeleton.view "Podcast" body
+
 
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
@@ -223,26 +242,37 @@ viewEpisode episode =
         , p [] [ text episode.description ]
         ]
 
+
 viewEpisodePage : Episode -> Page msg
 viewEpisodePage episode =
-  let 
-    body = viewEpisode episode -- EpisodePage.view episode
-  in 
+    let
+        body =
+            viewEpisode episode
+
+        -- EpisodePage.view episode
+    in
     Skeleton.view "Episode" body
 
+
+
 -- TODO replace with propper impl.
+
+
 viewResultPage : ResultPage -> Page msg
 viewResultPage resultPage =
-  let 
-    body = (div [] [ p [] [ text "Search Results Page" ] ] )
-  in
+    let
+        body =
+            div [] [ p [] [ text "Search Results Page" ] ]
+    in
     Skeleton.view "Search" body
+
 
 viewLink : String -> Html msg
 viewLink path =
     li []
         [ a [ href path ] [ text path ]
         ]
+
 
 viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure cause =
@@ -262,12 +292,15 @@ viewHttpFailure cause =
         Http.BadBody msg ->
             text ("Unable to load the data; reason: " ++ msg)
 
+
 viewHttpFailurePage : Http.Error -> Page msg
 viewHttpFailurePage cause =
-  let 
-    body = viewHttpFailure cause 
-  in 
+    let
+        body =
+            viewHttpFailure cause
+    in
     Skeleton.view "Error" body
+
 
 
 -- HTTP
@@ -281,6 +314,7 @@ getPodcast id =
         , expect = Http.expectJson LoadedPodcast podcastDecoder
         }
 
+
 getEpisode : String -> Cmd Msg
 getEpisode id =
     -- TODO id is currently ignored
@@ -289,7 +323,8 @@ getEpisode id =
         , expect = Http.expectJson LoadedEpisode episodeDecoder
         }
 
-getSearchResults : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> Cmd Msg
+
+getSearchResults : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg
 getSearchResults query pageNumber pageSize =
     -- TODO args are currently ignored
     Http.get

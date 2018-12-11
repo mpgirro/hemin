@@ -1,4 +1,4 @@
-module Router exposing (Route(..), parser, fromUrl)
+module Router exposing (Route(..), fromUrl, parser)
 
 import Browser.Navigation as Nav
 import Html exposing (Attribute)
@@ -13,10 +13,11 @@ import Url.Parser.Query as Query
 
 
 type Route
-  = HomePage
-  | PodcastPage String
-  | EpisodePage String
-  | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
+    = HomePage
+    | PodcastPage String
+    | EpisodePage String
+    | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
+
 
 parser : Parser (Route -> a) a
 parser =
@@ -26,6 +27,7 @@ parser =
         , Parser.map EpisodePage (s "e" </> string)
         , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
         ]
+
 
 fromUrl : Url.Url -> Route
 fromUrl url =

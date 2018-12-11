@@ -5,7 +5,9 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 
 
+
 -- MODEL
+
 
 type alias Page msg =
     { title : String
@@ -13,12 +15,14 @@ type alias Page msg =
     }
 
 
+
 -- VIEW
 
 
 view : String -> Html msg -> Page msg
-view title body = 
+view title body =
     buildPage title (template body)
+
 
 
 -- INTERNAL
@@ -30,33 +34,36 @@ buildPage title body =
     , body = body
     }
 
+
 template : Html msg -> List (Html msg)
 template content =
-    [ div [ class "container" ] 
+    [ div [ class "container" ]
         [ navbar
         , header
         , content
         , footer
         ]
     ]
-    
+
+
 navbar : Html msg
 navbar =
     -- the model is currently ignored! (we neither hold state nor provide functionality)
     nav [ class "navbar" ]
         [ a [ class "navbar-brand", href "/" ] [ text "HEMIN" ]
         , ul [ class "navbar-nav" ]
-            [ li [ class "nav-item" ] 
-                [ a [ class "nav-link", href "/search" ] [ text "search" ] 
+            [ li [ class "nav-item" ]
+                [ a [ class "nav-link", href "/search" ] [ text "search" ]
                 ]
-            , li [ class "nav-item" ] 
-                [ a [ class "nav-link", href "/discover" ] [ text "discover" ] 
+            , li [ class "nav-item" ]
+                [ a [ class "nav-link", href "/discover" ] [ text "discover" ]
                 ]
-            , li [ class "nav-item" ] 
-                [ a [ class "nav-link", href "/propose" ] [ text "+feed" ] 
+            , li [ class "nav-item" ]
+                [ a [ class "nav-link", href "/propose" ] [ text "+feed" ]
                 ]
             ]
         ]
+
 
 header : Html msg
 header =
@@ -76,7 +83,6 @@ footer =
     div []
         [ p [] [ text "Footer" ]
         ]
-
 
 
 viewLink : String -> Html msg
