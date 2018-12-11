@@ -1,4 +1,4 @@
-module App exposing (Model, Msg(..), Page, buildPage, footer, header, init, main, subscriptions, template, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
+module App exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
 
 import Browser
 import Browser.Navigation
@@ -12,6 +12,7 @@ import PodcastPage
 import Router exposing (Route(..), fromUrl, parser)
 import SearchPage
 import SearchResult exposing (ResultPage, resultPageDecoder)
+import Skeleton exposing (Page)
 import Url exposing (Url)
 
 -- MAIN
@@ -178,73 +179,30 @@ view model =
             viewResultPage resultPage
 
 
-type alias Page msg =
-    { title : String
-    , body : List (Html msg)
-    }
 
 
-buildPage : String -> List (Html msg) -> Page msg
-buildPage title body =
-    { title = title
-    , body = body
-    }
-
-
-header : Html msg
-header =
-    div []
-        [ p [] [ text "Header" ]
-        , ul []
-            [ viewLink "/p/abc"
-            , viewLink "/e/abc"
-            , viewLink "/discover"
-            , viewLink "/search?q=abc&p=1&s=1"
-            ]
-        ]
-
-
-footer : Html msg
-footer =
-    div []
-        [ p [] [ text "Footer" ]
-        ]
-
-
-template : Html msg -> List (Html msg)
-template content =
-    [ header
-    , content
-    , footer
-    ]
 
 viewLoadingPage : Page msg
 viewLoadingPage =
-    buildPage "Loading"
-        (template
-            (div []
-                [ p [] [ text "Loading..." ] ]
-            )
-        )
+  let 
+    body = (div [] [ p [] [ text "Loading..." ] ] )
+  in
+    Skeleton.view "Loading" body
 
 viewNotFound : Page msg
 viewNotFound =
-    buildPage "Not Found"
-        (template
-            (div []
-                [ p [] [ text "Not Found" ] ]
-            )
-        )
+  let 
+    body = (div [] [ p [] [ text "Not Found" ] ] )
+  in
+    Skeleton.view "Not Found" body
 
 
 viewHomePage : Page msg
 viewHomePage =
-    buildPage "Home Page"
-        (template
-            (div []
-                [ p [] [ text "Homepage" ] ]
-            )
-        )
+  let 
+    body = (div [] [ p [] [ text "Homepage" ] ] )
+  in
+    Skeleton.view "Home Page" body
 
 viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
@@ -259,7 +217,7 @@ viewPodcastPage podcast =
   let 
     body = viewPodcast podcast -- PodcastPage.view podcast
   in 
-    buildPage "Podcast" (template body)
+    Skeleton.view "Podcast" body
 
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
@@ -274,17 +232,15 @@ viewEpisodePage episode =
   let 
     body = viewEpisode episode -- EpisodePage.view episode
   in 
-    buildPage "Episode" (template body)
+    Skeleton.view "Episode" body
 
 -- TODO replace with propper impl.
 viewResultPage : ResultPage -> Page msg
 viewResultPage resultPage =
-    buildPage "Search"
-        (template
-            (div []
-                [ p [] [ text "Search Results Page" ] ]
-            )
-        )
+  let 
+    body = (div [] [ p [] [ text "Search Results Page" ] ] )
+  in
+    Skeleton.view "Search" body
 
 viewLink : String -> Html msg
 viewLink path =
@@ -315,7 +271,7 @@ viewHttpFailurePage cause =
   let 
     body = viewHttpFailure cause 
   in 
-    buildPage "Error" (template body)
+    Skeleton.view "Error" body
 
 
 -- HTTP
