@@ -9,14 +9,10 @@ import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
---import Router exposing (..)
+import Router exposing (Route(..), fromUrl, parser)
 import SearchPage
 import SearchResult exposing (ResultPage, resultPageDecoder)
 import Url exposing (Url)
-import Url.Parser as Parser exposing ((</>), (<?>), Parser, oneOf, s, string)
-import Url.Parser.Query as Query
-
-
 
 -- MAIN
 
@@ -90,7 +86,7 @@ update message model =
 
         UrlChanged url ->
             let 
-                route = fromUrl url
+                route = Router.fromUrl url
             in 
                 updateUrlChanged { model | route = route }
                 --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
@@ -320,29 +316,6 @@ viewHttpFailurePage cause =
     body = viewHttpFailure cause 
   in 
     buildPage "Error" (template body)
-
-
--- ROUTER
-
-
-type Route
-  = HomePage
-  | PodcastPage String
-  | EpisodePage String
-  | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
-
-parser : Parser (Route -> a) a
-parser =
-    oneOf
-        [ Parser.map HomePage Parser.top
-        , Parser.map PodcastPage (s "p" </> string)
-        , Parser.map EpisodePage (s "e" </> string)
-        , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
-        ]
-
-fromUrl : Url.Url -> Route
-fromUrl url =
-    Maybe.withDefault HomePage (Parser.parse parser url)
 
 
 -- HTTP
