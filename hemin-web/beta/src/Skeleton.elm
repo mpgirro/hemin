@@ -1,4 +1,4 @@
-module Skeleton exposing (Page, view, viewHttpFailure)
+module Skeleton exposing (Page, view, viewHttpFailure, viewLoadingPage)
 
 import Browser
 import Html exposing (..)
@@ -44,6 +44,13 @@ viewHttpFailure cause =
             text ("Unable to load the data; reason: " ++ msg)
 
 
+viewLoadingPage : Page msg
+viewLoadingPage =
+    let
+        body =
+            div [] [ p [] [ text "Loading..." ] ]
+    in
+    view "Loading" body
 
 -- INTERNAL
 

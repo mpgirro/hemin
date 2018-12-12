@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewPodcastPage, viewResultPage)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewResultPage)
 
 import Browser
 import Browser.Navigation
@@ -50,8 +50,7 @@ type Content
     | Loading
     | NotFound
     | HomeContent
-    | PodcastModel PodcastPage.Model
---    | PodcastContent Podcast
+    | PodcastContent PodcastPage.Model
     | EpisodeContent Episode
     | SearchResultContent ResultPage
 
@@ -76,8 +75,6 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
---    | LoadPodcast String
---    | LoadedPodcast (Result Http.Error Podcast)
     | PodcastMsg PodcastPage.Msg
     | LoadEpisode String
     | LoadedEpisode (Result Http.Error Episode)
@@ -103,27 +100,8 @@ update message model =
             in
             updateUrlChanged { model | route = route }
 
-
---        LoadPodcast id ->
---            ( model, getPodcast id )
-
---        LoadedPodcast result ->
---            case result of
---                Ok podcast ->
---                    ( { model | content = PodcastContent podcast }, Cmd.none )
-
---                Err cause ->
---                    ( { model | content = Failure cause }, Cmd.none )
-
         PodcastMsg msg ->
-            case model.content of
-                PodcastModel content ->
-                    let
-                        (pModel, pMsg) = PodcastPage.update msg content
-                    in
-                    ({ model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg)
-            
-                _ -> ( model, Cmd.none )
+            updatePodcastContent model msg
 
         -- TODO outsource to utility func
         LoadEpisode id ->
@@ -169,10 +147,21 @@ updateUrlChanged model =
         SearchPage query pageNumber pageSize ->
             ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
 
+updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
+updatePodcastContent model msg =
+    case model.content of
+        PodcastContent content ->
+            let
+                (pModel, pMsg) = PodcastPage.update msg content
+            in
+             ({ model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg)
+            
+        _ -> ( model, Cmd.none )
+
 
 wrapPodcastModel : PodcastPage.Model -> Content
 wrapPodcastModel model =
-    PodcastModel model
+    PodcastContent model
 
 
 wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg 
@@ -200,7 +189,7 @@ view model =
             viewHttpFailurePage cause
 
         Loading ->
-            viewLoadingPage
+            Skeleton.viewLoadingPage
 
         NotFound ->
             viewNotFound
@@ -208,26 +197,14 @@ view model =
         HomeContent ->
             viewHomePage
 
- --       PodcastContent podcast ->
- --           viewPodcastPage podcast
-
-        PodcastModel content ->
-            viewPodcastPage content
+        PodcastContent content ->
+            Skeleton.view "Podcast" (PodcastPage.view content)
 
         EpisodeContent episode ->
             viewEpisodePage episode
 
         SearchResultContent resultPage ->
             viewResultPage resultPage
-
-
-viewLoadingPage : Page msg
-viewLoadingPage =
-    let
-        body =
-            div [] [ p [] [ text "Loading..." ] ]
-    in
-    Skeleton.view "Loading" body
 
 
 viewNotFound : Page msg
@@ -246,24 +223,6 @@ viewHomePage =
             div [] [ p [] [ text "Homepage" ] ]
     in
     Skeleton.view "HEMIN : Podcast Catalog & Search" body
-
-
-viewPodcast : Podcast -> Html msg
-viewPodcast podcast =
-    div []
-        [ h1 [] [ text podcast.title ]
-        , a [ href podcast.link ] [ text podcast.link ]
-        , p [] [ text podcast.description ]
-        ]
-
-
---viewPodcastPage : Podcast -> Page msg
---viewPodcastPage podcast =
---    Skeleton.view "Podcast" (viewPodcast podcast)
-
-viewPodcastPage : PodcastPage.Model -> Page msg
-viewPodcastPage model =
-    Skeleton.view "Podcast" (PodcastPage.view model)
 
 
 viewEpisode : Episode -> Html msg
@@ -307,15 +266,6 @@ viewHttpFailurePage cause =
 
 
 -- HTTP
-
-
---getPodcast : String -> Cmd Msg
---getPodcast id =
-    -- TODO id is currently ignored
---    Http.get
---        { url = "https://api.hemin.io/json-examples/podcast.json"
---        , expect = Http.expectJson LoadedPodcast podcastDecoder
---        }
 
 
 getEpisode : String -> Cmd Msg
