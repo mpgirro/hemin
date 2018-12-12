@@ -17,7 +17,7 @@ import Url exposing (Url)
 
 
 
--- MAIN
+---- PROGRAM ----
 
 
 main : Program () Model Msg
@@ -33,7 +33,7 @@ main =
 
 
 
--- MODEL
+---- MODEL ----
 
 
 type alias Model =
@@ -56,24 +56,23 @@ type Content
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
---    ( Model key url HomePage HomeContent, Cmd.none )
---    update (UrlChanged url) (Model key url (Router.fromUrl url) HomeContent)
+    --    ( Model key url HomePage HomeContent, Cmd.none )
+    --    update (UrlChanged url) (Model key url (Router.fromUrl url) HomeContent)
     let
-        model = 
+        model =
             { key = key
             , url = url
             , route = Router.fromUrl url
             , content = Loading
             }
+
         --    Model key url (Router.fromUrl url) Loading
     in
     ( model, Browser.Navigation.pushUrl key (Url.toString url) )
 
 
 
-
-
--- UPDATE
+---- UPDATE ----
 
 
 type Msg
@@ -172,7 +171,7 @@ subscriptions model =
 
 
 
--- VIEW
+---- VIEW ----
 
 
 view : Model -> Browser.Document Msg
