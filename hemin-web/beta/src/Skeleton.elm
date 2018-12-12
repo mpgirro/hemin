@@ -68,7 +68,10 @@ navbar : Html msg
 navbar =
     -- the model is currently ignored! (we neither hold state nor provide functionality)
     nav [ class "navbar", class "navbar-expand-lg" ]
-        [ a [ class "navbar-brand", href "/" ] [ text "HEMIN" ]
+        [ a [ class "navbar-brand", href "/" ] 
+            [ img [ src "/logo.svg", width 30, height 30, class "d-inline-block align-top", alt "" ] [] 
+            , text "HEMIN" 
+            ]
         , ul [ class "navbar-nav" ]
             [ li [ class "nav-item" ]
                 [ a [ class "nav-link", href "/search" ] [ text "search" ]

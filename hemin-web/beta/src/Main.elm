@@ -224,7 +224,7 @@ viewHomePage =
         body =
             div [] [ p [] [ text "Homepage" ] ]
     in
-    Skeleton.view "Home Page" body
+    Skeleton.view "HEMIN | Home" body
 
 
 viewPodcast : Podcast -> Html msg
