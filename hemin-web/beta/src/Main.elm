@@ -238,13 +238,7 @@ viewPodcast podcast =
 
 viewPodcastPage : Podcast -> Page msg
 viewPodcastPage podcast =
-    let
-        body =
-            viewPodcast podcast
-
-        -- PodcastPage.view podcast
-    in
-    Skeleton.view "Podcast" body
+    Skeleton.view "Podcast" (viewPodcast podcast)
 
 
 viewEpisode : Episode -> Html msg
@@ -258,13 +252,7 @@ viewEpisode episode =
 
 viewEpisodePage : Episode -> Page msg
 viewEpisodePage episode =
-    let
-        body =
-            viewEpisode episode
-
-        -- EpisodePage.view episode
-    in
-    Skeleton.view "Episode" body
+    Skeleton.view "Episode" (viewEpisode episode)
 
 
 
@@ -287,32 +275,9 @@ viewLink path =
         ]
 
 
-viewHttpFailure : Http.Error -> Html msg
-viewHttpFailure cause =
-    case cause of
-        Http.BadUrl msg ->
-            text ("Unable to load the data; reason: " ++ msg)
-
-        Http.Timeout ->
-            text "Unable to load the data; reason: timeout"
-
-        Http.NetworkError ->
-            text "Unable to load the data; reason: network error"
-
-        Http.BadStatus status ->
-            text ("Unable to load the data; reason: status " ++ String.fromInt status)
-
-        Http.BadBody msg ->
-            text ("Unable to load the data; reason: " ++ msg)
-
-
 viewHttpFailurePage : Http.Error -> Page msg
 viewHttpFailurePage cause =
-    let
-        body =
-            viewHttpFailure cause
-    in
-    Skeleton.view "Error" body
+    Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
 
 
 

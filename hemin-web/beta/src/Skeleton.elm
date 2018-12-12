@@ -1,9 +1,9 @@
-module Skeleton exposing (Page, view)
+module Skeleton exposing (Page, view, viewHttpFailure)
 
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
-
+import Http
 
 
 -- MODEL
@@ -23,6 +23,24 @@ view : String -> Html msg -> Page msg
 view title body =
     buildPage title (template body)
 
+
+viewHttpFailure : Http.Error -> Html msg
+viewHttpFailure cause =
+    case cause of
+        Http.BadUrl msg ->
+            text ("Unable to load the data; reason: " ++ msg)
+
+        Http.Timeout ->
+            text "Unable to load the data; reason: timeout"
+
+        Http.NetworkError ->
+            text "Unable to load the data; reason: network error"
+
+        Http.BadStatus status ->
+            text ("Unable to load the data; reason: status " ++ String.fromInt status)
+
+        Http.BadBody msg ->
+            text ("Unable to load the data; reason: " ++ msg)
 
 
 -- INTERNAL
