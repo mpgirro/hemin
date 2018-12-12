@@ -5,7 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (..)
-
+import Skeleton exposing (Page, viewHttpFailure)
 
 
 -- MAIN
@@ -27,7 +27,7 @@ main =
 type Model
     = Failure Http.Error
     | Loading
-    | Success Podcast
+    | Content Podcast
 
 
 init : () -> ( Model, Cmd Msg )
@@ -45,20 +45,20 @@ initWithId id =
 
 
 type Msg
-    = GotPodcast (Result Http.Error Podcast)
-
-
-
---  | GotEpisodes (Result Http.Error String)
+    = LoadPodcast String
+    | LoadedPodcast (Result Http.Error Podcast)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        GotPodcast result ->
+        LoadPodcast id ->
+            ( model, getPodcast id )
+
+        LoadedPodcast result ->
             case result of
                 Ok podcast ->
-                    ( Success podcast, Cmd.none )
+                    ( Content podcast, Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
@@ -81,32 +81,13 @@ view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
-            viewHttpFailure cause
+            Skeleton.viewHttpFailure cause
 
         Loading ->
             text "Loading..."
 
-        Success podcast ->
+        Content podcast ->
             viewPodcast podcast
-
-
-viewHttpFailure : Http.Error -> Html msg
-viewHttpFailure cause =
-    case cause of
-        Http.BadUrl msg ->
-            text ("Unable to load the podcast; reason: " ++ msg)
-
-        Http.Timeout ->
-            text "Unable to load the podcast; reason: timeout"
-
-        Http.NetworkError ->
-            text "Unable to load the podcast; reason: network error"
-
-        Http.BadStatus status ->
-            text ("Unable to load the podcast; reason: status " ++ String.fromInt status)
-
-        Http.BadBody msg ->
-            text ("Unable to load the podcast; reason: " ++ msg)
 
 
 viewPodcast : Podcast -> Html msg
@@ -127,5 +108,5 @@ getPodcast id =
     -- TODO id is currently ignored
     Http.get
         { url = "https://api.hemin.io/json-examples/podcast.json"
-        , expect = Http.expectJson GotPodcast podcastDecoder
+        , expect = Http.expectJson LoadedPodcast podcastDecoder
         }
