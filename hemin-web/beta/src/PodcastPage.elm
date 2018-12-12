@@ -5,6 +5,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (..)
+import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
 
 
@@ -103,11 +104,6 @@ viewPodcast podcast =
 
 -- HTTP
 
-
 getPodcast : String -> Cmd Msg
 getPodcast id =
-    -- TODO id is currently ignored
-    Http.get
-        { url = "https://api.hemin.io/json-examples/podcast.json"
-        , expect = Http.expectJson LoadedPodcast podcastDecoder
-        }
+    RestApi.getPodcast LoadedPodcast id
