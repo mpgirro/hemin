@@ -1,4 +1,4 @@
-module PodcastPage exposing (Model, Msg(..), init, update, view)
+module PodcastPage exposing (Model(..), Msg(..), init, update, view, getPodcast)
 
 import Browser
 import Html exposing (..)

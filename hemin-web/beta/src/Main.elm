@@ -9,6 +9,7 @@ import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
+--import RestApi
 import Router exposing (Route(..), fromUrl, parser)
 import SearchPage
 import SearchResult exposing (ResultPage, resultPageDecoder)
@@ -49,7 +50,8 @@ type Content
     | Loading
     | NotFound
     | HomeContent
-    | PodcastContent Podcast
+    | PodcastModel PodcastPage.Model
+--    | PodcastContent Podcast
     | EpisodeContent Episode
     | SearchResultContent ResultPage
 
@@ -74,8 +76,9 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
-    | LoadPodcast String
-    | LoadedPodcast (Result Http.Error Podcast)
+--    | LoadPodcast String
+--    | LoadedPodcast (Result Http.Error Podcast)
+    | PodcastMsg PodcastPage.Msg
     | LoadEpisode String
     | LoadedEpisode (Result Http.Error Episode)
     | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
@@ -100,17 +103,27 @@ update message model =
             in
             updateUrlChanged { model | route = route }
 
-        --( { model | route = route }, Cmd.none ) -- (cmdFromRoute route)
-        LoadPodcast id ->
-            ( model, getPodcast id )
 
-        LoadedPodcast result ->
-            case result of
-                Ok podcast ->
-                    ( { model | content = PodcastContent podcast }, Cmd.none )
+--        LoadPodcast id ->
+--            ( model, getPodcast id )
 
-                Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none )
+--        LoadedPodcast result ->
+--            case result of
+--                Ok podcast ->
+--                    ( { model | content = PodcastContent podcast }, Cmd.none )
+
+--                Err cause ->
+--                    ( { model | content = Failure cause }, Cmd.none )
+
+        PodcastMsg msg ->
+            case model.content of
+                PodcastModel content ->
+                    let
+                        (pModel, pMsg) = PodcastPage.update msg content
+                    in
+                    ({ model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg)
+            
+                _ -> ( model, Cmd.none )
 
         -- TODO outsource to utility func
         LoadEpisode id ->
@@ -148,13 +161,23 @@ updateUrlChanged model =
             ( { model | content = HomeContent }, Cmd.none )
 
         PodcastPage id ->
-            ( { model | content = Loading }, getPodcast id )
+            ( { model | content = wrapPodcastModel PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
 
         EpisodePage id ->
             ( { model | content = Loading }, getEpisode id )
 
         SearchPage query pageNumber pageSize ->
             ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
+
+
+wrapPodcastModel : PodcastPage.Model -> Content
+wrapPodcastModel model =
+    PodcastModel model
+
+
+wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg 
+wrapPodcastMsg msg =
+    Cmd.map (PodcastMsg) msg
 
 
 
@@ -185,8 +208,11 @@ view model =
         HomeContent ->
             viewHomePage
 
-        PodcastContent podcast ->
-            viewPodcastPage podcast
+ --       PodcastContent podcast ->
+ --           viewPodcastPage podcast
+
+        PodcastModel content ->
+            viewPodcastPage content
 
         EpisodeContent episode ->
             viewEpisodePage episode
@@ -231,9 +257,13 @@ viewPodcast podcast =
         ]
 
 
-viewPodcastPage : Podcast -> Page msg
-viewPodcastPage podcast =
-    Skeleton.view "Podcast" (viewPodcast podcast)
+--viewPodcastPage : Podcast -> Page msg
+--viewPodcastPage podcast =
+--    Skeleton.view "Podcast" (viewPodcast podcast)
+
+viewPodcastPage : PodcastPage.Model -> Page msg
+viewPodcastPage model =
+    Skeleton.view "Podcast" (PodcastPage.view model)
 
 
 viewEpisode : Episode -> Html msg
@@ -279,13 +309,13 @@ viewHttpFailurePage cause =
 -- HTTP
 
 
-getPodcast : String -> Cmd Msg
-getPodcast id =
+--getPodcast : String -> Cmd Msg
+--getPodcast id =
     -- TODO id is currently ignored
-    Http.get
-        { url = "https://api.hemin.io/json-examples/podcast.json"
-        , expect = Http.expectJson LoadedPodcast podcastDecoder
-        }
+--    Http.get
+--        { url = "https://api.hemin.io/json-examples/podcast.json"
+--        , expect = Http.expectJson LoadedPodcast podcastDecoder
+--        }
 
 
 getEpisode : String -> Cmd Msg
