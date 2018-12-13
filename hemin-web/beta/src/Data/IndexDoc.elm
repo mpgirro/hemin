@@ -1,12 +1,9 @@
-module Data.SearchResult exposing (IndexDoc, ResultPage, emptyResultPage, indexDocDecoder, resultPageDecoder)
+module Data.IndexDoc exposing (IndexDoc, indexDocDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
-
-
--- TYPES
-
+--- MODELS ---
 
 type alias IndexDoc =
     { docType : String
@@ -21,27 +18,12 @@ type alias IndexDoc =
     , podcastTitle : String
     }
 
-
-type alias ResultPage =
-    { currPage : Int
-    , maxPage : Int
-    , totalHits : Int
-    , results : List IndexDoc
-    }
+--- DEFAULTS ---
 
 
 
--- DEFAULTS
 
-
-emptyResultPage : ResultPage
-emptyResultPage =
-    { currPage = 0
-    , maxPage = 0
-    , totalHits = 0
-    , results = []
-    }
-
+--- JSON ---
 
 indexDocDecoder : Decoder IndexDoc
 indexDocDecoder =
@@ -56,12 +38,3 @@ indexDocDecoder =
         |> optional "itunesAuthor" string ""
         |> optional "itunesSummary" string ""
         |> optional "podcastTitle" string ""
-
-
-resultPageDecoder : Decoder ResultPage
-resultPageDecoder =
-    Json.Decode.succeed ResultPage
-        |> required "currPage" int
-        |> required "maxPage" int
-        |> required "totalHits" int
-        |> required "results" (list indexDocDecoder)

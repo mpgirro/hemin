@@ -5,8 +5,9 @@ module Main exposing (Model, Msg, init, main, subscriptions, update, view, viewH
 import Browser
 import Browser.Navigation
 import Data.Episode exposing (Episode, episodeDecoder)
+import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
-import Data.SearchResult exposing (IndexDoc, ResultPage, resultPageDecoder)
+import Data.ResultPage exposing (ResultPage, resultPageDecoder)
 import Html exposing (div, p, text)
 import Http
 import Page.EpisodePage as EpisodePage
