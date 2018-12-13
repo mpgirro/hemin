@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewNotFound)
+module Main exposing (Model, Msg, init, main, subscriptions, update, view, viewHomePage, viewNotFound)
 
 --import RestApi
 
@@ -6,8 +6,7 @@ import Browser
 import Browser.Navigation
 import Episode exposing (Episode, episodeDecoder)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (div, p, text)
 import Http
 import Page.EpisodePage as EpisodePage
 import Page.PodcastPage as PodcastPage
@@ -80,11 +79,6 @@ type Msg
     | PodcastMsg PodcastPage.Msg
     | EpisodeMsg EpisodePage.Msg
     | SearchMsg SearchPage.Msg
-
-
-
---    | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
---    | LoadedResultPage (Result Http.Error ResultPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
