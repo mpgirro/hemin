@@ -112,13 +112,13 @@ updateUrlChanged model =
             ( { model | content = HomeContent }, Cmd.none )
 
         PodcastPage id ->
-            ( { model | content = wrapPodcastModel PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
+            ( { model | content = wrapPodcastContent PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
 
         EpisodePage id ->
-            ( { model | content = wrapEpisodeModel EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
+            ( { model | content = wrapEpisodeContent EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
         SearchPage query pageNum pageSize ->
-            ( { model | content = wrapSearchModel SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+            ( { model | content = wrapSearchContent SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
 
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
@@ -129,7 +129,7 @@ updatePodcastContent model msg =
                 ( model_, msg_ ) =
                     PodcastPage.update msg content
             in
-            ( { model | content = wrapPodcastModel model_ }, wrapPodcastMsg msg_ )
+            ( { model | content = wrapPodcastContent model_ }, wrapPodcastMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
@@ -143,7 +143,7 @@ updateEpisodeContent model msg =
                 ( model_, msg_ ) =
                     EpisodePage.update msg content
             in
-            ( { model | content = wrapEpisodeModel model_ }, wrapEpisodeMsg msg_ )
+            ( { model | content = wrapEpisodeContent model_ }, wrapEpisodeMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
@@ -157,7 +157,7 @@ updateSearchContent model msg =
                 ( model_, msg_ ) =
                     SearchPage.update msg content
             in
-            ( { model | content = wrapSearchModel model_ }, wrapSearchMsg msg_ )
+            ( { model | content = wrapSearchContent model_ }, wrapSearchMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
@@ -223,8 +223,8 @@ viewHomePage =
 --- UTILITIES (for documenting type signatures) ---
 
 
-wrapPodcastModel : PodcastPage.Model -> Content
-wrapPodcastModel model =
+wrapPodcastContent : PodcastPage.Model -> Content
+wrapPodcastContent model =
     PodcastContent model
 
 
@@ -233,8 +233,8 @@ wrapPodcastMsg msg =
     Cmd.map PodcastMsg msg
 
 
-wrapEpisodeModel : EpisodePage.Model -> Content
-wrapEpisodeModel model =
+wrapEpisodeContent : EpisodePage.Model -> Content
+wrapEpisodeContent model =
     EpisodeContent model
 
 
@@ -243,8 +243,8 @@ wrapEpisodeMsg msg =
     Cmd.map EpisodeMsg msg
 
 
-wrapSearchModel : SearchPage.Model -> Content
-wrapSearchModel model =
+wrapSearchContent : SearchPage.Model -> Content
+wrapSearchContent model =
     SearchContent model
 
 
