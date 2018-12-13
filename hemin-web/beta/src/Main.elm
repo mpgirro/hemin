@@ -5,14 +5,15 @@ module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, v
 import Browser
 import Browser.Navigation
 import Episode exposing (Episode, episodeDecoder)
-import EpisodePage
+
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
+import Page.EpisodePage as EpisodePage
+import Page.PodcastPage as PodcastPage
+import Page.SearchPage as SearchPage
 import Podcast exposing (Podcast, podcastDecoder)
-import PodcastPage
 import Router exposing (Route(..), fromUrl, parser)
-import SearchPage
 import SearchResult exposing (IndexDoc, ResultPage, resultPageDecoder)
 import Skeleton exposing (Page)
 import Url exposing (Url)

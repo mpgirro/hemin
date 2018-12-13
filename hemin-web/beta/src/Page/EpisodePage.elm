@@ -1,4 +1,4 @@
-module EpisodePage exposing (Model(..), Msg(..), getEpisode, init, update, view)
+module Page.EpisodePage exposing (Model(..), Msg(..), getEpisode, init, update, view)
 
 import Browser
 import Episode exposing (Episode)
