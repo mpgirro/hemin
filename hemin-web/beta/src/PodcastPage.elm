@@ -96,7 +96,7 @@ viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
     div []
         [ h1 [] [ text podcast.title ]
-        , a [ href podcast.link ] [ text podcast.link ]
+        , Skeleton.viewLink podcast.link
         , p [] [ text podcast.description ]
         ]
 

@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewLink, viewNotFound, viewResultPage)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewNotFound, viewResultPage)
 
 --import RestApi
 
@@ -266,17 +266,9 @@ viewIndexDoc doc =
     li []
         [ b [] [ text doc.title ]
         , br [] []
-        , a [ href doc.link ] [ text doc.link ]
+        , Skeleton.viewLink doc.link
         , p [] [ text doc.description ]
         ]
-
-
-viewLink : String -> Html msg
-viewLink path =
-    li []
-        [ a [ href path ] [ text path ]
-        ]
-
 
 viewHttpFailurePage : Http.Error -> Page msg
 viewHttpFailurePage cause =

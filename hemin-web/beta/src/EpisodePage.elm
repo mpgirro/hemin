@@ -6,7 +6,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import RestApi
-import Skeleton exposing (Page, viewHttpFailure)
+import Skeleton exposing (Page)
 
 
 
@@ -95,7 +95,7 @@ viewEpisode : Episode -> Html msg
 viewEpisode episode =
     div []
         [ h1 [] [ text episode.title ]
-        , a [ href episode.link ] [ text episode.link ]
+        , Skeleton.viewLink episode.link
         , p [] [ text episode.description ]
         ]
 

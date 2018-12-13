@@ -1,4 +1,4 @@
-module Skeleton exposing (Page, view, viewHttpFailure, viewLoadingPage)
+module Skeleton exposing (Page, view, viewHttpFailure, viewLoadingPage, viewLink)
 
 import Browser
 import Html exposing (..)
