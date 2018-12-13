@@ -19,6 +19,7 @@ getEpisode resultWrapper id =
         , expect = Http.expectJson resultWrapper episodeDecoder
         }
 
+
 getPodcast : (Result Http.Error Podcast -> msg) -> String -> Cmd msg
 getPodcast resultWrapper id =
     Http.get

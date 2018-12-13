@@ -1,4 +1,6 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewEpisodePage, viewHomePage, viewLink, viewNotFound, viewResultPage)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewLink, viewNotFound, viewResultPage)
+
+--import RestApi
 
 import Browser
 import Browser.Navigation
@@ -9,7 +11,6 @@ import Html.Attributes exposing (..)
 import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
---import RestApi
 import Router exposing (Route(..), fromUrl, parser)
 import SearchPage
 import SearchResult exposing (ResultPage, resultPageDecoder)
@@ -51,7 +52,7 @@ type Content
     | NotFound
     | HomeContent
     | PodcastContent PodcastPage.Model
-    | EpisodeContent Episode
+    | EpisodeContent EpisodePage.Model
     | SearchResultContent ResultPage
 
 
@@ -76,8 +77,7 @@ type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
     | PodcastMsg PodcastPage.Msg
-    | LoadEpisode String
-    | LoadedEpisode (Result Http.Error Episode)
+    | EpisodeMsg EpisodePage.Msg
     | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
     | LoadedResultPage (Result Http.Error ResultPage)
 
@@ -103,17 +103,8 @@ update message model =
         PodcastMsg msg ->
             updatePodcastContent model msg
 
-        -- TODO outsource to utility func
-        LoadEpisode id ->
-            ( model, getEpisode id )
-
-        LoadedEpisode result ->
-            case result of
-                Ok episode ->
-                    ( { model | content = EpisodeContent episode }, Cmd.none )
-
-                Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none )
+        EpisodeMsg msg ->
+            updateEpisodeContent model msg
 
         -- TODO outsource to utility func
         LoadResultPage query pageNumber pageSize ->
@@ -142,21 +133,24 @@ updateUrlChanged model =
             ( { model | content = wrapPodcastModel PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
 
         EpisodePage id ->
-            ( { model | content = Loading }, getEpisode id )
+            ( { model | content = wrapEpisodeModel EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
         SearchPage query pageNumber pageSize ->
             ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
+
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
 updatePodcastContent model msg =
     case model.content of
         PodcastContent content ->
             let
-                (pModel, pMsg) = PodcastPage.update msg content
+                ( pModel, pMsg ) =
+                    PodcastPage.update msg content
             in
-             ({ model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg)
-            
-        _ -> ( model, Cmd.none )
+            ( { model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 wrapPodcastModel : PodcastPage.Model -> Content
@@ -164,9 +158,33 @@ wrapPodcastModel model =
     PodcastContent model
 
 
-wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg 
+wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg
 wrapPodcastMsg msg =
-    Cmd.map (PodcastMsg) msg
+    Cmd.map PodcastMsg msg
+
+
+updateEpisodeContent : Model -> EpisodePage.Msg -> ( Model, Cmd Msg )
+updateEpisodeContent model msg =
+    case model.content of
+        EpisodeContent content ->
+            let
+                ( eModel, eMsg ) =
+                    EpisodePage.update msg content
+            in
+            ( { model | content = wrapEpisodeModel eModel }, wrapEpisodeMsg eMsg )
+
+        _ ->
+            ( model, Cmd.none )
+
+
+wrapEpisodeModel : EpisodePage.Model -> Content
+wrapEpisodeModel model =
+    EpisodeContent model
+
+
+wrapEpisodeMsg : Cmd EpisodePage.Msg -> Cmd Msg
+wrapEpisodeMsg msg =
+    Cmd.map EpisodeMsg msg
 
 
 
@@ -200,8 +218,8 @@ view model =
         PodcastContent content ->
             Skeleton.view "Podcast" (PodcastPage.view content)
 
-        EpisodeContent episode ->
-            viewEpisodePage episode
+        EpisodeContent content ->
+            Skeleton.view "Episode" (EpisodePage.view content)
 
         SearchResultContent resultPage ->
             viewResultPage resultPage
@@ -223,20 +241,6 @@ viewHomePage =
             div [] [ p [] [ text "Homepage" ] ]
     in
     Skeleton.view "HEMIN : Podcast Catalog & Search" body
-
-
-viewEpisode : Episode -> Html msg
-viewEpisode episode =
-    div []
-        [ h1 [] [ text episode.title ]
-        , a [ href episode.link ] [ text episode.link ]
-        , p [] [ text episode.description ]
-        ]
-
-
-viewEpisodePage : Episode -> Page msg
-viewEpisodePage episode =
-    Skeleton.view "Episode" (viewEpisode episode)
 
 
 
@@ -266,15 +270,6 @@ viewHttpFailurePage cause =
 
 
 -- HTTP
-
-
-getEpisode : String -> Cmd Msg
-getEpisode id =
-    -- TODO id is currently ignored
-    Http.get
-        { url = "https://api.hemin.io/json-examples/episode.json" -- "http://localhost:9000/api/v1/episode/8DTKUxDwRO991"
-        , expect = Http.expectJson LoadedEpisode episodeDecoder
-        }
 
 
 getSearchResults : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg

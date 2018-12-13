@@ -1,10 +1,10 @@
-module PodcastPage exposing (Model(..), Msg(..), init, update, view, getPodcast)
+module PodcastPage exposing (Model(..), Msg(..), getPodcast, init, update, view)
 
 import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Podcast exposing (..)
+import Podcast exposing (Podcast)
 import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
 
@@ -103,6 +103,7 @@ viewPodcast podcast =
 
 
 -- HTTP
+
 
 getPodcast : String -> Cmd Msg
 getPodcast id =
