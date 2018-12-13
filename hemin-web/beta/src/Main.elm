@@ -12,8 +12,7 @@ import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
 import Router exposing (Route(..), fromUrl, parser)
-import SearchPage
-import SearchResult exposing (ResultPage, resultPageDecoder)
+import SearchResult exposing (IndexDoc, ResultPage, resultPageDecoder)
 import Skeleton exposing (Page)
 import Url exposing (Url)
 
@@ -144,10 +143,10 @@ updatePodcastContent model msg =
     case model.content of
         PodcastContent content ->
             let
-                ( pModel, pMsg ) =
+                ( model_, msg_ ) =
                     PodcastPage.update msg content
             in
-            ( { model | content = wrapPodcastModel pModel }, wrapPodcastMsg pMsg )
+            ( { model | content = wrapPodcastModel model_ }, wrapPodcastMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
@@ -168,10 +167,10 @@ updateEpisodeContent model msg =
     case model.content of
         EpisodeContent content ->
             let
-                ( eModel, eMsg ) =
+                ( model_, msg_ ) =
                     EpisodePage.update msg content
             in
-            ( { model | content = wrapEpisodeModel eModel }, wrapEpisodeMsg eMsg )
+            ( { model | content = wrapEpisodeModel model_ }, wrapEpisodeMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
@@ -251,9 +250,25 @@ viewResultPage : ResultPage -> Page msg
 viewResultPage resultPage =
     let
         body =
-            div [] [ p [] [ text "Search Results Page" ] ]
+            div [] 
+                [ p [] [ text "Search Results Page" ] 
+                , p [] [ text ("currPage: " ++ String.fromInt resultPage.currPage)  ]
+                , p [] [ text ("maxPage: " ++ String.fromInt resultPage.maxPage)  ]
+                , p [] [ text ("totalHits: " ++ String.fromInt resultPage.totalHits)  ]
+                , ul [] <|
+                    List.map viewIndexDoc resultPage.results
+                ]
     in
     Skeleton.view "Search" body
+
+viewIndexDoc : IndexDoc -> Html msg
+viewIndexDoc doc =
+    li []
+        [ b [] [ text doc.title ]
+        , br [] []
+        , a [ href doc.link ] [ text doc.link ]
+        , p [] [ text doc.description ]
+        ]
 
 
 viewLink : String -> Html msg

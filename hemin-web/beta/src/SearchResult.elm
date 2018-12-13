@@ -49,8 +49,8 @@ indexDocDecoder =
         |> required "docType" string
         |> required "id" string
         |> optional "title" string ""
+        |> optional "link" string ""
         |> optional "description" string ""
-        |> optional "pubDate" string ""
         |> optional "pubDate" string ""
         |> optional "image" string ""
         |> optional "itunesAuthor" string ""
