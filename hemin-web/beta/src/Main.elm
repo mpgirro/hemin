@@ -1,4 +1,4 @@
-module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewNotFound, viewResultPage)
+module Main exposing (Model, Msg(..), init, main, subscriptions, update, view, viewHomePage, viewNotFound)
 
 --import RestApi
 
@@ -12,6 +12,7 @@ import Http
 import Podcast exposing (Podcast, podcastDecoder)
 import PodcastPage
 import Router exposing (Route(..), fromUrl, parser)
+import SearchPage
 import SearchResult exposing (IndexDoc, ResultPage, resultPageDecoder)
 import Skeleton exposing (Page)
 import Url exposing (Url)
@@ -52,7 +53,7 @@ type Content
     | HomeContent
     | PodcastContent PodcastPage.Model
     | EpisodeContent EpisodePage.Model
-    | SearchResultContent ResultPage
+    | SearchContent SearchPage.Model
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
@@ -77,8 +78,9 @@ type Msg
     | UrlChanged Url.Url
     | PodcastMsg PodcastPage.Msg
     | EpisodeMsg EpisodePage.Msg
-    | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
-    | LoadedResultPage (Result Http.Error ResultPage)
+    | SearchMsg SearchPage.Msg
+--    | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
+--    | LoadedResultPage (Result Http.Error ResultPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -105,17 +107,8 @@ update message model =
         EpisodeMsg msg ->
             updateEpisodeContent model msg
 
-        -- TODO outsource to utility func
-        LoadResultPage query pageNumber pageSize ->
-            ( model, getSearchResults query pageNumber pageSize )
-
-        LoadedResultPage result ->
-            case result of
-                Ok resultPage ->
-                    ( { model | content = SearchResultContent resultPage }, Cmd.none )
-
-                Err cause ->
-                    ( { model | content = Failure cause }, Cmd.none )
+        SearchMsg msg ->
+            updateSearchResultContent model msg
 
 
 
@@ -135,7 +128,7 @@ updateUrlChanged model =
             ( { model | content = wrapEpisodeModel EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
         SearchPage query pageNumber pageSize ->
-            ( { model | content = Loading }, getSearchResults query pageNumber pageSize )
+            ( { model | content = wrapSearchModel SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNumber pageSize) )
 
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
@@ -187,6 +180,31 @@ wrapEpisodeMsg msg =
 
 
 
+updateSearchResultContent : Model -> SearchPage.Msg -> ( Model, Cmd Msg )
+updateSearchResultContent model msg =
+    case model.content of
+        SearchContent content ->
+            let
+                ( model_, msg_ ) =
+                    SearchPage.update msg content
+            in
+            ( { model | content = wrapSearchModel model_ }, wrapSearchMsg msg_ )
+
+        _ ->
+            ( model, Cmd.none )
+
+
+wrapSearchModel : SearchPage.Model -> Content
+wrapSearchModel model =
+    SearchContent model
+
+
+wrapSearchMsg : Cmd SearchPage.Msg -> Cmd Msg
+wrapSearchMsg msg =
+    Cmd.map SearchMsg msg
+
+
+
 -- SUBSCRIPTIONS
 
 
@@ -220,8 +238,8 @@ view model =
         EpisodeContent content ->
             Skeleton.view "Episode" (EpisodePage.view content)
 
-        SearchResultContent resultPage ->
-            viewResultPage resultPage
+        SearchContent content ->
+            Skeleton.view "Search" (SearchPage.view content)
 
 
 viewNotFound : Page msg
@@ -246,43 +264,6 @@ viewHomePage =
 -- TODO replace with propper impl.
 
 
-viewResultPage : ResultPage -> Page msg
-viewResultPage resultPage =
-    let
-        body =
-            div [] 
-                [ p [] [ text "Search Results Page" ] 
-                , p [] [ text ("currPage: " ++ String.fromInt resultPage.currPage)  ]
-                , p [] [ text ("maxPage: " ++ String.fromInt resultPage.maxPage)  ]
-                , p [] [ text ("totalHits: " ++ String.fromInt resultPage.totalHits)  ]
-                , ul [] <|
-                    List.map viewIndexDoc resultPage.results
-                ]
-    in
-    Skeleton.view "Search" body
-
-viewIndexDoc : IndexDoc -> Html msg
-viewIndexDoc doc =
-    li []
-        [ b [] [ text doc.title ]
-        , br [] []
-        , Skeleton.viewLink doc.link
-        , p [] [ text doc.description ]
-        ]
-
 viewHttpFailurePage : Http.Error -> Page msg
 viewHttpFailurePage cause =
     Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
-
-
-
--- HTTP
-
-
-getSearchResults : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg
-getSearchResults query pageNumber pageSize =
-    -- TODO args are currently ignored
-    Http.get
-        { url = "https://api.hemin.io/json-examples/search.json"
-        , expect = Http.expectJson LoadedResultPage resultPageDecoder
-        }

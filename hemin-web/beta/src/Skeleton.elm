@@ -102,10 +102,10 @@ header =
     div []
         [ p [] [ text "Header" ]
         , ul []
-            [ viewLink "/p/abc"
-            , viewLink "/e/abc"
-            , viewLink "/discover"
-            , viewLink "/search?q=abc&p=1&s=1"
+            [ li [] [ viewLink "/p/abc" ]
+            , li [] [ viewLink "/e/abc" ]
+            , li [] [ viewLink "/discover" ]
+            , li [] [ viewLink "/search?q=abc&p=1&s=1" ]
             ]
         ]
 
@@ -119,6 +119,4 @@ footer =
 
 viewLink : String -> Html msg
 viewLink path =
-    li []
-        [ a [ href path ] [ text path ]
-        ]
+    a [ href path ] [ text path ]

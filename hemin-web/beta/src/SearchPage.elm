@@ -1,15 +1,17 @@
-module SearchPage exposing (Model(..), Msg(..), getResults, init, main, subscriptions, update, view, viewHttpFailure, viewResultPage)
+module SearchPage exposing (Model(..), Msg(..), init, main, subscriptions, update, view, getSearchResult)
 
 import Browser
 import Episode exposing (..)
-import Html exposing (Attribute, Html, div, h1, input, text)
+import Html exposing (Attribute, Html, div, h1, input, text, p, ul, li, b, br)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
 import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Podcast exposing (..)
+import RestApi
 import SearchResult exposing (..)
+import Skeleton exposing (Page)
 
 
 
@@ -31,14 +33,13 @@ main =
 
 type Model
     = Failure Http.Error
-    | Empty
     | Loading
-    | Success ResultPage
+    | Content ResultPage
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Loading, getResults "" Nothing Nothing )
+    ( Loading, getSearchResult Nothing Nothing Nothing )
 
 
 
@@ -46,21 +47,21 @@ init _ =
 
 
 type Msg
-    = SendSearchRequest String Int Int
-    | GotSearchResult (Result Http.Error ResultPage)
+    = LoadSearchResult (Maybe String) (Maybe Int) (Maybe Int)
+    | LoadedSearchResult (Result Http.Error ResultPage)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SendSearchRequest query page size ->
-            ( Empty, Cmd.none )
+        LoadSearchResult query pageNumber pageSize ->
+            ( model, getSearchResult query pageNumber pageSize )
 
         -- TODO send HTTP request!
-        GotSearchResult result ->
+        LoadedSearchResult result ->
             case result of
-                Ok resultPage ->
-                    ( Success resultPage, Cmd.none )
+                Ok searchResult ->
+                    ( Content searchResult, Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
@@ -79,56 +80,43 @@ subscriptions model =
 -- VIEW
 
 
-view : Model -> Html Msg
+view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
-            viewHttpFailure cause
-
-        Empty ->
-            text "Ready to search:"
+            Skeleton.viewHttpFailure cause
 
         Loading ->
             text "Loading..."
 
-        Success resultPage ->
-            viewResultPage resultPage
+        Content searchResult ->
+            viewSearchResult searchResult
 
 
-viewHttpFailure : Http.Error -> Html Msg
-viewHttpFailure cause =
-    case cause of
-        Http.BadUrl msg ->
-            text ("Unable to load the search results; reason: " ++ msg)
-
-        Http.Timeout ->
-            text "Unable to load the search results; reason: timeout"
-
-        Http.NetworkError ->
-            text "Unable to load the search results; reason: network error"
-
-        Http.BadStatus status ->
-            text ("Unable to load the search results; reason: status " ++ String.fromInt status)
-
-        Http.BadBody msg ->
-            text ("Unable to load the search results; reason: " ++ msg)
-
-
-viewResultPage : ResultPage -> Html Msg
-viewResultPage page =
-    div []
-        [ text "Add results here"
+viewSearchResult : ResultPage -> Html msg
+viewSearchResult searchResult =
+    div [] 
+        [ p [] [ text "Search Results Page" ] 
+        , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage)  ]
+        , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage)  ]
+        , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits)  ]
+        , ul [] <|
+            List.map viewIndexDoc searchResult.results
         ]
 
+viewIndexDoc : IndexDoc -> Html msg
+viewIndexDoc doc =
+    li []
+        [ b [] [ text doc.title ]
+        , br [] []
+        , Skeleton.viewLink doc.link
+        , p [] [ text doc.description ]
+        ]
 
 
 -- HTTP
 
 
-getResults : String -> Maybe Int -> Maybe Int -> Cmd Msg
-getResults query pageNumber pageSize =
-    -- TODO arguments are currently ignored
-    Http.get
-        { url = "https://api.hemin.io/json-examples/search.json"
-        , expect = Http.expectJson GotSearchResult resultPageDecoder
-        }
+getSearchResult : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg
+getSearchResult query pageNumber pageSize =
+    RestApi.getSearchResult LoadedSearchResult query pageNumber pageSize
