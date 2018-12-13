@@ -46,10 +46,6 @@ type Msg
     | LoadedEpisode (Result Http.Error Episode)
 
 
-
---  | GotChapters (Result Http.Error String)
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
@@ -93,7 +89,7 @@ view model =
 
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
-    div []
+    div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
         [ h1 [] [ text episode.title ]
         , Skeleton.viewLink episode.link
         , p [] [ text episode.description ]

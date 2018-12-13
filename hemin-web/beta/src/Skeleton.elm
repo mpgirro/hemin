@@ -1,6 +1,5 @@
-module Skeleton exposing (Page, view, viewHttpFailure, viewLink, viewLoadingPage)
+module Skeleton exposing (Page, siteName, view, viewHttpFailure, viewLink, viewLoadingPage)
 
-import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -53,6 +52,11 @@ viewLoadingPage =
     view "Loading" body
 
 
+--- CONSTANTS ---
+
+siteName : String 
+siteName =
+    "HEMIN"
 
 -- INTERNAL
 
@@ -66,7 +70,7 @@ buildPage title body =
 
 template : Html msg -> List (Html msg)
 template content =
-    [ div [ class "container" ]
+    [ div [ class "container-md" ]
         [ navbar
         , header
         , content
@@ -74,38 +78,35 @@ template content =
         ]
     ]
 
-
 navbar : Html msg
 navbar =
-    -- the model is currently ignored! (we neither hold state nor provide functionality)
-    nav [ class "navbar", class "navbar-expand-lg" ]
-        [ a [ class "navbar-brand", href "/" ]
-            [ img [ src "/logo.svg", width 30, height 30, class "d-inline-block align-top", alt "" ] []
-            , text "HEMIN"
-            ]
-        , ul [ class "navbar-nav" ]
-            [ li [ class "nav-item" ]
-                [ a [ class "nav-link", href "/search" ] [ text "search" ]
+    nav [ class "UnderlineNav" ]
+        [ div [ class "UnderlineNav-actions" ] 
+            [ a [ href "/" ] 
+                [ img [ src "/logo.svg", width 16, height 16, alt "" ] []
+                , div [ class "d-inline-block mx-1" ] 
+                    [ text siteName ]
                 ]
-            , li [ class "nav-item" ]
-                [ a [ class "nav-link", href "/discover" ] [ text "discover" ]
-                ]
-            , li [ class "nav-item" ]
-                [ a [ class "nav-link", href "/propose" ] [ text "+feed" ]
-                ]
+            ] 
+        , div [ class "UnderlineNav-body" ] 
+            [ a [ class "UnderlineNav-item", href "/search" ] [ text "search" ]
+            , a [ class "UnderlineNav-item", href "/discover" ] [ text "discover" ]
+            , a [ class "UnderlineNav-item", href "/propose" ] [ text "+feed" ]
             ]
         ]
 
 
 header : Html msg
 header =
-    div []
-        [ p [] [ text "Header" ]
-        , ul []
-            [ li [] [ viewLink "/p/abc" ]
-            , li [] [ viewLink "/e/abc" ]
-            , li [] [ viewLink "/discover" ]
-            , li [] [ viewLink "/search?q=abc&p=1&s=1" ]
+    div [ class "Box Box--danger" ]
+        [ div [ class "Box-body" ]
+            [ b [] [ text "Header" ]
+            , ul [ class "ml-4" ]
+                [ li [] [ viewLink "/p/abc" ]
+                , li [] [ viewLink "/e/abc" ]
+                , li [] [ viewLink "/discover" ]
+                , li [] [ viewLink "/search?q=abc&p=1&s=1" ]
+                ]
             ]
         ]
 

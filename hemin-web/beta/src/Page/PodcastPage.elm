@@ -94,7 +94,7 @@ view model =
 
 viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
-    div []
+    div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
         [ h1 [] [ text podcast.title ]
         , Skeleton.viewLink podcast.link
         , p [] [ text podcast.description ]

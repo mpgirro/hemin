@@ -100,19 +100,28 @@ viewSearchResult searchResult =
         , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage) ]
         , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage) ]
         , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits) ]
-        , ul [] <|
+        , ul [ class "list-style-none" ] <|
             List.map viewIndexDoc searchResult.results
         ]
 
 
 viewIndexDoc : IndexDoc -> Html msg
 viewIndexDoc doc =
-    li []
-        [ b [] [ text doc.title ]
-        , br [] []
-        , Skeleton.viewLink doc.link
-        , p [] [ text doc.description ]
+    li [ class "py-2" ]
+        [ div [ class "clearfix", class "p-2", class "border" ]
+            [ div [ class "float-left", class "p-3", class "mr-3", class "bg-gray" ]
+                [ text "Image" ]
+            , div [ class "overflow-hidden" ]
+                [ b [] [ text doc.title ]
+                , br [] []
+                , Skeleton.viewLink doc.link
+                , p [] [ text doc.description ]
+                ]
+            ]
         ]
+                
+            
+            
 
 
 
