@@ -1,4 +1,4 @@
-module SearchResult exposing (IndexDoc, ResultPage, emptyResultPage, indexDocDecoder, resultPageDecoder)
+module Data.SearchResult exposing (IndexDoc, ResultPage, emptyResultPage, indexDocDecoder, resultPageDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)

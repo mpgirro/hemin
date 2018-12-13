@@ -1,16 +1,16 @@
 module Page.SearchPage exposing (Model(..), Msg(..), getSearchResult, init, main, subscriptions, update, view)
 
 import Browser
-import Episode exposing (..)
+import Data.Episode exposing (..)
 import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
 import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
-import Podcast exposing (..)
+import Data.Podcast exposing (..)
 import RestApi
-import SearchResult exposing (..)
+import Data.SearchResult exposing (..)
 import Skeleton exposing (Page)
 
 

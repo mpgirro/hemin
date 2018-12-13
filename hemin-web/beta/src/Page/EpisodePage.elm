@@ -1,7 +1,7 @@
 module Page.EpisodePage exposing (Model(..), Msg(..), getEpisode, init, update, view)
 
 import Browser
-import Episode exposing (Episode)
+import Data.Episode exposing (Episode)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http

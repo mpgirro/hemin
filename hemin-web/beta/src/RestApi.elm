@@ -1,9 +1,9 @@
 module RestApi exposing (apiBase, getEpisode, getPodcast, getSearchResult)
 
-import Episode exposing (Episode, episodeDecoder)
+import Data.Episode exposing (Episode, episodeDecoder)
+import Data.Podcast exposing (Podcast, podcastDecoder)
+import Data.SearchResult exposing (ResultPage, resultPageDecoder)
 import Http
-import Podcast exposing (Podcast, podcastDecoder)
-import SearchResult exposing (ResultPage, resultPageDecoder)
 
 
 apiBase : String

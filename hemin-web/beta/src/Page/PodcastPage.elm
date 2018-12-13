@@ -4,7 +4,7 @@ import Browser
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Podcast exposing (Podcast)
+import Data.Podcast exposing (Podcast)
 import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
 

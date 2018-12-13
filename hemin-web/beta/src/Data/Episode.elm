@@ -1,4 +1,4 @@
-module Episode exposing (Episode, EpisodeItunes, emptyEpisodeItunes, episodeDecoder, episodeItunesDecoder)
+module Data.Episode exposing (Episode, EpisodeItunes, emptyEpisodeItunes, episodeDecoder, episodeItunesDecoder)
 
 import Json.Decode exposing (Decoder, field, int, nullable, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)

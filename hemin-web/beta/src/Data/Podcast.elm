@@ -1,4 +1,4 @@
-module Podcast exposing (Podcast, PodcastItunes, emptyPodcastItunes, podcastDecoder, podcastItunesDecoder)
+module Data.Podcast exposing (Podcast, PodcastItunes, emptyPodcastItunes, podcastDecoder, podcastItunesDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
