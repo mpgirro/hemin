@@ -1,8 +1,8 @@
-module SearchPage exposing (Model(..), Msg(..), init, main, subscriptions, update, view, getSearchResult)
+module SearchPage exposing (Model(..), Msg(..), getSearchResult, init, main, subscriptions, update, view)
 
 import Browser
 import Episode exposing (..)
-import Html exposing (Attribute, Html, div, h1, input, text, p, ul, li, b, br)
+import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
@@ -95,14 +95,15 @@ view model =
 
 viewSearchResult : ResultPage -> Html msg
 viewSearchResult searchResult =
-    div [] 
-        [ p [] [ text "Search Results Page" ] 
-        , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage)  ]
-        , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage)  ]
-        , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits)  ]
+    div []
+        [ p [] [ text "Search Results Page" ]
+        , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage) ]
+        , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage) ]
+        , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits) ]
         , ul [] <|
             List.map viewIndexDoc searchResult.results
         ]
+
 
 viewIndexDoc : IndexDoc -> Html msg
 viewIndexDoc doc =
@@ -112,6 +113,7 @@ viewIndexDoc doc =
         , Skeleton.viewLink doc.link
         , p [] [ text doc.description ]
         ]
+
 
 
 -- HTTP

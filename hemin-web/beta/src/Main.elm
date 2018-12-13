@@ -79,6 +79,9 @@ type Msg
     | PodcastMsg PodcastPage.Msg
     | EpisodeMsg EpisodePage.Msg
     | SearchMsg SearchPage.Msg
+
+
+
 --    | LoadResultPage (Maybe String) (Maybe Int) (Maybe Int)
 --    | LoadedResultPage (Result Http.Error ResultPage)
 
@@ -95,11 +98,7 @@ update message model =
                     ( model, Browser.Navigation.load href )
 
         UrlChanged url ->
-            let
-                route =
-                    Router.fromUrl url
-            in
-            updateUrlChanged { model | route = route }
+            updateUrlChanged { model | route = Router.fromUrl url }
 
         PodcastMsg msg ->
             updatePodcastContent model msg
@@ -108,11 +107,7 @@ update message model =
             updateEpisodeContent model msg
 
         SearchMsg msg ->
-            updateSearchResultContent model msg
-
-
-
--- TODO outsource to utility func
+            updateSearchContent model msg
 
 
 updateUrlChanged : Model -> ( Model, Cmd Msg )
@@ -127,8 +122,8 @@ updateUrlChanged model =
         EpisodePage id ->
             ( { model | content = wrapEpisodeModel EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
-        SearchPage query pageNumber pageSize ->
-            ( { model | content = wrapSearchModel SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNumber pageSize) )
+        SearchPage query pageNum pageSize ->
+            ( { model | content = wrapSearchModel SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
 
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
@@ -145,16 +140,6 @@ updatePodcastContent model msg =
             ( model, Cmd.none )
 
 
-wrapPodcastModel : PodcastPage.Model -> Content
-wrapPodcastModel model =
-    PodcastContent model
-
-
-wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg
-wrapPodcastMsg msg =
-    Cmd.map PodcastMsg msg
-
-
 updateEpisodeContent : Model -> EpisodePage.Msg -> ( Model, Cmd Msg )
 updateEpisodeContent model msg =
     case model.content of
@@ -169,19 +154,8 @@ updateEpisodeContent model msg =
             ( model, Cmd.none )
 
 
-wrapEpisodeModel : EpisodePage.Model -> Content
-wrapEpisodeModel model =
-    EpisodeContent model
-
-
-wrapEpisodeMsg : Cmd EpisodePage.Msg -> Cmd Msg
-wrapEpisodeMsg msg =
-    Cmd.map EpisodeMsg msg
-
-
-
-updateSearchResultContent : Model -> SearchPage.Msg -> ( Model, Cmd Msg )
-updateSearchResultContent model msg =
+updateSearchContent : Model -> SearchPage.Msg -> ( Model, Cmd Msg )
+updateSearchContent model msg =
     case model.content of
         SearchContent content ->
             let
@@ -192,16 +166,6 @@ updateSearchResultContent model msg =
 
         _ ->
             ( model, Cmd.none )
-
-
-wrapSearchModel : SearchPage.Model -> Content
-wrapSearchModel model =
-    SearchContent model
-
-
-wrapSearchMsg : Cmd SearchPage.Msg -> Cmd Msg
-wrapSearchMsg msg =
-    Cmd.map SearchMsg msg
 
 
 
@@ -221,7 +185,7 @@ view : Model -> Browser.Document Msg
 view model =
     case model.content of
         Failure cause ->
-            viewHttpFailurePage cause
+            Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
 
         Loading ->
             Skeleton.viewLoadingPage
@@ -261,9 +225,34 @@ viewHomePage =
 
 
 
--- TODO replace with propper impl.
+--- UTILITIES (for documenting type signatures) ---
 
 
-viewHttpFailurePage : Http.Error -> Page msg
-viewHttpFailurePage cause =
-    Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
+wrapPodcastModel : PodcastPage.Model -> Content
+wrapPodcastModel model =
+    PodcastContent model
+
+
+wrapPodcastMsg : Cmd PodcastPage.Msg -> Cmd Msg
+wrapPodcastMsg msg =
+    Cmd.map PodcastMsg msg
+
+
+wrapEpisodeModel : EpisodePage.Model -> Content
+wrapEpisodeModel model =
+    EpisodeContent model
+
+
+wrapEpisodeMsg : Cmd EpisodePage.Msg -> Cmd Msg
+wrapEpisodeMsg msg =
+    Cmd.map EpisodeMsg msg
+
+
+wrapSearchModel : SearchPage.Model -> Content
+wrapSearchModel model =
+    SearchContent model
+
+
+wrapSearchMsg : Cmd SearchPage.Msg -> Cmd Msg
+wrapSearchMsg msg =
+    Cmd.map SearchMsg msg
