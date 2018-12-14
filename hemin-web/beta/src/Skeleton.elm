@@ -52,11 +52,15 @@ viewLoadingPage =
     view "Loading" body
 
 
+
 --- CONSTANTS ---
 
-siteName : String 
+
+siteName : String
 siteName =
     "HEMIN"
+
+
 
 -- INTERNAL
 
@@ -78,17 +82,18 @@ template content =
         ]
     ]
 
+
 navbar : Html msg
 navbar =
     nav [ class "UnderlineNav" ]
-        [ div [ class "UnderlineNav-actions" ] 
-            [ a [ href "/" ] 
+        [ div [ class "UnderlineNav-actions" ]
+            [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 16, height 16, alt "" ] []
-                , div [ class "d-inline-block mx-1" ] 
+                , div [ class "d-inline-block mx-1" ]
                     [ text siteName ]
                 ]
-            ] 
-        , div [ class "UnderlineNav-body" ] 
+            ]
+        , div [ class "UnderlineNav-body" ]
             [ a [ class "UnderlineNav-item", href "/search" ] [ text "search" ]
             , a [ class "UnderlineNav-item", href "/discover" ] [ text "discover" ]
             , a [ class "UnderlineNav-item", href "/propose" ] [ text "+feed" ]

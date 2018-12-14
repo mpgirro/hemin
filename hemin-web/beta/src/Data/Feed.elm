@@ -1,9 +1,10 @@
 module Data.Feed exposing (Feed, feedDecoder)
 
-import Json.Decode exposing (Decoder, string, maybe)
+import Json.Decode exposing (Decoder, maybe, string)
 import Json.Decode.Pipeline exposing (optional, required)
 
-type alias Feed = 
+
+type alias Feed =
     { id : String
     , podcastId : String
     , url : Maybe String

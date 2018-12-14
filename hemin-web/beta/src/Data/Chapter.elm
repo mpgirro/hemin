@@ -1,18 +1,24 @@
 module Data.Chapter exposing (Chapter, chapterDecoder)
 
-import Json.Decode exposing (Decoder, string, maybe)
+import Json.Decode exposing (Decoder, maybe, string)
 import Json.Decode.Pipeline exposing (optional)
+
+
 
 --- MODELS ---
 
-type alias Chapter = 
+
+type alias Chapter =
     { start : Maybe String
     , title : Maybe String
     , href : Maybe String
     , image : Maybe String
     }
 
+
+
 --- JSON ---
+
 
 chapterDecoder : Decoder Chapter
 chapterDecoder =

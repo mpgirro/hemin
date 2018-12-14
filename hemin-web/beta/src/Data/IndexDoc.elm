@@ -1,9 +1,12 @@
 module Data.IndexDoc exposing (IndexDoc, indexDocDecoder)
 
-import Json.Decode exposing (Decoder, string, maybe)
+import Json.Decode exposing (Decoder, maybe, string)
 import Json.Decode.Pipeline exposing (optional, required)
 
+
+
 --- MODELS ---
+
 
 type alias IndexDoc =
     { docType : String
@@ -18,12 +21,11 @@ type alias IndexDoc =
     , podcastTitle : Maybe String
     }
 
+
+
 --- DEFAULTS ---
-
-
-
-
 --- JSON ---
+
 
 indexDocDecoder : Decoder IndexDoc
 indexDocDecoder =

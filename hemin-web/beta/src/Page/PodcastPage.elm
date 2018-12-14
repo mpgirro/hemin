@@ -1,13 +1,15 @@
 module Page.PodcastPage exposing (Model(..), Msg(..), getPodcast, init, update, view)
 
 import Browser
+import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Data.Podcast exposing (Podcast)
 import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
-import Util exposing (maybeAsText, maybeAsString)
+import Util exposing (maybeAsString, maybeAsText)
+
+
 
 -- MAIN
 

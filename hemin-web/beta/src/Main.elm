@@ -139,15 +139,15 @@ updateUrlChanged model =
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )
 updateHomeContent model msg =
     case model.content of
-            HomeContent content ->
-                let
-                    ( model_, msg_ ) =
-                        HomePage.update msg content
-                in
-                ( { model | content = wrapHomeContent model_ }, wrapHomeMsg msg_ )
+        HomeContent content ->
+            let
+                ( model_, msg_ ) =
+                    HomePage.update msg content
+            in
+            ( { model | content = wrapHomeContent model_ }, wrapHomeMsg msg_ )
 
-            _ ->
-                ( model, Cmd.none )
+        _ ->
+            ( model, Cmd.none )
 
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
@@ -191,6 +191,7 @@ updateSearchContent model msg =
         _ ->
             ( model, Cmd.none )
 
+
 updateDiscoverContent : Model -> DiscoverPage.Msg -> ( Model, Cmd Msg )
 updateDiscoverContent model msg =
     case model.content of
@@ -198,11 +199,12 @@ updateDiscoverContent model msg =
             let
                 ( model_, msg_ ) =
                     DiscoverPage.update msg content
-             in
-             ( { model | content = wrapDiscoverContent model_ }, wrapDiscoverMsg msg_ )
+            in
+            ( { model | content = wrapDiscoverContent model_ }, wrapDiscoverMsg msg_ )
 
         _ ->
             ( model, Cmd.none )
+
 
 
 --- SUBSCRIPTIONS ---
@@ -231,8 +233,8 @@ view model =
 
         HomeContent content ->
             Skeleton.view "" (HomePage.view content)
-            --viewHomePage
 
+        --viewHomePage
         PodcastContent content ->
             Skeleton.view "Podcast" (PodcastPage.view content)
 
@@ -267,13 +269,16 @@ viewHomePage =
 
 --- UTILITIES (for documenting type signatures) ---
 
+
 wrapHomeContent : HomePage.Model -> Content
 wrapHomeContent model =
     HomeContent model
 
+
 wrapHomeMsg : Cmd HomePage.Msg -> Cmd Msg
 wrapHomeMsg msg =
-  Cmd.map HomeMsg msg
+    Cmd.map HomeMsg msg
+
 
 wrapPodcastContent : PodcastPage.Model -> Content
 wrapPodcastContent model =

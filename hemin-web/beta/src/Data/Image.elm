@@ -1,7 +1,8 @@
 module Data.Image exposing (Image, imageDecoder)
 
-import Json.Decode exposing (Decoder, string, maybe, int)
+import Json.Decode exposing (Decoder, int, maybe, string)
 import Json.Decode.Pipeline exposing (optional, required)
+
 
 type alias Image =
     { id : String
@@ -26,5 +27,3 @@ imageDecoder =
         |> optional "contentType" (maybe string) Nothing
         |> optional "size" (maybe int) Nothing
         |> optional "createdAt" (maybe string) Nothing
-
-

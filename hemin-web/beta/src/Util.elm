@@ -2,6 +2,7 @@ module Util exposing (maybeAsString, maybeAsText)
 
 import Html exposing (Html, text)
 
+
 maybeAsText : Maybe String -> Html msg
 maybeAsText maybe =
     case maybe of

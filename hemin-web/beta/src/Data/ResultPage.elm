@@ -4,7 +4,10 @@ import Data.IndexDoc exposing (IndexDoc, indexDocDecoder)
 import Json.Decode exposing (Decoder, bool, field, int, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
+
+
 --- MODELS ---
+
 
 type alias ResultPage =
     { currPage : Int
@@ -12,6 +15,8 @@ type alias ResultPage =
     , totalHits : Int
     , results : List IndexDoc
     }
+
+
 
 --- DEFAULTS ---
 
@@ -25,7 +30,9 @@ emptyResultPage =
     }
 
 
+
 --- JSON ---
+
 
 resultPageDecoder : Decoder ResultPage
 resultPageDecoder =

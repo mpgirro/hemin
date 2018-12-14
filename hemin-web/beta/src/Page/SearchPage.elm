@@ -5,7 +5,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, text, ul, span)
+import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
@@ -13,7 +13,8 @@ import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import RestApi
 import Skeleton exposing (Page)
-import Util exposing (maybeAsText, maybeAsString)
+import Util exposing (maybeAsString, maybeAsText)
+
 
 
 -- MAIN
@@ -98,15 +99,15 @@ viewSearchResult : ResultPage -> Html msg
 viewSearchResult searchResult =
     div [ class "col-md-10", class "p-2", class "mx-auto" ]
         [ p []
-          [ text "Search Results Page" ]
+            [ text "Search Results Page" ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
-          [ text ("currPage:" ++ String.fromInt searchResult.currPage) ]
+            [ text ("currPage:" ++ String.fromInt searchResult.currPage) ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
-          [ text ("maxPage:" ++ String.fromInt searchResult.maxPage) ]
+            [ text ("maxPage:" ++ String.fromInt searchResult.maxPage) ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
-          [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
-        , ul [ class "list-style-none" ]
-            <| List.map viewIndexDoc searchResult.results
+            [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
+        , ul [ class "list-style-none" ] <|
+            List.map viewIndexDoc searchResult.results
         ]
 
 
@@ -124,9 +125,6 @@ viewIndexDoc doc =
                 ]
             ]
         ]
-                
-            
-            
 
 
 

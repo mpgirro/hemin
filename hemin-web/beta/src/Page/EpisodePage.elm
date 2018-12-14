@@ -7,7 +7,8 @@ import Html.Attributes exposing (..)
 import Http
 import RestApi
 import Skeleton exposing (Page)
-import Util exposing (maybeAsText, maybeAsString)
+import Util exposing (maybeAsString, maybeAsText)
+
 
 
 -- MAIN

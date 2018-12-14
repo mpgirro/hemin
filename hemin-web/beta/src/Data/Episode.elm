@@ -1,7 +1,7 @@
 module Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 
 import Data.Chapter exposing (Chapter, chapterDecoder)
-import Json.Decode exposing (Decoder, int, string, list, maybe, bool, field)
+import Json.Decode exposing (Decoder, bool, field, int, list, maybe, string)
 import Json.Decode.Pipeline exposing (optional, required)
 
 
@@ -21,6 +21,7 @@ type alias Episode =
     , guidIsPermalink : Maybe Bool
     , image : Maybe String
     , contentEncoded : Maybe String
+
     --, atomLinks : List AtomLink
     , chapters : List Chapter
     , itunes : EpisodeItunes
@@ -38,11 +39,13 @@ type alias EpisodeItunes =
     , episodeType : Maybe String
     }
 
+
 type alias EpisodeEnclosure =
     { url : Maybe String
     , length : Maybe Int
     , typ : Maybe String
     }
+
 
 
 --- DEFAULTS ---
@@ -59,12 +62,15 @@ emptyEpisodeItunes =
     , episodeType = Nothing
     }
 
+
 emptyEpisodeEnclosure : EpisodeEnclosure
 emptyEpisodeEnclosure =
     { url = Nothing
     , length = Nothing
     , typ = Nothing
     }
+
+
 
 --- JSON ---
 
@@ -87,9 +93,11 @@ episodeDecoder =
         |> optional "itunes" episodeItunesDecoder emptyEpisodeItunes
         |> optional "enclosure" episodeEnclosureDecoder emptyEpisodeEnclosure
 
+
 episodeListDecoder : Decoder (List Episode)
 episodeListDecoder =
     field "results" (list episodeDecoder)
+
 
 episodeItunesDecoder : Decoder EpisodeItunes
 episodeItunesDecoder =
@@ -101,6 +109,7 @@ episodeItunesDecoder =
         |> optional "season" (maybe int) Nothing
         |> optional "episode" (maybe int) Nothing
         |> optional "episodeType" (maybe string) Nothing
+
 
 episodeEnclosureDecoder : Decoder EpisodeEnclosure
 episodeEnclosureDecoder =

@@ -1,6 +1,6 @@
 module Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 
-import Json.Decode exposing (Decoder, bool, field, list, string, maybe)
+import Json.Decode exposing (Decoder, bool, field, list, maybe, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 
@@ -21,8 +21,10 @@ type alias Podcast =
     , docs : Maybe String
     , managingEditor : Maybe String
     , image : Maybe String
+
     --, atomLinks : List AtomLink
     , itunes : PodcastItunes
+
     --,registration : PodcastRegistration
     --,feedpress : PodcastFeedpress
     --,fyyd : PodcastFyyd
@@ -81,9 +83,11 @@ podcastDecoder =
         |> optional "image" (maybe string) Nothing
         |> optional "itunes" podcastItunesDecoder emptyPodcastItunes
 
+
 podcastListDecoder : Decoder (List Podcast)
 podcastListDecoder =
     field "results" (list podcastDecoder)
+
 
 podcastItunesDecoder : Decoder PodcastItunes
 podcastItunesDecoder =

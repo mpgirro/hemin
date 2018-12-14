@@ -6,7 +6,9 @@ import Html.Attributes exposing (..)
 import Http
 import RestApi
 import Skeleton exposing (Page)
-import Util exposing (maybeAsText, maybeAsString)
+import Util exposing (maybeAsString, maybeAsText)
+
+
 
 ---- MODEL ----
 
@@ -16,7 +18,10 @@ type Model
     | Loading
     | Content (List Podcast)
 
+
+
 ---- UPDATE ----
+
 
 type Msg
     = LoadDiscover Int Int
@@ -37,39 +42,44 @@ update msg model =
                 Err cause ->
                     ( Failure cause, Cmd.none )
 
+
+
 ---- VIEW ----
+
 
 view : Model -> Html msg
 view model =
     case model of
-            Failure cause ->
-                Skeleton.viewHttpFailure cause
+        Failure cause ->
+            Skeleton.viewHttpFailure cause
 
-            Loading ->
-                text "Loading..."
+        Loading ->
+            text "Loading..."
 
-            Content podcasts ->
-                viewDiscover podcasts
+        Content podcasts ->
+            viewDiscover podcasts
+
 
 viewDiscover : List Podcast -> Html msg
 viewDiscover podcasts =
     div []
-      [ div [ class "Subhead" ]
-        [ div [ class "Subhead-heading" ]
-            [ text "Discover Podcasts" ]
-        , div [ class "Subhead-description" ]
-            [ text "Discover new podcasts in this grid of cover images" ]
+        [ div [ class "Subhead" ]
+            [ div [ class "Subhead-heading" ]
+                [ text "Discover Podcasts" ]
+            , div [ class "Subhead-description" ]
+                [ text "Discover new podcasts in this grid of cover images" ]
+            ]
+        , ul [ class "list-style-none" ] <|
+            List.map viewPodcastCover podcasts
         ]
-      , ul [ class "list-style-none" ]
-          <| List.map viewPodcastCover podcasts
-      ]
-
 
 
 viewPodcastCover : Podcast -> Html msg
 viewPodcastCover podcast =
     li [ class "d-inline-block", class "col-2", class "p-2" ]
         [ img [ class "width-full", class "avatar", src (maybeAsString podcast.image) ] [] ]
+
+
 
 --- HTTP ---
 
