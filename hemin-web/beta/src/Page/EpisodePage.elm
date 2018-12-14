@@ -23,7 +23,7 @@ main =
 
 
 
--- MODEL
+---- MODEL ----
 
 
 type Model
@@ -38,7 +38,7 @@ init _ =
 
 
 
--- UPDATE
+---- UPDATE ----
 
 
 type Msg
@@ -71,7 +71,7 @@ subscriptions model =
 
 
 
--- VIEW
+---- VIEW ----
 
 
 view : Model -> Html msg
@@ -97,7 +97,7 @@ viewEpisode episode =
 
 
 
--- HTTP
+--- HTTP ---
 
 
 getEpisode : String -> Cmd Msg

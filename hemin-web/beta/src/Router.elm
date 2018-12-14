@@ -17,6 +17,7 @@ type Route
     | PodcastPage String
     | EpisodePage String
     | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
+    | DiscoverPage
 
 
 parser : Parser (Route -> a) a
@@ -26,6 +27,7 @@ parser =
         , Parser.map PodcastPage (s "p" </> string)
         , Parser.map EpisodePage (s "e" </> string)
         , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
+        , Parser.map DiscoverPage (s "discover")
         ]
 
 

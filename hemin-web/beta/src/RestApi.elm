@@ -1,8 +1,8 @@
-module RestApi exposing (apiBase, getEpisode, getPodcast, getSearchResult)
+module RestApi exposing (apiBase, getAllPodcasts, getEpisode, getPodcast, getSearchResult)
 
 import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
-import Data.Podcast exposing (Podcast, podcastDecoder)
+import Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
 import Http
 
@@ -29,6 +29,12 @@ getPodcast resultWrapper id =
         , expect = Http.expectJson resultWrapper podcastDecoder
         }
 
+getAllPodcasts : (Result Http.Error (List Podcast) -> msg) -> Int -> Int -> Cmd msg
+getAllPodcasts resultWrapper pageNumber pageSize =
+    Http.get
+        { url = apiBase ++ "/podcast-list.json"
+        , expect = Http.expectJson resultWrapper podcastListDecoder
+        }
 
 getSearchResult : (Result Http.Error ResultPage -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
 getSearchResult resultWrapper query pageNumber pageSize =

@@ -56,6 +56,7 @@ type Content
     | PodcastContent PodcastPage.Model
     | EpisodeContent EpisodePage.Model
     | SearchContent SearchPage.Model
+    | DiscoverContent DiscoverPage.Model
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
@@ -82,6 +83,7 @@ type Msg
     | PodcastMsg PodcastPage.Msg
     | EpisodeMsg EpisodePage.Msg
     | SearchMsg SearchPage.Msg
+    | DiscoverMsg DiscoverPage.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -110,6 +112,9 @@ update message model =
         SearchMsg msg ->
             updateSearchContent model msg
 
+        DiscoverMsg msg ->
+            updateDiscoverContent model msg
+
 
 updateUrlChanged : Model -> ( Model, Cmd Msg )
 updateUrlChanged model =
@@ -126,6 +131,9 @@ updateUrlChanged model =
 
         SearchPage query pageNum pageSize ->
             ( { model | content = wrapSearchContent SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+
+        DiscoverPage ->
+            ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
 
 
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )
@@ -183,9 +191,21 @@ updateSearchContent model msg =
         _ ->
             ( model, Cmd.none )
 
+updateDiscoverContent : Model -> DiscoverPage.Msg -> ( Model, Cmd Msg )
+updateDiscoverContent model msg =
+    case model.content of
+        DiscoverContent content ->
+            let
+                ( model_, msg_ ) =
+                    DiscoverPage.update msg content
+             in
+             ( { model | content = wrapDiscoverContent model_ }, wrapDiscoverMsg msg_ )
+
+        _ ->
+            ( model, Cmd.none )
 
 
--- SUBSCRIPTIONS
+--- SUBSCRIPTIONS ---
 
 
 subscriptions : Model -> Sub Msg
@@ -221,6 +241,9 @@ view model =
 
         SearchContent content ->
             Skeleton.view "Search" (SearchPage.view content)
+
+        DiscoverContent content ->
+            Skeleton.view "Discover" (DiscoverPage.view content)
 
 
 viewNotFound : Page msg
@@ -280,3 +303,13 @@ wrapSearchContent model =
 wrapSearchMsg : Cmd SearchPage.Msg -> Cmd Msg
 wrapSearchMsg msg =
     Cmd.map SearchMsg msg
+
+
+wrapDiscoverContent : DiscoverPage.Model -> Content
+wrapDiscoverContent model =
+    DiscoverContent model
+
+
+wrapDiscoverMsg : Cmd DiscoverPage.Msg -> Cmd Msg
+wrapDiscoverMsg msg =
+    Cmd.map DiscoverMsg msg

@@ -37,4 +37,4 @@ update msg model =
 
 view : Model -> Html msg
 view model =
-    div [] [ p [] [ text "Homepage" ] ]
+    div [] [ p [] [ text "Home Page" ] ]

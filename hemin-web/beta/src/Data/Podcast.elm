@@ -1,4 +1,4 @@
-module Data.Podcast exposing (Podcast, podcastDecoder)
+module Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, list, string, maybe)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -81,6 +81,9 @@ podcastDecoder =
         |> optional "image" (maybe string) Nothing
         |> optional "itunes" podcastItunesDecoder emptyPodcastItunes
 
+podcastListDecoder : Decoder (List Podcast)
+podcastListDecoder =
+    list podcastDecoder
 
 podcastItunesDecoder : Decoder PodcastItunes
 podcastItunesDecoder =
