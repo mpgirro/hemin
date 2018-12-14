@@ -96,7 +96,7 @@ view model =
 
 viewSearchResult : ResultPage -> Html msg
 viewSearchResult searchResult =
-    div []
+    div [ class "col-md-10", class "p-2", class "mx-auto" ]
         [ p [] [ text "Search Results Page" ]
         , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage) ]
         , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage) ]
