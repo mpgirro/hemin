@@ -7,8 +7,7 @@ import Http
 import Data.Podcast exposing (Podcast)
 import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
-
-
+import Util exposing (maybeAsText, maybeAsString)
 
 -- MAIN
 
@@ -95,9 +94,9 @@ view model =
 viewPodcast : Podcast -> Html msg
 viewPodcast podcast =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ h1 [] [ text podcast.title ]
-        , Skeleton.viewLink podcast.link
-        , p [] [ text podcast.description ]
+        [ h1 [] [ maybeAsText podcast.title ]
+        , Skeleton.viewLink (maybeAsString podcast.link)
+        , p [] [ maybeAsText podcast.description ]
         ]
 
 

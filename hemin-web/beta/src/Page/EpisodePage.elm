@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import RestApi
 import Skeleton exposing (Page)
-
+import Util exposing (maybeAsText, maybeAsString)
 
 
 -- MAIN
@@ -90,9 +90,9 @@ view model =
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ h1 [] [ text episode.title ]
-        , Skeleton.viewLink episode.link
-        , p [] [ text episode.description ]
+        [ h1 [] [ maybeAsText episode.title ]
+        , Skeleton.viewLink (maybeAsString episode.link)
+        , p [] [ maybeAsText episode.description ]
         ]
 
 

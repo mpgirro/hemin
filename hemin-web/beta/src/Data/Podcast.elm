@@ -1,4 +1,4 @@
-module Data.Podcast exposing (Podcast, PodcastItunes, emptyPodcastItunes, podcastDecoder, podcastItunesDecoder)
+module Data.Podcast exposing (Podcast, podcastDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, list, string, maybe)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -10,9 +10,9 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 
 type alias Podcast =
     { id : String
-    , title : String
-    , link : String
-    , description : String
+    , title : Maybe String
+    , link : Maybe String
+    , description : Maybe String
     , pubDate : Maybe String
     , lastBuildDate : Maybe String
     , language : Maybe String
@@ -30,15 +30,15 @@ type alias Podcast =
 
 
 type alias PodcastItunes =
-    { summary : String
-    , author : String
+    { summary : Maybe String
+    , author : Maybe String
     , keywords : List String
     , categories : List String
-    , explicit : Bool
-    , block : Bool
-    , podcastType : String
-    , ownerName : String
-    , ownerEmail : String
+    , explicit : Maybe Bool
+    , block : Maybe Bool
+    , podcastType : Maybe String
+    , ownerName : Maybe String
+    , ownerEmail : Maybe String
     }
 
 
@@ -48,15 +48,15 @@ type alias PodcastItunes =
 
 emptyPodcastItunes : PodcastItunes
 emptyPodcastItunes =
-    { summary = ""
-    , author = ""
+    { summary = Nothing
+    , author = Nothing
     , keywords = []
     , categories = []
-    , explicit = False
-    , block = False
-    , podcastType = ""
-    , ownerName = ""
-    , ownerEmail = ""
+    , explicit = Nothing
+    , block = Nothing
+    , podcastType = Nothing
+    , ownerName = Nothing
+    , ownerEmail = Nothing
     }
 
 
@@ -68,9 +68,9 @@ podcastDecoder : Decoder Podcast
 podcastDecoder =
     Json.Decode.succeed Podcast
         |> required "id" string
-        |> optional "title" string ""
-        |> optional "link" string ""
-        |> optional "description" string ""
+        |> optional "title" (maybe string) Nothing
+        |> optional "link" (maybe string) Nothing
+        |> optional "description" (maybe string) Nothing
         |> optional "pubDate" (maybe string) Nothing
         |> optional "lastBuildDate" (maybe string) Nothing
         |> optional "language" (maybe string) Nothing
@@ -85,12 +85,12 @@ podcastDecoder =
 podcastItunesDecoder : Decoder PodcastItunes
 podcastItunesDecoder =
     Json.Decode.succeed PodcastItunes
-        |> optional "summary" string ""
-        |> optional "author" string ""
+        |> optional "summary" (maybe string) Nothing
+        |> optional "author" (maybe string) Nothing
         |> optional "keywords" (list string) []
         |> optional "categories" (list string) []
-        |> optional "explicit" bool False
-        |> optional "block" bool False
-        |> optional "podcastType" string ""
-        |> optional "ownerName" string ""
-        |> optional "ownerEmail" string ""
+        |> optional "explicit" (maybe bool) Nothing
+        |> optional "block" (maybe bool) Nothing
+        |> optional "podcastType" (maybe string) Nothing
+        |> optional "ownerName" (maybe string) Nothing
+        |> optional "ownerEmail" (maybe string) Nothing

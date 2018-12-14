@@ -13,7 +13,7 @@ import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import RestApi
 import Skeleton exposing (Page)
-
+import Util exposing (maybeAsText, maybeAsString)
 
 
 -- MAIN
@@ -101,8 +101,8 @@ viewSearchResult searchResult =
         , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage) ]
         , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage) ]
         , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits) ]
-        , ul [ class "list-style-none" ] <|
-            List.map viewIndexDoc searchResult.results
+        , ul [ class "list-style-none" ]
+            <| List.map viewIndexDoc searchResult.results
         ]
 
 
@@ -113,10 +113,10 @@ viewIndexDoc doc =
             [ div [ class "float-left", class "p-3", class "mr-3", class "bg-gray" ]
                 [ text "Image" ]
             , div [ class "overflow-hidden" ]
-                [ b [] [ text doc.title ]
+                [ b [] [ maybeAsText doc.title ]
                 , br [] []
-                , Skeleton.viewLink doc.link
-                , p [] [ text doc.description ]
+                , Skeleton.viewLink (maybeAsString doc.link)
+                , p [] [ maybeAsText doc.description ]
                 ]
             ]
         ]
