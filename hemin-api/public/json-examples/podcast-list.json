@@ -4,7 +4,7 @@
             "id":"p1",
             "title":"Podcast title",
             "link":"http://example.com",
-            "description":"Podcast description",
+            "description":"Podcast description: Bacon ipsum dolor amet shankle rump tenderloin pork chop meatball strip steak bresaola doner sirloin capicola biltong shank pig. Alcatra frankfurter ham hock, ribeye prosciutto hamburger kevin brisket chuck burgdoggen short loin.",
             "language":"de-de",
             "copyright":"cc-by-nc-sa",
             "image":"i1",
@@ -15,21 +15,21 @@
                     "hrefResolved":"http://example.com",
                     "rel":"self",
                     "typ":"application/rss+xml",
-                    "length":0,
+                    "length":0
                 },
                 {
                     "href":"http://example.com",
                     "hrefResolved":"http://example.com",
                     "rel":"payment",
                     "typ":"text/html",
-                    "length":0,
+                    "length":0
                 }
             ],
             "registration": {
-                "complete":true,
+                "complete":true
             },
             "itunes":{
-                "summary":"Podcast summary",
+                "summary":"Podcast summary: Bacon ipsum dolor amet shankle rump tenderloin pork chop meatball strip steak bresaola doner sirloin capicola biltong shank pig. Alcatra frankfurter ham hock, ribeye prosciutto hamburger kevin brisket chuck burgdoggen short loin.",
                 "author":"Podcast author",
                 "keywords":[],
                 "categories":[
@@ -39,16 +39,16 @@
                 "block":false,
                 "podcastType":"episodic",
                 "ownerName":"Podcast owner name",
-                "ownerEmail":"podcast@example.com",
+                "ownerEmail":"podcast@example.com"
             },
             "feedpress":{},
-            "fyyd":{},
+            "fyyd":{}
         },
         {
             "id":"p2",
             "title":"Podcast title",
             "link":"http://example.com",
-            "description":"Podcast description",
+            "description":"Podcast description: Bacon ipsum dolor amet shankle rump tenderloin pork chop meatball strip steak bresaola doner sirloin capicola biltong shank pig. Alcatra frankfurter ham hock, ribeye prosciutto hamburger kevin brisket chuck burgdoggen short loin.",
             "language":"de-de",
             "copyright":"cc-by-nc-sa",
             "image":"i1",
@@ -59,18 +59,18 @@
                     "hrefResolved":"http://example.com",
                     "rel":"self",
                     "typ":"application/rss+xml",
-                    "length":0,
+                    "length":0
                 },
                 {
                     "href":"http://example.com",
                     "hrefResolved":"http://example.com",
                     "rel":"payment",
                     "typ":"text/html",
-                    "length":0,
+                    "length":0
                 }
             ],
             "registration": {
-                "complete":true,
+                "complete":true
             },
             "itunes":{
                 "summary":"Podcast summary",
@@ -83,10 +83,10 @@
                 "block":false,
                 "podcastType":"episodic",
                 "ownerName":"Podcast owner name",
-                "ownerEmail":"podcast@example.com",
+                "ownerEmail":"podcast@example.com"
             },
             "feedpress":{},
-            "fyyd":{},
-        },
-    ],
+            "fyyd":{}
+        }
+    ]
 }
