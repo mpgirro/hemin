@@ -1,4 +1,4 @@
-module Page.SearchPage exposing (Model(..), Msg(..), getSearchResult, init, main, subscriptions, update, view)
+module Page.Search exposing (Model(..), Msg(..), getSearchResult, init, main, subscriptions, update, view)
 
 import Browser
 import Data.Episode exposing (Episode, episodeDecoder)

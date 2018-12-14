@@ -10,11 +10,11 @@ import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
 import Html exposing (div, p, text)
 import Http
-import Page.DiscoverPage as DiscoverPage
-import Page.EpisodePage as EpisodePage
-import Page.HomePage as HomePage
-import Page.PodcastPage as PodcastPage
-import Page.SearchPage as SearchPage
+import Page.Discover as DiscoverPage
+import Page.Episode as EpisodePage
+import Page.Home as HomePage
+import Page.Podcast as PodcastPage
+import Page.Search as SearchPage
 import Router exposing (Route(..), fromUrl, parser)
 import Skeleton exposing (Page)
 import Url exposing (Url)

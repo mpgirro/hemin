@@ -1,12 +1,12 @@
-module Page.EpisodePage exposing (Model(..), Msg(..), getEpisode, init, update, view)
+module Page.Podcast exposing (Model(..), Msg(..), getPodcast, init, update, view)
 
 import Browser
-import Data.Episode exposing (Episode)
+import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import RestApi
-import Skeleton exposing (Page)
+import Skeleton exposing (Page, viewHttpFailure)
 import Util exposing (maybeAsString, maybeAsText)
 
 
@@ -24,39 +24,44 @@ main =
 
 
 
----- MODEL ----
+-- MODEL
 
 
 type Model
     = Failure Http.Error
     | Loading
-    | Content Episode
+    | Content Podcast
 
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( Loading, getEpisode "" )
+    ( Loading, getPodcast "" )
+
+
+initWithId : String -> ( Model, Cmd Msg )
+initWithId id =
+    ( Loading, getPodcast id )
 
 
 
----- UPDATE ----
+-- UPDATE
 
 
 type Msg
-    = LoadEpisode String
-    | LoadedEpisode (Result Http.Error Episode)
+    = LoadPodcast String
+    | LoadedPodcast (Result Http.Error Podcast)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadEpisode id ->
-            ( model, getEpisode id )
+        LoadPodcast id ->
+            ( model, getPodcast id )
 
-        LoadedEpisode result ->
+        LoadedPodcast result ->
             case result of
-                Ok episode ->
-                    ( Content episode, Cmd.none )
+                Ok podcast ->
+                    ( Content podcast, Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
@@ -72,7 +77,7 @@ subscriptions model =
 
 
 
----- VIEW ----
+-- VIEW
 
 
 view : Model -> Html msg
@@ -84,23 +89,23 @@ view model =
         Loading ->
             text "Loading..."
 
-        Content episode ->
-            viewEpisode episode
+        Content podcast ->
+            viewPodcast podcast
 
 
-viewEpisode : Episode -> Html msg
-viewEpisode episode =
+viewPodcast : Podcast -> Html msg
+viewPodcast podcast =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ h1 [] [ maybeAsText episode.title ]
-        , Skeleton.viewLink (maybeAsString episode.link)
-        , p [] [ maybeAsText episode.description ]
+        [ h1 [] [ maybeAsText podcast.title ]
+        , Skeleton.viewLink (maybeAsString podcast.link)
+        , p [] [ maybeAsText podcast.description ]
         ]
 
 
 
---- HTTP ---
+-- HTTP
 
 
-getEpisode : String -> Cmd Msg
-getEpisode id =
-    RestApi.getEpisode LoadedEpisode id
+getPodcast : String -> Cmd Msg
+getPodcast id =
+    RestApi.getPodcast LoadedPodcast id
