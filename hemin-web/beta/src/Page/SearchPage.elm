@@ -5,7 +5,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, span, text, ul)
+import Html exposing (Attribute, Html, b, br, div, form, h1, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
@@ -92,12 +92,21 @@ view model =
             text "Loading..."
 
         Content searchResult ->
-            viewSearchResult searchResult
+            div [ class "col-md-10", class "p-2", class "mx-auto" ]
+              [ viewSearchInput
+              , viewSearchResult searchResult
+              ]
+
+viewSearchInput : Html msg
+viewSearchInput =
+    Html.form []
+        [ input [ class "form-control", class "input-block", type_ "text", placeholder "Search for podcasts/episodes" ] []
+        ]
 
 
 viewSearchResult : ResultPage -> Html msg
 viewSearchResult searchResult =
-    div [ class "col-md-10", class "p-2", class "mx-auto" ]
+    div []
         [ p []
             [ text "Search Results Page" ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
