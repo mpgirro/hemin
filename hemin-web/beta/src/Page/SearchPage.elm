@@ -5,7 +5,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, text, ul)
+import Html exposing (Attribute, Html, b, br, div, h1, input, li, p, text, ul, span)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput)
 import Http
@@ -97,10 +97,14 @@ view model =
 viewSearchResult : ResultPage -> Html msg
 viewSearchResult searchResult =
     div [ class "col-md-10", class "p-2", class "mx-auto" ]
-        [ p [] [ text "Search Results Page" ]
-        , p [] [ text ("currPage: " ++ String.fromInt searchResult.currPage) ]
-        , p [] [ text ("maxPage: " ++ String.fromInt searchResult.maxPage) ]
-        , p [] [ text ("totalHits: " ++ String.fromInt searchResult.totalHits) ]
+        [ p []
+          [ text "Search Results Page" ]
+        , span [ class "Label", class "Label--gray", class "mx-2" ]
+          [ text ("currPage:" ++ String.fromInt searchResult.currPage) ]
+        , span [ class "Label", class "Label--gray", class "mx-2" ]
+          [ text ("maxPage:" ++ String.fromInt searchResult.maxPage) ]
+        , span [ class "Label", class "Label--gray", class "mx-2" ]
+          [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
         , ul [ class "list-style-none" ]
             <| List.map viewIndexDoc searchResult.results
         ]

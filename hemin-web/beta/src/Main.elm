@@ -10,7 +10,9 @@ import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
 import Html exposing (div, p, text)
 import Http
+import Page.DiscoverPage as DiscoverPage
 import Page.EpisodePage as EpisodePage
+import Page.HomePage as HomePage
 import Page.PodcastPage as PodcastPage
 import Page.SearchPage as SearchPage
 import Router exposing (Route(..), fromUrl, parser)
@@ -50,7 +52,7 @@ type Content
     = Failure Http.Error
     | Loading
     | NotFound
-    | HomeContent
+    | HomeContent HomePage.Model
     | PodcastContent PodcastPage.Model
     | EpisodeContent EpisodePage.Model
     | SearchContent SearchPage.Model
@@ -76,6 +78,7 @@ init flags url key =
 type Msg
     = LinkClicked Browser.UrlRequest
     | UrlChanged Url.Url
+    | HomeMsg HomePage.Msg
     | PodcastMsg PodcastPage.Msg
     | EpisodeMsg EpisodePage.Msg
     | SearchMsg SearchPage.Msg
@@ -95,6 +98,9 @@ update message model =
         UrlChanged url ->
             updateUrlChanged { model | route = Router.fromUrl url }
 
+        HomeMsg msg ->
+            updateHomeContent model msg
+
         PodcastMsg msg ->
             updatePodcastContent model msg
 
@@ -109,7 +115,8 @@ updateUrlChanged : Model -> ( Model, Cmd Msg )
 updateUrlChanged model =
     case model.route of
         HomePage ->
-            ( { model | content = HomeContent }, Cmd.none )
+            -- TODO: here we do not dispatch a message that will replace the Loading model
+            ( { model | content = wrapHomeContent HomePage.Loading }, Cmd.none )
 
         PodcastPage id ->
             ( { model | content = wrapPodcastContent PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
@@ -119,6 +126,20 @@ updateUrlChanged model =
 
         SearchPage query pageNum pageSize ->
             ( { model | content = wrapSearchContent SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+
+
+updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )
+updateHomeContent model msg =
+    case model.content of
+            HomeContent content ->
+                let
+                    ( model_, msg_ ) =
+                        HomePage.update msg content
+                in
+                ( { model | content = wrapHomeContent model_ }, wrapHomeMsg msg_ )
+
+            _ ->
+                ( model, Cmd.none )
 
 
 updatePodcastContent : Model -> PodcastPage.Msg -> ( Model, Cmd Msg )
@@ -188,8 +209,9 @@ view model =
         NotFound ->
             viewNotFound
 
-        HomeContent ->
-            viewHomePage
+        HomeContent content ->
+            Skeleton.view "" (HomePage.view content)
+            --viewHomePage
 
         PodcastContent content ->
             Skeleton.view "Podcast" (PodcastPage.view content)
@@ -222,6 +244,13 @@ viewHomePage =
 
 --- UTILITIES (for documenting type signatures) ---
 
+wrapHomeContent : HomePage.Model -> Content
+wrapHomeContent model =
+    HomeContent model
+
+wrapHomeMsg : Cmd HomePage.Msg -> Cmd Msg
+wrapHomeMsg msg =
+  Cmd.map HomeMsg msg
 
 wrapPodcastContent : PodcastPage.Model -> Content
 wrapPodcastContent model =
