@@ -1,7 +1,7 @@
-module Data.Episode exposing (Episode, episodeDecoder)
+module Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 
 import Data.Chapter exposing (Chapter, chapterDecoder)
-import Json.Decode exposing (Decoder, int, string, list, maybe, bool)
+import Json.Decode exposing (Decoder, int, string, list, maybe, bool, field)
 import Json.Decode.Pipeline exposing (optional, required)
 
 
@@ -87,6 +87,9 @@ episodeDecoder =
         |> optional "itunes" episodeItunesDecoder emptyEpisodeItunes
         |> optional "enclosure" episodeEnclosureDecoder emptyEpisodeEnclosure
 
+episodeListDecoder : Decoder (List Episode)
+episodeListDecoder =
+    field "results" (list episodeDecoder)
 
 episodeItunesDecoder : Decoder EpisodeItunes
 episodeItunesDecoder =

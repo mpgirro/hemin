@@ -83,7 +83,7 @@ podcastDecoder =
 
 podcastListDecoder : Decoder (List Podcast)
 podcastListDecoder =
-    list podcastDecoder
+    field "results" (list podcastDecoder)
 
 podcastItunesDecoder : Decoder PodcastItunes
 podcastItunesDecoder =
