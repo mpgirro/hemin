@@ -21,7 +21,8 @@ apiBase =
 getEpisode : (Result Http.Error Episode -> msg) -> String -> Cmd msg
 getEpisode resultWrapper id =
     Http.get
-        { url = apiBase ++ "/episode.json"
+        { --url = apiBase ++ "/episode.json"
+          url = apiBase ++ "/episode/" ++ id
         , expect = Http.expectJson resultWrapper episodeDecoder
         }
 
@@ -29,7 +30,8 @@ getEpisode resultWrapper id =
 getPodcast : (Result Http.Error Podcast -> msg) -> String -> Cmd msg
 getPodcast resultWrapper id =
     Http.get
-        { url = apiBase ++ "/podcast.json"
+        { --url = apiBase ++ "/podcast.json"
+          url = apiBase ++ "/podcast/" ++ id
         , expect = Http.expectJson resultWrapper podcastDecoder
         }
 

@@ -5,7 +5,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, b, br, div, form, h1, input, li, p, span, text, ul)
+import Html exposing (Attribute, Html, b, br, div, form, h1, input, li, p, span, text, ul, a)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onSubmit)
 import Http
@@ -155,14 +155,30 @@ viewIndexDoc doc =
             [ div [ class "float-left", class "p-3", class "mr-3", class "bg-gray" ]
                 [ text "Image" ]
             , div [ class "overflow-hidden" ]
-                [ b [] [ maybeAsText doc.title ]
+                [ viewIndexDocTitleAsLink doc
                 , br [] []
                 , Skeleton.viewLink (maybeAsString doc.link)
+                , p [] [ text doc.docType ]
                 , p [] [ maybeAsText doc.description ]
                 ]
             ]
         ]
 
+
+viewIndexDocTitleAsLink : IndexDoc -> Html Msg
+viewIndexDocTitleAsLink doc =
+    let
+      ref : String
+      ref =
+          case doc.docType of
+              "podcast" ->
+                  "/p/" ++ doc.id
+              "episode" ->
+                  "/e/" ++ doc.id
+              _ -> ""
+    in
+    a [ href ref ]
+      [ maybeAsText doc.title ]
 
 
 -- HTTP
