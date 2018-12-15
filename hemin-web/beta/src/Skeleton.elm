@@ -123,6 +123,7 @@ footer =
         ]
 
 
+-- TODO deprecated? I implement the functionality in podcast/episode pages separately
 viewLink : String -> Html msg
 viewLink path =
     a [ href path ] [ text path ]

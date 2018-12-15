@@ -1,4 +1,4 @@
-module Util exposing (maybeAsString, maybeAsText)
+module Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 import Html exposing (Html, text)
 
@@ -10,7 +10,7 @@ maybeAsText maybe =
             text txt
 
         Nothing ->
-            text ""
+            emptyHtml
 
 
 maybeAsString : Maybe String -> String
@@ -21,3 +21,7 @@ maybeAsString maybe =
 
         Nothing ->
             ""
+
+
+emptyHtml : Html msg
+emptyHtml = text ""

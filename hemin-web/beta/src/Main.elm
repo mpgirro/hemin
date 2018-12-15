@@ -8,7 +8,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (div, p, text)
+import Html exposing (Html, div, p, text)
 import Http
 import Page.Discover as DiscoverPage
 import Page.Episode as EpisodePage
@@ -130,7 +130,7 @@ updateUrlChanged model =
             ( { model | content = wrapEpisodeContent EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
         SearchPage query pageNum pageSize ->
-            ( { model | content = wrapSearchContent SearchPage.Loading }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+            ( { model | content = wrapSearchContent SearchPage.Ready }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
 
         DiscoverPage ->
             ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
@@ -242,7 +242,7 @@ view model =
             Skeleton.view "Episode" (EpisodePage.view content)
 
         SearchContent content ->
-            Skeleton.view "Search" (SearchPage.view content)
+            Skeleton.view "Search" (wrapSearchHtml (SearchPage.view content))
 
         DiscoverContent content ->
             Skeleton.view "Discover" (DiscoverPage.view content)
@@ -309,6 +309,9 @@ wrapSearchMsg : Cmd SearchPage.Msg -> Cmd Msg
 wrapSearchMsg msg =
     Cmd.map SearchMsg msg
 
+wrapSearchHtml : Html SearchPage.Msg -> Html Msg
+wrapSearchHtml msg =
+    Html.map SearchMsg msg
 
 wrapDiscoverContent : DiscoverPage.Model -> Content
 wrapDiscoverContent model =
