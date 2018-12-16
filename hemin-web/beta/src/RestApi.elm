@@ -12,10 +12,13 @@ apiBase : String
 apiBase =
     -- local alternative:
     "http://localhost:9000/api/v1"
-    -- production:
-    -- "https://api.hemin.io/api/v1"
-    -- JSON examples
-    --"https://api.hemin.io/json-examples"
+
+
+
+-- production:
+-- "https://api.hemin.io/api/v1"
+-- JSON examples
+--"https://api.hemin.io/json-examples"
 
 
 getEpisode : (Result Http.Error Episode -> msg) -> String -> Cmd msg
@@ -40,10 +43,12 @@ getAllPodcasts : (Result Http.Error (List Podcast) -> msg) -> Int -> Int -> Cmd 
 getAllPodcasts resultWrapper pageNumber pageSize =
     let
         p : String
-        p = "p=" ++ String.fromInt pageNumber
+        p =
+            "p=" ++ String.fromInt pageNumber
 
         s : String
-        s = "s=" ++ String.fromInt pageSize
+        s =
+            "s=" ++ String.fromInt pageSize
     in
     Http.get
         { url = apiBase ++ "/podcast?" ++ p ++ "&" ++ s
@@ -55,43 +60,68 @@ getSearchResult : (Result Http.Error ResultPage -> msg) -> Maybe String -> Maybe
 getSearchResult resultWrapper query pageNumber pageSize =
     let
         q : Maybe String
-        q = maybeQuery query
+        q =
+            maybeQuery query
 
         p : Maybe String
-        p = maybePageNumber pageNumber
+        p =
+            maybePageNumber pageNumber
 
         s : Maybe String
-        s = maybePageSize pageSize
+        s =
+            maybePageSize pageSize
 
         params : String
-        params = String.join "&" (Maybe.Extra.values [q, p, s])
+        params =
+            String.join "&" (Maybe.Extra.values [ q, p, s ])
+
+        urlQuery : String
+        urlQuery =
+            if params == "" then
+                ""
+
+            else
+                "?" ++ params
+
+        path : String
+        path =
+            "/search"
+                ++ urlQuery
     in
     Http.get
         { --url = apiBase ++ "/search.json"
-          url = apiBase ++ "/search" ++ ( if params == "" then "" else "?" ++ params  )
+          url =
+            apiBase
+                ++ path
         , expect = Http.expectJson resultWrapper resultPageDecoder
         }
+
 
 maybeQuery : Maybe String -> Maybe String
 maybeQuery query =
     case query of
         Just q ->
             Just ("q=" ++ q)
+
         Nothing ->
             Nothing
 
+
 maybePageNumber : Maybe Int -> Maybe String
 maybePageNumber pageNumber =
-     case pageNumber of
-         Just page ->
-             Just ("p=" ++ String.fromInt page)
-         Nothing ->
-             Nothing
+    case pageNumber of
+        Just page ->
+            Just ("p=" ++ String.fromInt page)
+
+        Nothing ->
+            Nothing
+
 
 maybePageSize : Maybe Int -> Maybe String
 maybePageSize pageSize =
-     case pageSize of
-         Just size ->
-             Just ("s=" ++ String.fromInt size)
-         Nothing ->
-             Nothing
+    case pageSize of
+        Just size ->
+            Just ("s=" ++ String.fromInt size)
+
+        Nothing ->
+            Nothing

@@ -24,4 +24,5 @@ maybeAsString maybe =
 
 
 emptyHtml : Html msg
-emptyHtml = text ""
+emptyHtml =
+    text ""

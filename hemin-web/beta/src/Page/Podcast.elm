@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import RestApi
 import Skeleton exposing (Page, viewHttpFailure)
-import Util exposing (maybeAsString, maybeAsText, emptyHtml)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
 
@@ -108,11 +108,12 @@ viewCoverImage : Podcast -> Html msg
 viewCoverImage podcast =
     case podcast.image of
         Just image ->
-          div []
-            [ img [ src image, alt "cover image" ] [] ]
+            div []
+                [ img [ src image, alt "cover image" ] [] ]
 
         Nothing ->
             emptyHtml
+
 
 viewTitle : Podcast -> Html msg
 viewTitle podcast =
@@ -123,6 +124,7 @@ viewTitle podcast =
         Nothing ->
             emptyHtml
 
+
 viewLink : Podcast -> Html msg
 viewLink podcast =
     case podcast.link of
@@ -132,26 +134,31 @@ viewLink podcast =
         Nothing ->
             emptyHtml
 
+
 viewDecription : Podcast -> Html msg
 viewDecription podcast =
     case podcast.itunes.summary of
-         Just summary ->
+        Just summary ->
             viewDescriptionParagraph summary
-         Nothing ->
-             case podcast.description of
-                 Just description ->
+
+        Nothing ->
+            case podcast.description of
+                Just description ->
                     viewDescriptionParagraph description
-                 Nothing ->
+
+                Nothing ->
                     emptyHtml
+
 
 viewDescriptionParagraph : String -> Html msg
 viewDescriptionParagraph description =
     p [ class "mt-4" ] [ text description ]
 
+
 viewCategories : Podcast -> Html msg
 viewCategories podcast =
-    div [ class "mt-3" ]
-      <| List.map viewCategory podcast.itunes.categories
+    div [ class "mt-3" ] <|
+        List.map viewCategory podcast.itunes.categories
 
 
 viewCategory : String -> Html msg
@@ -161,6 +168,7 @@ viewCategory category =
         [ span [ class "oi", class "oi-tag" ] []
         , text category
         ]
+
 
 
 -- HTTP

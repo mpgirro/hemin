@@ -76,6 +76,7 @@ template : Html msg -> List (Html msg)
 template content =
     [ div [ class "container-md" ]
         [ navbar
+
         --, header
         , content
         , footer
@@ -100,7 +101,11 @@ navbar =
             ]
         ]
 
+
+
 -- TODO deprecated?
+
+
 header : Html msg
 header =
     div [ class "Box Box--danger" ]
@@ -123,7 +128,10 @@ footer =
         ]
 
 
+
 -- TODO deprecated? I implement the functionality in podcast/episode pages separately
+
+
 viewLink : String -> Html msg
 viewLink path =
     a [ href path ] [ text path ]
