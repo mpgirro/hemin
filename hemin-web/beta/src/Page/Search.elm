@@ -1,4 +1,4 @@
-module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, subscriptions, update, view, redirectLocalUrl)
+module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, redirectLocalUrl, subscriptions, update, view)
 
 import Browser
 import Browser.Navigation
@@ -6,9 +6,10 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, b, br, div, form, h1, input, li, p, span, text, ul, a)
+import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput, onSubmit)
+import Html.Events exposing (keyCode, on, onInput, onSubmit)
+import Html.Events.Extra exposing (onEnter)
 import Http
 import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
@@ -16,7 +17,8 @@ import Maybe.Extra
 import RestApi
 import Skeleton exposing (Page)
 import Url exposing (Url)
-import Util exposing (maybeAsString, maybeAsText, emptyHtml)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText)
+
 
 
 -- MODEL
@@ -24,26 +26,26 @@ import Util exposing (maybeAsString, maybeAsText, emptyHtml)
 
 type Model
     = Failure Http.Error
---    | Ready
---    | Loading
---    | Content ResultPage
     | Loading SearchState
     | Content SearchState
 
+
 type alias SearchState =
-  { key : Maybe Browser.Navigation.Key
-  , query : Maybe String
-  , pageNumber : Maybe Int
-  , pageSize : Maybe Int
-  , results : Maybe ResultPage
-  }
+    { key : Maybe Browser.Navigation.Key
+    , query : Maybe String
+    , pageNumber : Maybe Int
+    , pageSize : Maybe Int
+    , results : Maybe ResultPage
+    }
+
 
 
 -- UPDATE
 
 
 type Msg
-    = UpdateSearchUrl (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
+    = UpdateState SearchState
+    | UpdateSearchUrl (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
     | LoadSearchResult (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
     | LoadedSearchResult (Result Http.Error ResultPage)
 
@@ -51,48 +53,47 @@ type Msg
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UpdateState state ->
+            case model of
+                Failure cause ->
+                    -- TODO this is bullshit and must be changed
+                    ( Failure cause, Cmd.none )
+
+                Loading _ ->
+                    ( Loading state, Cmd.none )
+
+                Content _ ->
+                    ( Loading state, Cmd.none )
+
         UpdateSearchUrl key query pageNumber pageSize ->
             case model of
                 Failure cause ->
                     -- TODO this is bullshit and must be changed
-                    (Failure cause, Cmd.none)
+                    ( Failure cause, Cmd.none )
 
-                Loading state ->
+                Loading _ ->
                     let
                         s : SearchState
-                        s = { key = key
-                            , query = query
-                            , pageNumber = pageNumber
-                            , pageSize = pageSize
-                            , results = Nothing
-                            }
+                        s =
+                            stateFromParams key query pageNumber pageSize
                     in
                     ( Loading s, redirectLocalUrl s )
 
-                Content state ->
+                Content _ ->
                     let
                         s : SearchState
-                        s = { key = key
-                            , query = query
-                            , pageNumber = pageNumber
-                            , pageSize = pageSize
-                            , results = Nothing
-                            }
+                        s =
+                            stateFromParams key query pageNumber pageSize
                     in
                     ( Loading s, redirectLocalUrl s )
 
         LoadSearchResult key query pageNumber pageSize ->
             let
                 s : SearchState
-                s = { key = key
-                    , query = query
-                    , pageNumber = pageNumber
-                    , pageSize = pageSize
-                    , results = Nothing
-                    }
+                s =
+                    stateFromParams key query pageNumber pageSize
             in
             ( Loading s, getSearchResult query pageNumber pageSize )
-
 
         -- TODO send HTTP request!
         LoadedSearchResult result ->
@@ -104,51 +105,79 @@ update msg model =
                         Failure _ ->
                             let
                                 s : SearchState
-                                s = { key = Nothing
+                                s =
+                                    { key = Nothing
                                     , query = Nothing
                                     , pageNumber = Nothing
                                     , pageSize = Nothing
                                     , results = Just searchResult
                                     }
                             in
-                            ( Content s, Cmd.none)
+                            ( Content s, Cmd.none )
 
                         Loading state ->
-                            ( Content { state | results = (Just searchResult) }, Cmd.none)
+                            ( Content { state | results = Just searchResult }, Cmd.none )
 
                         -- TODO should I be receiving a Loaded msg in a Content state anyway?
                         Content state ->
-                            ( Content { state | results = (Just searchResult) }, Cmd.none)
+                            ( Content { state | results = Just searchResult }, Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
 
 
+stateFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> SearchState
+stateFromParams key query pageNumber pageSize =
+    { key = key
+    , query = query
+    , pageNumber = pageNumber
+    , pageSize = pageSize
+    , results = Nothing
+    }
+
+
 redirectLocalUrl : SearchState -> Cmd Msg
 redirectLocalUrl state =
     let
-                q : Maybe String
-                q = maybeQuery state.query
+        q : Maybe String
+        q =
+            maybeQuery state.query
 
-                p : Maybe String
-                p = maybePageNumber state.pageNumber
+        p : Maybe String
+        p =
+            maybePageNumber state.pageNumber
 
-                s : Maybe String
-                s = maybePageSize state.pageSize
+        s : Maybe String
+        s =
+            maybePageSize state.pageSize
 
-                params : String
-                params = "" ++ String.join "&" (Maybe.Extra.values [q, p, s])
+        params : String
+        params =
+            "" ++ String.join "&" (Maybe.Extra.values [ q, p, s ])
 
-                url : String
-                url = "/search" ++ ( if params == "" then "" else "?" ++ params  )
+        urlQuery : String
+        urlQuery =
+            if params == "" then
+                ""
+
+            else
+                "?" ++ params
+
+        path : String
+        path =
+            "/search"
+                ++ urlQuery
     in
     case state.key of
-      Just key ->
-        Browser.Navigation.pushUrl key url
-      Nothing ->
-        Cmd.none -- TODO
+        Just key ->
+            Browser.Navigation.pushUrl key path
+
+        Nothing ->
+            Cmd.none
 
 
+
+-- TODO
 -- SUBSCRIPTIONS
 
 
@@ -167,20 +196,6 @@ view model =
         Failure cause ->
             Skeleton.viewHttpFailure cause
 
-{--
-        Ready ->
-            div [ class "col-md-10", class "p-2", class "mx-auto" ]
-                [ viewSearchInput ]
-
-        Loading ->
-            text "Loading..."
-
-        Content searchResult ->
-            div [ class "col-md-10", class "p-2", class "mx-auto" ]
-              [ viewSearchInput
-              , viewSearchResult searchResult
-              ]
---}
         Loading state ->
             div [ class "col-md-10", class "p-2", class "mx-auto" ]
                 [ viewSearchInput state ]
@@ -188,8 +203,8 @@ view model =
         Content state ->
             case state.results of
                 Nothing ->
-                  div [ class "col-md-10", class "p-2", class "mx-auto" ]
-                      [ viewSearchInput state ]
+                    div [ class "col-md-10", class "p-2", class "mx-auto" ]
+                        [ viewSearchInput state ]
 
                 Just searchResults ->
                     div [ class "col-md-10", class "p-2", class "mx-auto" ]
@@ -197,33 +212,39 @@ view model =
                         , viewSearchResult searchResults
                         ]
 
+
 viewSearchInput : SearchState -> Html Msg
 viewSearchInput state =
     input
-                [ class "form-control"
-                , class "input-block"
-                , type_ "text"
-                , value (maybeAsString state.query)
-                , placeholder "Search for podcasts/episodes"
-                , onInput (searchOnInput state)
-                --, onInput (redirectLocalUrl state)
-                --, onSubmit searchOnInput
-                ]
-                []
+        [ class "form-control"
+        , class "input-block"
+        , type_ "text"
+        , value (maybeAsString state.query)
+        , placeholder "Search for podcasts/episodes"
+        , onInput (updateStateQuery state)
+        , onEnter (submitSearchRequest state)
+        ]
+        []
 
 
-searchOnInput : SearchState -> String -> Msg
-searchOnInput state query =
-    UpdateSearchUrl state.key (Just query) (Just 1) (Just 20)
+updateStateQuery : SearchState -> String -> Msg
+updateStateQuery state query =
+    UpdateState { state | query = Just query }
+
+
+submitSearchRequest : SearchState -> Msg
+submitSearchRequest state =
+    UpdateSearchUrl state.key state.query Nothing Nothing
+
+
 
 -- TODO
 -- next page if viable
 --searchOnTurnPageOver : String -> Int -> Int -> Msg
-
-
 -- TODO
 -- previous page if viable
 --searchOnTurnPageBack : String -> Int -> Int -> Msg
+
 
 viewSearchResult : ResultPage -> Html Msg
 viewSearchResult searchResult =
@@ -236,8 +257,8 @@ viewSearchResult searchResult =
             [ text ("maxPage:" ++ String.fromInt searchResult.maxPage) ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
             [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
-        , ul [ class "list-style-none" ]
-            <| List.map viewIndexDoc searchResult.results
+        , ul [ class "list-style-none" ] <|
+            List.map viewIndexDoc searchResult.results
         ]
 
 
@@ -260,28 +281,34 @@ viewIndexDoc doc =
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
     let
-      url : String
-      url =
-          case doc.docType of
-              "podcast" ->
-                  "/p/" ++ doc.id
-              "episode" ->
-                  "/e/" ++ doc.id
-              _ ->
-                  ""
+        path : String
+        path =
+            case doc.docType of
+                "podcast" ->
+                    "/p/" ++ doc.id
+
+                "episode" ->
+                    "/e/" ++ doc.id
+
+                _ ->
+                    ""
     in
-    a [ href url, class "f3" ]
-      [ maybeAsText doc.title ]
+    a [ href path, class "f3" ]
+        [ maybeAsText doc.title ]
 
 
 viewDocType : IndexDoc -> Html Msg
 viewDocType doc =
     case doc.docType of
         "podcast" ->
-          span [ class "Label", class "bg-yellow" ] [ text "PODCAST" ]
+            span [ class "Label", class "bg-yellow" ] [ text "PODCAST" ]
+
         "episode" ->
-          span [ class "Label", class "bg-blue" ] [ text "EPISODE" ]
-        _ -> emptyHtml
+            span [ class "Label", class "bg-blue" ] [ text "EPISODE" ]
+
+        _ ->
+            emptyHtml
+
 
 
 -- HTTP
@@ -292,29 +319,36 @@ maybeQuery query =
     case query of
         Just q ->
             Just ("q=" ++ q)
+
         Nothing ->
             Nothing
 
+
 maybePageNumber : Maybe Int -> Maybe String
 maybePageNumber pageNumber =
-     case pageNumber of
-         Just page ->
-             Just ("p=" ++ String.fromInt page)
-         Nothing ->
-             Nothing
+    case pageNumber of
+        Just page ->
+            Just ("p=" ++ String.fromInt page)
+
+        Nothing ->
+            Nothing
+
 
 maybePageSize : Maybe Int -> Maybe String
 maybePageSize pageSize =
-     case pageSize of
-         Just size ->
-             Just ("s=" ++ String.fromInt size)
-         Nothing ->
-             Nothing
+    case pageSize of
+        Just size ->
+            Just ("s=" ++ String.fromInt size)
+
+        Nothing ->
+            Nothing
+
 
 getSearchResult : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg
 getSearchResult query pageNumber pageSize =
-    case (query, pageNumber, pageSize) of
-        (Nothing, Nothing, Nothing) ->
+    case ( query, pageNumber, pageSize ) of
+        ( Nothing, Nothing, Nothing ) ->
             Cmd.none
-        (_, _, _) ->
+
+        ( _, _, _ ) ->
             RestApi.getSearchResult LoadedSearchResult query pageNumber pageSize
