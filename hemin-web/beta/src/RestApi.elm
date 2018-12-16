@@ -6,6 +6,7 @@ import Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
 import Http
 import Maybe.Extra
+import Util exposing (maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
 
 
 apiBase : String
@@ -59,17 +60,14 @@ getAllPodcasts resultWrapper pageNumber pageSize =
 getSearchResult : (Result Http.Error ResultPage -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
 getSearchResult resultWrapper query pageNumber pageSize =
     let
-        q : Maybe String
         q =
-            maybeQuery query
+            maybeQueryParam query
 
-        p : Maybe String
         p =
-            maybePageNumber pageNumber
+            maybePageNumberParam pageNumber
 
-        s : Maybe String
         s =
-            maybePageSize pageSize
+            maybePageSizeParam pageSize
 
         params : String
         params =
@@ -95,33 +93,3 @@ getSearchResult resultWrapper query pageNumber pageSize =
                 ++ path
         , expect = Http.expectJson resultWrapper resultPageDecoder
         }
-
-
-maybeQuery : Maybe String -> Maybe String
-maybeQuery query =
-    case query of
-        Just q ->
-            Just ("q=" ++ q)
-
-        Nothing ->
-            Nothing
-
-
-maybePageNumber : Maybe Int -> Maybe String
-maybePageNumber pageNumber =
-    case pageNumber of
-        Just page ->
-            Just ("p=" ++ String.fromInt page)
-
-        Nothing ->
-            Nothing
-
-
-maybePageSize : Maybe Int -> Maybe String
-maybePageSize pageSize =
-    case pageSize of
-        Just size ->
-            Just ("s=" ++ String.fromInt size)
-
-        Nothing ->
-            Nothing

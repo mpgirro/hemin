@@ -1,4 +1,4 @@
-module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, redirectLocalUrl, subscriptions, update, view)
+module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, redirectLocalUrl, update, view)
 
 import Browser
 import Browser.Navigation
@@ -17,11 +17,11 @@ import Maybe.Extra
 import RestApi
 import Skeleton exposing (Page)
 import Url exposing (Url)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
 
 
 
--- MODEL
+--- MODEL ---
 
 
 type Model
@@ -40,7 +40,7 @@ type alias SearchState =
 
 
 
--- UPDATE
+--- UPDATE ---
 
 
 type Msg
@@ -59,33 +59,16 @@ update msg model =
                     -- TODO this is bullshit and must be changed
                     ( Failure cause, Cmd.none )
 
-                Loading _ ->
-                    ( Loading state, Cmd.none )
-
-                Content _ ->
+                _ ->
                     ( Loading state, Cmd.none )
 
         UpdateSearchUrl key query pageNumber pageSize ->
-            case model of
-                Failure cause ->
-                    -- TODO this is bullshit and must be changed
-                    ( Failure cause, Cmd.none )
-
-                Loading _ ->
-                    let
-                        s : SearchState
-                        s =
-                            stateFromParams key query pageNumber pageSize
-                    in
-                    ( Loading s, redirectLocalUrl s )
-
-                Content _ ->
-                    let
-                        s : SearchState
-                        s =
-                            stateFromParams key query pageNumber pageSize
-                    in
-                    ( Loading s, redirectLocalUrl s )
+            let
+                s : SearchState
+                s =
+                    stateFromParams key query pageNumber pageSize
+            in
+            ( Loading s, redirectLocalUrl s )
 
         LoadSearchResult key query pageNumber pageSize ->
             let
@@ -126,36 +109,31 @@ update msg model =
                     ( Failure cause, Cmd.none )
 
 
-stateFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> SearchState
-stateFromParams key query pageNumber pageSize =
-    { key = key
-    , query = query
-    , pageNumber = pageNumber
-    , pageSize = pageSize
-    , results = Nothing
-    }
+updateStateQuery : SearchState -> String -> Msg
+updateStateQuery state query =
+    UpdateState { state | query = Just query }
+
+
+updateSearchUrl : SearchState -> Msg
+updateSearchUrl state =
+    UpdateSearchUrl state.key state.query Nothing Nothing
 
 
 redirectLocalUrl : SearchState -> Cmd Msg
 redirectLocalUrl state =
     let
-        q : Maybe String
         q =
-            maybeQuery state.query
+            maybeQueryParam state.query
 
-        p : Maybe String
         p =
-            maybePageNumber state.pageNumber
+            maybePageNumberParam state.pageNumber
 
-        s : Maybe String
         s =
-            maybePageSize state.pageSize
+            maybePageSizeParam state.pageSize
 
-        params : String
         params =
             "" ++ String.join "&" (Maybe.Extra.values [ q, p, s ])
 
-        urlQuery : String
         urlQuery =
             if params == "" then
                 ""
@@ -163,7 +141,6 @@ redirectLocalUrl state =
             else
                 "?" ++ params
 
-        path : String
         path =
             "/search"
                 ++ urlQuery
@@ -177,17 +154,7 @@ redirectLocalUrl state =
 
 
 
--- TODO
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
-
-
--- VIEW
+--- VIEW ---
 
 
 view : Model -> Html Msg
@@ -222,19 +189,9 @@ viewSearchInput state =
         , value (maybeAsString state.query)
         , placeholder "Search for podcasts/episodes"
         , onInput (updateStateQuery state)
-        , onEnter (submitSearchRequest state)
+        , onEnter (updateSearchUrl state)
         ]
         []
-
-
-updateStateQuery : SearchState -> String -> Msg
-updateStateQuery state query =
-    UpdateState { state | query = Just query }
-
-
-submitSearchRequest : SearchState -> Msg
-submitSearchRequest state =
-    UpdateSearchUrl state.key state.query Nothing Nothing
 
 
 
@@ -311,37 +268,7 @@ viewDocType doc =
 
 
 
--- HTTP
-
-
-maybeQuery : Maybe String -> Maybe String
-maybeQuery query =
-    case query of
-        Just q ->
-            Just ("q=" ++ q)
-
-        Nothing ->
-            Nothing
-
-
-maybePageNumber : Maybe Int -> Maybe String
-maybePageNumber pageNumber =
-    case pageNumber of
-        Just page ->
-            Just ("p=" ++ String.fromInt page)
-
-        Nothing ->
-            Nothing
-
-
-maybePageSize : Maybe Int -> Maybe String
-maybePageSize pageSize =
-    case pageSize of
-        Just size ->
-            Just ("s=" ++ String.fromInt size)
-
-        Nothing ->
-            Nothing
+--- HTTP ---
 
 
 getSearchResult : Maybe String -> Maybe Int -> Maybe Int -> Cmd Msg
@@ -352,3 +279,17 @@ getSearchResult query pageNumber pageSize =
 
         ( _, _, _ ) ->
             RestApi.getSearchResult LoadedSearchResult query pageNumber pageSize
+
+
+
+--- INTERNAL HELPERS ---
+
+
+stateFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> SearchState
+stateFromParams key query pageNumber pageSize =
+    { key = key
+    , query = query
+    , pageNumber = pageNumber
+    , pageSize = pageSize
+    , results = Nothing
+    }
