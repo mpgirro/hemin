@@ -130,7 +130,18 @@ updateUrlChanged model =
             ( { model | content = wrapEpisodeContent EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
 
         SearchPage query pageNum pageSize ->
-            ( { model | content = wrapSearchContent SearchPage.Ready }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+            let
+              state : SearchPage.SearchState
+              state =
+                  { key = Just model.key
+                  , query = query
+                  , pageNumber = pageNum
+                  , pageSize = pageSize
+                  , results = Nothing
+                  }
+            in
+            ( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+            --( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.redirectLocalUrl state) )
 
         DiscoverPage ->
             ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
