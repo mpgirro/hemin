@@ -38,8 +38,15 @@ getPodcast resultWrapper id =
 
 getAllPodcasts : (Result Http.Error (List Podcast) -> msg) -> Int -> Int -> Cmd msg
 getAllPodcasts resultWrapper pageNumber pageSize =
+    let
+        p : String
+        p = "p=" ++ String.fromInt pageNumber
+
+        s : String
+        s = "s=" ++ String.fromInt pageSize
+    in
     Http.get
-        { url = apiBase ++ "/podcast-list.json"
+        { url = apiBase ++ "/podcast?" ++ p ++ "&" ++ s
         , expect = Http.expectJson resultWrapper podcastListDecoder
         }
 
@@ -56,6 +63,7 @@ getSearchResult resultWrapper query pageNumber pageSize =
         s : Maybe String
         s = maybePageSize pageSize
 
+        params : String
         params = String.join "&" (Maybe.Extra.values [q, p, s])
     in
     Http.get
