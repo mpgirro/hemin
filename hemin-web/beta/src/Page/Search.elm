@@ -16,8 +16,9 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Maybe.Extra
 import RestApi
 import Skeleton exposing (Page)
+import String.Extra
 import Url exposing (Url)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml)
 
 
 
@@ -229,11 +230,18 @@ viewIndexDoc doc =
                 [ viewIndexDocTitleAsLink doc
                 , br [] []
                 , viewDocType doc
-                , p [] [ maybeAsText doc.description ]
+                , p [] [ viewStrippedDescription doc ]
+                --, viewInnerHtml (maybeAsString doc.description)
                 ]
             ]
         ]
 
+viewStrippedDescription : IndexDoc -> Html Msg
+viewStrippedDescription doc =
+    let
+        description = String.Extra.stripTags (maybeAsString doc.description)
+    in
+    text description
 
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =

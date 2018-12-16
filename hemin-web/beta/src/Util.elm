@@ -1,7 +1,8 @@
-module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
+module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml)
 
-import Html exposing (Html, text)
-
+import Html exposing (Html, text, div)
+import Html.Attributes
+import Json.Encode
 
 maybeAsText : Maybe String -> Html msg
 maybeAsText maybe =
@@ -56,3 +57,11 @@ maybePageSizeParam pageSize =
 emptyHtml : Html msg
 emptyHtml =
     text ""
+
+viewInnerHtml: String -> Html msg
+viewInnerHtml t =
+    div
+        [ Json.Encode.string t
+            |> Html.Attributes.property "innerHTML"
+        ]
+        []
