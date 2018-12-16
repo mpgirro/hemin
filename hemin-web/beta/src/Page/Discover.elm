@@ -77,7 +77,16 @@ viewDiscover podcasts =
 viewPodcastCover : Podcast -> Html msg
 viewPodcastCover podcast =
     li [ class "d-inline-block", class "col-2", class "p-2" ]
-        [ img [ class "width-full", class "avatar", src (maybeAsString podcast.image) ] [] ]
+
+        [ a [ href ("/p/" ++ podcast.id) ]
+          [ img
+                      [ class "width-full"
+                      , class "avatar"
+                      , src (maybeAsString podcast.image)
+                      , alt (maybeAsString podcast.title)
+                      ] []
+          ]
+        ]
 
 
 
