@@ -76,7 +76,7 @@ template : Html msg -> List (Html msg)
 template content =
     [ div [ class "container-md" ]
         [ navbar
-        , header
+        --, header
         , content
         , footer
         ]
@@ -85,7 +85,7 @@ template content =
 
 navbar : Html msg
 navbar =
-    nav [ class "UnderlineNav" ]
+    nav [ class "UnderlineNav", class "mb-4" ]
         [ div [ class "UnderlineNav-actions" ]
             [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 16, height 16, alt "" ] []
@@ -100,7 +100,7 @@ navbar =
             ]
         ]
 
-
+-- TODO deprecated?
 header : Html msg
 header =
     div [ class "Box Box--danger" ]

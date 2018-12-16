@@ -13,7 +13,7 @@ import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import RestApi
 import Skeleton exposing (Page)
-import Util exposing (maybeAsString, maybeAsText)
+import Util exposing (maybeAsString, maybeAsText, emptyHtml)
 
 
 
@@ -157,8 +157,7 @@ viewIndexDoc doc =
             , div [ class "overflow-hidden" ]
                 [ viewIndexDocTitleAsLink doc
                 , br [] []
-                , Skeleton.viewLink (maybeAsString doc.link)
-                , p [] [ text doc.docType ]
+                , viewDocType doc
                 , p [] [ maybeAsText doc.description ]
                 ]
             ]
@@ -168,17 +167,28 @@ viewIndexDoc doc =
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
     let
-      ref : String
-      ref =
+      url : String
+      url =
           case doc.docType of
               "podcast" ->
                   "/p/" ++ doc.id
               "episode" ->
                   "/e/" ++ doc.id
-              _ -> ""
+              _ ->
+                  ""
     in
-    a [ href ref ]
+    a [ href url, class "f3" ]
       [ maybeAsText doc.title ]
+
+
+viewDocType : IndexDoc -> Html Msg
+viewDocType doc =
+    case doc.docType of
+        "podcast" ->
+          span [ class "Label", class "bg-yellow" ] [ text "PODCAST" ]
+        "episode" ->
+          span [ class "Label", class "bg-blue" ] [ text "EPISODE" ]
+        _ -> emptyHtml
 
 
 -- HTTP
