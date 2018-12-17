@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+function propose() {
+    curl -X POST -H "Content-Type: text/plain" --data "${1}" http://localhost:9000/api/v1/feed/propose
+}
+
+
+filename="/Users/max/repos/projects/hemin/hemin-api/feeds-test.txt"
+
+while read -r feed; do
+    propose "$feed"
+done < "$filename"
