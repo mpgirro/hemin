@@ -229,7 +229,7 @@ viewSearchResult query pageNumber pageSize searchResult =
 viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
     li [ class "py-2" ]
-        [ div [ class "clearfix", class "p-2", class "border" ]
+        [ div [ class "clearfix", class "p-2" ]
             [ viewCoverImage doc
             , div [ class "overflow-hidden" ]
                 [ viewIndexDocTitleAsLink doc
@@ -295,14 +295,6 @@ viewDocType doc =
 viewPagination : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
 viewPagination query pageNumber pageSize searchResult =
     let
-        pageNum : Int
-        pageNum =
-            case pageNumber of
-                Just p ->
-                    p
-                Nothing ->
-                    1
-
         path : Int -> String
         path p =
             "/search?q=" ++ (maybeAsString query) ++ "&p=" ++ (String.fromInt p)
@@ -316,7 +308,7 @@ viewPagination query pageNumber pageSize searchResult =
                     , ariaLabel "First"
                     , href (path 1)
                     ]
-                    [ text "First" ]
+                    [ text "1" ]
             else
                 emptyHtml
 
@@ -333,9 +325,23 @@ viewPagination query pageNumber pageSize searchResult =
              else
                 emptyHtml
 
+        viewLowerGap : Html Msg
+        viewLowerGap =
+            if searchResult.currPage > 1 then
+                span [ class "gap" ] [ text "…" ]
+            else
+                emptyHtml
+
         viewCurrent : Html Msg
         viewCurrent =
             em [ class "current", class "selected" ] [ text (String.fromInt searchResult.currPage) ]
+
+        viewHigherGap : Html Msg
+        viewHigherGap =
+            if searchResult.currPage < searchResult.maxPage then
+                span [ class "gap" ] [ text "…" ]
+            else
+                emptyHtml
 
         viewNext : Html Msg
         viewNext =
@@ -359,18 +365,20 @@ viewPagination query pageNumber pageSize searchResult =
                     , ariaLabel "Last"
                     , href (path searchResult.maxPage)
                     ]
-                    [ text "Last" ]
+                    [ text (String.fromInt searchResult.maxPage) ]
             else
                 emptyHtml
     in
     nav [ class "paginate-container", ariaLabel "Pagination" ]
         [ div
             [ class "pagination" ]
-            [ viewFirst
-            , viewPrev
+            [ viewPrev
+            , viewFirst
+            , viewLowerGap
             , viewCurrent
-            , viewNext
+            , viewHigherGap
             , viewLast
+            , viewNext
             ]
         ]
 
