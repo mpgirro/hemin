@@ -6,7 +6,8 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul, img, nav)
+import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul, img, nav, em)
+import Html.Attributes.Aria exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (keyCode, on, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
@@ -177,7 +178,7 @@ view model =
                 Just searchResults ->
                     div [ class "col-md-10", class "p-2", class "mx-auto" ]
                         [ viewSearchInput state
-                        , viewSearchResult searchResults
+                        , viewSearchResult state.query state.pageNumber state.pageSize searchResults
                         ]
 
 
@@ -205,8 +206,8 @@ viewSearchInput state =
 --searchOnTurnPageBack : String -> Int -> Int -> Msg
 
 
-viewSearchResult : ResultPage -> Html Msg
-viewSearchResult searchResult =
+viewSearchResult : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
+viewSearchResult query pageNumber pageSize searchResult =
     div []
         [ p [ class "my-3" ]
             [ text "Search resulted in "
@@ -221,7 +222,7 @@ viewSearchResult searchResult =
             [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
         , ul [ class "list-style-none" ] <|
             List.map viewIndexDoc searchResult.results
-        , viewPagination searchResult
+        , viewPagination query pageNumber pageSize searchResult
         ]
 
 
@@ -291,10 +292,87 @@ viewDocType doc =
         _ ->
             emptyHtml
 
-viewPagination : ResultPage -> Html Msg
-viewPagination searchResult =
-    --nav [ class "paginate-container",  ] []
-    emptyHtml
+viewPagination : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
+viewPagination query pageNumber pageSize searchResult =
+    let
+        pageNum : Int
+        pageNum =
+            case pageNumber of
+                Just p ->
+                    p
+                Nothing ->
+                    1
+
+        path : Int -> String
+        path p =
+            "/search?q=" ++ (maybeAsString query) ++ "&p=" ++ (String.fromInt p)
+
+        viewFirst : Html Msg
+        viewFirst =
+            if searchResult.currPage > 1 then
+                a
+                    [ class "first_page"
+                    , rel "first"
+                    , ariaLabel "First"
+                    , href (path 1)
+                    ]
+                    [ text "First" ]
+            else
+                emptyHtml
+
+        viewPrev : Html Msg
+        viewPrev =
+            if searchResult.currPage > 1 then
+                a
+                    [ class "previous_page"
+                    , rel "previous"
+                    , ariaLabel "Previous"
+                    , href (path (searchResult.currPage - 1))
+                    ]
+                    [ text "Previous" ]
+             else
+                emptyHtml
+
+        viewCurrent : Html Msg
+        viewCurrent =
+            em [ class "current", class "selected" ] [ text (String.fromInt searchResult.currPage) ]
+
+        viewNext : Html Msg
+        viewNext =
+            if searchResult.currPage < searchResult.maxPage then
+                a
+                    [ class "next_page"
+                    , rel "next"
+                    , ariaLabel "Next"
+                    , href (path (searchResult.currPage + 1))
+                    ]
+                    [ text "Next" ]
+            else
+                emptyHtml
+
+        viewLast : Html Msg
+        viewLast =
+            if searchResult.currPage < searchResult.maxPage then
+                a
+                    [ class "last_page"
+                    , rel "last"
+                    , ariaLabel "Last"
+                    , href (path searchResult.maxPage)
+                    ]
+                    [ text "Last" ]
+            else
+                emptyHtml
+    in
+    nav [ class "paginate-container", ariaLabel "Pagination" ]
+        [ div
+            [ class "pagination" ]
+            [ viewFirst
+            , viewPrev
+            , viewCurrent
+            , viewNext
+            , viewLast
+            ]
+        ]
 
 
 --- HTTP ---
