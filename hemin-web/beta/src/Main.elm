@@ -280,7 +280,7 @@ view model =
             Skeleton.view "Discover" (DiscoverPage.view content)
 
         ProposeContent content ->
-            Skeleton.view "Propose" (ProposePage.view content)
+            Skeleton.view "Propose" (wrapProposeHtml (ProposePage.view content))
 
 
 viewNotFound : Page msg
@@ -368,3 +368,7 @@ wrapProposeContent model =
 wrapProposeMsg : Cmd ProposePage.Msg -> Cmd Msg
 wrapProposeMsg msg =
     Cmd.map ProposeMsg msg
+
+wrapProposeHtml : Html ProposePage.Msg -> Html Msg
+wrapProposeHtml msg =
+    Html.map ProposeMsg msg
