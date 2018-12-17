@@ -210,7 +210,7 @@ viewSearchResult query pageNumber pageSize searchResult =
 viewTotalHits : ResultPage -> Html Msg
 viewTotalHits searchResult =
     p
-        [ class "text-small", class "text-gray", class "my-3" ]
+        [ class "note", class "my-3" ]
         [ text "Search resulted in "
         , text (String.fromInt searchResult.totalHits)
         , text " hits"

@@ -46,25 +46,26 @@ viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure error =
     case error of
         Http.BadUrl msg ->
-            viewErrorExplanation "Unable to load the data" ("reason: " ++ msg) Nothing
+            viewErrorExplanation "Unable to load data" msg Nothing
 
         Http.Timeout ->
-            viewErrorExplanation "Unable to load the data" "reason: timeout" Nothing
+            viewErrorExplanation "Unable to load data" "timeout" Nothing
 
         Http.NetworkError ->
-            viewErrorExplanation "Unable to load the data" "reason: network error" Nothing
+            viewErrorExplanation "Unable to load data" "network error" Nothing
 
         Http.BadStatus status ->
-            viewErrorExplanation "Unable to load the data" ("reason: HTTP status " ++ String.fromInt status) Nothing
+            viewErrorExplanation "Unable to load data" ("HTTP status " ++ String.fromInt status) Nothing
 
         Http.BadBody msg ->
-            viewErrorExplanation "Unable to load the data" "reason: bad body" (Just msg)
+            viewErrorExplanation "Unable to load data" "bad body" (Just msg)
 
 
 viewErrorExplanation : String -> String -> Maybe String -> Html msg
 viewErrorExplanation info reason body =
     div []
-        [ viewErrorInfo info
+        [ h1 [ class "f1-light", class "mb-3" ] [ text "Error" ]
+        , viewErrorInfo info
         , viewErrorReason reason
         , viewErrorBody body
         ]
@@ -77,15 +78,20 @@ viewErrorInfo info =
 
 viewErrorReason : String -> Html msg
 viewErrorReason reason =
-    p [] [ text reason ]
+    p []
+        [ text "Reason: "
+        , b [] [ text reason ]
+        ]
 
 
 viewErrorBody : Maybe String -> Html msg
 viewErrorBody body =
     case body of
         Just txt ->
-            pre []
-                [ text txt ]
+            div []
+                [ p [] [ text "We received this body to the failure response:" ]
+                , pre [] [ text txt ]
+                ]
 
         Nothing ->
             emptyHtml

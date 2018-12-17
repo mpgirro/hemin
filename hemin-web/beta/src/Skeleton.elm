@@ -78,9 +78,12 @@ buildPage title body =
 template : Html msg -> List (Html msg)
 template content =
     [ div [ class "hemin", class "container-md" ]
-        [ navbar
-        , content
-        , footer
+        [ div
+            [ class "px-2" ]
+             [ navbar
+             , content
+             , footer
+             ]
         ]
     ]
 
@@ -105,6 +108,18 @@ navbar =
 
 footer : Html msg
 footer =
-    div []
-        [ p [] [ text "Footer" ]
+    div
+        [ class "footer"
+        --, class "position-absolute"
+        ]
+        [ p
+            [ class "note"
+            , class "my-3"
+            ]
+            [ text "HEMIN is an open source podcast catalog & search engine. Check out the code on "
+            , a [ href "https://github.com/mpgirro/hemin"] [ text "GitHub" ]
+            , text ". This site is written in "
+            , a [ href "https://elm-lang.org" ] [ text "Elm" ]
+            , text ". The podcasts and artworks embedded on this page are properties of their owners."
+            ]
         ]
