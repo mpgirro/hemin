@@ -1,4 +1,4 @@
-module Page.Podcast exposing (Model(..), Msg(..), getPodcast, init, update, view)
+module Page.Podcast exposing (Model(..), Msg(..), getPodcast, update, view)
 
 import Browser
 import Data.Podcast exposing (Podcast)
@@ -10,20 +10,6 @@ import Skeleton exposing (Page, viewHttpFailure)
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
-
--- MAIN
-
-
-main =
-    Browser.element
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
-
-
-
 -- MODEL
 
 
@@ -31,17 +17,6 @@ type Model
     = Failure Http.Error
     | Loading
     | Content Podcast
-
-
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Loading, getPodcast "" )
-
-
-initWithId : String -> ( Model, Cmd Msg )
-initWithId id =
-    ( Loading, getPodcast id )
-
 
 
 -- UPDATE
@@ -65,16 +40,6 @@ update msg model =
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
 
 
 -- VIEW
@@ -121,7 +86,7 @@ viewTitle : Podcast -> Html msg
 viewTitle podcast =
     case podcast.title of
         Just title ->
-            h1 [ class "lh-condensed-ultra", class "mt-4", class "mb-0" ] [ maybeAsText podcast.title ]
+            h1 [ class "f2-light", class "lh-condensed-ultra", class "mt-4", class "mb-0" ] [ maybeAsText podcast.title ]
 
         Nothing ->
             emptyHtml

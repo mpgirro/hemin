@@ -1,4 +1,4 @@
-module Page.Episode exposing (Model(..), Msg(..), getEpisode, init, update, view)
+module Page.Episode exposing (Model(..), Msg(..), getEpisode, update, view)
 
 import Browser
 import Data.Episode exposing (Episode)
@@ -10,20 +10,6 @@ import Skeleton exposing (Page)
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
-
--- MAIN
-
-
-main =
-    Browser.element
-        { init = init
-        , update = update
-        , subscriptions = subscriptions
-        , view = view
-        }
-
-
-
 ---- MODEL ----
 
 
@@ -31,12 +17,6 @@ type Model
     = Failure Http.Error
     | Loading
     | Content Episode
-
-
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Loading, getEpisode "" )
-
 
 
 ---- UPDATE ----
@@ -60,16 +40,6 @@ update msg model =
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
-
-
-
--- SUBSCRIPTIONS
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.none
-
 
 
 ---- VIEW ----

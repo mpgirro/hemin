@@ -106,7 +106,7 @@ navbar =
     nav [ class "UnderlineNav", class "mb-4" ]
         [ div [ class "UnderlineNav-actions" ]
             [ a [ href "/" ]
-                [ img [ src "/logo.svg", width 16, height 16, alt "" ] []
+                [ img [ src "/logo.svg", width 12, height 12, alt "" ] []
                 , div [ class "hemin-brand", class "d-inline-block mx-1" ]
                     [ text siteName ]
                 ]
