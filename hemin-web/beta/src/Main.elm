@@ -14,6 +14,7 @@ import Page.Discover as DiscoverPage
 import Page.Episode as EpisodePage
 import Page.Home as HomePage
 import Page.Podcast as PodcastPage
+import Page.Propose as ProposePage
 import Page.Search as SearchPage
 import Router exposing (Route(..), fromUrl, parser)
 import Skeleton exposing (Page)
@@ -57,6 +58,7 @@ type Content
     | EpisodeContent EpisodePage.Model
     | SearchContent SearchPage.Model
     | DiscoverContent DiscoverPage.Model
+    | ProposeContent ProposePage.Model
 
 
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
@@ -84,6 +86,7 @@ type Msg
     | EpisodeMsg EpisodePage.Msg
     | SearchMsg SearchPage.Msg
     | DiscoverMsg DiscoverPage.Msg
+    | ProposeMsg ProposePage.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -115,6 +118,9 @@ update message model =
         DiscoverMsg msg ->
             updateDiscoverContent model msg
 
+        ProposeMsg msg ->
+            updateProposeContent model msg
+
 
 updateUrlChanged : Model -> ( Model, Cmd Msg )
 updateUrlChanged model =
@@ -145,6 +151,9 @@ updateUrlChanged model =
         --( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.redirectLocalUrl state) )
         DiscoverPage ->
             ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
+
+        ProposePage ->
+            ( { model | content = wrapProposeContent ProposePage.Ready }, Cmd.none )
 
 
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )
@@ -217,6 +226,18 @@ updateDiscoverContent model msg =
             ( model, Cmd.none )
 
 
+updateProposeContent : Model -> ProposePage.Msg -> ( Model, Cmd Msg )
+updateProposeContent model msg =
+    case model.content of
+        ProposeContent content ->
+            let
+                ( model_, msg_ ) =
+                    ProposePage.update msg content
+            in
+            ( { model | content = wrapProposeContent model_ }, wrapProposeMsg msg_ )
+
+        _ ->
+            ( model, Cmd.none )
 
 --- SUBSCRIPTIONS ---
 
@@ -257,6 +278,9 @@ view model =
 
         DiscoverContent content ->
             Skeleton.view "Discover" (DiscoverPage.view content)
+
+        ProposeContent content ->
+            Skeleton.view "Propose" (ProposePage.view content)
 
 
 viewNotFound : Page msg
@@ -334,3 +358,13 @@ wrapDiscoverContent model =
 wrapDiscoverMsg : Cmd DiscoverPage.Msg -> Cmd Msg
 wrapDiscoverMsg msg =
     Cmd.map DiscoverMsg msg
+
+
+wrapProposeContent : ProposePage.Model -> Content
+wrapProposeContent model =
+    ProposeContent model
+
+
+wrapProposeMsg : Cmd ProposePage.Msg -> Cmd Msg
+wrapProposeMsg msg =
+    Cmd.map ProposeMsg msg

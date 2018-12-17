@@ -18,6 +18,7 @@ type Route
     | EpisodePage String
     | SearchPage (Maybe String) (Maybe Int) (Maybe Int)
     | DiscoverPage
+    | ProposePage
 
 
 parser : Parser (Route -> a) a
@@ -28,6 +29,7 @@ parser =
         , Parser.map EpisodePage (s "e" </> string)
         , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
         , Parser.map DiscoverPage (s "discover")
+        , Parser.map ProposePage (s "propose")
         ]
 
 
