@@ -93,7 +93,7 @@ viewEpisode episode =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
         [ viewCoverImage episode
         , h1 [] [ maybeAsText episode.title ]
-        , Skeleton.viewLink (maybeAsString episode.link)
+        , Skeleton.viewLink episode.link
         , p [] [ maybeAsText episode.description ]
         ]
 

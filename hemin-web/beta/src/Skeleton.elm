@@ -3,7 +3,7 @@ module Skeleton exposing (Page, siteName, view, viewHttpFailure, viewLink, viewL
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-
+import Util exposing (maybeAsString, maybeAsText, emptyHtml)
 
 
 -- MODEL
@@ -22,6 +22,25 @@ type alias Page msg =
 view : String -> Html msg -> Page msg
 view title body =
     buildPage title (template body)
+
+viewLink : Maybe String -> Html msg
+viewLink externalLink =
+    case externalLink of
+        Just link ->
+            let
+                stripProtocol =
+                    if String.startsWith "https://" link then
+                        String.dropLeft 8 link
+                    else if String.startsWith "http://" link then
+                        String.dropLeft 7 link
+                    else
+                        link
+            in
+            a [ href link, class "website-link", class "text-gray" ] [ text stripProtocol ]
+
+        Nothing ->
+            emptyHtml
+
 
 
 viewHttpFailure : Http.Error -> Html msg
@@ -74,10 +93,8 @@ buildPage title body =
 
 template : Html msg -> List (Html msg)
 template content =
-    [ div [ class "container-md" ]
+    [ div [ class "hemin", class "container-md" ]
         [ navbar
-
-        --, header
         , content
         , footer
         ]
@@ -90,7 +107,7 @@ navbar =
         [ div [ class "UnderlineNav-actions" ]
             [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 16, height 16, alt "" ] []
-                , div [ class "d-inline-block mx-1" ]
+                , div [ class "hemin-brand", class "d-inline-block mx-1" ]
                     [ text siteName ]
                 ]
             ]
@@ -101,37 +118,8 @@ navbar =
             ]
         ]
 
-
-
--- TODO deprecated?
-
-
-header : Html msg
-header =
-    div [ class "Box Box--danger" ]
-        [ div [ class "Box-body" ]
-            [ b [] [ text "Header" ]
-            , ul [ class "ml-4" ]
-                [ li [] [ viewLink "/p/abc" ]
-                , li [] [ viewLink "/e/abc" ]
-                , li [] [ viewLink "/discover" ]
-                , li [] [ viewLink "/search?q=abc&p=1&s=1" ]
-                ]
-            ]
-        ]
-
-
 footer : Html msg
 footer =
     div []
         [ p [] [ text "Footer" ]
         ]
-
-
-
--- TODO deprecated? I implement the functionality in podcast/episode pages separately
-
-
-viewLink : String -> Html msg
-viewLink path =
-    a [ href path ] [ text path ]

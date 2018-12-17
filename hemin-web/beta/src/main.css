@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css?family=Nunito');     /* used as default body text */
+@import url('https://fonts.googleapis.com/css?family=Quicksand');  /* used for all the headers and website links */
+@import url('https://fonts.googleapis.com/css?family=Comfortaa');  /* used for the "HEMIN" brand name */
+
+
+.hemin {
+    font-family: 'Nunito', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6 {
+    font-family: 'Quicksand', sans-serif;
+}
+
+.website-link {
+    font-family: 'Quicksand', sans-serif;
+}
+
+.hemin .hemin-brand {
+    font-family: 'Quicksand', sans-serif; /* use Comfortaa for chi symbol &#967; */
+}

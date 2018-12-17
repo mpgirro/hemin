@@ -189,42 +189,30 @@ viewSearchInput state =
         , class "input-block"
         , type_ "text"
         , value (maybeAsString state.query)
-        , placeholder "Search for podcasts/episodes"
+        , placeholder "What are you looking for?"
         , onInput (updateStateQuery state)
         , onEnter (updateSearchUrl state)
         ]
         []
 
 
-
--- TODO
--- next page if viable
---searchOnTurnPageOver : String -> Int -> Int -> Msg
-
--- TODO
--- previous page if viable
---searchOnTurnPageBack : String -> Int -> Int -> Msg
-
-
 viewSearchResult : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =
     div []
-        [ p [ class "my-3" ]
-            [ text "Search resulted in "
-            , text (String.fromInt searchResult.totalHits)
-            , text " hits"
-            ]
-        , span [ class "Label", class "Label--gray", class "mx-2" ]
-            [ text ("currPage:" ++ String.fromInt searchResult.currPage) ]
-        , span [ class "Label", class "Label--gray", class "mx-2" ]
-            [ text ("maxPage:" ++ String.fromInt searchResult.maxPage) ]
-        , span [ class "Label", class "Label--gray", class "mx-2" ]
-            [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
+        [ viewTotalHits searchResult
         , ul [ class "list-style-none" ] <|
             List.map viewIndexDoc searchResult.results
         , viewPagination query pageNumber pageSize searchResult
         ]
 
+viewTotalHits : ResultPage -> Html Msg
+viewTotalHits searchResult =
+    p
+        [ class "text-small", class "text-gray", class "my-3" ]
+        [ text "Search resulted in "
+        , text (String.fromInt searchResult.totalHits)
+        , text " hits"
+        ]
 
 viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
@@ -258,8 +246,10 @@ viewStrippedDescription : IndexDoc -> Html Msg
 viewStrippedDescription doc =
     let
         stripped = String.Extra.stripTags (maybeAsString doc.description)
+
+        truncate = String.left 280 stripped
     in
-    p [] [ text stripped ]
+    p [] [ text (truncate ++ "...") ]
 
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
@@ -295,9 +285,21 @@ viewDocType doc =
 viewPagination : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
 viewPagination query pageNumber pageSize searchResult =
     let
+        qParam : String
+        qParam =
+            "q=" ++ (maybeAsString query)
+
+        sParam : String
+        sParam =
+            case pageSize of
+                Just s ->
+                    "&s=" ++ (String.fromInt s)
+                Nothing ->
+                    ""
+
         path : Int -> String
         path p =
-            "/search?q=" ++ (maybeAsString query) ++ "&p=" ++ (String.fromInt p)
+            "/search?" ++ qParam ++ "&p=" ++ (String.fromInt p) ++ sParam
 
         viewFirst : Html Msg
         viewFirst =
@@ -369,18 +371,21 @@ viewPagination query pageNumber pageSize searchResult =
             else
                 emptyHtml
     in
-    nav [ class "paginate-container", ariaLabel "Pagination" ]
-        [ div
-            [ class "pagination" ]
-            [ viewPrev
-            , viewFirst
-            , viewLowerGap
-            , viewCurrent
-            , viewHigherGap
-            , viewLast
-            , viewNext
+    if searchResult.maxPage > 1 then
+        nav [ class "paginate-container", ariaLabel "Pagination" ]
+            [ div
+                [ class "pagination" ]
+                [ viewPrev
+                , viewFirst
+                , viewLowerGap
+                , viewCurrent
+                , viewHigherGap
+                , viewLast
+                , viewNext
+                ]
             ]
-        ]
+    else
+        emptyHtml
 
 
 --- HTTP ---
