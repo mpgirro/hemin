@@ -6,15 +6,16 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul, img, nav, em)
-import Html.Attributes.Aria exposing (..)
+import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, li, nav, p, span, text, ul)
 import Html.Attributes exposing (..)
+import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (keyCode, on, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
 import Http
 import Json.Decode exposing (Decoder, bool, field, list, string)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Maybe.Extra
+import Page.Error as ErrorPage
 import RestApi
 import Skeleton exposing (Page)
 import String.Extra
@@ -163,7 +164,7 @@ view : Model -> Html Msg
 view model =
     case model of
         Failure cause ->
-            Skeleton.viewHttpFailure cause
+            ErrorPage.view (ErrorPage.HttpFailure cause)
 
         Loading state ->
             div [ class "col-md-10", class "p-2", class "mx-auto" ]
@@ -196,7 +197,7 @@ viewSearchInput state =
         []
 
 
-viewSearchResult : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
+viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> ResultPage -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =
     div []
         [ viewTotalHits searchResult
@@ -204,6 +205,7 @@ viewSearchResult query pageNumber pageSize searchResult =
             List.map viewIndexDoc searchResult.results
         , viewPagination query pageNumber pageSize searchResult
         ]
+
 
 viewTotalHits : ResultPage -> Html Msg
 viewTotalHits searchResult =
@@ -213,6 +215,7 @@ viewTotalHits searchResult =
         , text (String.fromInt searchResult.totalHits)
         , text " hits"
         ]
+
 
 viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
@@ -224,32 +227,38 @@ viewIndexDoc doc =
                 , br [] []
                 , viewDocType doc
                 , viewStrippedDescription doc
+
                 --, viewInnerHtml (maybeAsString doc.description)
                 ]
             ]
         ]
+
 
 viewCoverImage : IndexDoc -> Html Msg
 viewCoverImage doc =
     div [ class "float-left", class "mr-3", class "mt-2", class "bg-gray" ]
         [ img
             [ src (maybeAsString doc.image)
-            , alt ("cover image of " ++ (maybeAsString doc.title))
+            , alt ("cover image of " ++ maybeAsString doc.title)
             , class "avatar"
             , width 72
             , height 72
-            ] []
+            ]
+            []
         ]
 
 
 viewStrippedDescription : IndexDoc -> Html Msg
 viewStrippedDescription doc =
     let
-        stripped = String.Extra.stripTags (maybeAsString doc.description)
+        stripped =
+            String.Extra.stripTags (maybeAsString doc.description)
 
-        truncate = String.left 280 stripped
+        truncate =
+            String.left 280 stripped
     in
     p [] [ text (truncate ++ "...") ]
+
 
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
@@ -282,24 +291,26 @@ viewDocType doc =
         _ ->
             emptyHtml
 
-viewPagination : (Maybe String) -> (Maybe Int) -> (Maybe Int) -> ResultPage -> Html Msg
+
+viewPagination : Maybe String -> Maybe Int -> Maybe Int -> ResultPage -> Html Msg
 viewPagination query pageNumber pageSize searchResult =
     let
         qParam : String
         qParam =
-            "q=" ++ (maybeAsString query)
+            "q=" ++ maybeAsString query
 
         sParam : String
         sParam =
             case pageSize of
                 Just s ->
-                    "&s=" ++ (String.fromInt s)
+                    "&s=" ++ String.fromInt s
+
                 Nothing ->
                     ""
 
         path : Int -> String
         path p =
-            "/search?" ++ qParam ++ "&p=" ++ (String.fromInt p) ++ sParam
+            "/search?" ++ qParam ++ "&p=" ++ String.fromInt p ++ sParam
 
         viewFirst : Html Msg
         viewFirst =
@@ -311,6 +322,7 @@ viewPagination query pageNumber pageSize searchResult =
                     , href (path 1)
                     ]
                     [ text "1" ]
+
             else
                 emptyHtml
 
@@ -324,13 +336,15 @@ viewPagination query pageNumber pageSize searchResult =
                     , href (path (searchResult.currPage - 1))
                     ]
                     [ text "Previous" ]
-             else
+
+            else
                 emptyHtml
 
         viewLowerGap : Html Msg
         viewLowerGap =
             if searchResult.currPage > 1 then
                 span [ class "gap" ] [ text "…" ]
+
             else
                 emptyHtml
 
@@ -342,6 +356,7 @@ viewPagination query pageNumber pageSize searchResult =
         viewHigherGap =
             if searchResult.currPage < searchResult.maxPage then
                 span [ class "gap" ] [ text "…" ]
+
             else
                 emptyHtml
 
@@ -355,6 +370,7 @@ viewPagination query pageNumber pageSize searchResult =
                     , href (path (searchResult.currPage + 1))
                     ]
                     [ text "Next" ]
+
             else
                 emptyHtml
 
@@ -368,6 +384,7 @@ viewPagination query pageNumber pageSize searchResult =
                     , href (path searchResult.maxPage)
                     ]
                     [ text (String.fromInt searchResult.maxPage) ]
+
             else
                 emptyHtml
     in
@@ -384,8 +401,10 @@ viewPagination query pageNumber pageSize searchResult =
                 , viewNext
                 ]
             ]
+
     else
         emptyHtml
+
 
 
 --- HTTP ---

@@ -5,9 +5,11 @@ import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
+import Page.Error as ErrorPage
 import RestApi
-import Skeleton exposing (Page, viewHttpFailure)
+import Skeleton exposing (Page)
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
+
 
 
 -- MODEL
@@ -17,6 +19,7 @@ type Model
     = Failure Http.Error
     | Loading
     | Content Podcast
+
 
 
 -- UPDATE
@@ -42,6 +45,7 @@ update msg model =
                     ( Failure cause, Cmd.none )
 
 
+
 -- VIEW
 
 
@@ -49,7 +53,7 @@ view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
-            Skeleton.viewHttpFailure cause
+            ErrorPage.view (ErrorPage.HttpFailure cause)
 
         Loading ->
             text "Loading..."
@@ -74,7 +78,8 @@ viewCoverImage podcast =
     case podcast.image of
         Just image ->
             let
-                altText = "cover image of " ++ (maybeAsString podcast.title)
+                altText =
+                    "cover image of " ++ maybeAsString podcast.title
             in
             div [] [ img [ src image, alt altText, class "width-full" ] [] ]
 

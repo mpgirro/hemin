@@ -14,6 +14,7 @@ type Model
     = Failure Http.Error
     | Ready
 
+
 type Msg
     = Propose String
 

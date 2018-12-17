@@ -12,6 +12,7 @@ import Html exposing (Html, div, p, text)
 import Http
 import Page.Discover as DiscoverPage
 import Page.Episode as EpisodePage
+import Page.Error as ErrorPage
 import Page.Home as HomePage
 import Page.Podcast as PodcastPage
 import Page.Propose as ProposePage
@@ -50,8 +51,7 @@ type alias Model =
 
 
 type Content
-    = Failure Http.Error
-    | Loading
+    = Loading
     | NotFound
     | HomeContent HomePage.Model
     | PodcastContent PodcastPage.Model
@@ -148,7 +148,6 @@ updateUrlChanged model =
             in
             ( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
 
-        --( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.redirectLocalUrl state) )
         DiscoverPage ->
             ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
 
@@ -239,6 +238,8 @@ updateProposeContent model msg =
         _ ->
             ( model, Cmd.none )
 
+
+
 --- SUBSCRIPTIONS ---
 
 
@@ -254,9 +255,8 @@ subscriptions model =
 view : Model -> Browser.Document Msg
 view model =
     case model.content of
-        Failure cause ->
-            Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
-
+        --Failure cause ->
+        --    Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
         Loading ->
             Skeleton.viewLoadingPage
 
@@ -264,7 +264,7 @@ view model =
             viewNotFound
 
         HomeContent content ->
-            Skeleton.view "" (HomePage.view content)
+            Skeleton.view "Home" (HomePage.view content)
 
         --viewHomePage
         PodcastContent content ->

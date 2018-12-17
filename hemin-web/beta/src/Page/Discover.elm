@@ -4,6 +4,7 @@ import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
+import Page.Error as ErrorPage
 import RestApi
 import Skeleton exposing (Page)
 import Util exposing (maybeAsString, maybeAsText)
@@ -51,7 +52,7 @@ view : Model -> Html msg
 view model =
     case model of
         Failure cause ->
-            Skeleton.viewHttpFailure cause
+            ErrorPage.view (ErrorPage.HttpFailure cause)
 
         Loading ->
             text "Loading..."
