@@ -109,7 +109,12 @@ viewCoverImage podcast =
     case podcast.image of
         Just image ->
             div []
-                [ img [ src image, alt "cover image" ] [] ]
+                [ img
+                    [ src image
+                    , alt "cover image"
+                    , class "width-full"
+                    ]
+                    [] ]
 
         Nothing ->
             emptyHtml

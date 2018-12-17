@@ -6,7 +6,7 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
-import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul)
+import Html exposing (Attribute, Html, a, b, br, div, form, h1, input, li, p, span, text, ul, img, nav)
 import Html.Attributes exposing (..)
 import Html.Events exposing (keyCode, on, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
@@ -199,6 +199,7 @@ viewSearchInput state =
 -- TODO
 -- next page if viable
 --searchOnTurnPageOver : String -> Int -> Int -> Msg
+
 -- TODO
 -- previous page if viable
 --searchOnTurnPageBack : String -> Int -> Int -> Msg
@@ -207,8 +208,11 @@ viewSearchInput state =
 viewSearchResult : ResultPage -> Html Msg
 viewSearchResult searchResult =
     div []
-        [ p []
-            [ text "Search Results Page" ]
+        [ p [ class "my-3" ]
+            [ text "Search resulted in "
+            , text (String.fromInt searchResult.totalHits)
+            , text " hits"
+            ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
             [ text ("currPage:" ++ String.fromInt searchResult.currPage) ]
         , span [ class "Label", class "Label--gray", class "mx-2" ]
@@ -217,6 +221,7 @@ viewSearchResult searchResult =
             [ text ("totalHits:" ++ String.fromInt searchResult.totalHits) ]
         , ul [ class "list-style-none" ] <|
             List.map viewIndexDoc searchResult.results
+        , viewPagination searchResult
         ]
 
 
@@ -224,24 +229,36 @@ viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
     li [ class "py-2" ]
         [ div [ class "clearfix", class "p-2", class "border" ]
-            [ div [ class "float-left", class "p-3", class "mr-3", class "bg-gray" ]
-                [ text "Image" ]
+            [ viewCoverImage doc
             , div [ class "overflow-hidden" ]
                 [ viewIndexDocTitleAsLink doc
                 , br [] []
                 , viewDocType doc
-                , p [] [ viewStrippedDescription doc ]
+                , viewStrippedDescription doc
                 --, viewInnerHtml (maybeAsString doc.description)
                 ]
             ]
         ]
 
+viewCoverImage : IndexDoc -> Html Msg
+viewCoverImage doc =
+    div [ class "float-left", class "mr-3", class "mt-2", class "bg-gray" ]
+        [ img
+            [ src (maybeAsString doc.image)
+            , alt ("cover image of " ++ (maybeAsString doc.title))
+            , class "avatar"
+            , width 72
+            , height 72
+            ] []
+        ]
+
+
 viewStrippedDescription : IndexDoc -> Html Msg
 viewStrippedDescription doc =
     let
-        description = String.Extra.stripTags (maybeAsString doc.description)
+        stripped = String.Extra.stripTags (maybeAsString doc.description)
     in
-    text description
+    p [] [ text stripped ]
 
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
@@ -274,6 +291,10 @@ viewDocType doc =
         _ ->
             emptyHtml
 
+viewPagination : ResultPage -> Html Msg
+viewPagination searchResult =
+    --nav [ class "paginate-container",  ] []
+    emptyHtml
 
 
 --- HTTP ---
