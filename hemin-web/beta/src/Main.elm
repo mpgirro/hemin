@@ -369,6 +369,7 @@ wrapProposeMsg : Cmd ProposePage.Msg -> Cmd Msg
 wrapProposeMsg msg =
     Cmd.map ProposeMsg msg
 
+
 wrapProposeHtml : Html ProposePage.Msg -> Html Msg
 wrapProposeHtml msg =
     Html.map ProposeMsg msg

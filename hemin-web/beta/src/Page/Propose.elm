@@ -1,9 +1,9 @@
 module Page.Propose exposing (Model(..), Msg(..), update, view)
 
-import Html exposing (Html, form, input, div, text, p, span, button)
+import Html exposing (Html, button, div, form, input, p, span, text)
 import Html.Attributes exposing (..)
-import Html.Events exposing (onInput)
 import Html.Attributes.Aria exposing (..)
+import Html.Events exposing (onInput)
 import Http
 import Skeleton exposing (Page)
 
@@ -38,13 +38,14 @@ view model =
                 , viewSubmitButton
                 ]
             ]
-
         ]
+
 
 viewInput : Html Msg
 viewInput =
     let
-        placeholderValue = "Enter the feed to propose here"
+        placeholderValue =
+            "Enter the feed to propose here"
     in
     input
         [ class "form-control"
@@ -55,6 +56,7 @@ viewInput =
         , onInput Propose
         ]
         []
+
 
 viewSubmitButton : Html Msg
 viewSubmitButton =

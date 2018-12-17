@@ -80,10 +80,10 @@ template content =
     [ div [ class "hemin", class "container-md" ]
         [ div
             [ class "px-2" ]
-             [ navbar
-             , content
-             , footer
-             ]
+            [ navbar
+            , content
+            , footer
+            ]
         ]
     ]
 
@@ -110,6 +110,7 @@ footer : Html msg
 footer =
     div
         [ class "footer"
+
         --, class "position-absolute"
         ]
         [ p
@@ -117,7 +118,7 @@ footer =
             , class "my-3"
             ]
             [ text "HEMIN is an open source podcast catalog & search engine. Check out the code on "
-            , a [ href "https://github.com/mpgirro/hemin"] [ text "GitHub" ]
+            , a [ href "https://github.com/mpgirro/hemin" ] [ text "GitHub" ]
             , text ". This site is written in "
             , a [ href "https://elm-lang.org" ] [ text "Elm" ]
             , text ". The podcasts and artworks embedded on this page are properties of their owners."
