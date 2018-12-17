@@ -108,13 +108,10 @@ viewCoverImage : Podcast -> Html msg
 viewCoverImage podcast =
     case podcast.image of
         Just image ->
-            div []
-                [ img
-                    [ src image
-                    , alt "cover image"
-                    , class "width-full"
-                    ]
-                    [] ]
+            let
+                altText = "cover image of " ++ (maybeAsString podcast.title)
+            in
+            div [] [ img [ src image, alt altText, class "width-full" ] [] ]
 
         Nothing ->
             emptyHtml

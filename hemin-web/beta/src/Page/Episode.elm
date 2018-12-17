@@ -7,7 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import RestApi
 import Skeleton exposing (Page)
-import Util exposing (maybeAsString, maybeAsText)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
 
@@ -91,12 +91,23 @@ view model =
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ h1 [] [ maybeAsText episode.title ]
+        [ viewCoverImage episode
+        , h1 [] [ maybeAsText episode.title ]
         , Skeleton.viewLink (maybeAsString episode.link)
         , p [] [ maybeAsText episode.description ]
         ]
 
+viewCoverImage : Episode -> Html msg
+viewCoverImage episode =
+    case episode.image of
+        Just image ->
+            let
+                altText = "cover image of " ++ (maybeAsString episode.title)
+            in
+            div [] [ img [ src image, alt altText, class "width-full" ] [] ]
 
+        Nothing ->
+            emptyHtml
 
 --- HTTP ---
 
