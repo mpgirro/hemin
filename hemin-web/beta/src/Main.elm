@@ -152,7 +152,7 @@ updateUrlChanged model =
             ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
 
         ProposePage ->
-            ( { model | content = wrapProposeContent ProposePage.Ready }, Cmd.none )
+            ( { model | content = wrapProposeContent (ProposePage.FeedUrl "") }, Cmd.none )
 
 
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )

@@ -1,4 +1,4 @@
-module RestApi exposing (apiBase, getAllPodcasts, getEpisode, getPodcast, getSearchResult)
+module RestApi exposing (apiBase, getAllPodcasts, getEpisode, getPodcast, getSearchResult, proposeFeed)
 
 import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
@@ -11,22 +11,14 @@ import Util exposing (maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
 
 apiBase : String
 apiBase =
-    -- local alternative:
+    -- "https://api.hemin.io/api/v1"
     "http://localhost:9000/api/v1"
-
-
-
--- production:
--- "https://api.hemin.io/api/v1"
--- JSON examples
---"https://api.hemin.io/json-examples"
 
 
 getEpisode : (Result Http.Error Episode -> msg) -> String -> Cmd msg
 getEpisode resultWrapper id =
     Http.get
-        { --url = apiBase ++ "/episode.json"
-          url = apiBase ++ "/episode/" ++ id
+        { url = apiBase ++ "/episode/" ++ id
         , expect = Http.expectJson resultWrapper episodeDecoder
         }
 
@@ -34,8 +26,7 @@ getEpisode resultWrapper id =
 getPodcast : (Result Http.Error Podcast -> msg) -> String -> Cmd msg
 getPodcast resultWrapper id =
     Http.get
-        { --url = apiBase ++ "/podcast.json"
-          url = apiBase ++ "/podcast/" ++ id
+        { url = apiBase ++ "/podcast/" ++ id
         , expect = Http.expectJson resultWrapper podcastDecoder
         }
 
@@ -80,16 +71,16 @@ getSearchResult resultWrapper query pageNumber pageSize =
 
             else
                 "?" ++ params
-
-        path : String
-        path =
-            "/search"
-                ++ urlQuery
     in
     Http.get
-        { --url = apiBase ++ "/search.json"
-          url =
-            apiBase
-                ++ path
+        { url = apiBase ++ "/search" ++ urlQuery
         , expect = Http.expectJson resultWrapper resultPageDecoder
+        }
+
+proposeFeed : (Result Http.Error () -> msg) -> String -> Cmd msg
+proposeFeed resultWrapper feed =
+    Http.post
+        { url = (apiBase ++ "/feed/propose")
+        , body = Http.stringBody "text/plain" feed
+        , expect = Http.expectWhatever resultWrapper
         }
