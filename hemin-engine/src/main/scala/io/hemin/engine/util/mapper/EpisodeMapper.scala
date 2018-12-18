@@ -67,4 +67,20 @@ object EpisodeMapper {
     .map(Success(_))
     .getOrElse(mapperFailureSolrToEpisode(src))
 
+  def toTeaser(episode: Episode): Option[Episode] = Option(episode)
+    .map{ e =>
+      Episode(
+        id = e.id,
+        podcastId = e.podcastId,
+        podcastTitle = e.podcastTitle,
+        title = e.title,
+        link = e.link,
+        pubDate = e.pubDate,
+        image = e.image,
+        itunes = EpisodeItunes(
+          summary = e.itunes.summary,
+        )
+      )
+    }
+
 }

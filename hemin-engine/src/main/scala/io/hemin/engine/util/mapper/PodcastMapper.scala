@@ -55,4 +55,19 @@ object PodcastMapper {
     .map(Success(_))
     .getOrElse(mapperFailureSolrToPodcast(doc))
 
+  def toTeaser(podcast: Podcast): Option[Podcast] = Option(podcast)
+    .map { p =>
+      Podcast(
+        id = p.id,
+        title = p.title,
+        link = p.link,
+        description = p.description,
+        pubDate = p.pubDate,
+        image = p.image,
+        itunes = PodcastItunes(
+          summary = p.itunes.summary,
+        )
+      )
+    }
+
 }
