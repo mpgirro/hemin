@@ -134,9 +134,11 @@ redirectLocalUrl state =
         s =
             maybePageSizeParam state.pageSize
 
+        params : String
         params =
-            "" ++ String.join "&" (Maybe.Extra.values [ q, p, s ])
+            String.join "&" (Maybe.Extra.values [ q, p, s ])
 
+        urlQuery : String
         urlQuery =
             if params == "" then
                 ""
@@ -144,9 +146,9 @@ redirectLocalUrl state =
             else
                 "?" ++ params
 
+        path : String
         path =
-            "/search"
-                ++ urlQuery
+            (++) "/search" urlQuery
     in
     case state.key of
         Just key ->
@@ -236,7 +238,7 @@ viewIndexDoc doc =
 
 viewCoverImage : IndexDoc -> Html Msg
 viewCoverImage doc =
-    div [ class "float-left", class "mr-3", class "mt-2", class "bg-gray" ]
+    div [ class "float-left", class "mr-3", class "mt-1", class "bg-gray" ]
         [ img
             [ src (maybeAsString doc.image)
             , alt ("cover image of " ++ maybeAsString doc.title)
@@ -275,7 +277,7 @@ viewIndexDocTitleAsLink doc =
                 _ ->
                     ""
     in
-    a [ href path, class "f3" ]
+    a [ href path, class "f4" ]
         [ maybeAsText doc.title ]
 
 
@@ -283,10 +285,10 @@ viewDocType : IndexDoc -> Html Msg
 viewDocType doc =
     case doc.docType of
         "podcast" ->
-            span [ class "Label", class "bg-yellow" ] [ text "PODCAST" ]
+            span [ class "Label", class "Label--outline" ] [ text "PODCAST" ]
 
         "episode" ->
-            span [ class "Label", class "bg-blue" ] [ text "EPISODE" ]
+            span [ class "Label", class "Label--outline" ] [ text "EPISODE" ]
 
         _ ->
             emptyHtml

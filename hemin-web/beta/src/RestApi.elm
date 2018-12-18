@@ -43,7 +43,7 @@ getAllPodcasts resultWrapper pageNumber pageSize =
             "s=" ++ String.fromInt pageSize
     in
     Http.get
-        { url = apiBase ++ "/podcast?" ++ p ++ "&" ++ s
+        { url = apiBase ++ "/podcast/teaser?" ++ p ++ "&" ++ s
         , expect = Http.expectJson resultWrapper podcastListDecoder
         }
 
