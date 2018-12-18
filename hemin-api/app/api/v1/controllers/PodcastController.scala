@@ -3,6 +3,7 @@ package api.v1.controllers
 import api.v1.controllers.bases.PodcastBaseController
 import api.v1.controllers.components.PodcastControllerComponents
 import api.v1.utils.ArrayWrapper
+import io.hemin.engine.util.mapper.{EpisodeMapper, PodcastMapper}
 import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger
@@ -28,7 +29,7 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
 
   def all(p: Option[Int], s: Option[Int]): Action[AnyContent] =
     PodcastAction.async { implicit request =>
-      log.trace(s"GET all podcast: p = $p & s = $s")
+      log.trace(s"GET all podcasts: p = $p & s = $s")
       podcastService
         .all(p, s)
         .map { ps =>
@@ -36,11 +37,25 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
         }
     }
 
+  def allAsTeaser(p: Option[Int], s: Option[Int]): Action[AnyContent] =
+    PodcastAction.async { implicit request =>
+      log.trace(s"GET all podcasts as teasers: p = $p & s = $s")
+      podcastService
+        .all(p, s)
+        .map(ps => ps.map(PodcastMapper.toTeaser))
+        .map(_.flatten)
+        .map { ps =>
+          Ok(Json.toJson(ArrayWrapper(ps)))
+        }
+    }
+
   def episodes(id: String): Action[AnyContent] =
     PodcastAction.async { implicit request =>
-      log.trace(s"GET episodes by podcast: id = $id")
+      log.trace(s"GET episodes by podcast (reduced to teasers): id = $id")
       podcastService
         .episodes(id)
+        .map(es => es.map(EpisodeMapper.toTeaser))
+        .map(_.flatten)
         .map { es =>
           Ok(Json.toJson(ArrayWrapper(es)))
         }
