@@ -131,7 +131,10 @@ updateUrlChanged model =
             ( { model | content = wrapHomeContent HomePage.Loading }, Cmd.none )
 
         PodcastPage id ->
-            ( { model | content = wrapPodcastContent PodcastPage.Loading }, wrapPodcastMsg (PodcastPage.getPodcast id) )
+            let
+                (m, c) = PodcastPage.init id
+            in
+            ( { model | content = wrapPodcastContent m }, wrapPodcastMsg c )
 
         EpisodePage id ->
             ( { model | content = wrapEpisodeContent EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )

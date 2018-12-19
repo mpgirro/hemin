@@ -1,13 +1,16 @@
-module Page.Podcast exposing (Model(..), Msg(..), getPodcast, update, view)
+module Page.Podcast exposing (Model, Msg(..), init, getPodcast, update, view)
 
 import Browser
+import Data.Episode exposing (Episode)
 import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
 import RestApi
+import Router exposing (redirectToEpisode)
 import Skeleton exposing (Page)
+import String.Extra
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
@@ -15,10 +18,28 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 ---- MODEL ----
 
 
-type Model
-    = Failure Http.Error
-    | Loading
-    | Content Podcast
+type alias Model =
+    { status : Status
+    , failure : Maybe Http.Error
+    , podcast : Maybe Podcast
+    , episodes : List Episode
+    }
+
+
+type Status
+    = Loading
+    | Ready
+
+
+init : String -> ( Model, Cmd Msg )
+init id =
+    let
+        model = Model Loading Nothing Nothing []
+
+        cmds = Cmd.batch [ getPodcast id, getEpisodes id ]
+    in
+    ( model, cmds )
+
 
 
 
@@ -28,6 +49,8 @@ type Model
 type Msg
     = LoadPodcast String
     | LoadedPodcast (Result Http.Error Podcast)
+    | LoadEpisodes String
+    | LoadedEpisodes (Result Http.Error (List Episode))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -39,38 +62,66 @@ update msg model =
         LoadedPodcast result ->
             case result of
                 Ok podcast ->
-                    ( Content podcast, Cmd.none )
+                    ( { model | podcast = Just podcast, status = Ready } , Cmd.none )
 
-                Err cause ->
-                    ( Failure cause, Cmd.none )
+                Err error ->
+                    ( { model | failure = Just error, status = Ready } , Cmd.none )
 
+        LoadEpisodes id ->
+            ( model, getEpisodes id )
 
+        LoadedEpisodes result ->
+            case result of
+                Ok episodes ->
+                    ( { model | episodes = episodes } , Cmd.none )
+
+                Err error ->
+                    ( { model | failure = Just error } , Cmd.none )
 
 ---- VIEW ----
 
 
 view : Model -> Html msg
 view model =
-    case model of
-        Failure cause ->
-            ErrorPage.view (ErrorPage.HttpFailure cause)
+    case model.status of
 
         Loading ->
             text "Loading..."
 
-        Content podcast ->
-            viewPodcast podcast
+        Ready ->
+            div [ class "col-sm-8"
+                , class "col-md-6"
+                , class "col-lg-6"
+                , class "p-2"
+                , class "mx-auto"
+                ]
+                [ viewHttpError model.failure
+                , viewPodcast model.podcast
+                , viewEpisodes model.episodes
+                ]
 
+viewHttpError : Maybe Http.Error -> Html msg
+viewHttpError maybeError =
+    case maybeError of
+        Just error ->
+            ErrorPage.view (ErrorPage.HttpFailure error)
+        Nothing ->
+            emptyHtml
 
-viewPodcast : Podcast -> Html msg
-viewPodcast podcast =
-    div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ viewCoverImage podcast
-        , viewTitle podcast
-        , viewLink podcast
-        , viewDecription podcast
-        , viewCategories podcast
-        ]
+viewPodcast : Maybe Podcast -> Html msg
+viewPodcast maybePodcast =
+    case maybePodcast of
+        Just podcast ->
+            div []
+                [ viewCoverImage podcast
+                , viewTitle podcast
+                , viewLink podcast
+                , viewDecription podcast
+                , viewCategories podcast
+                ]
+        Nothing ->
+            emptyHtml
+
 
 
 viewCoverImage : Podcast -> Html msg
@@ -79,7 +130,7 @@ viewCoverImage podcast =
         Just image ->
             let
                 altText =
-                    "cover image of " ++ maybeAsString podcast.title
+                    "cover image of podcast: " ++ maybeAsString podcast.title
             in
             div [] [ img [ src image, alt altText, class "width-full" ] [] ]
 
@@ -143,6 +194,83 @@ viewCategory category =
         ]
 
 
+viewEpisodes : List Episode -> Html msg
+viewEpisodes episodes =
+    case episodes of
+        [] ->
+            emptyHtml
+
+        first :: _ ->
+            div []
+                [ h2 [] [ text "Episodes" ]
+                , ul [ class "list-style-none" ] <|
+                    List.map viewEpisodeTeaser episodes
+                ]
+
+viewEpisodeTeaser : Episode -> Html msg
+viewEpisodeTeaser episode =
+    let
+        viewEpisodeTeaserCover : Html msg
+        viewEpisodeTeaserCover =
+            case episode.image of
+                Just image ->
+                    let
+                        altText =
+                            "cover image of " ++ maybeAsString episode.title
+                    in
+                    div [ class "float-left", class "mr-3", class "mt-1", class "bg-gray" ]
+                            [ img
+                                [ src (maybeAsString episode.image)
+                                , alt ("cover image of episode: " ++ maybeAsString episode.title)
+                                , class "avatar"
+                                , width 56
+                                , height 56
+                                ]
+                                []
+                            ]
+
+                Nothing ->
+                    emptyHtml
+
+        viewEpisodeTeaserTitle : Html msg
+        viewEpisodeTeaserTitle =
+            a
+                [ href (redirectToEpisode episode), class "f4" ]
+                [ maybeAsText episode.title ]
+
+        viewEpisodeTeaserDescription : Html msg
+        viewEpisodeTeaserDescription =
+            let
+                description : String
+                description =
+                    case (episode.description, episode.itunes.summary) of
+                        (Just d, _) ->
+                            d
+                        (Nothing, Just s) ->
+                            s
+                        (Nothing, Nothing) ->
+                            ""
+
+                stripped =
+                    String.Extra.stripTags description
+
+                truncate =
+                    String.left 280 stripped
+            in
+            p [] [ text (truncate ++ "...") ]
+
+    in
+    li [ class "py-2" ]
+        [ div [ class "clearfix", class "p-2" ]
+            [ viewEpisodeTeaserCover
+            , div []
+                [ viewEpisodeTeaserTitle
+                --, br [] []
+                --, viewEpisodeTeaserDescription
+                ]
+            ]
+        ]
+
 
 --- HTTP ---
 
@@ -150,3 +278,7 @@ viewCategory category =
 getPodcast : String -> Cmd Msg
 getPodcast id =
     RestApi.getPodcast LoadedPodcast id
+
+getEpisodes : String -> Cmd Msg
+getEpisodes id =
+    RestApi.getEpisodesByPodcast LoadedEpisodes id
