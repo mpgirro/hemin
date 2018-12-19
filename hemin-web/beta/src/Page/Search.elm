@@ -206,6 +206,8 @@ viewSearchInput state =
         , type_ "text"
         , value (maybeAsString state.query)
         , placeholder "What are you looking for?"
+        , autocomplete False
+        , spellcheck False
         , onInput (updateStateQuery state)
         , onEnter (updateSearchUrl state)
         ]

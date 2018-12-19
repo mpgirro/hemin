@@ -107,6 +107,8 @@ viewInput url =
         , type_ "text"
         , value url
         , placeholder placeholderValue
+        , autocomplete False
+        , spellcheck False
         , ariaLabel placeholderValue
         , onInput NewUrl
         ]
