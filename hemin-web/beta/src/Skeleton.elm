@@ -1,6 +1,6 @@
 module Skeleton exposing (Page, view, viewLink, viewLoadingPage)
 
-import Constant
+import Const
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -86,7 +86,7 @@ navbar =
             [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 12, height 12, alt "" ] []
                 , div [ class "hemin-brand", class "d-inline-block mx-1" ]
-                    [ text Constant.siteName ]
+                    [ text Const.siteName ]
                 ]
             ]
         , div [ class "UnderlineNav-body" ]
@@ -108,7 +108,7 @@ footer =
             [ class "note"
             , class "my-3"
             ]
-            [ text Constant.siteName
+            [ text Const.siteName
             , text " is an open source podcast catalog & search engine. Check out the code on "
             , a [ href "https://github.com/mpgirro/hemin" ] [ text "GitHub" ]
             , text ". This site is written in "

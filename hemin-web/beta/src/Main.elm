@@ -4,7 +4,7 @@ module Main exposing (Model, Msg, init, main, subscriptions, update, view, viewH
 
 import Browser
 import Browser.Navigation
-import Constant
+import Const
 import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
@@ -299,7 +299,7 @@ viewHomePage =
         body =
             div [] [ p [] [ text "Homepage" ] ]
     in
-    Skeleton.view (Constant.siteName ++ " : Podcast Catalog & Search") body
+    Skeleton.view (Const.siteName ++ " : Podcast Catalog & Search") body
 
 
 

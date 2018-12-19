@@ -1,6 +1,6 @@
 module Page.Propose exposing (Model(..), Msg(..), update, view)
 
-import Constant
+import Const
 import Html exposing (Html, button, div, form, input, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
@@ -76,7 +76,7 @@ view model =
                     [ div
                         [ class "flash", class "flash-full", class "flash-success" ]
                         [ text "Feed successfully proposed. "
-                        , text Constant.siteName
+                        , text Const.siteName
                         , text " will process it shortly."
                         ]
                     ]
@@ -92,7 +92,7 @@ viewForm url =
     div []
             [ p []
                 [ text "Please submit the URL to the feed of the podcast that you want to add to "
-                , text Constant.siteName
+                , text Const.siteName
                 , text ":"
                 ]
             , Html.form []
