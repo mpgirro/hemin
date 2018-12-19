@@ -5,6 +5,7 @@ import Data.Episode exposing (Episode)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
+import Json.Encode
 import Page.Error as ErrorPage
 import RestApi
 import Router exposing (redirectToParent)
@@ -81,7 +82,7 @@ viewPodcastTitle episode =
         Just title ->
             div
                 [ class "text-center"
-                , class "f3-light"
+                , class "f4"
                 , class "lh-condensed-ultra"
                 , class "mb-2"
                 ]
@@ -123,7 +124,7 @@ viewLink episode =
 
 viewDecription : Episode -> Html msg
 viewDecription episode =
-    case (episode.contentEncoded, episode.description, episode.itunes.summary) of
+    case (toDescriptionTriple episode) of
         (Just content, _, _) ->
             viewDescriptionParagraph content
         (Nothing, Just description, _) ->
@@ -136,8 +137,11 @@ viewDecription episode =
 
 viewDescriptionParagraph : String -> Html msg
 viewDescriptionParagraph description =
-    p [ class "mt-4" ] [ text description ]
-
+    p [ class "mt-4" ]
+        [ Html.node "rendered-html"
+            [ property "content" (Json.Encode.string description) ]
+            []
+        ]
 
 viewSmallInfos : Episode -> Html msg
 viewSmallInfos episode =
@@ -145,8 +149,8 @@ viewSmallInfos episode =
         (Nothing, Nothing) ->
             emptyHtml
         (_, _) ->
-            div [ class "mb-3" ]
-                [ small [ class "mb-3" ]
+            div [ class "mt-3" ]
+                [ small [ class "note" ]
                     [ viewPubDate episode
                     , viewItunesDuration episode
                     ]
@@ -169,9 +173,29 @@ viewItunesDuration episode =
         Nothing ->
             emptyHtml
 
+
 --- HTTP ---
 
 
 getEpisode : String -> Cmd Msg
 getEpisode id =
     RestApi.getEpisode LoadedEpisode id
+
+
+--- INTERNAL HELPERS ---
+
+toDescriptionTriple : Episode -> (Maybe String, Maybe String, Maybe String)
+toDescriptionTriple e =
+    let
+        emptyToNothing : Maybe String -> Maybe String
+        emptyToNothing maybeString =
+            case maybeString of
+                Just str ->
+                    if String.isEmpty str then
+                                            Nothing
+                    else
+                        Just str
+                Nothing ->
+                    Nothing
+    in
+    (emptyToNothing e.contentEncoded, emptyToNothing e.description, e.itunes.summary)
