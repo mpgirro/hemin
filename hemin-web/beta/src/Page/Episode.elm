@@ -70,6 +70,7 @@ viewEpisode episode =
         , viewCoverImage episode
         , viewTitle episode
         , viewLink episode
+        , viewSmallInfos episode
         , viewDecription episode
         ]
 
@@ -122,22 +123,51 @@ viewLink episode =
 
 viewDecription : Episode -> Html msg
 viewDecription episode =
-    case episode.itunes.summary of
-        Just summary ->
+    case (episode.contentEncoded, episode.description, episode.itunes.summary) of
+        (Just content, _, _) ->
+            viewDescriptionParagraph content
+        (Nothing, Just description, _) ->
+            viewDescriptionParagraph description
+        (Nothing, Nothing, Just summary) ->
             viewDescriptionParagraph summary
+        (Nothing, Nothing, Nothing) ->
+            emptyHtml
 
-        Nothing ->
-            case episode.description of
-                Just description ->
-                    viewDescriptionParagraph description
-
-                Nothing ->
-                    emptyHtml
 
 viewDescriptionParagraph : String -> Html msg
 viewDescriptionParagraph description =
     p [ class "mt-4" ] [ text description ]
 
+
+viewSmallInfos : Episode -> Html msg
+viewSmallInfos episode =
+    case (episode.pubDate, episode.itunes.duration) of
+        (Nothing, Nothing) ->
+            emptyHtml
+        (_, _) ->
+            div [ class "mb-3" ]
+                [ small [ class "mb-3" ]
+                    [ viewPubDate episode
+                    , viewItunesDuration episode
+                    ]
+                ]
+
+
+viewPubDate : Episode -> Html msg
+viewPubDate episode =
+    case episode.pubDate of
+        Just pubDate ->
+            span [ class "mr-2" ] [ text pubDate ]
+        Nothing ->
+            emptyHtml
+
+viewItunesDuration : Episode -> Html msg
+viewItunesDuration episode =
+    case episode.itunes.duration of
+        Just duration ->
+            span [ class "mr-2" ] [ text duration ]
+        Nothing ->
+            emptyHtml
 
 --- HTTP ---
 
