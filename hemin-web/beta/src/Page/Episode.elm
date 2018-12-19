@@ -65,12 +65,33 @@ view model =
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
     div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
-        [ viewCoverImage episode
-        , h1 [] [ maybeAsText episode.title ]
-        , Skeleton.viewLink episode.link
-        , p [] [ maybeAsText episode.description ]
+        [ viewPodcastTitle episode
+        , viewCoverImage episode
+        , viewTitle episode
+        , viewLink episode
+        , viewDecription episode
         ]
 
+
+viewPodcastTitle : Episode -> Html msg
+viewPodcastTitle episode =
+    case episode.podcastTitle of
+        Just title ->
+            div
+                [ class "text-center"
+                , class "f3-light"
+                , class "lh-condensed-ultra"
+                , class "mb-2"
+                ]
+                [ a
+                    [ href ("/p/" ++ episode.podcastId)
+                    , class "link-gray"
+                    ]
+                    [ text title ]
+                ]
+
+        Nothing ->
+            emptyHtml
 
 viewCoverImage : Episode -> Html msg
 viewCoverImage episode =
@@ -85,6 +106,36 @@ viewCoverImage episode =
         Nothing ->
             emptyHtml
 
+viewTitle : Episode -> Html msg
+viewTitle episode =
+    case episode.title of
+        Just title ->
+            h1 [ class "f2-light", class "lh-condensed-ultra", class "mt-4", class "mb-0" ] [ maybeAsText episode.title ]
+
+        Nothing ->
+            emptyHtml
+
+viewLink : Episode -> Html msg
+viewLink episode =
+    Skeleton.viewLink episode.link
+
+viewDecription : Episode -> Html msg
+viewDecription episode =
+    case episode.itunes.summary of
+        Just summary ->
+            viewDescriptionParagraph summary
+
+        Nothing ->
+            case episode.description of
+                Just description ->
+                    viewDescriptionParagraph description
+
+                Nothing ->
+                    emptyHtml
+
+viewDescriptionParagraph : String -> Html msg
+viewDescriptionParagraph description =
+    p [ class "mt-4" ] [ text description ]
 
 
 --- HTTP ---

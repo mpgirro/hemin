@@ -41,6 +41,14 @@ type alias SearchState =
     , results : Maybe ResultPage
     }
 
+emptySearchState : SearchState
+emptySearchState =
+    { key = Nothing
+    , query = Nothing
+    , pageNumber = Nothing
+    , pageSize = Nothing
+    , results = Nothing
+    }
 
 
 --- UPDATE ---
@@ -166,20 +174,24 @@ view : Model -> Html Msg
 view model =
     case model of
         Failure cause ->
-            ErrorPage.view (ErrorPage.HttpFailure cause)
+            div [ class "col-md-9", class "p-2", class "mx-auto" ]
+                [ viewSearchInput emptySearchState
+                , ErrorPage.view (ErrorPage.HttpFailure cause)
+                ]
+
 
         Loading state ->
-            div [ class "col-md-10", class "p-2", class "mx-auto" ]
+            div [ class "col-md-9", class "p-2", class "mx-auto" ]
                 [ viewSearchInput state ]
 
         Content state ->
             case state.results of
                 Nothing ->
-                    div [ class "col-md-10", class "p-2", class "mx-auto" ]
+                    div [ class "col-md-9", class "p-2", class "mx-auto" ]
                         [ viewSearchInput state ]
 
                 Just searchResults ->
-                    div [ class "col-md-10", class "p-2", class "mx-auto" ]
+                    div [ class "col-md-9", class "p-2", class "mx-auto" ]
                         [ viewSearchInput state
                         , viewSearchResult state.query state.pageNumber state.pageSize searchResults
                         ]
@@ -190,6 +202,7 @@ viewSearchInput state =
     input
         [ class "form-control"
         , class "input-block"
+        , class "mb-3"
         , type_ "text"
         , value (maybeAsString state.query)
         , placeholder "What are you looking for?"

@@ -40,7 +40,7 @@ viewLink externalLink =
                     else
                         link
             in
-            a [ href link, class "website-link", class "text-gray" ] [ text stripProtocol ]
+            a [ href link, class "link-gray", class "font-quicksand" ] [ text stripProtocol ]
 
         Nothing ->
             emptyHtml

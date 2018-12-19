@@ -12,7 +12,7 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
 
--- MODEL
+---- MODEL ----
 
 
 type Model
@@ -22,7 +22,7 @@ type Model
 
 
 
--- UPDATE
+---- UPDATE ----
 
 
 type Msg
@@ -46,7 +46,7 @@ update msg model =
 
 
 
--- VIEW
+---- VIEW ----
 
 
 view : Model -> Html msg
@@ -138,7 +138,7 @@ viewCategory category =
 
 
 
--- HTTP
+--- HTTP ---
 
 
 getPodcast : String -> Cmd Msg
