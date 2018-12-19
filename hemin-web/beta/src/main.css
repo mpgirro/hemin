@@ -8,7 +8,8 @@
 }
 
 h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
+.h1, .h2, .h3, .h4, .h5, .h6
+.f1, .f2, .f3, .f4, .f5, .f6 {
     font-family: 'Quicksand', sans-serif;
 }
 
@@ -30,4 +31,19 @@ h1, h2, h3, h4, h5, h6,
     bottom: 0;
     overflow-wrap: normal;
     */
+}
+
+rendered-html ul {
+    display: block;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
+    -webkit-padding-start: 20px;
+}
+
+rendered-html p {
+    display: block;
+    -webkit-margin-before: 1em;
+    -webkit-margin-after: 1em;
+    -webkit-margin-start: 0px;
+    -webkit-margin-end: 0px;
 }
