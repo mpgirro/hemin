@@ -17,6 +17,7 @@ import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Maybe.Extra
 import Page.Error as ErrorPage
 import RestApi
+import Router exposing (redirectByIndexDocType)
 import Skeleton exposing (Page)
 import String.Extra
 import Url exposing (Url)
@@ -279,20 +280,8 @@ viewStrippedDescription doc =
 
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
-    let
-        path : String
-        path =
-            case doc.docType of
-                "podcast" ->
-                    "/p/" ++ doc.id
-
-                "episode" ->
-                    "/e/" ++ doc.id
-
-                _ ->
-                    ""
-    in
-    a [ href path, class "f4" ]
+    a
+        [ href (redirectByIndexDocType doc), class "f4" ]
         [ maybeAsText doc.title ]
 
 

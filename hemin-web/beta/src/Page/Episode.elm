@@ -7,6 +7,7 @@ import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
 import RestApi
+import Router exposing (redirectToParent)
 import Skeleton exposing (Page)
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
@@ -84,7 +85,7 @@ viewPodcastTitle episode =
                 , class "mb-2"
                 ]
                 [ a
-                    [ href ("/p/" ++ episode.podcastId)
+                    [ href (redirectToParent episode)
                     , class "link-gray"
                     ]
                     [ text title ]

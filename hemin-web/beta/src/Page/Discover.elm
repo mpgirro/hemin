@@ -6,6 +6,7 @@ import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
 import RestApi
+import Router exposing (redirectToPodcast)
 import Skeleton exposing (Page)
 import Util exposing (maybeAsString, maybeAsText)
 
@@ -78,7 +79,7 @@ viewDiscover podcasts =
 viewPodcastCover : Podcast -> Html msg
 viewPodcastCover podcast =
     li [ class "d-inline-block", class "col-2", class "p-2" ]
-        [ a [ href ("/p/" ++ podcast.id) ]
+        [ a [ href (redirectToPodcast podcast) ]
             [ img
                 [ class "width-full"
                 , class "avatar"
