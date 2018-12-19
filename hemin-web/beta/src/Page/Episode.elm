@@ -10,7 +10,7 @@ import Page.Error as ErrorPage
 import RestApi
 import Router exposing (redirectToParent)
 import Skeleton exposing (Page)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText, viewInnerHtml, prettyDateHtml)
 
 
 
@@ -88,7 +88,7 @@ viewPodcastTitle episode =
                 ]
                 [ a
                     [ href (redirectToParent episode)
-                    , class "link-gray"
+                    , class "link-gray-dark"
                     ]
                     [ text title ]
                 ]
@@ -120,7 +120,8 @@ viewTitle episode =
 
 viewLink : Episode -> Html msg
 viewLink episode =
-    Skeleton.viewLink episode.link
+    div [ class "mt-1" ] [ Skeleton.viewLink episode.link ]
+
 
 viewDecription : Episode -> Html msg
 viewDecription episode =
@@ -138,9 +139,7 @@ viewDecription episode =
 viewDescriptionParagraph : String -> Html msg
 viewDescriptionParagraph description =
     p [ class "mt-4" ]
-        [ Html.node "rendered-html"
-            [ property "content" (Json.Encode.string description) ]
-            []
+        [ viewInnerHtml description
         ]
 
 viewSmallInfos : Episode -> Html msg
@@ -161,7 +160,8 @@ viewPubDate : Episode -> Html msg
 viewPubDate episode =
     case episode.pubDate of
         Just pubDate ->
-            span [ class "mr-2" ] [ text pubDate ]
+            span [ class "mr-2" ]
+                [ prettyDateHtml pubDate ]
         Nothing ->
             emptyHtml
 
@@ -192,7 +192,7 @@ toDescriptionTriple e =
             case maybeString of
                 Just str ->
                     if String.isEmpty str then
-                                            Nothing
+                        Nothing
                     else
                         Just str
                 Nothing ->

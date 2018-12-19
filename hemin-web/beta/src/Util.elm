@@ -1,8 +1,11 @@
-module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml)
+module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateString, prettyDateHtml)
 
-import Html exposing (Html, div, text)
-import Html.Attributes
+import Html exposing (Html, div, text, span)
+import Html.Attributes exposing (property, class)
 import Json.Encode
+import DateFormat
+import Iso8601
+import Time exposing (Posix, Zone)
 
 
 maybeAsText : Maybe String -> Html msg
@@ -61,9 +64,39 @@ emptyHtml =
 
 
 viewInnerHtml : String -> Html msg
-viewInnerHtml t =
-    div
-        [ Json.Encode.string t
-            |> Html.Attributes.property "innerHTML"
-        ]
+viewInnerHtml html =
+    Html.node "rendered-html"
+        [ property "content" (Json.Encode.string html) ]
         []
+
+prettyDateString : String -> Maybe String
+prettyDateString timestamp =
+    let
+        formatter : Zone -> Posix -> String
+        formatter =
+            DateFormat.format
+                [ DateFormat.monthNameFull
+                , DateFormat.text " "
+                , DateFormat.dayOfMonthSuffix
+                , DateFormat.text ", "
+                , DateFormat.yearNumber
+                ]
+
+        timezone : Zone
+        timezone =
+            Time.utc
+    in
+    case Iso8601.toTime timestamp of
+        Ok posix ->
+            Just (formatter timezone posix)
+        Err _ ->
+            Nothing
+
+
+prettyDateHtml : String -> Html msg
+prettyDateHtml timestamp =
+    case prettyDateString timestamp of
+        Just pretty ->
+            text pretty
+        Nothing ->
+            span [ class "text-red" ] [ text "DATE_PARSING_ERROR" ]
