@@ -1,5 +1,6 @@
-module Skeleton exposing (Page, siteName, view, viewLink, viewLoadingPage)
+module Skeleton exposing (Page, view, viewLink, viewLoadingPage)
 
+import Constant
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
@@ -55,16 +56,6 @@ viewLoadingPage =
     view "Loading" body
 
 
-
---- CONSTANTS ---
-
-
-siteName : String
-siteName =
-    "HEMIN"
-
-
-
 -- INTERNAL
 
 
@@ -95,7 +86,7 @@ navbar =
             [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 12, height 12, alt "" ] []
                 , div [ class "hemin-brand", class "d-inline-block mx-1" ]
-                    [ text siteName ]
+                    [ text Constant.siteName ]
                 ]
             ]
         , div [ class "UnderlineNav-body" ]
@@ -117,7 +108,8 @@ footer =
             [ class "note"
             , class "my-3"
             ]
-            [ text "HEMIN is an open source podcast catalog & search engine. Check out the code on "
+            [ text Constant.siteName
+            , text " is an open source podcast catalog & search engine. Check out the code on "
             , a [ href "https://github.com/mpgirro/hemin" ] [ text "GitHub" ]
             , text ". This site is written in "
             , a [ href "https://elm-lang.org" ] [ text "Elm" ]

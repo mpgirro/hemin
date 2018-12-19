@@ -91,7 +91,13 @@ viewTitle : Podcast -> Html msg
 viewTitle podcast =
     case podcast.title of
         Just title ->
-            h1 [ class "f2-light", class "lh-condensed-ultra", class "mt-4", class "mb-0" ] [ maybeAsText podcast.title ]
+            h1
+                [ class "f2-light"
+                , class "lh-condensed-ultra"
+                , class "mt-4"
+                , class "mb-0"
+                ]
+                [ maybeAsText podcast.title ]
 
         Nothing ->
             emptyHtml
