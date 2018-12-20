@@ -1,4 +1,5 @@
-module Const exposing (..)
+module Const exposing (siteName)
+
 
 siteName : String
 siteName =

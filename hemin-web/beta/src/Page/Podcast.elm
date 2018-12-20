@@ -1,4 +1,4 @@
-module Page.Podcast exposing (Model, Msg(..), init, getPodcast, update, view)
+module Page.Podcast exposing (Model, Msg(..), getPodcast, init, update, view)
 
 import Browser
 import Data.Episode exposing (Episode)
@@ -34,12 +34,13 @@ type Status
 init : String -> ( Model, Cmd Msg )
 init id =
     let
-        model = Model Loading Nothing Nothing []
+        model =
+            Model Loading Nothing Nothing []
 
-        cmds = Cmd.batch [ getPodcast id, getEpisodes id ]
+        cmds =
+            Cmd.batch [ getPodcast id, getEpisodes id ]
     in
     ( model, cmds )
-
 
 
 
@@ -62,10 +63,10 @@ update msg model =
         LoadedPodcast result ->
             case result of
                 Ok podcast ->
-                    ( { model | podcast = Just podcast, status = Ready } , Cmd.none )
+                    ( { model | podcast = Just podcast, status = Ready }, Cmd.none )
 
                 Err error ->
-                    ( { model | failure = Just error, status = Ready } , Cmd.none )
+                    ( { model | failure = Just error, status = Ready }, Cmd.none )
 
         LoadEpisodes id ->
             ( model, getEpisodes id )
@@ -73,10 +74,12 @@ update msg model =
         LoadedEpisodes result ->
             case result of
                 Ok episodes ->
-                    ( { model | episodes = episodes } , Cmd.none )
+                    ( { model | episodes = episodes }, Cmd.none )
 
                 Err error ->
-                    ( { model | failure = Just error } , Cmd.none )
+                    ( { model | failure = Just error }, Cmd.none )
+
+
 
 ---- VIEW ----
 
@@ -84,12 +87,12 @@ update msg model =
 view : Model -> Html msg
 view model =
     case model.status of
-
         Loading ->
             text "Loading..."
 
         Ready ->
-            div [ class "col-sm-8"
+            div
+                [ class "col-sm-8"
                 , class "col-md-6"
                 , class "col-lg-6"
                 , class "p-2"
@@ -100,13 +103,17 @@ view model =
                 , viewEpisodes model.episodes
                 ]
 
+
 viewHttpError : Maybe Http.Error -> Html msg
 viewHttpError maybeError =
     case maybeError of
         Just error ->
-            ErrorPage.view (ErrorPage.HttpFailure error)
+            div [ class "flash", class "flash-full", class "flash-error" ]
+                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
+
         Nothing ->
             emptyHtml
+
 
 viewPodcast : Maybe Podcast -> Html msg
 viewPodcast maybePodcast =
@@ -119,9 +126,9 @@ viewPodcast maybePodcast =
                 , viewDecription podcast
                 , viewCategories podcast
                 ]
+
         Nothing ->
             emptyHtml
-
 
 
 viewCoverImage : Podcast -> Html msg
@@ -207,6 +214,7 @@ viewEpisodes episodes =
                     List.map viewEpisodeTeaser episodes
                 ]
 
+
 viewEpisodeTeaser : Episode -> Html msg
 viewEpisodeTeaser episode =
     let
@@ -219,15 +227,15 @@ viewEpisodeTeaser episode =
                             "cover image of " ++ maybeAsString episode.title
                     in
                     div [ class "float-left", class "mr-3", class "mt-1", class "bg-gray" ]
-                            [ img
-                                [ src (maybeAsString episode.image)
-                                , alt ("cover image of episode: " ++ maybeAsString episode.title)
-                                , class "avatar"
-                                , width 56
-                                , height 56
-                                ]
-                                []
+                        [ img
+                            [ src (maybeAsString episode.image)
+                            , alt ("cover image of episode: " ++ maybeAsString episode.title)
+                            , class "avatar"
+                            , width 56
+                            , height 56
                             ]
+                            []
+                        ]
 
                 Nothing ->
                     emptyHtml
@@ -243,12 +251,14 @@ viewEpisodeTeaser episode =
             let
                 description : String
                 description =
-                    case (episode.description, episode.itunes.summary) of
-                        (Just d, _) ->
+                    case ( episode.description, episode.itunes.summary ) of
+                        ( Just d, _ ) ->
                             d
-                        (Nothing, Just s) ->
+
+                        ( Nothing, Just s ) ->
                             s
-                        (Nothing, Nothing) ->
+
+                        ( Nothing, Nothing ) ->
                             ""
 
                 stripped =
@@ -258,18 +268,19 @@ viewEpisodeTeaser episode =
                     String.left 280 stripped
             in
             p [] [ text (truncate ++ "...") ]
-
     in
     li [ class "py-2" ]
         [ div [ class "clearfix", class "p-2" ]
             [ viewEpisodeTeaserCover
             , div []
                 [ viewEpisodeTeaserTitle
+
                 --, br [] []
                 --, viewEpisodeTeaserDescription
                 ]
             ]
         ]
+
 
 
 --- HTTP ---
@@ -278,6 +289,7 @@ viewEpisodeTeaser episode =
 getPodcast : String -> Cmd Msg
 getPodcast id =
     RestApi.getPodcast LoadedPodcast id
+
 
 getEpisodes : String -> Cmd Msg
 getEpisodes id =

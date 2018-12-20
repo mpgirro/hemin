@@ -42,6 +42,7 @@ type alias SearchState =
     , results : Maybe ResultPage
     }
 
+
 emptySearchState : SearchState
 emptySearchState =
     { key = Nothing
@@ -50,6 +51,7 @@ emptySearchState =
     , pageSize = Nothing
     , results = Nothing
     }
+
 
 
 --- UPDATE ---
@@ -179,7 +181,6 @@ view model =
                 [ viewSearchInput emptySearchState
                 , ErrorPage.view (ErrorPage.HttpFailure cause)
                 ]
-
 
         Loading state ->
             div [ class "col-md-9", class "p-2", class "mx-auto" ]

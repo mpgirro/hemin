@@ -10,7 +10,7 @@ import Page.Error as ErrorPage
 import RestApi
 import Router exposing (redirectToParent)
 import Skeleton exposing (Page)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText, viewInnerHtml, prettyDateHtml)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText, prettyDateHtml, viewInnerHtml)
 
 
 
@@ -96,6 +96,7 @@ viewPodcastTitle episode =
         Nothing ->
             emptyHtml
 
+
 viewCoverImage : Episode -> Html msg
 viewCoverImage episode =
     case episode.image of
@@ -109,6 +110,7 @@ viewCoverImage episode =
         Nothing ->
             emptyHtml
 
+
 viewTitle : Episode -> Html msg
 viewTitle episode =
     case episode.title of
@@ -118,6 +120,7 @@ viewTitle episode =
         Nothing ->
             emptyHtml
 
+
 viewLink : Episode -> Html msg
 viewLink episode =
     div [ class "mt-1" ] [ Skeleton.viewLink episode.link ]
@@ -125,14 +128,17 @@ viewLink episode =
 
 viewDecription : Episode -> Html msg
 viewDecription episode =
-    case (toDescriptionTriple episode) of
-        (Just content, _, _) ->
+    case toDescriptionTriple episode of
+        ( Just content, _, _ ) ->
             viewDescriptionParagraph content
-        (Nothing, Just description, _) ->
+
+        ( Nothing, Just description, _ ) ->
             viewDescriptionParagraph description
-        (Nothing, Nothing, Just summary) ->
+
+        ( Nothing, Nothing, Just summary ) ->
             viewDescriptionParagraph summary
-        (Nothing, Nothing, Nothing) ->
+
+        ( Nothing, Nothing, Nothing ) ->
             emptyHtml
 
 
@@ -142,12 +148,14 @@ viewDescriptionParagraph description =
         [ viewInnerHtml description
         ]
 
+
 viewSmallInfos : Episode -> Html msg
 viewSmallInfos episode =
-    case (episode.pubDate, episode.itunes.duration) of
-        (Nothing, Nothing) ->
+    case ( episode.pubDate, episode.itunes.duration ) of
+        ( Nothing, Nothing ) ->
             emptyHtml
-        (_, _) ->
+
+        ( _, _ ) ->
             div [ class "mt-3" ]
                 [ small [ class "note" ]
                     [ viewPubDate episode
@@ -162,16 +170,20 @@ viewPubDate episode =
         Just pubDate ->
             span [ class "mr-2" ]
                 [ prettyDateHtml pubDate ]
+
         Nothing ->
             emptyHtml
+
 
 viewItunesDuration : Episode -> Html msg
 viewItunesDuration episode =
     case episode.itunes.duration of
         Just duration ->
             span [ class "mr-2" ] [ text duration ]
+
         Nothing ->
             emptyHtml
+
 
 
 --- HTTP ---
@@ -182,9 +194,11 @@ getEpisode id =
     RestApi.getEpisode LoadedEpisode id
 
 
+
 --- INTERNAL HELPERS ---
 
-toDescriptionTriple : Episode -> (Maybe String, Maybe String, Maybe String)
+
+toDescriptionTriple : Episode -> ( Maybe String, Maybe String, Maybe String )
 toDescriptionTriple e =
     let
         emptyToNothing : Maybe String -> Maybe String
@@ -193,9 +207,11 @@ toDescriptionTriple e =
                 Just str ->
                     if String.isEmpty str then
                         Nothing
+
                     else
                         Just str
+
                 Nothing ->
                     Nothing
     in
-    (emptyToNothing e.contentEncoded, emptyToNothing e.description, e.itunes.summary)
+    ( emptyToNothing e.contentEncoded, emptyToNothing e.description, e.itunes.summary )

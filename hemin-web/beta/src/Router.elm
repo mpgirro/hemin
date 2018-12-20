@@ -1,4 +1,4 @@
-module Router exposing (Route(..), fromUrl, parser, redirectByIndexDocType, redirectToEpisode, redirectToPodcast, redirectToParent)
+module Router exposing (Route(..), fromUrl, parser, redirectByIndexDocType, redirectToEpisode, redirectToParent, redirectToPodcast)
 
 import Browser.Navigation as Nav
 import Data.Episode exposing (Episode)
@@ -41,6 +41,7 @@ fromUrl url =
     Maybe.withDefault HomePage (Parser.parse parser url)
 
 
+
 --- PUBLIC HELPERS ---
 
 
@@ -52,6 +53,7 @@ redirectToEpisode episode =
 redirectToPodcast : Podcast -> String
 redirectToPodcast podcast =
     podcastPagePrefix ++ podcast.id
+
 
 redirectToParent : Episode -> String
 redirectToParent episode =
@@ -69,6 +71,8 @@ redirectByIndexDocType doc =
 
         _ ->
             ""
+
+
 
 --- INTERNAL ---
 

@@ -1,10 +1,10 @@
-module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateString, prettyDateHtml)
+module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, prettyDateHtml, prettyDateString, viewInnerHtml)
 
-import Html exposing (Html, div, text, span)
-import Html.Attributes exposing (property, class)
-import Json.Encode
 import DateFormat
+import Html exposing (Html, div, span, text)
+import Html.Attributes exposing (class, property)
 import Iso8601
+import Json.Encode
 import Time exposing (Posix, Zone)
 
 
@@ -69,6 +69,7 @@ viewInnerHtml html =
         [ property "content" (Json.Encode.string html) ]
         []
 
+
 prettyDateString : String -> Maybe String
 prettyDateString timestamp =
     let
@@ -89,6 +90,7 @@ prettyDateString timestamp =
     case Iso8601.toTime timestamp of
         Ok posix ->
             Just (formatter timezone posix)
+
         Err _ ->
             Nothing
 
@@ -98,5 +100,6 @@ prettyDateHtml timestamp =
     case prettyDateString timestamp of
         Just pretty ->
             text pretty
+
         Nothing ->
             span [ class "text-red" ] [ text "DATE_PARSING_ERROR" ]

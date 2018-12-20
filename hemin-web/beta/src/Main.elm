@@ -132,7 +132,8 @@ updateUrlChanged model =
 
         PodcastPage id ->
             let
-                (m, c) = PodcastPage.init id
+                ( m, c ) =
+                    PodcastPage.init id
             in
             ( { model | content = wrapPodcastContent m }, wrapPodcastMsg c )
 

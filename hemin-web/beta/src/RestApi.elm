@@ -22,11 +22,13 @@ getEpisode resultWrapper id =
         , expect = Http.expectJson resultWrapper episodeDecoder
         }
 
+
 getEpisodesByPodcast resultWrapper id =
     Http.get
         { url = apiBase ++ "/podcast/" ++ id ++ "/episodes"
         , expect = Http.expectJson resultWrapper episodeListDecoder
         }
+
 
 getPodcast : (Result Http.Error Podcast -> msg) -> String -> Cmd msg
 getPodcast resultWrapper id =
@@ -82,10 +84,11 @@ getSearchResult resultWrapper query pageNumber pageSize =
         , expect = Http.expectJson resultWrapper resultPageDecoder
         }
 
+
 proposeFeed : (Result Http.Error () -> msg) -> String -> Cmd msg
 proposeFeed resultWrapper feed =
     Http.post
-        { url = (apiBase ++ "/feed/propose")
+        { url = apiBase ++ "/feed/propose"
         , body = Http.stringBody "text/plain" feed
         , expect = Http.expectWhatever resultWrapper
         }
