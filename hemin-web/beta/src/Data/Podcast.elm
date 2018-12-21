@@ -21,13 +21,7 @@ type alias Podcast =
     , docs : Maybe String
     , managingEditor : Maybe String
     , image : Maybe String
-
-    --, atomLinks : List AtomLink
     , itunes : PodcastItunes
-
-    --,registration : PodcastRegistration
-    --,feedpress : PodcastFeedpress
-    --,fyyd : PodcastFyyd
     }
 
 

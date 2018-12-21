@@ -21,8 +21,6 @@ type alias Episode =
     , guidIsPermalink : Maybe Bool
     , image : Maybe String
     , contentEncoded : Maybe String
-
-    --, atomLinks : List AtomLink
     , chapters : List Chapter
     , itunes : EpisodeItunes
     , enclosure : EpisodeEnclosure

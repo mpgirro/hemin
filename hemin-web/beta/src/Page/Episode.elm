@@ -66,7 +66,12 @@ view model =
 
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
-    div [ class "col-sm-8", class "col-md-6", class "col-lg-6", class "p-2", class "mx-auto" ]
+    div [ class "col-sm-8"
+        , class "col-md-6"
+        , class "col-lg-6"
+        , class "p-2"
+        , class "mx-auto"
+        ]
         [ viewPodcastTitle episode
         , viewCoverImage episode
         , viewTitle episode
@@ -88,7 +93,7 @@ viewPodcastTitle episode =
                 ]
                 [ a
                     [ href (redirectToParent episode)
-                    , class "link-gray-dark"
+                    , class "link-gray"
                     ]
                     [ text title ]
                 ]
@@ -115,7 +120,13 @@ viewTitle : Episode -> Html msg
 viewTitle episode =
     case episode.title of
         Just title ->
-            h1 [ class "f2-light", class "lh-condensed-ultra", class "mt-4", class "mb-0" ] [ maybeAsText episode.title ]
+            h1
+                [ class "f2-light"
+                , class "lh-condensed-ultra"
+                , class "mt-4"
+                , class "mb-0"
+                ]
+                [ maybeAsText episode.title ]
 
         Nothing ->
             emptyHtml
@@ -168,11 +179,10 @@ viewPubDate : Episode -> Html msg
 viewPubDate episode =
     case episode.pubDate of
         Just pubDate ->
-            span [ class "mr-2" ]
-                [ prettyDateHtml pubDate ]
+            span [ class "mr-2" ] [ prettyDateHtml pubDate ]
 
         Nothing ->
-            emptyHtml
+            text "n/a"
 
 
 viewItunesDuration : Episode -> Html msg
@@ -182,7 +192,7 @@ viewItunesDuration episode =
             span [ class "mr-2" ] [ text duration ]
 
         Nothing ->
-            emptyHtml
+            text "n/a"
 
 
 

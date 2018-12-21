@@ -34,8 +34,13 @@ type Status
 init : String -> ( Model, Cmd Msg )
 init id =
     let
+        model : Model
         model =
-            Model Loading Nothing Nothing []
+            { status = Loading
+            , failure = Nothing
+            , podcast = Nothing
+            , episodes = []
+            }
 
         cmds =
             Cmd.batch [ getPodcast id, getEpisodes id ]
