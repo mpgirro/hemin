@@ -1,4 +1,12 @@
-module Router exposing (Route(..), fromUrl, parser, redirectByIndexDocType, redirectToEpisode, redirectToParent, redirectToPodcast)
+module Router exposing
+    ( Route(..)
+    , fromUrl
+    , parser
+    , redirectByIndexDocType
+    , redirectToEpisode
+    , redirectToParent
+    , redirectToPodcast
+    )
 
 import Browser.Navigation as Nav
 import Data.Episode exposing (Episode)

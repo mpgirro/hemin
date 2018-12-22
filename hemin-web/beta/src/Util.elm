@@ -1,4 +1,14 @@
-module Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, prettyDateHtml, prettyDateString, viewInnerHtml)
+module Util exposing
+    ( emptyHtml
+    , maybeAsString
+    , maybeAsText
+    , maybePageNumberParam
+    , maybePageSizeParam
+    , maybeQueryParam
+    , prettyDateHtml
+    , prettyDateString
+    , viewInnerHtml
+    )
 
 import DateFormat
 import Html exposing (Html, div, span, text)

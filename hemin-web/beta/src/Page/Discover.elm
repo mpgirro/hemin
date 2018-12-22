@@ -1,4 +1,11 @@
-module Page.Discover exposing (Model(..), Msg(..), getAllPodcast, init, update, view)
+module Page.Discover exposing
+    ( Model(..)
+    , Msg(..)
+    , getAllPodcast
+    , init
+    , update
+    , view
+    )
 
 import Data.Podcast exposing (Podcast)
 import Html exposing (..)

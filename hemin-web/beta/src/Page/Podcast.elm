@@ -1,4 +1,11 @@
-module Page.Podcast exposing (Model, Msg(..), getPodcast, init, update, view)
+module Page.Podcast exposing
+    ( Model
+    , Msg(..)
+    , getPodcast
+    , init
+    , update
+    , view
+    )
 
 import Browser
 import Data.Episode exposing (Episode)

@@ -1,4 +1,9 @@
-module Page.Home exposing (Model(..), Msg(..), update, view)
+module Page.Home exposing
+    ( Model(..)
+    , Msg(..)
+    , update
+    , view
+    )
 
 import Html exposing (..)
 import Html.Attributes exposing (..)

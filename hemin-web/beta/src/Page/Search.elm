@@ -1,4 +1,13 @@
-module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, init, redirectLocalUrl, update, view)
+module Page.Search exposing
+    ( Model(..)
+    , Msg(..)
+    , SearchState
+    , getSearchResult
+    , init
+    , redirectLocalUrl
+    , update
+    , view
+    )
 
 import Browser
 import Browser.Navigation

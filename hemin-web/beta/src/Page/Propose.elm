@@ -1,4 +1,10 @@
-module Page.Propose exposing (Model(..), Msg(..), init, update, view)
+module Page.Propose exposing
+    ( Model(..)
+    , Msg(..)
+    , init
+    , update
+    , view
+    )
 
 import Const
 import Html exposing (Html, button, div, form, input, p, span, text)
