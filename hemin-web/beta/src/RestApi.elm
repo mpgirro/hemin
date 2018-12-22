@@ -1,6 +1,16 @@
-module RestApi exposing (apiBase, getAllPodcasts, getEpisode, getEpisodesByPodcast, getPodcast, getSearchResult, proposeFeed)
+module RestApi exposing
+    ( apiBase
+    , getAllPodcasts
+    , getEpisode
+    , getEpisodesByPodcast
+    , getFeedsByPodcast
+    , getPodcast
+    , getSearchResult
+    , proposeFeed
+    )
 
 import Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
+import Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 import Data.ResultPage exposing (ResultPage, resultPageDecoder)
@@ -23,10 +33,19 @@ getEpisode resultWrapper id =
         }
 
 
+getEpisodesByPodcast : (Result Http.Error (List Episode) -> msg) -> String -> Cmd msg
 getEpisodesByPodcast resultWrapper id =
     Http.get
         { url = apiBase ++ "/podcast/" ++ id ++ "/episodes"
         , expect = Http.expectJson resultWrapper episodeListDecoder
+        }
+
+
+getFeedsByPodcast : (Result Http.Error (List Feed) -> msg) -> String -> Cmd msg
+getFeedsByPodcast resultWrapper id =
+    Http.get
+        { url = apiBase ++ "/podcast/" ++ id ++ "/feeds"
+        , expect = Http.expectJson resultWrapper feedListDecoder
         }
 
 

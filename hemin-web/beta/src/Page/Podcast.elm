@@ -2,6 +2,7 @@ module Page.Podcast exposing (Model, Msg(..), getPodcast, init, update, view)
 
 import Browser
 import Data.Episode exposing (Episode)
+import Data.Feed exposing (Feed)
 import Data.Podcast exposing (Podcast)
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -23,6 +24,7 @@ type alias Model =
     , failure : Maybe Http.Error
     , podcast : Maybe Podcast
     , episodes : List Episode
+    , feeds : List Feed
     }
 
 
@@ -40,11 +42,12 @@ init id =
             , failure = Nothing
             , podcast = Nothing
             , episodes = []
+            , feeds = []
             }
 
         cmd : Cmd Msg
         cmd =
-            Cmd.batch [ getPodcast id, getEpisodes id ]
+            Cmd.batch [ getPodcast id, getEpisodes id, getFeeds id ]
     in
     ( model, cmd )
 
@@ -58,6 +61,8 @@ type Msg
     | LoadedPodcast (Result Http.Error Podcast)
     | LoadEpisodes String
     | LoadedEpisodes (Result Http.Error (List Episode))
+    | LoadFeeds String
+    | LoadedFeeds (Result Http.Error (List Feed))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -85,7 +90,16 @@ update msg model =
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
+        LoadFeeds id ->
+            ( model, getFeeds id )
 
+        LoadedFeeds result ->
+            case result of
+                Ok feeds ->
+                    ( { model | feeds = feeds }, Cmd.none )
+
+                Err error ->
+                    ( { model | failure = Just error }, Cmd.none )
 
 ---- VIEW ----
 
@@ -107,6 +121,7 @@ view model =
                 [ viewHttpError model.failure
                 , viewPodcast model.podcast
                 , viewEpisodes model.episodes
+                , viewFeeds model.feeds
                 ]
 
 
@@ -288,6 +303,25 @@ viewEpisodeTeaser episode =
         ]
 
 
+viewFeeds : List Feed -> Html msg
+viewFeeds feeds =
+    let
+        viewFeed : Feed -> String
+        viewFeed feed =
+            maybeAsString feed.url
+    in
+    case feeds of
+            [] ->
+                emptyHtml
+
+            first :: _ ->
+                div []
+                    [ h2 [] [ text "Feeds" ]
+                    , pre []
+                        [ text (String.join "\n" (List.map viewFeed feeds))
+                        ]
+                    ]
+
 
 --- HTTP ---
 
@@ -300,3 +334,7 @@ getPodcast id =
 getEpisodes : String -> Cmd Msg
 getEpisodes id =
     RestApi.getEpisodesByPodcast LoadedEpisodes id
+
+getFeeds : String -> Cmd Msg
+getFeeds id =
+    RestApi.getFeedsByPodcast LoadedFeeds id

@@ -1,6 +1,6 @@
-module Data.Feed exposing (Feed, feedDecoder)
+module Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 
-import Json.Decode exposing (Decoder, maybe, string)
+import Json.Decode exposing (Decoder, field, list, maybe, string)
 import Json.Decode.Pipeline exposing (optional, required)
 
 
@@ -21,3 +21,8 @@ feedDecoder =
         |> optional "url" (maybe string) Nothing
         |> optional "lastChecked" (maybe string) Nothing
         |> optional "lastStatus" (maybe string) Nothing
+
+
+feedListDecoder : Decoder (List Feed)
+feedListDecoder =
+    field "results" (list feedDecoder)
