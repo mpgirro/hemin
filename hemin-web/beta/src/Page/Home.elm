@@ -47,13 +47,13 @@ update msg model =
                     ( Failure cause, Cmd.none )
 
 
-view : Model -> ( String, Html msg )
+view : Model -> ( String, Html Msg )
 view model =
     let
         title =
             "Home"
 
-        body : Html msg
+        body : Html Msg
         body =
             div [] [ p [] [ text "Home Page" ] ]
     in

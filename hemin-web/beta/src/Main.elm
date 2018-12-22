@@ -297,13 +297,25 @@ viewContent model =
             viewNotFound
 
         HomeContent content ->
-            HomePage.view content
+            let
+                ( title, body ) =
+                    HomePage.view content
+            in
+            ( title, wrapHomeHtml body )
 
         PodcastContent content ->
-            PodcastPage.view content
+            let
+                ( title, body ) =
+                    PodcastPage.view content
+            in
+            ( title, wrapPodcastHtml body )
 
         EpisodeContent content ->
-            EpisodePage.view content
+            let
+                ( title, body ) =
+                    EpisodePage.view content
+            in
+            ( title, wrapEpisodeHtml body )
 
         SearchContent content ->
             let
@@ -313,7 +325,11 @@ viewContent model =
             ( title, wrapSearchHtml body )
 
         DiscoverContent content ->
-            DiscoverPage.view content
+            let
+                ( title, body ) =
+                    DiscoverPage.view content
+            in
+            ( title, wrapDiscoverHtml body )
 
         ProposeContent content ->
             let
@@ -346,6 +362,11 @@ wrapHomeMsg msg =
     Cmd.map HomeMsg msg
 
 
+wrapHomeHtml : Html HomePage.Msg -> Html Msg
+wrapHomeHtml msg =
+    Html.map HomeMsg msg
+
+
 wrapPodcastContent : PodcastPage.Model -> Content
 wrapPodcastContent model =
     PodcastContent model
@@ -356,6 +377,11 @@ wrapPodcastMsg msg =
     Cmd.map PodcastMsg msg
 
 
+wrapPodcastHtml : Html PodcastPage.Msg -> Html Msg
+wrapPodcastHtml msg =
+    Html.map PodcastMsg msg
+
+
 wrapEpisodeContent : EpisodePage.Model -> Content
 wrapEpisodeContent model =
     EpisodeContent model
@@ -364,6 +390,11 @@ wrapEpisodeContent model =
 wrapEpisodeMsg : Cmd EpisodePage.Msg -> Cmd Msg
 wrapEpisodeMsg msg =
     Cmd.map EpisodeMsg msg
+
+
+wrapEpisodeHtml : Html EpisodePage.Msg -> Html Msg
+wrapEpisodeHtml msg =
+    Html.map EpisodeMsg msg
 
 
 wrapSearchContent : SearchPage.Model -> Content
@@ -389,6 +420,11 @@ wrapDiscoverContent model =
 wrapDiscoverMsg : Cmd DiscoverPage.Msg -> Cmd Msg
 wrapDiscoverMsg msg =
     Cmd.map DiscoverMsg msg
+
+
+wrapDiscoverHtml : Html DiscoverPage.Msg -> Html Msg
+wrapDiscoverHtml msg =
+    Html.map DiscoverMsg msg
 
 
 wrapProposeContent : ProposePage.Model -> Content

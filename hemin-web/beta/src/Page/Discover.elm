@@ -70,13 +70,13 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> ( String, Html msg )
+view : Model -> ( String, Html Msg )
 view model =
     let
         title =
             "Discover"
 
-        body : Html msg
+        body : Html Msg
         body =
             case model of
                 Failure cause ->
@@ -91,7 +91,7 @@ view model =
     ( title, body )
 
 
-viewDiscover : List Podcast -> Html msg
+viewDiscover : List Podcast -> Html Msg
 viewDiscover podcasts =
     div []
         [ div [ class "Subhead" ]
@@ -105,7 +105,7 @@ viewDiscover podcasts =
         ]
 
 
-viewPodcastCover : Podcast -> Html msg
+viewPodcastCover : Podcast -> Html Msg
 viewPodcastCover podcast =
     li [ class "d-inline-block", class "col-2", class "p-2" ]
         [ a [ href (redirectToPodcast podcast) ]

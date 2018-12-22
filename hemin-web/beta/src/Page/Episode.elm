@@ -72,13 +72,13 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> ( String, Html msg )
+view : Model -> ( String, Html Msg )
 view model =
     let
         title =
             "Episode"
 
-        body : Html msg
+        body : Html Msg
         body =
             case model of
                 Failure cause ->
@@ -93,7 +93,7 @@ view model =
     ( title, body )
 
 
-viewEpisode : Episode -> Html msg
+viewEpisode : Episode -> Html Msg
 viewEpisode episode =
     div
         [ class "col-sm-8"
@@ -111,7 +111,7 @@ viewEpisode episode =
         ]
 
 
-viewPodcastTitle : Episode -> Html msg
+viewPodcastTitle : Episode -> Html Msg
 viewPodcastTitle episode =
     case episode.podcastTitle of
         Just title ->
@@ -132,7 +132,7 @@ viewPodcastTitle episode =
             emptyHtml
 
 
-viewCoverImage : Episode -> Html msg
+viewCoverImage : Episode -> Html Msg
 viewCoverImage episode =
     case episode.image of
         Just image ->
@@ -146,7 +146,7 @@ viewCoverImage episode =
             emptyHtml
 
 
-viewTitle : Episode -> Html msg
+viewTitle : Episode -> Html Msg
 viewTitle episode =
     case episode.title of
         Just title ->
@@ -162,12 +162,12 @@ viewTitle episode =
             emptyHtml
 
 
-viewLink : Episode -> Html msg
+viewLink : Episode -> Html Msg
 viewLink episode =
     div [ class "mt-1" ] [ Skeleton.viewLink episode.link ]
 
 
-viewDecription : Episode -> Html msg
+viewDecription : Episode -> Html Msg
 viewDecription episode =
     case toDescriptionTriple episode of
         ( Just content, _, _ ) ->
@@ -183,14 +183,14 @@ viewDecription episode =
             emptyHtml
 
 
-viewDescriptionParagraph : String -> Html msg
+viewDescriptionParagraph : String -> Html Msg
 viewDescriptionParagraph description =
     p [ class "mt-4" ]
         [ viewInnerHtml description
         ]
 
 
-viewSmallInfos : Episode -> Html msg
+viewSmallInfos : Episode -> Html Msg
 viewSmallInfos episode =
     case ( episode.pubDate, episode.itunes.duration ) of
         ( Nothing, Nothing ) ->
@@ -205,7 +205,7 @@ viewSmallInfos episode =
                 ]
 
 
-viewPubDate : Episode -> Html msg
+viewPubDate : Episode -> Html Msg
 viewPubDate episode =
     case episode.pubDate of
         Just pubDate ->
@@ -215,7 +215,7 @@ viewPubDate episode =
             text "n/a"
 
 
-viewItunesDuration : Episode -> Html msg
+viewItunesDuration : Episode -> Html Msg
 viewItunesDuration episode =
     case episode.itunes.duration of
         Just duration ->

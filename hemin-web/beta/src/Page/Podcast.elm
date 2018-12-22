@@ -113,13 +113,13 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> ( String, Html msg )
+view : Model -> ( String, Html Msg )
 view model =
     let
         title =
             "Podcast"
 
-        body : Html msg
+        body : Html Msg
         body =
             case model.status of
                 Loading ->
@@ -142,7 +142,7 @@ view model =
     ( title, body )
 
 
-viewHttpError : Maybe Http.Error -> Html msg
+viewHttpError : Maybe Http.Error -> Html Msg
 viewHttpError maybeError =
     case maybeError of
         Just error ->
@@ -153,7 +153,7 @@ viewHttpError maybeError =
             emptyHtml
 
 
-viewPodcast : Maybe Podcast -> Html msg
+viewPodcast : Maybe Podcast -> Html Msg
 viewPodcast maybePodcast =
     case maybePodcast of
         Just podcast ->
@@ -169,7 +169,7 @@ viewPodcast maybePodcast =
             emptyHtml
 
 
-viewCoverImage : Podcast -> Html msg
+viewCoverImage : Podcast -> Html Msg
 viewCoverImage podcast =
     case podcast.image of
         Just image ->
@@ -183,7 +183,7 @@ viewCoverImage podcast =
             emptyHtml
 
 
-viewTitle : Podcast -> Html msg
+viewTitle : Podcast -> Html Msg
 viewTitle podcast =
     case podcast.title of
         Just title ->
@@ -199,12 +199,12 @@ viewTitle podcast =
             emptyHtml
 
 
-viewLink : Podcast -> Html msg
+viewLink : Podcast -> Html Msg
 viewLink podcast =
     Skeleton.viewLink podcast.link
 
 
-viewDecription : Podcast -> Html msg
+viewDecription : Podcast -> Html Msg
 viewDecription podcast =
     case podcast.itunes.summary of
         Just summary ->
@@ -219,18 +219,18 @@ viewDecription podcast =
                     emptyHtml
 
 
-viewDescriptionParagraph : String -> Html msg
+viewDescriptionParagraph : String -> Html Msg
 viewDescriptionParagraph description =
     p [ class "mt-4" ] [ text description ]
 
 
-viewCategories : Podcast -> Html msg
+viewCategories : Podcast -> Html Msg
 viewCategories podcast =
     div [ class "mt-3" ] <|
         List.map viewCategory podcast.itunes.categories
 
 
-viewCategory : String -> Html msg
+viewCategory : String -> Html Msg
 viewCategory category =
     -- TODO add the OpenIconic stuff
     span [ class "Label", class "Label--gray", class "p-1", class "mr-1" ]
@@ -239,7 +239,7 @@ viewCategory category =
         ]
 
 
-viewEpisodes : List Episode -> Html msg
+viewEpisodes : List Episode -> Html Msg
 viewEpisodes episodes =
     case episodes of
         [] ->
@@ -254,10 +254,10 @@ viewEpisodes episodes =
                 ]
 
 
-viewEpisodeTeaser : Episode -> Html msg
+viewEpisodeTeaser : Episode -> Html Msg
 viewEpisodeTeaser episode =
     let
-        viewEpisodeTeaserCover : Html msg
+        viewEpisodeTeaserCover : Html Msg
         viewEpisodeTeaserCover =
             case episode.image of
                 Just image ->
@@ -279,13 +279,13 @@ viewEpisodeTeaser episode =
                 Nothing ->
                     emptyHtml
 
-        viewEpisodeTeaserTitle : Html msg
+        viewEpisodeTeaserTitle : Html Msg
         viewEpisodeTeaserTitle =
             a
                 [ href (redirectToEpisode episode), class "f4" ]
                 [ maybeAsText episode.title ]
 
-        viewEpisodeTeaserDescription : Html msg
+        viewEpisodeTeaserDescription : Html Msg
         viewEpisodeTeaserDescription =
             let
                 description : String
@@ -321,7 +321,7 @@ viewEpisodeTeaser episode =
         ]
 
 
-viewFeeds : List Feed -> Html msg
+viewFeeds : List Feed -> Html Msg
 viewFeeds feeds =
     let
         viewFeed : Feed -> String
