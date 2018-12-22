@@ -14,7 +14,7 @@ import Browser.Navigation
 import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
-import Data.ResultPage exposing (ResultPage, resultPageDecoder)
+import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, li, nav, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
@@ -48,7 +48,7 @@ type alias SearchState =
     , query : Maybe String
     , pageNumber : Maybe Int
     , pageSize : Maybe Int
-    , results : Maybe ResultPage
+    , results : Maybe SearchResult
     }
 
 
@@ -84,7 +84,7 @@ type Msg
     = UpdateState SearchState
     | UpdateSearchUrl (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
     | LoadSearchResult (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
-    | LoadedSearchResult (Result Http.Error ResultPage)
+    | LoadedSearchResult (Result Http.Error SearchResult)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -239,7 +239,7 @@ viewSearchInput state =
         []
 
 
-viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> ResultPage -> Html Msg
+viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =
     div []
         [ viewTotalHits searchResult
@@ -249,7 +249,7 @@ viewSearchResult query pageNumber pageSize searchResult =
         ]
 
 
-viewTotalHits : ResultPage -> Html Msg
+viewTotalHits : SearchResult -> Html Msg
 viewTotalHits searchResult =
     p
         [ class "note", class "my-3" ]
@@ -322,7 +322,7 @@ viewDocType doc =
             emptyHtml
 
 
-viewPagination : Maybe String -> Maybe Int -> Maybe Int -> ResultPage -> Html Msg
+viewPagination : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewPagination query pageNumber pageSize searchResult =
     let
         qParam : String

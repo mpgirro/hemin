@@ -108,6 +108,8 @@ update msg model =
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
+
+
 ---- VIEW ----
 
 
@@ -236,8 +238,9 @@ viewEpisodes episodes =
             emptyHtml
 
         first :: _ ->
-            div []
-                [ h2 [] [ text "Episodes" ]
+            div [ class "mt-4" ]
+                [ div [ class "Subhead" ]
+                    [ div [ class "Subhead-heading" ] [ text "Episodes" ] ]
                 , ul [ class "list-style-none" ] <|
                     List.map viewEpisodeTeaser episodes
                 ]
@@ -318,16 +321,18 @@ viewFeeds feeds =
             maybeAsString feed.url
     in
     case feeds of
-            [] ->
-                emptyHtml
+        [] ->
+            emptyHtml
 
-            first :: _ ->
-                div []
-                    [ h2 [] [ text "Feeds" ]
-                    , pre []
-                        [ text (String.join "\n" (List.map viewFeed feeds))
-                        ]
+        first :: _ ->
+            div [ class "mt-4" ]
+                [ div [ class "Subhead" ]
+                    [ div [ class "Subhead-heading" ] [ text "Feeds" ] ]
+                , pre []
+                    [ text (String.join "\n" (List.map viewFeed feeds))
                     ]
+                ]
+
 
 
 --- HTTP ---
@@ -341,6 +346,7 @@ getPodcast id =
 getEpisodes : String -> Cmd Msg
 getEpisodes id =
     RestApi.getEpisodesByPodcast LoadedEpisodes id
+
 
 getFeeds : String -> Cmd Msg
 getFeeds id =

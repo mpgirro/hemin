@@ -13,7 +13,7 @@ import Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 import Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
-import Data.ResultPage exposing (ResultPage, resultPageDecoder)
+import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import Http
 import Maybe.Extra
 import Util exposing (maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
@@ -74,7 +74,7 @@ getAllPodcasts resultWrapper pageNumber pageSize =
         }
 
 
-getSearchResult : (Result Http.Error ResultPage -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
+getSearchResult : (Result Http.Error SearchResult -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
 getSearchResult resultWrapper query pageNumber pageSize =
     let
         q =
@@ -100,7 +100,7 @@ getSearchResult resultWrapper query pageNumber pageSize =
     in
     Http.get
         { url = apiBase ++ "/search" ++ urlQuery
-        , expect = Http.expectJson resultWrapper resultPageDecoder
+        , expect = Http.expectJson resultWrapper searchResultDecoder
         }
 
 

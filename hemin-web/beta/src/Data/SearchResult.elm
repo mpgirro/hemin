@@ -1,15 +1,15 @@
-module Data.ResultPage exposing (ResultPage, resultPageDecoder)
+module Data.SearchResult exposing (SearchResult, searchResultDecoder)
 
 import Data.IndexDoc exposing (IndexDoc, indexDocDecoder)
-import Json.Decode exposing (Decoder, bool, field, int, list, string)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
+import Json.Decode exposing (Decoder, int, list)
+import Json.Decode.Pipeline exposing (required)
 
 
 
 --- MODELS ---
 
 
-type alias ResultPage =
+type alias SearchResult =
     { currPage : Int
     , maxPage : Int
     , totalHits : Int
@@ -21,8 +21,8 @@ type alias ResultPage =
 --- DEFAULTS ---
 
 
-emptyResultPage : ResultPage
-emptyResultPage =
+emptySearchResult : SearchResult
+emptySearchResult =
     { currPage = 0
     , maxPage = 0
     , totalHits = 0
@@ -34,9 +34,9 @@ emptyResultPage =
 --- JSON ---
 
 
-resultPageDecoder : Decoder ResultPage
-resultPageDecoder =
-    Json.Decode.succeed ResultPage
+searchResultDecoder : Decoder SearchResult
+searchResultDecoder =
+    Json.Decode.succeed SearchResult
         |> required "currPage" int
         |> required "maxPage" int
         |> required "totalHits" int

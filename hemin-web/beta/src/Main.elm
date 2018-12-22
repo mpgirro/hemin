@@ -16,7 +16,7 @@ import Const
 import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
-import Data.ResultPage exposing (ResultPage, resultPageDecoder)
+import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import Html exposing (Html, div, p, text)
 import Http
 import Page.Discover as DiscoverPage
