@@ -113,25 +113,33 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> Html msg
+view : Model -> ( String, Html msg )
 view model =
-    case model.status of
-        Loading ->
-            text "Loading..."
+    let
+        title =
+            "Podcast"
 
-        Ready ->
-            div
-                [ class "col-sm-8"
-                , class "col-md-6"
-                , class "col-lg-6"
-                , class "p-2"
-                , class "mx-auto"
-                ]
-                [ viewHttpError model.failure
-                , viewPodcast model.podcast
-                , viewEpisodes model.episodes
-                , viewFeeds model.feeds
-                ]
+        body : Html msg
+        body =
+            case model.status of
+                Loading ->
+                    text "Loading..."
+
+                Ready ->
+                    div
+                        [ class "col-sm-8"
+                        , class "col-md-6"
+                        , class "col-lg-6"
+                        , class "p-2"
+                        , class "mx-auto"
+                        ]
+                        [ viewHttpError model.failure
+                        , viewPodcast model.podcast
+                        , viewEpisodes model.episodes
+                        , viewFeeds model.feeds
+                        ]
+    in
+    ( title, body )
 
 
 viewHttpError : Maybe Http.Error -> Html msg

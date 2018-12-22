@@ -1,4 +1,4 @@
-module Skeleton exposing (Page, view, viewLink, viewLoadingPage)
+module Skeleton exposing (Page, view, viewLink)
 
 import Const
 import Html exposing (..)
@@ -45,15 +45,6 @@ viewLink externalLink =
 
         Nothing ->
             emptyHtml
-
-
-viewLoadingPage : Page msg
-viewLoadingPage =
-    let
-        body =
-            div [] [ p [] [ text "Loading..." ] ]
-    in
-    view "Loading" body
 
 
 

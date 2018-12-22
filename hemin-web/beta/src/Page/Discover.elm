@@ -70,17 +70,25 @@ update msg model =
 ---- VIEW ----
 
 
-view : Model -> Html msg
+view : Model -> ( String, Html msg )
 view model =
-    case model of
-        Failure cause ->
-            ErrorPage.view (ErrorPage.HttpFailure cause)
+    let
+        title =
+            "Discover"
 
-        Loading ->
-            text "Loading..."
+        body : Html msg
+        body =
+            case model of
+                Failure cause ->
+                    ErrorPage.view (ErrorPage.HttpFailure cause)
 
-        Content podcasts ->
-            viewDiscover podcasts
+                Loading ->
+                    text "Loading..."
+
+                Content podcasts ->
+                    viewDiscover podcasts
+    in
+    ( title, body )
 
 
 viewDiscover : List Podcast -> Html msg

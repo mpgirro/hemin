@@ -196,9 +196,12 @@ redirectLocalUrl state =
 --- VIEW ---
 
 
-view : Model -> Html Msg
+view : Model -> ( String, Html Msg )
 view model =
     let
+        title =
+            "Search"
+
         childNodes : List (Html Msg)
         childNodes =
             case model of
@@ -219,8 +222,12 @@ view model =
                             [ viewSearchInput state
                             , viewSearchResult state.query state.pageNumber state.pageSize searchResults
                             ]
+
+        body : Html Msg
+        body =
+            div [ class "col-md-9", class "p-2", class "mx-auto" ] childNodes
     in
-    div [ class "col-md-9", class "p-2", class "mx-auto" ] childNodes
+    ( title, body )
 
 
 viewSearchInput : SearchState -> Html Msg

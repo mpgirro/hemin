@@ -68,42 +68,50 @@ update msg model =
                     ( Failure cause, Cmd.none )
 
 
-view : Model -> Html Msg
+view : Model -> ( String, Html Msg )
 view model =
-    case model of
-        FeedUrl url ->
-            viewForm url
+    let
+        title =
+            "Search"
 
-        Proposing feed ->
-            div []
-                [ viewForm feed
-                , div [ class "Box", class "mt-3" ]
-                    [ div
-                        [ class "flash", class "flash-full", class "flash-warn" ]
-                        [ text "Proposing..." ]
-                    ]
+        body : Html Msg
+        body =
+            case model of
+                FeedUrl url ->
+                    viewForm url
 
-                --, p [ class "mt-2" ] [ text "Proposing..." ]
-                ]
+                Proposing feed ->
+                    div []
+                        [ viewForm feed
+                        , div [ class "Box", class "mt-3" ]
+                            [ div
+                                [ class "flash", class "flash-full", class "flash-warn" ]
+                                [ text "Proposing..." ]
+                            ]
 
-        Success feed ->
-            div []
-                [ viewForm feed
-                , div [ class "Box", class "mt-3" ]
-                    [ div
-                        [ class "flash", class "flash-full", class "flash-success" ]
-                        [ text "Feed successfully proposed. "
-                        , text Const.siteName
-                        , text " will process it shortly."
-                        , text " If the feed is valid and not yet in our database, the podcast and episodes will be available soon."
+                        --, p [ class "mt-2" ] [ text "Proposing..." ]
                         ]
-                    ]
 
-                --, p [ class "mt-2" ] [ text "Feed successfully proposed. HEMIN will process it shortly." ]
-                ]
+                Success feed ->
+                    div []
+                        [ viewForm feed
+                        , div [ class "Box", class "mt-3" ]
+                            [ div
+                                [ class "flash", class "flash-full", class "flash-success" ]
+                                [ text "Feed successfully proposed. "
+                                , text Const.siteName
+                                , text " will process it shortly."
+                                , text " If the feed is valid and not yet in our database, the podcast and episodes will be available soon."
+                                ]
+                            ]
 
-        Failure cause ->
-            ErrorPage.view (ErrorPage.HttpFailure cause)
+                        --, p [ class "mt-2" ] [ text "Feed successfully proposed. HEMIN will process it shortly." ]
+                        ]
+
+                Failure cause ->
+                    ErrorPage.view (ErrorPage.HttpFailure cause)
+    in
+    ( title, body )
 
 
 viewForm : String -> Html Msg

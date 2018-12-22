@@ -6,7 +6,6 @@ module Main exposing
     , subscriptions
     , update
     , view
-    , viewHomePage
     , viewNotFound
     )
 
@@ -282,51 +281,61 @@ subscriptions model =
 
 view : Model -> Browser.Document Msg
 view model =
+    let
+        ( title, body ) =
+            viewContent model
+    in
+    Skeleton.view title body
+
+
+viewContent : Model -> ( String, Html Msg )
+viewContent model =
     case model.content of
-        --Failure cause ->
-        --    Skeleton.view "Error" (Skeleton.viewHttpFailure cause)
         Loading ->
-            Skeleton.viewLoadingPage
+            let
+                title =
+                    "Loading"
+
+                body =
+                    div [] [ p [] [ text "Loading..." ] ]
+            in
+            ( title, body )
 
         NotFound ->
             viewNotFound
 
         HomeContent content ->
-            Skeleton.view "Home" (HomePage.view content)
+            HomePage.view content
 
-        --viewHomePage
         PodcastContent content ->
-            Skeleton.view "Podcast" (PodcastPage.view content)
+            PodcastPage.view content
 
         EpisodeContent content ->
-            Skeleton.view "Episode" (EpisodePage.view content)
+            EpisodePage.view content
 
         SearchContent content ->
-            Skeleton.view "Search" (wrapSearchHtml (SearchPage.view content))
+            let
+                ( title, body ) = SearchPage.view content
+            in
+            ( title, wrapSearchHtml body )
 
         DiscoverContent content ->
-            Skeleton.view "Discover" (DiscoverPage.view content)
+            DiscoverPage.view content
 
         ProposeContent content ->
-            Skeleton.view "Propose" (wrapProposeHtml (ProposePage.view content))
+            let
+                ( title, body ) = ProposePage.view content
+            in
+            ( title, wrapProposeHtml body )
 
 
-viewNotFound : Page msg
+viewNotFound : ( String, Html msg )
 viewNotFound =
     let
         body =
             div [] [ p [] [ text "Not Found" ] ]
     in
-    Skeleton.view "Not Found" body
-
-
-viewHomePage : Page msg
-viewHomePage =
-    let
-        body =
-            div [] [ p [] [ text "Homepage" ] ]
-    in
-    Skeleton.view (Const.siteName ++ " : Podcast Catalog & Search") body
+    ( "Not Found", body )
 
 
 
