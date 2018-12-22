@@ -1,4 +1,4 @@
-module Page.Discover exposing (Model(..), Msg(..), getAllPodcast, update, view, init)
+module Page.Discover exposing (Model(..), Msg(..), getAllPodcast, init, update, view)
 
 import Data.Podcast exposing (Podcast)
 import Html exposing (..)
@@ -25,12 +25,15 @@ init : ( Model, Cmd Msg )
 init =
     let
         model : Model
-        model = Loading
+        model =
+            Loading
 
         cmd : Cmd Msg
-        cmd = getAllPodcast 1 36
+        cmd =
+            getAllPodcast 1 36
     in
     ( model, cmd )
+
 
 
 ---- UPDATE ----

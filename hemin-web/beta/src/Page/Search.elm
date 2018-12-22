@@ -1,4 +1,4 @@
-module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, redirectLocalUrl, update, view, init)
+module Page.Search exposing (Model(..), Msg(..), SearchState, getSearchResult, init, redirectLocalUrl, update, view)
 
 import Browser
 import Browser.Navigation
@@ -52,16 +52,20 @@ emptySearchState =
     , results = Nothing
     }
 
+
 init : SearchState -> ( Model, Cmd Msg )
 init s =
     let
         model : Model
-        model = Loading s
+        model =
+            Loading s
 
         cmd : Cmd Msg
-        cmd = getSearchResult s.query s.pageNumber s.pageSize
+        cmd =
+            getSearchResult s.query s.pageNumber s.pageSize
     in
     ( model, cmd )
+
 
 
 --- UPDATE ---

@@ -1,4 +1,4 @@
-module Page.Propose exposing (Model(..), Msg(..), update, view, init)
+module Page.Propose exposing (Model(..), Msg(..), init, update, view)
 
 import Const
 import Html exposing (Html, button, div, form, input, p, span, text)
@@ -26,7 +26,8 @@ init : ( Model, Cmd Msg )
 init =
     let
         model : Model
-        model = FeedUrl ""
+        model =
+            FeedUrl ""
     in
     ( model, Cmd.none )
 

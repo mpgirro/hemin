@@ -1,7 +1,5 @@
 module Main exposing (Model, Msg, init, main, subscriptions, update, view, viewHomePage, viewNotFound)
 
---import RestApi
-
 import Browser
 import Browser.Navigation
 import Const
@@ -172,7 +170,7 @@ updateUrlChanged model =
                 ( m, c ) =
                     ProposePage.init
             in
-            ( { model | content = wrapProposeContent m } , wrapProposeMsg c )
+            ( { model | content = wrapProposeContent m }, wrapProposeMsg c )
 
 
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )

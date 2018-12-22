@@ -1,4 +1,4 @@
-module Page.Episode exposing (Model(..), Msg(..), getEpisode, update, view, init)
+module Page.Episode exposing (Model(..), Msg(..), getEpisode, init, update, view)
 
 import Browser
 import Data.Episode exposing (Episode)
@@ -23,17 +23,19 @@ type Model
     | Content Episode
 
 
-
 init : String -> ( Model, Cmd Msg )
 init id =
     let
         model : Model
-        model = Loading
+        model =
+            Loading
 
         cmd : Cmd Msg
-        cmd = getEpisode id
+        cmd =
+            getEpisode id
     in
     ( model, cmd )
+
 
 
 ---- UPDATE ----
@@ -78,7 +80,8 @@ view model =
 
 viewEpisode : Episode -> Html msg
 viewEpisode episode =
-    div [ class "col-sm-8"
+    div
+        [ class "col-sm-8"
         , class "col-md-6"
         , class "col-lg-6"
         , class "p-2"
