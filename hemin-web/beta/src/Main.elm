@@ -138,7 +138,11 @@ updateUrlChanged model =
             ( { model | content = wrapPodcastContent m }, wrapPodcastMsg c )
 
         EpisodePage id ->
-            ( { model | content = wrapEpisodeContent EpisodePage.Loading }, wrapEpisodeMsg (EpisodePage.getEpisode id) )
+            let
+                ( m, c ) =
+                    EpisodePage.init id
+            in
+            ( { model | content = wrapEpisodeContent m }, wrapEpisodeMsg c )
 
         SearchPage query pageNum pageSize ->
             let
@@ -150,14 +154,25 @@ updateUrlChanged model =
                     , pageSize = pageSize
                     , results = Nothing
                     }
+
+                ( m, c ) =
+                    SearchPage.init state
             in
-            ( { model | content = wrapSearchContent (SearchPage.Loading state) }, wrapSearchMsg (SearchPage.getSearchResult query pageNum pageSize) )
+            ( { model | content = wrapSearchContent m }, wrapSearchMsg c )
 
         DiscoverPage ->
-            ( { model | content = wrapDiscoverContent DiscoverPage.Loading }, wrapDiscoverMsg (DiscoverPage.getAllPodcast 1 36) )
+            let
+                ( m, c ) =
+                    DiscoverPage.init
+            in
+            ( { model | content = wrapDiscoverContent m }, wrapDiscoverMsg c )
 
         ProposePage ->
-            ( { model | content = wrapProposeContent (ProposePage.FeedUrl "") }, Cmd.none )
+            let
+                ( m, c ) =
+                    ProposePage.init
+            in
+            ( { model | content = wrapProposeContent m } , wrapProposeMsg c )
 
 
 updateHomeContent : Model -> HomePage.Msg -> ( Model, Cmd Msg )

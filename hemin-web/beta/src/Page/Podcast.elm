@@ -42,6 +42,7 @@ init id =
             , episodes = []
             }
 
+        cmds : Cmd Msg
         cmds =
             Cmd.batch [ getPodcast id, getEpisodes id ]
     in
