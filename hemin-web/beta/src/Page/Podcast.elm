@@ -42,11 +42,11 @@ init id =
             , episodes = []
             }
 
-        cmds : Cmd Msg
-        cmds =
+        cmd : Cmd Msg
+        cmd =
             Cmd.batch [ getPodcast id, getEpisodes id ]
     in
-    ( model, cmds )
+    ( model, cmd )
 
 
 

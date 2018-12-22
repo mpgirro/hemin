@@ -180,10 +180,10 @@ updateHomeContent model msg =
     case model.content of
         HomeContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     HomePage.update msg content
             in
-            ( { model | content = wrapHomeContent model_ }, wrapHomeMsg msg_ )
+            ( { model | content = wrapHomeContent m }, wrapHomeMsg c )
 
         _ ->
             ( model, Cmd.none )
@@ -194,10 +194,10 @@ updatePodcastContent model msg =
     case model.content of
         PodcastContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     PodcastPage.update msg content
             in
-            ( { model | content = wrapPodcastContent model_ }, wrapPodcastMsg msg_ )
+            ( { model | content = wrapPodcastContent m }, wrapPodcastMsg c )
 
         _ ->
             ( model, Cmd.none )
@@ -208,10 +208,10 @@ updateEpisodeContent model msg =
     case model.content of
         EpisodeContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     EpisodePage.update msg content
             in
-            ( { model | content = wrapEpisodeContent model_ }, wrapEpisodeMsg msg_ )
+            ( { model | content = wrapEpisodeContent m }, wrapEpisodeMsg c )
 
         _ ->
             ( model, Cmd.none )
@@ -222,10 +222,10 @@ updateSearchContent model msg =
     case model.content of
         SearchContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     SearchPage.update msg content
             in
-            ( { model | content = wrapSearchContent model_ }, wrapSearchMsg msg_ )
+            ( { model | content = wrapSearchContent m }, wrapSearchMsg c )
 
         _ ->
             ( model, Cmd.none )
@@ -236,10 +236,10 @@ updateDiscoverContent model msg =
     case model.content of
         DiscoverContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     DiscoverPage.update msg content
             in
-            ( { model | content = wrapDiscoverContent model_ }, wrapDiscoverMsg msg_ )
+            ( { model | content = wrapDiscoverContent m }, wrapDiscoverMsg c )
 
         _ ->
             ( model, Cmd.none )
@@ -250,10 +250,10 @@ updateProposeContent model msg =
     case model.content of
         ProposeContent content ->
             let
-                ( model_, msg_ ) =
+                ( m, c ) =
                     ProposePage.update msg content
             in
-            ( { model | content = wrapProposeContent model_ }, wrapProposeMsg msg_ )
+            ( { model | content = wrapProposeContent m }, wrapProposeMsg c )
 
         _ ->
             ( model, Cmd.none )
