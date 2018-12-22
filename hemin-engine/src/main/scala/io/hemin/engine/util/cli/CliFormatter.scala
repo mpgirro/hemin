@@ -70,7 +70,7 @@ object CliFormatter {
       websiteData    = doc.websiteData.map(truncat),
     ))
 
-  def format(results: ResultPage): String = prettyPrint(results)
+  def format(results: SearchResult): String = prettyPrint(results)
 
   def format(xs: List[Any]): String = prettyPrint(xs)
 

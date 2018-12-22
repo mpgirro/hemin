@@ -1,6 +1,6 @@
 package io.hemin.engine.searcher.retriever
 
-import io.hemin.engine.model.ResultPage
+import io.hemin.engine.model.SearchResult
 import io.hemin.engine.searcher.SearcherConfig
 
 import scala.concurrent.ExecutionContext
@@ -14,7 +14,7 @@ class ElasticRetriever (config: SearcherConfig,
 
   override protected[this] def searcherConfig: SearcherConfig = config
 
-  override protected[this] def searchIndex(q: String, p: Int, s: Int): ResultPage = {
+  override protected[this] def searchIndex(q: String, p: Int, s: Int): SearchResult = {
     // TODO implement!
     throw new UnsupportedOperationException("ElasticRetriever.searchIndex(_,_,_) not yet implemented")
   }

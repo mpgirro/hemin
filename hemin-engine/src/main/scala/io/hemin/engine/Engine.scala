@@ -141,19 +141,19 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   }
 
   /** Search the index for the given query parameter. Returns a
-    * [[io.hemin.engine.model.ResultPage]] instance matching the
+    * [[io.hemin.engine.model.SearchResult]] instance matching the
     * page and size parameters.
     *
     * @param query The query to search the internal reverse index for.
-    * @param page  The page for the [[io.hemin.engine.model.ResultPage]]. If None, then
+    * @param page  The page for the [[io.hemin.engine.model.SearchResult]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
     * @param size  The size (= maximum number of elements in the
-    *              [[io.hemin.engine.model.ResultPage.results]] list) of the
-    *              [[io.hemin.engine.model.ResultPage]]. If None, then
+    *              [[io.hemin.engine.model.SearchResult.results]] list) of the
+    *              [[io.hemin.engine.model.SearchResult]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
-    * @return The [[io.hemin.engine.model.ResultPage]] matching the query/page/size parameters.
+    * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[ResultPage] = guarded {
+  def search(query: String, page: Option[Int], size: Option[Int]): Future[SearchResult] = guarded {
     (bus ? SearchRequest(query, page, size))
       .mapTo[SearchResults]
       .map(_.results)

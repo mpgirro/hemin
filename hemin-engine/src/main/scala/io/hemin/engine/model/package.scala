@@ -13,7 +13,7 @@ package io.hemin.engine
   * are structure more complex internally. The [[io.hemin.engine.model.info]]
   * package provides the nested information classes.
   *
-  * All models except the [[io.hemin.engine.model.ResultPage]] extend the
+  * All models except the [[io.hemin.engine.model.SearchResult]] extend the
   * [[io.hemin.engine.model.Patchable]] trait. Hence they provide two methods,
   * `patchLeft()` and `patchRight()`, which are used to perform sane updates
   * to the members of a model, with respect to `Option` and `List`. For example,
