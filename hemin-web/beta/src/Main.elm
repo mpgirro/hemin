@@ -59,8 +59,7 @@ type alias Model =
 
 
 type Content
-    = Loading
-    | NotFound
+    = NotFound
     | HomeContent HomePage.Model
     | PodcastContent PodcastPage.Model
     | EpisodeContent EpisodePage.Model
@@ -72,11 +71,14 @@ type Content
 init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
+        ( content, _ ) =
+            HomePage.init
+
         model =
             { key = key
             , url = url
             , route = Router.fromUrl url
-            , content = Loading
+            , content = HomeContent content
             }
     in
     ( model, Browser.Navigation.pushUrl key (Url.toString url) )
@@ -291,16 +293,6 @@ view model =
 viewContent : Model -> ( String, Html Msg )
 viewContent model =
     case model.content of
-        Loading ->
-            let
-                title =
-                    "Loading"
-
-                body =
-                    div [] [ p [] [ text "Loading..." ] ]
-            in
-            ( title, body )
-
         NotFound ->
             viewNotFound
 
@@ -315,7 +307,8 @@ viewContent model =
 
         SearchContent content ->
             let
-                ( title, body ) = SearchPage.view content
+                ( title, body ) =
+                    SearchPage.view content
             in
             ( title, wrapSearchHtml body )
 
@@ -324,7 +317,8 @@ viewContent model =
 
         ProposeContent content ->
             let
-                ( title, body ) = ProposePage.view content
+                ( title, body ) =
+                    ProposePage.view content
             in
             ( title, wrapProposeHtml body )
 

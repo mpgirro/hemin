@@ -1,6 +1,7 @@
 module Page.Home exposing
     ( Model(..)
     , Msg(..)
+    , init
     , update
     , view
     )
@@ -19,6 +20,11 @@ type Model
     = Failure Http.Error
     | Loading
     | Content
+
+
+init : ( Model, Cmd Msg )
+init =
+    ( Loading, Cmd.none )
 
 
 type Msg
