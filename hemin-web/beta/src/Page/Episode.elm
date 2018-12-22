@@ -12,7 +12,6 @@ import Data.Episode exposing (Episode)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
-import Json.Encode
 import Page.Error as ErrorPage
 import RestApi
 import Router exposing (redirectToParent)

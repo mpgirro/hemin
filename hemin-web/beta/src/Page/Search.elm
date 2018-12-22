@@ -21,8 +21,6 @@ import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (keyCode, on, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
 import Http
-import Json.Decode exposing (Decoder, bool, field, list, string)
-import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Maybe.Extra
 import Page.Error as ErrorPage
 import RestApi

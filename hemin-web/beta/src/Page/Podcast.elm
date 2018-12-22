@@ -7,7 +7,6 @@ module Page.Podcast exposing
     , view
     )
 
-import Browser
 import Data.Episode exposing (Episode)
 import Data.Feed exposing (Feed)
 import Data.Podcast exposing (Podcast)
