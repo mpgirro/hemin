@@ -9,7 +9,7 @@ object JsonWrites {
   implicit val indexDocWrites: Writes[IndexDoc] = Json.writes[IndexDoc]
 
   /** Mapping to write a ResultWrapper out as a JSON value. */
-  implicit val resultPageWrites: Writes[ResultPage] = Json.writes[ResultPage]
+  implicit val searchResultWrites: Writes[SearchResult] = Json.writes[SearchResult]
 
   implicit val atomLinkWrites: Writes[AtomLink] = Json.writes[AtomLink]
 
