@@ -198,28 +198,29 @@ redirectLocalUrl state =
 
 view : Model -> Html Msg
 view model =
-    case model of
-        Failure cause ->
-            div [ class "col-md-9", class "p-2", class "mx-auto" ]
-                [ viewSearchInput emptySearchState
-                , ErrorPage.view (ErrorPage.HttpFailure cause)
-                ]
+    let
+        childNodes : List (Html Msg)
+        childNodes =
+            case model of
+                Failure cause ->
+                    [ viewSearchInput emptySearchState
+                    , ErrorPage.view (ErrorPage.HttpFailure cause)
+                    ]
 
-        Loading state ->
-            div [ class "col-md-9", class "p-2", class "mx-auto" ]
-                [ viewSearchInput state ]
+                Loading state ->
+                    [ viewSearchInput state ]
 
-        Content state ->
-            case state.results of
-                Nothing ->
-                    div [ class "col-md-9", class "p-2", class "mx-auto" ]
-                        [ viewSearchInput state ]
+                Content state ->
+                    case state.results of
+                        Nothing ->
+                            [ viewSearchInput state ]
 
-                Just searchResults ->
-                    div [ class "col-md-9", class "p-2", class "mx-auto" ]
-                        [ viewSearchInput state
-                        , viewSearchResult state.query state.pageNumber state.pageSize searchResults
-                        ]
+                        Just searchResults ->
+                            [ viewSearchInput state
+                            , viewSearchResult state.query state.pageNumber state.pageSize searchResults
+                            ]
+    in
+    div [ class "col-md-9", class "p-2", class "mx-auto" ] childNodes
 
 
 viewSearchInput : SearchState -> Html Msg
