@@ -1,10 +1,18 @@
+<h1 align="center">
+  HEMIN
+</h1>
 
-# HEMIN : Podcast Catalog & Search Engine System
+<h3 align="center">
+  Podcast Catalog & Search Engine System
+</h3>
+
+<div align="center">
+  
+[![Website hemin.io](https://img.shields.io/website-up-down-green-red/https/hemin.io.svg)](https://hemin.io/) [![Build Status](https://travis-ci.org/mpgirro/hemin.png)](https://travis-ci.org/mpgirro/hemin) [![Twitter](https://img.shields.io/badge/Twitter-%40hemin_io-blue.svg)](https://twitter.com/hemin_io) [![Scala version](https://img.shields.io/badge/scala-2.12-blue.svg)](https://www.scala-lang.org/download/2.12.0.html) [![Akka version](https://img.shields.io/badge/akka-2.5-blue.svg)](https://akka.io/blog/news/2017/04/13/akka-2.5.0-released) [![Play Framework version](https://img.shields.io/badge/play-2.6-blue.svg)](https://www.playframework.com/documentation/2.6.x/Highlights26) [![Solr version](https://img.shields.io/badge/solr-7.5-blue.svg)](https://lucene.apache.org/solr/guide/7_5/index.html) [![Mongo version](https://img.shields.io/badge/mongo-4.0-blue.svg)](https://docs.mongodb.com/manual/release-notes/4.0/)
+  
+</div>
 
 
-[![Website hemin.io](https://img.shields.io/website-up-down-green-red/https/hemin.io.svg)](https://hemin.io/)
-[![Build Status](https://travis-ci.org/mpgirro/hemin.png)](https://travis-ci.org/mpgirro/hemin)
-[![Twitter](https://img.shields.io/badge/Twitter-%40hemin_io-blue.svg)](https://twitter.com/hemin_io)
 
 <!--[![GitHub release](https://img.shields.io/github/release/mpgirro/hemin.svg)](https://github.com/mpgirro/hemin/releases/)-->
 
