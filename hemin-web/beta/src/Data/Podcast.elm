@@ -26,7 +26,8 @@ type alias Podcast =
 
 
 type alias PodcastItunes =
-    { summary : Maybe String
+    { subtitle : Maybe String
+    , summary : Maybe String
     , author : Maybe String
     , keywords : List String
     , categories : List String
@@ -44,7 +45,8 @@ type alias PodcastItunes =
 
 emptyPodcastItunes : PodcastItunes
 emptyPodcastItunes =
-    { summary = Nothing
+    { subtitle = Nothing
+    , summary = Nothing
     , author = Nothing
     , keywords = []
     , categories = []
@@ -86,6 +88,7 @@ podcastListDecoder =
 podcastItunesDecoder : Decoder PodcastItunes
 podcastItunesDecoder =
     Json.Decode.succeed PodcastItunes
+        |> optional "subtitle" (maybe string) Nothing
         |> optional "summary" (maybe string) Nothing
         |> optional "author" (maybe string) Nothing
         |> optional "keywords" (list string) []
