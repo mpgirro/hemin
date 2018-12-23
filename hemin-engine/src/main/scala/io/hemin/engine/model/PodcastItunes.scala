@@ -1,6 +1,7 @@
 package io.hemin.engine.model
 
 final case class PodcastItunes(
+  subtitle: Option[String]    = None,
   summary: Option[String]     = None,
   author: Option[String]      = None,
   keywords: List[String]      = Nil,
@@ -15,6 +16,7 @@ final case class PodcastItunes(
   override def patchLeft(diff: PodcastItunes): PodcastItunes = Option(diff) match {
     case None       => this
     case Some(that) => PodcastItunes(
+      subtitle    = reduceLeft(this.subtitle, that.subtitle),
       summary     = reduceLeft(this.summary, that.summary),
       author      = reduceLeft(this.author, that.author),
       keywords    = reduceLeft(this.keywords, that.keywords),
@@ -30,6 +32,7 @@ final case class PodcastItunes(
   override def patchRight(diff: PodcastItunes): PodcastItunes = Option(diff) match {
     case None       => this
     case Some(that) => PodcastItunes(
+      subtitle    = reduceRight(this.subtitle, that.subtitle),
       summary     = reduceRight(this.summary, that.summary),
       author      = reduceRight(this.author, that.author),
       keywords    = reduceRight(this.keywords, that.keywords),

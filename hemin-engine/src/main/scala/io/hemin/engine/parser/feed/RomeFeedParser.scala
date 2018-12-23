@@ -139,6 +139,7 @@ class RomeFeedParser private (private val xmlData: String) {
   private lazy val podcastItunesInfo: PodcastItunes = feedItunesModule
     .map { itunes =>
       PodcastItunes(
+        subtitle    = Option(itunes.getSubtitle),
         summary     = Option(itunes.getSummary),
         author      = Option(itunes.getAuthor),
         keywords    = Option(itunes.getKeywords)
