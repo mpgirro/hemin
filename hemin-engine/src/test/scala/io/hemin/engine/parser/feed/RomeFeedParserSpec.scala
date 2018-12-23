@@ -51,7 +51,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
             p.itunes.categories.exists(_.equals("Technology")) // TODO nested stuff, and more tests
             p.itunes.explicit shouldBe Some(false)
             p.itunes.block shouldBe Some(false)
-            p.itunes.podcastType shouldBe Some("episodic")
+            p.itunes.typ shouldBe Some("episodic")
             p.itunes.ownerName shouldBe Some("Lorem Ipsum")
             p.itunes.ownerEmail shouldBe Some("test@example.org")
             p.feedpress.locale shouldEqual None // TODO why not Some("en") ?!

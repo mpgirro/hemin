@@ -139,22 +139,22 @@ class RomeFeedParser private (private val xmlData: String) {
   private lazy val podcastItunesInfo: PodcastItunes = feedItunesModule
     .map { itunes =>
       PodcastItunes(
-        subtitle    = Option(itunes.getSubtitle),
-        summary     = Option(itunes.getSummary),
-        author      = Option(itunes.getAuthor),
-        keywords    = Option(itunes.getKeywords)
+        subtitle   = Option(itunes.getSubtitle),
+        summary    = Option(itunes.getSummary),
+        author     = Option(itunes.getAuthor),
+        keywords   = Option(itunes.getKeywords)
           .map(_.toList)
           .getOrElse(Nil),
-        categories  = Option(itunes.getCategories)
+        categories = Option(itunes.getCategories)
           .map(_.asScala.map(_.getName))
           .map(_.toSet)  // eliminate duplicates
           .map(_.toList)
           .getOrElse(Nil),
-        explicit    = Option(itunes.getExplicit),
-        block       = Option(itunes.getBlock),
-        podcastType = Option(itunes.getType),
-        ownerName   = Option(itunes.getOwnerName),
-        ownerEmail  = Option(itunes.getOwnerEmailAddress),
+        explicit   = Option(itunes.getExplicit),
+        block      = Option(itunes.getBlock),
+        typ        = Option(itunes.getType),
+        ownerName  = Option(itunes.getOwnerName),
+        ownerEmail = Option(itunes.getOwnerEmailAddress),
       )
     }.getOrElse(PodcastItunes())
 
