@@ -1,6 +1,6 @@
 module Page.Discover exposing
-    ( Model(..)
-    , Msg(..)
+    ( Model
+    , Msg
     , getAllPodcast
     , init
     , update

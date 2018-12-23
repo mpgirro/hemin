@@ -1,6 +1,6 @@
 module Page.Propose exposing
-    ( Model(..)
-    , Msg(..)
+    ( Model
+    , Msg
     , init
     , update
     , view
