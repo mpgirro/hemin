@@ -335,34 +335,45 @@ viewEpisodeTeaser episode =
         viewEpisodeTeaserDescription : Html Msg
         viewEpisodeTeaserDescription =
             let
-                description : String
+                description : Maybe String
                 description =
-                    case ( episode.description, episode.itunes.summary ) of
-                        ( Just d, _ ) ->
-                            d
+                    case ( episode.description, episode.itunes.summary, episode.contentEncoded ) of
+                        ( Just d, _, _ ) ->
+                            Just d
 
-                        ( Nothing, Just s ) ->
-                            s
+                        ( Nothing, Just s, _ ) ->
+                            Just s
 
-                        ( Nothing, Nothing ) ->
+                        ( Nothing, Nothing, Just c ) ->
+                            Just c
+
+                        ( Nothing, Nothing, Nothing ) ->
+                            Nothing
+
+                teaser : String
+                teaser =
+                    case description of
+                        Just s ->
+                            (truncate s) ++ "..."
+
+                        Nothing ->
                             ""
 
-                stripped =
-                    String.Extra.stripTags description
+                stripped s =
+                    String.Extra.stripTags s
 
-                truncate =
-                    String.left 280 stripped
+                truncate s =
+                    String.left 70 s
             in
-            p [] [ text (truncate ++ "...") ]
+            p [] [ text teaser ]
     in
     li [ class "py-2" ]
         [ div [ class "clearfix", class "p-2" ]
             [ viewEpisodeTeaserCover
             , div [ class "overflow-hidden" ]
                 [ viewEpisodeTeaserTitle
-
-                --, br [] []
-                --, viewEpisodeTeaserDescription
+                , br [] []
+                , viewEpisodeTeaserDescription
                 ]
             ]
         ]
