@@ -1,7 +1,6 @@
 module Page.Discover exposing
     ( Model
     , Msg
-    , getAllPodcast
     , init
     , update
     , view

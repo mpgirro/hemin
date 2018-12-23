@@ -1,7 +1,6 @@
 module Page.Episode exposing
     ( Model
     , Msg
-    , getEpisode
     , init
     , update
     , view

@@ -2,9 +2,7 @@ module Page.Search exposing
     ( Model
     , Msg
     , SearchState
-    , getSearchResult
     , init
-    , redirectLocalUrl
     , update
     , view
     )
@@ -46,7 +44,7 @@ type alias SearchState =
     , query : Maybe String
     , pageNumber : Maybe Int
     , pageSize : Maybe Int
-    , results : Maybe SearchResult
+    , result : Maybe SearchResult
     }
 
 
@@ -56,20 +54,23 @@ emptySearchState =
     , query = Nothing
     , pageNumber = Nothing
     , pageSize = Nothing
-    , results = Nothing
+    , result = Nothing
     }
 
 
-init : SearchState -> ( Model, Cmd Msg )
-init s =
+init : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Maybe SearchResult -> ( Model, Cmd Msg )
+init key query pageNumber pageSize result =
     let
+        state : SearchState
+        state = SearchState key query pageNumber pageSize result
+
         model : Model
         model =
-            Loading s
+            Loading state
 
         cmd : Cmd Msg
         cmd =
-            getSearchResult s.query s.pageNumber s.pageSize
+            getSearchResult query pageNumber pageSize
     in
     ( model, cmd )
 
@@ -128,17 +129,17 @@ update msg model =
                                     , query = Nothing
                                     , pageNumber = Nothing
                                     , pageSize = Nothing
-                                    , results = Just searchResult
+                                    , result = Just searchResult
                                     }
                             in
                             ( Content s, Cmd.none )
 
                         Loading state ->
-                            ( Content { state | results = Just searchResult }, Cmd.none )
+                            ( Content { state | result = Just searchResult }, Cmd.none )
 
                         -- TODO should I be receiving a Loaded msg in a Content state anyway?
                         Content state ->
-                            ( Content { state | results = Just searchResult }, Cmd.none )
+                            ( Content { state | result = Just searchResult }, Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
@@ -212,7 +213,7 @@ view model =
                     [ viewSearchInput state ]
 
                 Content state ->
-                    case state.results of
+                    case state.result of
                         Nothing ->
                             [ viewSearchInput state ]
 
@@ -466,5 +467,5 @@ stateFromParams key query pageNumber pageSize =
     , query = query
     , pageNumber = pageNumber
     , pageSize = pageSize
-    , results = Nothing
+    , result = Nothing
     }

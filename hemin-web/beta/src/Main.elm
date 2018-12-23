@@ -137,7 +137,11 @@ updateUrlChanged model =
     case model.route of
         HomePage ->
             -- TODO: here we do not dispatch a message that will replace the Loading model
-            ( { model | content = wrapHomeContent HomePage.Loading }, Cmd.none )
+            let
+                ( c, m ) =
+                    HomePage.init
+            in
+            ( { model | content = wrapHomeContent c }, wrapHomeMsg m )
 
         PodcastPage id ->
             let
@@ -155,17 +159,8 @@ updateUrlChanged model =
 
         SearchPage query pageNum pageSize ->
             let
-                state : SearchPage.SearchState
-                state =
-                    { key = Just model.key
-                    , query = query
-                    , pageNumber = pageNum
-                    , pageSize = pageSize
-                    , results = Nothing
-                    }
-
                 ( c, m ) =
-                    SearchPage.init state
+                    SearchPage.init (Just model.key) query pageNum pageSize Nothing
             in
             ( { model | content = wrapSearchContent c }, wrapSearchMsg m )
 
