@@ -1,7 +1,6 @@
 module Page.Podcast exposing
     ( Model
-    , Msg(..)
-    , getPodcast
+    , Msg
     , init
     , update
     , view
@@ -14,6 +13,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
+import Podlove.SubscribeButton as PodloveButton
 import RestApi
 import Router exposing (redirectToEpisode)
 import Skeleton exposing (Page)
@@ -69,6 +69,7 @@ type Msg
     | LoadedEpisodes (Result Http.Error (List Episode))
     | LoadFeeds String
     | LoadedFeeds (Result Http.Error (List Feed))
+    | PodloveSubScribeButtonMsg PodloveButton.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -107,7 +108,9 @@ update msg model =
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
-
+        PodloveSubScribeButtonMsg m ->
+            -- TODO what to do here?
+            ( model, Cmd.none )
 
 ---- VIEW ----
 
@@ -134,6 +137,7 @@ view model =
                         ]
                         [ viewHttpError model.failure
                         , viewPodcast model.podcast
+                        , viewSubscribeButton model.podcast model.feeds
                         , viewEpisodes model.episodes
                         , viewFeeds model.feeds
                         ]
@@ -237,6 +241,50 @@ viewCategory category =
         , text category
         ]
 
+
+viewSubscribeButton : Maybe Podcast -> List Feed -> Html Msg
+viewSubscribeButton maybePodcast feeds =
+    case (maybePodcast, feeds) of
+        (Just podcast, head :: _) ->
+           viewPodloveButton podcast feeds
+
+        (_, _) ->
+            emptyHtml
+
+viewPodloveButton : Podcast -> List Feed -> Html Msg
+viewPodloveButton podcast feeds =
+    let
+        toButtonFeed : Feed -> PodloveButton.Feed
+        toButtonFeed feed =
+            -- TODO add to backend data
+            { type_ = Just "audio"
+            -- TODO add to backend data
+            , format = Just "mp3"
+            , url = feed.url
+            -- TODO add to backend data
+            , variant = Just "high"
+            , directoryUrlItunes = Nothing
+            }
+
+        feedConfig : List PodloveButton.Feed
+        feedConfig =
+            List.map toButtonFeed feeds
+
+        buttonConfig : PodloveButton.Model
+        buttonConfig =
+            { title = podcast.title
+            , subtitle = podcast.itunes.subtitle
+            , description = podcast.description
+            -- TODO once we migrate to use Image classes, use the URL from the class
+            , cover = podcast.image
+            , feeds = feedConfig
+            }
+
+        wrapMsg : Html PodloveButton.Msg -> Html Msg
+        wrapMsg msg =
+            Html.map PodloveSubScribeButtonMsg msg
+    in
+    wrapMsg (PodloveButton.view buttonConfig)
 
 viewEpisodes : List Episode -> Html Msg
 viewEpisodes episodes =
