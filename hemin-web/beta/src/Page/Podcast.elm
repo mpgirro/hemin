@@ -69,7 +69,7 @@ type Msg
     | LoadedEpisodes (Result Http.Error (List Episode))
     | LoadFeeds String
     | LoadedFeeds (Result Http.Error (List Feed))
-    | PodloveSubScribeButtonMsg PodloveButton.Msg
+    | PodloveSubscribeButtonMsg PodloveButton.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -108,7 +108,7 @@ update msg model =
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
-        PodloveSubScribeButtonMsg m ->
+        PodloveSubscribeButtonMsg m ->
             -- TODO what to do here?
             ( model, Cmd.none )
 
@@ -282,7 +282,7 @@ viewPodloveButton podcast feeds =
 
         wrapMsg : Html PodloveButton.Msg -> Html Msg
         wrapMsg msg =
-            Html.map PodloveSubScribeButtonMsg msg
+            Html.map PodloveSubscribeButtonMsg msg
     in
     wrapMsg (PodloveButton.view buttonConfig)
 
@@ -358,7 +358,7 @@ viewEpisodeTeaser episode =
     li [ class "py-2" ]
         [ div [ class "clearfix", class "p-2" ]
             [ viewEpisodeTeaserCover
-            , div []
+            , div [ class "overflow-hidden" ]
                 [ viewEpisodeTeaserTitle
 
                 --, br [] []
