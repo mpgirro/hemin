@@ -88,7 +88,24 @@ update msg model =
         LoadedPodcast result ->
             case result of
                 Ok podcast ->
-                    ( { model | podcast = Just podcast, status = Ready }, Cmd.none )
+                    {--
+                    let
+                        mod : Model
+                        mod = { model | podcast = Just podcast, status = Ready }
+
+                        ( _, cmd ) = updatePodloveButton mod PodloveButton.SendToJs
+                    in
+                    ( mod, cmd )
+                    --}
+                    let
+                        buttonModel : PodloveButton.Model
+                        buttonModel =
+                            toPodloveButtonModel model
+
+                        cmd : Cmd Msg
+                        cmd = wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+                    in
+                    ( { model | podcast = Just podcast, status = Ready }, cmd )
 
                 Err error ->
                     ( { model | failure = Just error, status = Ready }, Cmd.none )
@@ -110,22 +127,44 @@ update msg model =
         LoadedFeeds result ->
             case result of
                 Ok feeds ->
+                    {--
+                    let
+                        mod : Model
+                        mod = { model | feeds = feeds }
+
+                        ( _, cmd ) = updatePodloveButton mod PodloveButton.SendToJs
+                    in
+                    ( mod, cmd )
+                    --}
+                    let
+                        buttonModel : PodloveButton.Model
+                        buttonModel =
+                            toPodloveButtonModel model
+
+                        cmd : Cmd Msg
+                        cmd = wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+                    in
                     ( { model | feeds = feeds }, Cmd.none )
 
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
         PodloveButtonMsg buttonMsg ->
-            let
-                buttonModel : PodloveButton.Model
-                buttonModel =
-                    toPodloveButtonModel model
+            --updatePodloveButton model buttonMsg
+            ( model, Cmd.none )
 
-                ( c, m ) =
-                    PodloveButton.update buttonMsg buttonModel
-            in
-            ( model, wrapPodloveButtonMsg m )
 
+updatePodloveButton : Model -> PodloveButton.Msg -> ( Model, Cmd Msg )
+updatePodloveButton model buttonMsg =
+    let
+        buttonModel : PodloveButton.Model
+        buttonModel =
+            toPodloveButtonModel model
+
+        ( _, m ) =
+            PodloveButton.update buttonMsg buttonModel
+    in
+    ( model, wrapPodloveButtonMsg m )
 
 ---- VIEW ----
 
