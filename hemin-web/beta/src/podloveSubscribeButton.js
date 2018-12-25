@@ -1,12 +1,9 @@
-import { Elm } from './Main.elm';
 
-var button = document.getElementById('podlove-subscribe-button');
-var app = Elm.Main.embed(button);
-// receive something from Elm
-app.ports.podloveSubscribeButton.subscribe(function (config) {
+function configurePodloveSubscribeButton(config) {
   console.log("got from Elm:", config);
   //window.podcastData = config;
 
+  /*
   const child1 = document.createElement('script');
 
   const podloveSubscribeButtonJS = `window.podcastData = ${config}`;
@@ -29,4 +26,5 @@ app.ports.podloveSubscribeButton.subscribe(function (config) {
   //const child3 = document.createElement('noscript');
   //child3.appendChild(document.createTextNode(`<a href="${this.podcast.link}">Subscribe to feed</a>`));
   //button.appendChild(child3);
-});
+  */
+}

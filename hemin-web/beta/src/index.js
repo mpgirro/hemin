@@ -2,10 +2,12 @@ import './main.css';
 import { Elm } from './Main.elm';
 import registerServiceWorker from './registerServiceWorker';
 import './customElements';
-//import './podloveSubscribeButton';
+import configurePodloveSubscribeButton from './podloveSubscribeButton';
 
-Elm.Main.init({
+var app = Elm.Main.init({
   node: document.getElementById('root')
 });
+
+app.ports.podloveSubscribeButton.subscribe(configurePodloveSubscribeButton);
 
 registerServiceWorker();

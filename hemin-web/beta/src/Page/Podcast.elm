@@ -51,9 +51,16 @@ init id =
             , feeds = []
             }
 
+        ( _, podloveButtonCmd ) =
+            PodloveButton.init
+
+        initPodloveButton : Cmd Msg
+        initPodloveButton =
+            wrapPodloveButtonMsg podloveButtonCmd
+
         cmd : Cmd Msg
         cmd =
-            Cmd.batch [ getPodcast id, getEpisodes id, getFeeds id ]
+            Cmd.batch [ getPodcast id, getEpisodes id, getFeeds id, initPodloveButton ]
     in
     ( model, cmd )
 
@@ -69,7 +76,7 @@ type Msg
     | LoadedEpisodes (Result Http.Error (List Episode))
     | LoadFeeds String
     | LoadedFeeds (Result Http.Error (List Feed))
-    | PodloveSubscribeButtonMsg PodloveButton.Msg
+    | PodloveButtonMsg PodloveButton.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -108,9 +115,17 @@ update msg model =
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
 
-        PodloveSubscribeButtonMsg m ->
-            -- TODO what to do here?
-            ( model, Cmd.none )
+        PodloveButtonMsg buttonMsg ->
+            let
+                buttonModel : PodloveButton.Model
+                buttonModel =
+                    toPodloveButtonModel model
+
+                ( c, m ) =
+                    PodloveButton.update buttonMsg buttonModel
+            in
+            ( model, wrapPodloveButtonMsg m )
+
 
 ---- VIEW ----
 
@@ -137,7 +152,7 @@ view model =
                         ]
                         [ viewHttpError model.failure
                         , viewPodcast model.podcast
-                        , viewSubscribeButton model.podcast model.feeds
+                        , viewPodloveButton model
                         , viewEpisodes model.episodes
                         , viewFeeds model.feeds
                         ]
@@ -242,49 +257,20 @@ viewCategory category =
         ]
 
 
-viewSubscribeButton : Maybe Podcast -> List Feed -> Html Msg
-viewSubscribeButton maybePodcast feeds =
-    case (maybePodcast, feeds) of
-        (Just podcast, head :: _) ->
-           viewPodloveButton podcast feeds
+viewPodloveButton : Model -> Html Msg
+viewPodloveButton model =
+    case (model.podcast, model.feeds) of
+        (Just podcast, head :: _ ) ->
+            let
+                buttonModel : PodloveButton.Model
+                buttonModel =
+                    toPodloveButtonModel model
+            in
+            wrapPodloveButtonHtml (PodloveButton.view buttonModel)
 
-        (_, _) ->
+        ( _, _ ) ->
             emptyHtml
 
-viewPodloveButton : Podcast -> List Feed -> Html Msg
-viewPodloveButton podcast feeds =
-    let
-        toButtonFeed : Feed -> PodloveButton.Feed
-        toButtonFeed feed =
-            -- TODO add to backend data
-            { type_ = Just "audio"
-            -- TODO add to backend data
-            , format = Just "mp3"
-            , url = feed.url
-            -- TODO add to backend data
-            , variant = Just "high"
-            , directoryUrlItunes = Nothing
-            }
-
-        feedConfig : List PodloveButton.Feed
-        feedConfig =
-            List.map toButtonFeed feeds
-
-        buttonConfig : PodloveButton.Model
-        buttonConfig =
-            { title = podcast.title
-            , subtitle = podcast.itunes.subtitle
-            , description = podcast.description
-            -- TODO once we migrate to use Image classes, use the URL from the class
-            , cover = podcast.image
-            , feeds = feedConfig
-            }
-
-        wrapMsg : Html PodloveButton.Msg -> Html Msg
-        wrapMsg msg =
-            Html.map PodloveSubscribeButtonMsg msg
-    in
-    wrapMsg (PodloveButton.view buttonConfig)
 
 viewEpisodes : List Episode -> Html Msg
 viewEpisodes episodes =
@@ -417,3 +403,51 @@ getEpisodes id =
 getFeeds : String -> Cmd Msg
 getFeeds id =
     RestApi.getFeedsByPodcast LoadedFeeds id
+
+
+--- INTERNALS ---
+
+
+wrapPodloveButtonMsg : Cmd PodloveButton.Msg -> Cmd Msg
+wrapPodloveButtonMsg msg =
+    Cmd.map PodloveButtonMsg msg
+
+
+wrapPodloveButtonHtml : Html PodloveButton.Msg -> Html Msg
+wrapPodloveButtonHtml msg =
+    Html.map PodloveButtonMsg msg
+
+
+toPodloveButtonModel : Model -> PodloveButton.Model
+toPodloveButtonModel model =
+    let
+       toButtonModel : Podcast -> List Feed -> PodloveButton.Model
+       toButtonModel podcast feeds =
+           { title = podcast.title
+           , subtitle = podcast.itunes.subtitle
+           , description = podcast.description
+           , cover = podcast.image
+           , feeds = toButtonFeeds feeds
+           }
+
+       toButtonFeeds : List Feed -> List PodloveButton.Feed
+       toButtonFeeds feeds =
+           List.map toButtonFeed feeds
+
+       toButtonFeed : Feed -> PodloveButton.Feed
+       toButtonFeed feed =
+           { type_ = Nothing
+           , format = Nothing
+           , url = feed.url
+           , variant = Nothing
+           , directoryUrlItunes = Nothing
+           }
+    in
+    case (model.podcast, model.feeds) of
+        (Just podcast, head :: _) ->
+            toButtonModel podcast model.feeds
+
+        (_, _) ->
+            PodloveButton.emptyModel
+
+

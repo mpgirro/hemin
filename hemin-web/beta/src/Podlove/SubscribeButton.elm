@@ -2,6 +2,7 @@ port module Podlove.SubscribeButton exposing
     ( Feed
     , Msg
     , Model
+    , emptyModel
     , init
     , update
     , view
@@ -9,11 +10,11 @@ port module Podlove.SubscribeButton exposing
 
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)
-import Json.Encode exposing (encode, string, list, object)
+--import Json.Encode exposing (encode, string, list, object)
 
---- PORTS ---
+---- OUTBOUND PORTS ----
 
-port podloveSubscribeButton : Json.Encode.Value -> Cmd msg
+port podloveSubscribeButton : Model -> Cmd msg
 
 ---- MODEL ----
 
@@ -34,13 +35,21 @@ type alias Feed =
     , directoryUrlItunes : Maybe String
     }
 
-emptyConfig : Model
-emptyConfig =
-    { title = Nothing
-    , subtitle = Nothing
-    , description = Nothing
-    , cover = Nothing
-    , feeds = []
+emptyModel : Model
+emptyModel =
+    { title = Just "test title"
+    , subtitle = Just "test subtitle"
+    , description = Just "test description"
+    , cover = Just "http://example.org/cover.jpg"
+    , feeds =
+        [
+            { type_ = Just "audio"
+            , format = Just "mp3"
+            , url = Just "http://exampe.org/feed.rss"
+            , variant = Nothing
+            , directoryUrlItunes = Nothing
+            }
+        ]
     }
 
 
@@ -48,10 +57,10 @@ init : ( Model, Cmd Msg )
 init =
     let
         model : Model
-        model = emptyConfig
+        model = emptyModel
 
         cmd : Cmd Msg
-        cmd = Cmd.none
+        cmd = podloveSubscribeButton model
     in
     ( model, cmd )
 
@@ -66,11 +75,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
          SendToJs ->
-             let
-                 value : Json.Encode.Value
-                 value = encodeConfig model
+            {--
+            let
+                value : Json.Encode.Value
+                value = encodeConfig model
             in
-            ( model, podloveSubscribeButton value )
+            --}
+            ( model, podloveSubscribeButton model )
 
 
 --- VIEW ---
@@ -79,8 +90,10 @@ view : Model -> Html Msg
 view _ =
     div [ id "podlove-subscribe-button" ] []
 
+
 --- JSON ---
 
+{--
 encodeConfig : Model -> Json.Encode.Value
 encodeConfig config =
   object
@@ -110,3 +123,4 @@ encodeMaybeString maybeString =
             string s
         Nothing ->
             Json.Encode.null
+--}
