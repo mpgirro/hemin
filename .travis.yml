@@ -13,7 +13,7 @@ matrix:
       before_script:
         - cd hemin-engine  
       script:
-        - sbt test
+        - sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - env: PROJECT=hemin-api
       language: scala
@@ -22,14 +22,17 @@ matrix:
       jdk:
         - oraclejdk8
         - openjdk8
-      install: cd hemin-engine && sbt clean compile publishM2  
       cache:
         directories:
           - $HOME/.m2
-      #before_script:
-      #  - cd hemin-api
+      install: 
+        - cd hemin-engine
+        - sbt clean compile publishM2  
+        - cd ..
+      before_script:
+        - cd hemin-api
       script:
-        - sbt test
+        - sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - env: PROJECT=hemin-web/beta
       language: elm
