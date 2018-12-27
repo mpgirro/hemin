@@ -60,7 +60,7 @@ init id =
 
         cmd : Cmd Msg
         cmd =
-            Cmd.batch [ getPodcast id, getEpisodes id, getFeeds id, initPodloveButton ]
+            Cmd.batch [ getPodcast id, getEpisodes id, getFeeds id ]
     in
     ( model, cmd )
 
@@ -88,24 +88,17 @@ update msg model =
         LoadedPodcast result ->
             case result of
                 Ok podcast ->
-                    {--
                     let
                         mod : Model
-                        mod = { model | podcast = Just podcast, status = Ready }
-
-                        ( _, cmd ) = updatePodloveButton mod PodloveButton.SendToJs
-                    in
-                    ( mod, cmd )
-                    --}
-                    let
-                        buttonModel : PodloveButton.Model
-                        buttonModel =
-                            toPodloveButtonModel model
+                        mod =
+                            { model | podcast = Just podcast, status = Ready }
 
                         cmd : Cmd Msg
-                        cmd = wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+                        cmd =
+                            sendPodloveButtonModelToJs mod
                     in
-                    ( { model | podcast = Just podcast, status = Ready }, cmd )
+                    ( mod, Cmd.none )
+
 
                 Err error ->
                     ( { model | failure = Just error, status = Ready }, Cmd.none )
@@ -127,24 +120,16 @@ update msg model =
         LoadedFeeds result ->
             case result of
                 Ok feeds ->
-                    {--
                     let
                         mod : Model
-                        mod = { model | feeds = feeds }
-
-                        ( _, cmd ) = updatePodloveButton mod PodloveButton.SendToJs
-                    in
-                    ( mod, cmd )
-                    --}
-                    let
-                        buttonModel : PodloveButton.Model
-                        buttonModel =
-                            toPodloveButtonModel model
+                        mod =
+                            { model | feeds = feeds }
 
                         cmd : Cmd Msg
-                        cmd = wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+                        cmd =
+                            sendPodloveButtonModelToJs mod
                     in
-                    ( { model | feeds = feeds }, Cmd.none )
+                    ( mod, Cmd.none )
 
                 Err error ->
                     ( { model | failure = Just error }, Cmd.none )
@@ -161,10 +146,24 @@ updatePodloveButton model buttonMsg =
         buttonModel =
             toPodloveButtonModel model
 
+        -- TODO ignore the result! we just need trigger the update
         ( _, m ) =
             PodloveButton.update buttonMsg buttonModel
     in
-    ( model, wrapPodloveButtonMsg m )
+    --( model, wrapPodloveButtonMsg m )
+    ( model, Cmd.none)
+
+
+
+sendPodloveButtonModelToJs : Model -> Cmd Msg
+sendPodloveButtonModelToJs model =
+    let
+        buttonModel : PodloveButton.Model
+        buttonModel =
+            toPodloveButtonModel model
+    in
+    wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+
 
 ---- VIEW ----
 
