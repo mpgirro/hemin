@@ -1,0 +1,4 @@
+baseURL = "https://changelog.hemin.io/"
+languageCode = "en-us"
+title = "HEMIN Changelog"
+theme = "hugo-changelog-theme"
