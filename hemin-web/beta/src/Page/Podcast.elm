@@ -99,7 +99,6 @@ update msg model =
                     in
                     ( mod, Cmd.none )
 
-
                 Err error ->
                     ( { model | failure = Just error, status = Ready }, Cmd.none )
 
@@ -151,8 +150,7 @@ updatePodloveButton model buttonMsg =
             PodloveButton.update buttonMsg buttonModel
     in
     --( model, wrapPodloveButtonMsg m )
-    ( model, Cmd.none)
-
+    ( model, Cmd.none )
 
 
 sendPodloveButtonModelToJs : Model -> Cmd Msg
@@ -163,6 +161,7 @@ sendPodloveButtonModelToJs model =
             toPodloveButtonModel model
     in
     wrapPodloveButtonMsg (PodloveButton.sendPodloveSubscribeButtonModel buttonModel)
+
 
 
 ---- VIEW ----
@@ -297,8 +296,8 @@ viewCategory category =
 
 viewPodloveButton : Model -> Html Msg
 viewPodloveButton model =
-    case (model.podcast, model.feeds) of
-        (Just podcast, head :: _ ) ->
+    case ( model.podcast, model.feeds ) of
+        ( Just podcast, head :: _ ) ->
             let
                 buttonModel : PodloveButton.Model
                 buttonModel =
@@ -378,7 +377,7 @@ viewEpisodeTeaser episode =
                 teaser =
                     case description of
                         Just s ->
-                            (truncate s) ++ "..."
+                            truncate s ++ "..."
 
                         Nothing ->
                             ""
@@ -443,6 +442,7 @@ getFeeds id =
     RestApi.getFeedsByPodcast LoadedFeeds id
 
 
+
 --- INTERNALS ---
 
 
@@ -459,33 +459,31 @@ wrapPodloveButtonHtml msg =
 toPodloveButtonModel : Model -> PodloveButton.Model
 toPodloveButtonModel model =
     let
-       toButtonModel : Podcast -> List Feed -> PodloveButton.Model
-       toButtonModel podcast feeds =
-           { title = podcast.title
-           , subtitle = podcast.itunes.subtitle
-           , description = podcast.description
-           , cover = podcast.image
-           , feeds = toButtonFeeds feeds
-           }
+        toButtonModel : Podcast -> List Feed -> PodloveButton.Model
+        toButtonModel podcast feeds =
+            { title = podcast.title
+            , subtitle = podcast.itunes.subtitle
+            , description = podcast.description
+            , cover = podcast.image
+            , feeds = toButtonFeeds feeds
+            }
 
-       toButtonFeeds : List Feed -> List PodloveButton.Feed
-       toButtonFeeds feeds =
-           List.map toButtonFeed feeds
+        toButtonFeeds : List Feed -> List PodloveButton.Feed
+        toButtonFeeds feeds =
+            List.map toButtonFeed feeds
 
-       toButtonFeed : Feed -> PodloveButton.Feed
-       toButtonFeed feed =
-           { type_ = Nothing
-           , format = Nothing
-           , url = feed.url
-           , variant = Nothing
-           , directoryUrlItunes = Nothing
-           }
+        toButtonFeed : Feed -> PodloveButton.Feed
+        toButtonFeed feed =
+            { type_ = Nothing
+            , format = Nothing
+            , url = feed.url
+            , variant = Nothing
+            , directoryUrlItunes = Nothing
+            }
     in
-    case (model.podcast, model.feeds) of
-        (Just podcast, head :: _) ->
+    case ( model.podcast, model.feeds ) of
+        ( Just podcast, head :: _ ) ->
             toButtonModel podcast model.feeds
 
-        (_, _) ->
+        ( _, _ ) ->
             PodloveButton.emptyModel
-
-

@@ -62,7 +62,8 @@ init : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int ->
 init key query pageNumber pageSize result =
     let
         state : SearchState
-        state = SearchState key query pageNumber pageSize result
+        state =
+            SearchState key query pageNumber pageSize result
 
         model : Model
         model =
@@ -259,7 +260,7 @@ viewSearchResult query pageNumber pageSize searchResult =
 viewTotalHits : SearchResult -> Html Msg
 viewTotalHits searchResult =
     p
-        [ class "note", class "my-3" ]
+        [ class "note", class "my-3", class "px-2" ]
         [ text "Search resulted in "
         , text (String.fromInt searchResult.totalHits)
         , text " hits"
