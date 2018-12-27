@@ -10,6 +10,8 @@ matrix:
       jdk:
         - oraclejdk8
         - openjdk8
+      before_script:
+        - cd hemin-engine  
       script:
         - sbt test
 
@@ -55,8 +57,8 @@ matrix:
         - cd tests
         - npm install
         - cd ..
-      #before_script:
-      #  - cd hemin-web/beta
+      before_script:
+        - cd hemin-web/beta
       script:
         - elm-format --validate src/
         - elm-app test
