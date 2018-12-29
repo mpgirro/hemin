@@ -34,7 +34,7 @@ object CatalogStore {
   final case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
   // CatalogEvents
   //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
-  final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: LocalDateTime, status: FeedStatus) extends CatalogEvent
+  final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: Long, status: FeedStatus) extends CatalogEvent
   final case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
   final case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
   final case class SaveChapter(chapter: Chapter) extends CatalogEvent
@@ -270,7 +270,7 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty) {
-            val now = LocalDateTime.now()
+            val now = System.currentTimeMillis()
 
             val podcastId = idGenerator.newId
             val podcast = Podcast(
@@ -320,7 +320,7 @@ class CatalogStore(config: CatalogConfig)
 
   }
 
-  private def onFeedStatusUpdate(podcastId: String, url: String, timestamp: LocalDateTime, status: FeedStatus): Unit = {
+  private def onFeedStatusUpdate(podcastId: String, url: String, timestamp: Long, status: FeedStatus): Unit = {
     log.debug("Received FeedStatusUpdate({},{},{})", url, timestamp, status)
 
     feeds

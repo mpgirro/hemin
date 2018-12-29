@@ -16,7 +16,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
 
   private val feedData: String = Files.lines(Paths.get("src", "test", "resources", "testfeed.xml")).collect(Collectors.joining("\n"))
 
-  private val testDate: Option[LocalDateTime] = DateMapper.asLocalDateTime("2018-03-16T23:49:08")
+  private val testDate: Option[Long] = Some(1521240548000L) // = 2018-03-16T23:49:08
 
   "The Parser" should "parse the Feed" in {
     RomeFeedParser.parse(feedData) match {

@@ -20,7 +20,7 @@ object LuceneMapper {
       }
       s.description.foreach    { x => d.add(new TextField(IndexField.Description.entryName, x, Field.Store.YES)) }
       s.podcastTitle.foreach   { x => d.add(new TextField(IndexField.PodcastTitle.entryName, x, Field.Store.YES)) }
-      s.pubDate.foreach        { x => d.add(new StringField(IndexField.PubDate.entryName, DateMapper.asString(x).get, Field.Store.YES)) }
+      s.pubDate.foreach        { x => d.add(new StringField(IndexField.PubDate.entryName, x.toString, Field.Store.YES)) }
       s.image.foreach          { x => d.add(new TextField(IndexField.ItunesImage.entryName, x, Field.Store.YES)) }
       s.itunesAuthor.foreach   { x => d.add(new TextField(IndexField.ItunesAuthor.entryName, x, Field.Store.NO)) }
       s.itunesSummary.foreach  { x => d.add(new TextField(IndexField.ItunesSummary.entryName, x, Field.Store.YES)) }

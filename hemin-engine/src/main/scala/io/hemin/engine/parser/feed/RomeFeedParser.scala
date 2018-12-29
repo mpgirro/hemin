@@ -36,7 +36,7 @@ class RomeFeedParser private (private val xmlData: String) {
     title           = podcastTitleWithImageFallback,
     link            = podcastLinkWithImageFallback,
     description     = podcastDescriptionWithImageFallback,
-    pubDate         = DateMapper.asLocalDateTime(feed.getPublishedDate),
+    pubDate         = DateMapper.asMilliseconds(feed.getPublishedDate),
     image           = podcastImageWithItunesFallback,
     lastBuildDate   = None,  // TODO the parser does not yet produce this
     language        = Option(feed.getLanguage),
@@ -66,7 +66,7 @@ class RomeFeedParser private (private val xmlData: String) {
     podcastTitle    = podcast.title,
     title           = Option(e.getTitle),
     link            = UrlMapper.sanitize(e.getLink),
-    pubDate         = DateMapper.asLocalDateTime(e.getPublishedDate),
+    pubDate         = DateMapper.asMilliseconds(e.getPublishedDate),
     guid            = Option(e.getUri),
     guidIsPermalink = None, // TODO welches feld von ROME korrespondiert zu diesem Boolean?
     description     = Option(e.getDescription).map(_.getValue),

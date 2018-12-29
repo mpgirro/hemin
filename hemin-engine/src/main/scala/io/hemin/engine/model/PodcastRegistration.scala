@@ -3,8 +3,8 @@ package io.hemin.engine.model
 import java.time.LocalDateTime
 
 final case class PodcastRegistration(
-  timestamp: Option[LocalDateTime] = None,
-  complete: Option[Boolean]        = None,
+  timestamp: Option[Long]   = None,
+  complete: Option[Boolean] = None,
 ) extends Patchable[PodcastRegistration] {
 
   override def patchLeft(diff: PodcastRegistration): PodcastRegistration = Option(diff) match {

@@ -28,6 +28,12 @@ object DateMapper {
     .map(_.toInstant)
     .map(_.toEpochMilli)
 
+  def asMilliseconds(value: java.util.Date): Option[Long] = Option(value)
+    .map(_.getTime)
+
+  def asMilliseconds(value: String): Option[Long] = asLocalDateTime(value)
+    .flatMap(asMilliseconds)
+
   def asLocalDateTime(value: java.util.Date): Option[LocalDateTime] = Option(value)
     .map(_.toInstant)
     .map(LocalDateTime.ofInstant(_, ZONE))
