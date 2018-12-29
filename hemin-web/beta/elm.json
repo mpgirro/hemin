@@ -15,6 +15,7 @@
             "elm/time": "1.0.0",
             "elm/url": "1.0.0",
             "elm-community/html-extra": "3.0.0",
+            "elm-community/json-extra": "4.0.0",
             "elm-community/maybe-extra": "5.0.0",
             "elm-community/string-extra": "4.0.0",
             "fapian/elm-html-aria": "1.4.0",

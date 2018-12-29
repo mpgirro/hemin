@@ -1,14 +1,16 @@
 module Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 
 import Json.Decode exposing (Decoder, field, list, maybe, string)
+import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
+import Time exposing (Posix)
 
 
 type alias Feed =
     { id : String
     , podcastId : String
     , url : Maybe String
-    , lastChecked : Maybe String
+    , lastChecked : Maybe Posix
     , lastStatus : Maybe String
     }
 
@@ -19,7 +21,7 @@ feedDecoder =
         |> required "id" string
         |> required "podcastId" string
         |> optional "url" (maybe string) Nothing
-        |> optional "lastChecked" (maybe string) Nothing
+        |> optional "lastChecked" (maybe datetime) Nothing
         |> optional "lastStatus" (maybe string) Nothing
 
 

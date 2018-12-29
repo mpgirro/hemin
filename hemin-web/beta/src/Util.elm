@@ -13,9 +13,10 @@ module Util exposing
 import DateFormat
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, property)
-import Iso8601
+--import Iso8601
+import Json.Decode exposing (Decoder, maybe, int)
 import Json.Encode
-import Time exposing (Posix, Zone)
+import Time exposing (Posix, Month, toMonth, toDay, toYear, millisToPosix)
 
 
 maybeAsText : Maybe String -> Html msg
@@ -79,37 +80,43 @@ viewInnerHtml html =
         [ property "content" (Json.Encode.string html) ]
         []
 
+toMonthString : Month -> String
+toMonthString month =
+  case month of
+    Time.Jan -> "01"
+    Time.Feb -> "02"
+    Time.Mar -> "03"
+    Time.Apr -> "04"
+    Time.May -> "05"
+    Time.Jun -> "06"
+    Time.Jul -> "07"
+    Time.Aug -> "08"
+    Time.Sep -> "09"
+    Time.Oct -> "10"
+    Time.Nov -> "11"
+    Time.Dec -> "12"
 
-prettyDateString : String -> Maybe String
-prettyDateString timestamp =
+prettyDateString : Posix -> String
+prettyDateString posix =
     let
-        formatter : Zone -> Posix -> String
-        formatter =
-            DateFormat.format
-                [ DateFormat.monthNameFull
-                , DateFormat.text " "
-                , DateFormat.dayOfMonthSuffix
-                , DateFormat.text ", "
-                , DateFormat.yearNumber
-                ]
+        year : String
+        year = String.fromInt (toYear Time.utc posix)
 
-        timezone : Zone
-        timezone =
-            Time.utc
+        month : String
+        month = toMonthString (toMonth Time.utc posix)
+
+        day : String
+        day = String.fromInt (toDay Time.utc posix)
     in
-    case Iso8601.toTime timestamp of
-        Ok posix ->
-            Just (formatter timezone posix)
-
-        Err _ ->
-            Nothing
+    year ++ "-" ++ month ++ "-" ++ day
 
 
-prettyDateHtml : String -> Html msg
-prettyDateHtml timestamp =
-    case prettyDateString timestamp of
-        Just pretty ->
-            text pretty
+prettyDateHtml : Posix -> Html msg
+prettyDateHtml posix =
+    let
+        value : String
+        value = prettyDateString posix
+    in
+    text value
+-- span [ class "text-red" ] [ text "DATE_PARSING_ERROR" ]
 
-        Nothing ->
-            span [ class "text-red" ] [ text "DATE_PARSING_ERROR" ]

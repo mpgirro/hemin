@@ -2,8 +2,9 @@ module Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 
 import Data.Chapter exposing (Chapter, chapterDecoder)
 import Json.Decode exposing (Decoder, bool, field, int, list, maybe, string)
+import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
-
+import Time exposing (Posix)
 
 
 --- MODELS ---
@@ -16,7 +17,7 @@ type alias Episode =
     , title : Maybe String
     , link : Maybe String
     , description : Maybe String
-    , pubDate : Maybe String
+    , pubDate : Maybe Posix
     , guid : Maybe String
     , guidIsPermalink : Maybe Bool
     , image : Maybe String
@@ -82,7 +83,7 @@ episodeDecoder =
         |> optional "title" (maybe string) Nothing
         |> optional "link" (maybe string) Nothing
         |> optional "description" (maybe string) Nothing
-        |> optional "pubDate" (maybe string) Nothing
+        |> optional "pubDate" (maybe datetime) Nothing
         |> optional "guid" (maybe string) Nothing
         |> optional "guidIsPermalink" (maybe bool) Nothing
         |> optional "image" (maybe string) Nothing

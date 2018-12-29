@@ -1,8 +1,8 @@
 module Skeleton exposing (Page, view, viewLink)
 
 import Const
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, div, p, text, b, ul, li, a, nav, img)
+import Html.Attributes exposing (class, href, src, width, height, alt)
 import Http
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
@@ -73,7 +73,9 @@ template content =
 
 navbar : Html msg
 navbar =
-    nav [ class "UnderlineNav", class "mb-4" ]
+    nav [ class "UnderlineNav"
+        , class "mb-4"
+        ]
         [ div [ class "UnderlineNav-actions" ]
             [ a [ href "/" ]
                 [ img [ src "/logo.svg", width 12, height 12, alt "" ] []
@@ -93,13 +95,21 @@ footer : Html msg
 footer =
     div
         [ class "footer"
-
+        , class "clearfix"
         --, class "position-absolute"
         ]
-        [ p
-            [ class "note"
-            , class "my-3"
-            ]
+        [ footerLeft
+        , footerRight
+        ]
+
+
+footerLeft : Html msg
+footerLeft =
+    div [ class "col-9"
+        , class "float-left"
+        ]
+        [ p [ class "mt-5" ] [ b [] [ text ("About " ++ Const.siteName) ] ]
+        , p [ class "note" ]
             [ text Const.siteName
             , text " is an open source podcast catalog & search engine. Check out the code on "
             , a [ href "https://github.com/mpgirro/hemin" ] [ text "GitHub" ]
@@ -107,4 +117,22 @@ footer =
             , a [ href "https://elm-lang.org" ] [ text "Elm" ]
             , text ". The podcasts and artworks embedded on this page are properties of their owners."
             ]
+        ]
+
+
+footerRight : Html msg
+footerRight =
+    div [ class "col-2"
+        , class "float-right"
+        ]
+        [ p [ class "mt-5" ] [ b [] [ text "Links" ] ]
+        , p [ class "note" ]
+            [ ul
+                [ class "list-style-none" ]
+                [ li [] [ a [ href "https://blog.hemin.io" ] [ text "Blog" ] ]
+                , li [] [ a [ href "https://changelog.hemin.io" ] [ text "Changelog" ] ]
+                , li [] [ a [ href "" ] [ text "TODO" ] ]
+                ]
+            ]
+
         ]

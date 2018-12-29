@@ -1,8 +1,9 @@
 module Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, list, maybe, string)
+import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
-
+import Time exposing (Posix)
 
 
 -- TYPES
@@ -13,8 +14,8 @@ type alias Podcast =
     , title : Maybe String
     , link : Maybe String
     , description : Maybe String
-    , pubDate : Maybe String
-    , lastBuildDate : Maybe String
+    , pubDate : Maybe Posix
+    , lastBuildDate : Maybe Posix
     , language : Maybe String
     , generator : Maybe String
     , copyright : Maybe String
@@ -69,8 +70,8 @@ podcastDecoder =
         |> optional "title" (maybe string) Nothing
         |> optional "link" (maybe string) Nothing
         |> optional "description" (maybe string) Nothing
-        |> optional "pubDate" (maybe string) Nothing
-        |> optional "lastBuildDate" (maybe string) Nothing
+        |> optional "pubDate" (maybe datetime) Nothing
+        |> optional "lastBuildDate" (maybe datetime) Nothing
         |> optional "language" (maybe string) Nothing
         |> optional "generator" (maybe string) Nothing
         |> optional "copyright" (maybe string) Nothing
