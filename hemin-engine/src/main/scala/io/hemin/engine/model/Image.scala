@@ -1,16 +1,16 @@
 package io.hemin.engine.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 final case class Image (
-  id: Option[String]          = None,
-  url: Option[String]         = None,
-  data: Option[String]        = None,
-  hash: Option[String]        = None,
-  name: Option[String]        = None,
-  contentType: Option[String] = None,
-  size: Option[Long]          = None,
-  createdAt: Option[Long]     = None,
+  id: Option[String]               = None,
+  url: Option[String]              = None,
+  data: Option[String]             = None,
+  hash: Option[String]             = None,
+  name: Option[String]             = None,
+  contentType: Option[String]      = None,
+  size: Option[Long]               = None,
+  createdAt: Option[ZonedDateTime] = None,
 ) extends Patchable[Image] {
 
   override def patchLeft(diff: Image): Image = Option(diff) match {

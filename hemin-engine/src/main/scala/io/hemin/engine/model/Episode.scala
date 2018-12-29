@@ -1,6 +1,6 @@
 package io.hemin.engine.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 final case class Episode(
   id: Option[String]                = None,
@@ -8,7 +8,7 @@ final case class Episode(
   podcastTitle: Option[String]      = None,
   title: Option[String]             = None,
   link: Option[String]              = None,
-  pubDate: Option[Long]             = None,
+  pubDate: Option[ZonedDateTime]    = None,
   guid: Option[String]              = None,
   guidIsPermalink: Option[Boolean]  = None,
   description: Option[String]       = None,

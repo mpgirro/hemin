@@ -1,10 +1,10 @@
 package io.hemin.engine.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 final case class PodcastRegistration(
-  timestamp: Option[Long]   = None,
-  complete: Option[Boolean] = None,
+  timestamp: Option[ZonedDateTime] = None,
+  complete: Option[Boolean]        = None,
 ) extends Patchable[PodcastRegistration] {
 
   override def patchLeft(diff: PodcastRegistration): PodcastRegistration = Option(diff) match {

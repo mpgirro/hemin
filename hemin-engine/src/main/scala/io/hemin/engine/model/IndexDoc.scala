@@ -1,6 +1,6 @@
 package io.hemin.engine.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 final case class IndexDoc(
   docType: Option[String]        = None,
@@ -8,7 +8,7 @@ final case class IndexDoc(
   title: Option[String]          = None,
   link: Option[String]           = None,
   description: Option[String]    = None,
-  pubDate: Option[Long]          = None,
+  pubDate: Option[ZonedDateTime] = None,
   image: Option[String]          = None,
   itunesAuthor: Option[String]   = None,
   itunesSummary: Option[String]  = None,

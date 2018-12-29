@@ -1,25 +1,25 @@
 package io.hemin.engine.model
 
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
 final case class Podcast(
-  id: Option[String]                = None,
-  title: Option[String]             = None,
-  link: Option[String]              = None,
-  description: Option[String]       = None,
-  pubDate: Option[Long]             = None,
-  lastBuildDate: Option[Long]       = None,
-  language: Option[String]          = None,
-  generator: Option[String]         = None,
-  copyright: Option[String]         = None,
-  docs: Option[String]              = None,
-  managingEditor: Option[String]    = None,
-  image: Option[String]             = None,
-  atomLinks: List[AtomLink]         = Nil,
-  registration: PodcastRegistration = PodcastRegistration(),
-  itunes: PodcastItunes             = PodcastItunes(),
-  feedpress: PodcastFeedpress       = PodcastFeedpress(),
-  fyyd: PodcastFyyd                 = PodcastFyyd(),
+  id: Option[String]                   = None,
+  title: Option[String]                = None,
+  link: Option[String]                 = None,
+  description: Option[String]          = None,
+  pubDate: Option[ZonedDateTime]       = None,
+  lastBuildDate: Option[ZonedDateTime] = None,
+  language: Option[String]             = None,
+  generator: Option[String]            = None,
+  copyright: Option[String]            = None,
+  docs: Option[String]                 = None,
+  managingEditor: Option[String]       = None,
+  image: Option[String]                = None,
+  atomLinks: List[AtomLink]            = Nil,
+  registration: PodcastRegistration    = PodcastRegistration(),
+  itunes: PodcastItunes                = PodcastItunes(),
+  feedpress: PodcastFeedpress          = PodcastFeedpress(),
+  fyyd: PodcastFyyd                    = PodcastFyyd(),
 ) extends Patchable[Podcast] {
 
   override def patchLeft(diff: Podcast): Podcast = Option(diff) match {

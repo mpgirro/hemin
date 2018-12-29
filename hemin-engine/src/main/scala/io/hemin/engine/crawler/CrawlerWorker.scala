@@ -12,6 +12,7 @@ import io.hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import io.hemin.engine.model.FeedStatus
 import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
+import io.hemin.engine.util.TimeUtil
 
 import scala.concurrent.{ExecutionContext, blocking}
 import scala.language.postfixOps
@@ -149,7 +150,7 @@ class CrawlerWorker (config: CrawlerConfig)
     job match {
       case WebsiteFetchJob() => // do nothing...
       case _ =>
-        val catalogEvent = FeedStatusUpdate(id, url, System.currentTimeMillis(), FeedStatus.DownloadError)
+        val catalogEvent = FeedStatusUpdate(id, url, TimeUtil.now(), FeedStatus.DownloadError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }
@@ -229,13 +230,13 @@ class CrawlerWorker (config: CrawlerConfig)
           job match {
             case NewPodcastFetchJob() =>
               parser ! ParseNewPodcastData(url, id, asString(data, enc))
-              val catalogEvent = FeedStatusUpdate(id, url, System.currentTimeMillis(), FeedStatus.DownloadSuccess)
+              val catalogEvent = FeedStatusUpdate(id, url, TimeUtil.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
             case UpdateEpisodesFetchJob(etag, lastMod) =>
               parser ! ParseUpdateEpisodeData(url, id, asString(data, enc))
-              val catalogEvent = FeedStatusUpdate(id, url, System.currentTimeMillis(), FeedStatus.DownloadSuccess)
+              val catalogEvent = FeedStatusUpdate(id, url, TimeUtil.now(), FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 

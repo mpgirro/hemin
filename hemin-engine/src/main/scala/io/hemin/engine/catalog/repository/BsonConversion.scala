@@ -1,6 +1,6 @@
 package io.hemin.engine.catalog.repository
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZonedDateTime}
 
 import io.hemin.engine.model._
 import io.hemin.engine.util.mapper.DateMapper
@@ -40,12 +40,20 @@ object BsonConversion {
   def asStringSet(key: String)(implicit bson: BSONDocument): Option[Set[String]] = bson.getAs[Set[String]](key)
 
 
-  implicit object DateWriter extends BSONWriter[LocalDateTime,BSONDateTime] {
+  implicit object LocalDateTimeWriter extends BSONWriter[LocalDateTime,BSONDateTime] {
     def write(value: LocalDateTime): BSONDateTime = BSONDateTime(DateMapper.asMilliseconds(value).get)
   }
 
-  implicit object DateReader extends BSONReader[BSONDateTime,LocalDateTime] {
+  implicit object LocalDateTimeReader extends BSONReader[BSONDateTime,LocalDateTime] {
     def read(dt: BSONDateTime): LocalDateTime = DateMapper.asLocalDateTime(dt.value).get
+  }
+
+  implicit object ZonedDateTimeWriter extends BSONWriter[ZonedDateTime,BSONDateTime] {
+    def write(value: ZonedDateTime): BSONDateTime = BSONDateTime(DateMapper.asMilliseconds(value).get)
+  }
+
+  implicit object ZonedDateTimeReader extends BSONReader[BSONDateTime,ZonedDateTime] {
+    def read(dt: BSONDateTime): ZonedDateTime = DateMapper.asZonedDateTime(dt.value).get
   }
 
   implicit object FeedStatusWriter extends BSONWriter[FeedStatus,BSONString] {

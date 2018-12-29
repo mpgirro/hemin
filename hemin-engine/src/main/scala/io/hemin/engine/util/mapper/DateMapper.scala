@@ -3,15 +3,19 @@ package io.hemin.engine.util.mapper
 import java.sql.Timestamp
 import java.time._
 
+import io.hemin.engine.util.TimeUtil
+
 
 object DateMapper {
 
-  val ZONE: ZoneId = ZoneId.of("Europe/Vienna")
+  def asString(value: LocalDateTime): Option[String] = Option(value)
+    .map(_.toString)
 
-  def asString(localDateTime: LocalDateTime): Option[String] = Option(localDateTime).map(_.toString)
+  def asString(value: ZonedDateTime): Option[String] = Option(value)
+    .map(_.toString)
 
   def asDate(value: LocalDate): Option[java.util.Date] = Option(value)
-    .map(_.atStartOfDay(ZONE))
+    .map(_.atStartOfDay(TimeUtil.ZONE))
     .map(_.toInstant)
     .map(java.util.Date.from)
 
@@ -20,11 +24,14 @@ object DateMapper {
     .map(java.util.Date.from)
 
   def asDate(value: LocalDateTime): Option[java.util.Date] = Option(value)
-    .map(_.atZone(ZONE))
+    .map(_.atZone(TimeUtil.ZONE))
     .map(_.toInstant)
     .map(java.util.Date.from)
 
   def asMilliseconds(value: LocalDateTime): Option[Long] = asZonedDateTime(value)
+    .flatMap(asMilliseconds)
+
+  def asMilliseconds(value: ZonedDateTime): Option[Long] = Option(value)
     .map(_.toInstant)
     .map(_.toEpochMilli)
 
@@ -36,7 +43,7 @@ object DateMapper {
 
   def asLocalDateTime(value: java.util.Date): Option[LocalDateTime] = Option(value)
     .map(_.toInstant)
-    .map(LocalDateTime.ofInstant(_, ZONE))
+    .map(LocalDateTime.ofInstant(_, TimeUtil.ZONE))
 
   def asLocalDateTime(value: java.sql.Timestamp): Option[LocalDateTime] = Option(value)
     .map(_.toLocalDateTime)
@@ -44,11 +51,11 @@ object DateMapper {
   def asLocalDateTime(value: ZonedDateTime): Option[LocalDateTime] = Option(value)
     .map(LocalDateTime.from)
 
-  def asLocalDateTime(milliseconds: Long): Option[LocalDateTime] = Option(milliseconds)
+  def asLocalDateTime(value: Long): Option[LocalDateTime] = Option(value)
     .map(Instant.ofEpochMilli)
-    .map(LocalDateTime.ofInstant(_, ZONE))
+    .map(LocalDateTime.ofInstant(_, TimeUtil.ZONE))
 
-  def asLocalDateTime(localDateTime: String): Option[LocalDateTime] = Option(localDateTime)
+  def asLocalDateTime(value: String): Option[LocalDateTime] = Option(value)
     .map(LocalDateTime.parse)
 
   def asSqlTimestamp(value: LocalDateTime): Option[java.sql.Timestamp] = Option(value)
@@ -56,7 +63,7 @@ object DateMapper {
 
   def asLocalDate(value: java.util.Date): Option[LocalDate] = Option(value)
     .map(_.toInstant)
-    .map(ZonedDateTime.ofInstant(_, ZONE))
+    .map(ZonedDateTime.ofInstant(_, TimeUtil.ZONE))
     .map(_.toLocalDate)
 
   def asLocalDate(value: java.sql.Date): Option[LocalDate] = Option(value)
@@ -64,13 +71,16 @@ object DateMapper {
 
   def asZonedDateTime(value: java.util.Date): Option[ZonedDateTime] = Option(value)
     .map(_.toInstant)
-    .map(ZonedDateTime.ofInstant(_, ZONE))
+    .map(ZonedDateTime.ofInstant(_, TimeUtil.ZONE))
 
   def asZonedDateTime(value: LocalDateTime): Option[ZonedDateTime] = Option(value)
-    .map(ZonedDateTime.ofInstant(_, ZoneOffset.UTC, ZONE))
+    .map(ZonedDateTime.ofInstant(_, ZoneOffset.UTC, TimeUtil.ZONE))
 
-  def asZonedDateTime(zonedDateTime: String): Option[ZonedDateTime] = Option(zonedDateTime)
+  def asZonedDateTime(value: String): Option[ZonedDateTime] = Option(value)
     .map(ZonedDateTime.parse)
+
+  def asZonedDateTime(value: Long): Option[ZonedDateTime] = asLocalDateTime(value)
+    .flatMap(asZonedDateTime)
 
   def asSqlDate(value: LocalDate): Option[java.sql.Date] = Option(value)
     .map(java.sql.Date.valueOf)

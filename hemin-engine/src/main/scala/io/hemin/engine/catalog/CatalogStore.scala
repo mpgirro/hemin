@@ -1,6 +1,6 @@
 package io.hemin.engine.catalog
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZonedDateTime}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
@@ -10,7 +10,7 @@ import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
 import io.hemin.engine.updater.Updater.ProcessFeed
-import io.hemin.engine.util.IdGenerator
+import io.hemin.engine.util.{IdGenerator, TimeUtil}
 import io.hemin.engine.util.mapper.IndexMapper
 import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 
@@ -34,7 +34,7 @@ object CatalogStore {
   final case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
   // CatalogEvents
   //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
-  final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: Long, status: FeedStatus) extends CatalogEvent
+  final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: ZonedDateTime, status: FeedStatus) extends CatalogEvent
   final case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
   final case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
   final case class SaveChapter(chapter: Chapter) extends CatalogEvent
@@ -270,7 +270,7 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty) {
-            val now = System.currentTimeMillis()
+            val now = TimeUtil.now()
 
             val podcastId = idGenerator.newId
             val podcast = Podcast(
@@ -320,7 +320,7 @@ class CatalogStore(config: CatalogConfig)
 
   }
 
-  private def onFeedStatusUpdate(podcastId: String, url: String, timestamp: Long, status: FeedStatus): Unit = {
+  private def onFeedStatusUpdate(podcastId: String, url: String, timestamp: ZonedDateTime, status: FeedStatus): Unit = {
     log.debug("Received FeedStatusUpdate({},{},{})", url, timestamp, status)
 
     feeds
@@ -808,7 +808,7 @@ class CatalogStore(config: CatalogConfig)
                     podcastId    = Some(podcastId),
                     podcastTitle = p.title,
                     registration = EpisodeRegistration(
-                      timestamp = Some(LocalDateTime.now())
+                      timestamp = Some(TimeUtil.now())
                     ),
                     chapters = episode.chapters.map(_.copy(episodeId = Some(episodeId))), // TODO are chapters now embedded, remove episodeId
                   )

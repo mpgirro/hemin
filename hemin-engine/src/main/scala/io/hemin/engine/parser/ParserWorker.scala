@@ -1,6 +1,6 @@
 package io.hemin.engine.parser
 
-import java.time.LocalDateTime
+import java.time.{LocalDateTime, ZonedDateTime}
 import java.util.Base64
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
@@ -11,7 +11,7 @@ import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
-import io.hemin.engine.util.HashUtil
+import io.hemin.engine.util.{HashUtil, TimeUtil}
 import io.hemin.engine.util.mapper.IndexMapper
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
@@ -210,7 +210,7 @@ class ParserWorker (config: ParserConfig)
         ex.printStackTrace()
 
         // we update the status of the feed, to persist the information that this feed stinks
-        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, System.currentTimeMillis(), FeedStatus.ParserError)
+        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, TimeUtil.now(), FeedStatus.ParserError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }
