@@ -2,7 +2,6 @@ module Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 
 import Data.Chapter exposing (Chapter, chapterDecoder)
 import Json.Decode exposing (Decoder, bool, field, int, list, maybe, string)
-import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
 import Util exposing (decodePosix)

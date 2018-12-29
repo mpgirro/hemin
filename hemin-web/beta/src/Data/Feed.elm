@@ -1,7 +1,6 @@
 module Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 
 import Json.Decode exposing (Decoder, field, list, maybe, string)
-import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
 import Util exposing (decodePosix)

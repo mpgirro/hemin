@@ -1,13 +1,12 @@
 module Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 
 import Json.Decode exposing (Decoder, bool, field, list, maybe, string)
-import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Time exposing (Posix)
 import Util exposing (decodePosix)
 
 
--- TYPES
+--- TYPES ---
 
 
 type alias Podcast =
@@ -61,7 +60,7 @@ emptyPodcastItunes =
 
 
 
--- JSON
+--- JSON ---
 
 
 podcastDecoder : Decoder Podcast

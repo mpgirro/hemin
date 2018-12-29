@@ -1,7 +1,6 @@
 module Data.IndexDoc exposing (IndexDoc, indexDocDecoder)
 
 import Json.Decode exposing (Decoder, maybe, string)
-import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
 import Util exposing (decodePosix)

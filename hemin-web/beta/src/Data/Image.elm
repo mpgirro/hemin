@@ -1,9 +1,9 @@
 module Data.Image exposing (Image, imageDecoder)
 
 import Json.Decode exposing (Decoder, int, maybe, string)
-import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
+import Util exposing (decodePosix)
 
 
 type alias Image =
@@ -28,4 +28,4 @@ imageDecoder =
         |> optional "name" (maybe string) Nothing
         |> optional "contentType" (maybe string) Nothing
         |> optional "size" (maybe int) Nothing
-        |> optional "createdAt" (maybe datetime) Nothing
+        |> optional "createdAt" (maybe decodePosix) Nothing
