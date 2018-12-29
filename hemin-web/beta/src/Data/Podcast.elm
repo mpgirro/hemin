@@ -4,6 +4,7 @@ import Json.Decode exposing (Decoder, bool, field, list, maybe, string)
 import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (hardcoded, optional, required)
 import Time exposing (Posix)
+import Util exposing (decodePosix)
 
 
 -- TYPES
@@ -70,8 +71,8 @@ podcastDecoder =
         |> optional "title" (maybe string) Nothing
         |> optional "link" (maybe string) Nothing
         |> optional "description" (maybe string) Nothing
-        |> optional "pubDate" (maybe datetime) Nothing
-        |> optional "lastBuildDate" (maybe datetime) Nothing
+        |> optional "pubDate" (maybe decodePosix) Nothing
+        |> optional "lastBuildDate" (maybe decodePosix) Nothing
         |> optional "language" (maybe string) Nothing
         |> optional "generator" (maybe string) Nothing
         |> optional "copyright" (maybe string) Nothing

@@ -4,6 +4,7 @@ import Json.Decode exposing (Decoder, maybe, string)
 import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
+import Util exposing (decodePosix)
 
 
 --- MODELS ---
@@ -35,7 +36,7 @@ indexDocDecoder =
         |> optional "title" (maybe string) Nothing
         |> optional "link" (maybe string) Nothing
         |> optional "description" (maybe string) Nothing
-        |> optional "pubDate" (maybe datetime) Nothing
+        |> optional "pubDate" (maybe decodePosix) Nothing
         |> optional "image" (maybe string) Nothing
         |> optional "itunesAuthor" (maybe string) Nothing
         |> optional "itunesSummary" (maybe string) Nothing

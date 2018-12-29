@@ -1,5 +1,6 @@
 module Util exposing
-    ( emptyHtml
+    ( decodePosix
+    , emptyHtml
     , maybeAsString
     , maybeAsText
     , maybePageNumberParam
@@ -120,3 +121,11 @@ prettyDateHtml posix =
     text value
 -- span [ class "text-red" ] [ text "DATE_PARSING_ERROR" ]
 
+
+decodePosix : Decoder Posix
+decodePosix =
+    Json.Decode.andThen
+        (\value ->
+            Json.Decode.succeed (millisToPosix value)
+        )
+        Json.Decode.int

@@ -4,6 +4,7 @@ import Json.Decode exposing (Decoder, field, list, maybe, string)
 import Json.Decode.Extra exposing (datetime)
 import Json.Decode.Pipeline exposing (optional, required)
 import Time exposing (Posix)
+import Util exposing (decodePosix)
 
 
 type alias Feed =
@@ -21,7 +22,7 @@ feedDecoder =
         |> required "id" string
         |> required "podcastId" string
         |> optional "url" (maybe string) Nothing
-        |> optional "lastChecked" (maybe datetime) Nothing
+        |> optional "lastChecked" (maybe decodePosix) Nothing
         |> optional "lastStatus" (maybe string) Nothing
 
 
