@@ -10,7 +10,7 @@ final case class Image (
   name: Option[String]             = None,
   contentType: Option[String]      = None,
   size: Option[Long]               = None,
-  createdAt: Option[ZonedDateTime] = None,
+  createdAt: Option[Long] = None,
 ) extends Patchable[Image] {
 
   override def patchLeft(diff: Image): Image = Option(diff) match {

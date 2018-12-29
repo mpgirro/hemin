@@ -3,7 +3,7 @@ package io.hemin.engine.model
 import java.time.ZonedDateTime
 
 final case class EpisodeRegistration(
-  timestamp: Option[ZonedDateTime] = None,
+  timestamp: Option[Long] = None,
 ) extends Patchable[EpisodeRegistration] {
 
   override def patchLeft(diff: EpisodeRegistration): EpisodeRegistration = Option(diff) match {

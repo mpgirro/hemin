@@ -3,7 +3,7 @@ package io.hemin.engine.model
 import java.time.ZonedDateTime
 
 final case class PodcastRegistration(
-  timestamp: Option[ZonedDateTime] = None,
+  timestamp: Option[Long] = None,
   complete: Option[Boolean]        = None,
 ) extends Patchable[PodcastRegistration] {
 

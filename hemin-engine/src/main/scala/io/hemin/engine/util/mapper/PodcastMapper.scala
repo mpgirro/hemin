@@ -32,7 +32,7 @@ object PodcastMapper {
         id          = LuceneMapper.get(d, IndexField.Id.entryName),
         title       = LuceneMapper.get(d, IndexField.Title.entryName),
         link        = LuceneMapper.get(d, IndexField.Link.entryName),
-        pubDate     = DateMapper.asZonedDateTime(d.get(IndexField.PubDate.entryName)),
+        pubDate     = DateMapper.asMilliseconds(d.get(IndexField.PubDate.entryName)),
         description = LuceneMapper.get(d, IndexField.Description.entryName),
         image       = LuceneMapper.get(d, IndexField.ItunesImage.entryName),
       )
@@ -47,7 +47,7 @@ object PodcastMapper {
         id          = SolrMapper.firstStringMatch(d, IndexField.Id.entryName),
         title       = SolrMapper.firstStringMatch(d, IndexField.Title.entryName),
         link        = SolrMapper.firstStringMatch(d, IndexField.Link.entryName),
-        pubDate     = SolrMapper.firstDateMatch(d, IndexField.PubDate.entryName).flatMap(x => DateMapper.asZonedDateTime(x)),
+        pubDate     = SolrMapper.firstDateMatch(d, IndexField.PubDate.entryName).flatMap(x => DateMapper.asMilliseconds(x)),
         description = SolrMapper.firstStringMatch(d, IndexField.Description.entryName),
         image       = SolrMapper.firstStringMatch(d, IndexField.ItunesImage.entryName),
       )

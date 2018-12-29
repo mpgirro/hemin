@@ -8,7 +8,7 @@ final case class Episode(
   podcastTitle: Option[String]      = None,
   title: Option[String]             = None,
   link: Option[String]              = None,
-  pubDate: Option[ZonedDateTime]    = None,
+  pubDate: Option[Long]    = None,
   guid: Option[String]              = None,
   guidIsPermalink: Option[Boolean]  = None,
   description: Option[String]       = None,

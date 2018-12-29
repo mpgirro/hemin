@@ -8,7 +8,7 @@ final case class IndexDoc(
   title: Option[String]          = None,
   link: Option[String]           = None,
   description: Option[String]    = None,
-  pubDate: Option[ZonedDateTime] = None,
+  pubDate: Option[Long] = None,
   image: Option[String]          = None,
   itunesAuthor: Option[String]   = None,
   itunesSummary: Option[String]  = None,

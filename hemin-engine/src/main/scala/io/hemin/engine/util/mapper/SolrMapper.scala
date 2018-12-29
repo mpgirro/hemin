@@ -23,11 +23,7 @@ object SolrMapper {
       }
       s.description.foreach    { x => d.addField(IndexField.Description.entryName, x) }
       s.podcastTitle.foreach   { x => d.addField(IndexField.PodcastTitle.entryName, x) }
-      s.pubDate.foreach        { x => d.addField(IndexField.PubDate.entryName, DateMapper
-        .asLocalDateTime(x)
-        .flatMap(DateMapper.asString)
-        .get)
-      }
+      s.pubDate.foreach        { x => d.addField(IndexField.PubDate.entryName, x.toString) }
       s.image.foreach          { x => d.addField(IndexField.ItunesImage.entryName, x) }
       s.itunesAuthor.foreach   { x => d.addField(IndexField.ItunesAuthor.entryName, x) }
       s.itunesSummary.foreach  { x => d.addField(IndexField.ItunesSummary.entryName, x) }

@@ -210,7 +210,7 @@ class ParserWorker (config: ParserConfig)
         ex.printStackTrace()
 
         // we update the status of the feed, to persist the information that this feed stinks
-        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, TimeUtil.now(), FeedStatus.ParserError)
+        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, System.currentTimeMillis(), FeedStatus.ParserError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
     }

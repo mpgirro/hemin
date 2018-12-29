@@ -6,9 +6,9 @@ final case class Feed(
   id: Option[String]                           = None,
   podcastId: Option[String]                    = None,
   url: Option[String]                          = None,
-  lastChecked: Option[ZonedDateTime]           = None,
+  lastChecked: Option[Long]           = None,
   lastStatus: Option[FeedStatus]               = None,
-  registrationTimestamp: Option[ZonedDateTime] = None,
+  registrationTimestamp: Option[Long] = None,
 ) extends Patchable[Feed] {
 
   override def patchLeft(diff: Feed): Feed = Option(diff) match {
