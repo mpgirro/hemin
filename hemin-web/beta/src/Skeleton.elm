@@ -1,8 +1,8 @@
 module Skeleton exposing (Page, view, viewLink)
 
 import Const
-import Html exposing (Html, div, p, text, b, ul, li, a, nav, img)
-import Html.Attributes exposing (class, href, src, width, height, alt)
+import Html exposing (Html, a, b, div, img, li, nav, p, text, ul)
+import Html.Attributes exposing (alt, class, height, href, src, width)
 import Http
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
@@ -73,7 +73,8 @@ template content =
 
 navbar : Html msg
 navbar =
-    nav [ class "UnderlineNav"
+    nav
+        [ class "UnderlineNav"
         , class "mb-4"
         ]
         [ div [ class "UnderlineNav-actions" ]
@@ -96,6 +97,7 @@ footer =
     div
         [ class "footer"
         , class "clearfix"
+
         --, class "position-absolute"
         ]
         [ footerLeft
@@ -105,7 +107,8 @@ footer =
 
 footerLeft : Html msg
 footerLeft =
-    div [ class "col-9"
+    div
+        [ class "col-9"
         , class "float-left"
         ]
         [ p [ class "mt-5" ] [ b [] [ text ("About " ++ Const.siteName) ] ]
@@ -122,7 +125,8 @@ footerLeft =
 
 footerRight : Html msg
 footerRight =
-    div [ class "col-2"
+    div
+        [ class "col-2"
         , class "float-right"
         ]
         [ p [ class "mt-5" ] [ b [] [ text "Links" ] ]
@@ -134,5 +138,4 @@ footerRight =
                 , li [] [ a [ href "" ] [ text "TODO" ] ]
                 ]
             ]
-
         ]
