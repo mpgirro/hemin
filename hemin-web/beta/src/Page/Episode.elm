@@ -23,8 +23,8 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText, prettyDateHtml, vie
 ---- MODEL ----
 
 
-type alias Model
-    = { episode : WebData Episode }
+type alias Model =
+    { episode : WebData Episode }
 
 
 init : String -> ( Model, Cmd Msg )
@@ -57,7 +57,7 @@ update msg model =
             ( model, getEpisode id )
 
         LoadedEpisode episode ->
-            ({ model | episode = episode }, Cmd.none )
+            ( { model | episode = episode }, Cmd.none )
 
 
 
@@ -74,10 +74,10 @@ view model =
         body =
             case model.episode of
                 RemoteData.NotAsked ->
-                            text "Initialising..."
+                    text "Initialising..."
 
                 RemoteData.Loading ->
-                            text "Loading..."
+                    text "Loading..."
 
                 RemoteData.Failure error ->
                     viewHttpError (Just error)
@@ -97,6 +97,7 @@ viewHttpError maybeError =
 
         Nothing ->
             emptyHtml
+
 
 viewEpisode : Episode -> Html Msg
 viewEpisode episode =

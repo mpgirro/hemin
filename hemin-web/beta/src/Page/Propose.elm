@@ -158,6 +158,7 @@ viewSubmitButton =
         [ button
             [ class "btn"
             , class "text-normal"
+
             --, attribute "style" "padding: 0"
             , type_ "button"
             , ariaLabel "Submit"

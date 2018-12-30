@@ -79,15 +79,15 @@ update msg model =
 
         LoadedPodcast podcast ->
             let
-                                    mod : Model
-                                    mod =
-                                        { model | podcast = podcast }
+                mod : Model
+                mod =
+                    { model | podcast = podcast }
 
-                                    cmd : Cmd Msg
-                                    cmd =
-                                        sendPodloveButtonModelToJs mod
-                                in
-                                ( mod, Cmd.none )
+                cmd : Cmd Msg
+                cmd =
+                    sendPodloveButtonModelToJs mod
+            in
+            ( mod, Cmd.none )
 
         LoadEpisodes id ->
             ( model, getEpisodes id )
@@ -100,15 +100,15 @@ update msg model =
 
         LoadedFeeds feeds ->
             let
-                                    mod : Model
-                                    mod =
-                                        { model | feeds = feeds }
+                mod : Model
+                mod =
+                    { model | feeds = feeds }
 
-                                    cmd : Cmd Msg
-                                    cmd =
-                                        sendPodloveButtonModelToJs mod
-                                in
-                                ( mod, Cmd.none )
+                cmd : Cmd Msg
+                cmd =
+                    sendPodloveButtonModelToJs mod
+            in
+            ( mod, Cmd.none )
 
         PodloveButtonMsg buttonMsg ->
             --updatePodloveButton model buttonMsg
@@ -153,18 +153,17 @@ view model =
         body : Html Msg
         body =
             div
-                                    [ class "col-sm-8"
-                                    , class "col-md-6"
-                                    , class "col-lg-6"
-                                    , class "p-2"
-                                    , class "mx-auto"
-                                    ]
-                                    [ viewPodcast model.podcast
-                                    , viewPodloveButton model
-                                    , viewEpisodes model.episodes
-                                    , viewFeeds model.feeds
-                                    ]
-
+                [ class "col-sm-8"
+                , class "col-md-6"
+                , class "col-lg-6"
+                , class "p-2"
+                , class "mx-auto"
+                ]
+                [ viewPodcast model.podcast
+                , viewPodloveButton model
+                , viewEpisodes model.episodes
+                , viewFeeds model.feeds
+                ]
     in
     ( title, body )
 
@@ -394,34 +393,33 @@ viewEpisodeTeaser episode =
 viewFeeds : WebData (List Feed) -> Html Msg
 viewFeeds webdata =
     case webdata of
-            RemoteData.NotAsked ->
-                text "Initialising..."
+        RemoteData.NotAsked ->
+            text "Initialising..."
 
-            RemoteData.Loading ->
-                text "Loading..."
+        RemoteData.Loading ->
+            text "Loading..."
 
-            RemoteData.Failure error ->
-                viewHttpError (Just error)
+        RemoteData.Failure error ->
+            viewHttpError (Just error)
 
-            RemoteData.Success feeds ->
+        RemoteData.Success feeds ->
+            let
+                viewFeed : Feed -> String
+                viewFeed feed =
+                    maybeAsString feed.url
+            in
+            case feeds of
+                [] ->
+                    emptyHtml
 
-                let
-                    viewFeed : Feed -> String
-                    viewFeed feed =
-                        maybeAsString feed.url
-                in
-                case feeds of
-                    [] ->
-                        emptyHtml
-
-                    first :: _ ->
-                        div [ class "mt-4" ]
-                            [ div [ class "Subhead" ]
-                                [ div [ class "Subhead-heading" ] [ text "Feeds" ] ]
-                            , pre []
-                                [ text (String.join "\n" (List.map viewFeed feeds))
-                                ]
+                first :: _ ->
+                    div [ class "mt-4" ]
+                        [ div [ class "Subhead" ]
+                            [ div [ class "Subhead-heading" ] [ text "Feeds" ] ]
+                        , pre []
+                            [ text (String.join "\n" (List.map viewFeed feeds))
                             ]
+                        ]
 
 
 
@@ -465,6 +463,7 @@ toPodloveButtonModel model =
             case model.feeds of
                 RemoteData.Success fs ->
                     fs
+
                 _ ->
                     []
 

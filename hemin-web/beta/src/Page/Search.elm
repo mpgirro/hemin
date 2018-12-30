@@ -13,10 +13,10 @@ import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import FeatherIcons
-import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, li, nav, p, span, text, ul, button)
+import Html exposing (Attribute, Html, a, b, br, button, div, em, form, h1, img, input, li, nav, p, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
-import Html.Events exposing (keyCode, on, onInput, onSubmit, onClick)
+import Html.Events exposing (keyCode, on, onClick, onInput, onSubmit)
 import Http
 import Maybe.Extra
 import Page.Error as ErrorPage
@@ -57,7 +57,7 @@ init key query pageNumber pageSize result =
     let
         model : Model
         model =
-           initModelFromParams key query pageNumber pageSize
+            initModelFromParams key query pageNumber pageSize
 
         cmd : Cmd Msg
         cmd =
@@ -87,7 +87,7 @@ update msg model =
             let
                 m : Model
                 m =
-                   loadingModelFromParams key query pageNumber pageSize
+                    loadingModelFromParams key query pageNumber pageSize
             in
             ( m, redirectLocalUrl m )
 
@@ -201,10 +201,12 @@ viewSearchForm model =
             ]
         ]
 
+
 viewSearchInput : Model -> Html Msg
 viewSearchInput model =
     input
         [ class "form-control"
+
         --, class "input-block"
         , class "input"
         , attribute "style" "height: 44px !important"
@@ -216,6 +218,7 @@ viewSearchInput model =
         , onInput (updateModelQuery model)
         ]
         []
+
 
 viewSearchButton : Model -> Html Msg
 viewSearchButton model =
@@ -231,6 +234,7 @@ viewSearchButton model =
                 |> FeatherIcons.toHtml []
             ]
         ]
+
 
 viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =
