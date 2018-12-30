@@ -47,7 +47,7 @@ object PodcastMapper {
         id          = SolrMapper.firstStringMatch(d, IndexField.Id.entryName),
         title       = SolrMapper.firstStringMatch(d, IndexField.Title.entryName),
         link        = SolrMapper.firstStringMatch(d, IndexField.Link.entryName),
-        pubDate     = SolrMapper.firstDateMatch(d, IndexField.PubDate.entryName).flatMap(x => DateMapper.asMilliseconds(x)),
+        pubDate     = SolrMapper.firstLongMatch(d, IndexField.PubDate.entryName),
         description = SolrMapper.firstStringMatch(d, IndexField.Description.entryName),
         image       = SolrMapper.firstStringMatch(d, IndexField.ItunesImage.entryName),
       )

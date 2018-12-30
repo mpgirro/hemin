@@ -48,7 +48,7 @@ object SolrMapper {
   def firstStringMatch(doc: SolrDocument, fieldName: String): Option[String] =
     firstMatch(doc, fieldName).map(_.asInstanceOf[String])
 
-  def firstDateMatch(doc: SolrDocument, fieldName: String): Option[Date] =
-    firstMatch(doc, fieldName).map(_.asInstanceOf[Date])
+  def firstLongMatch(doc: SolrDocument, fieldName: String): Option[Long] =
+    firstMatch(doc, fieldName).map(_.asInstanceOf[Long])
 
 }

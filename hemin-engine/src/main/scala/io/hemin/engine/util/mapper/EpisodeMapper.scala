@@ -54,7 +54,7 @@ object EpisodeMapper {
         title        = SolrMapper.firstStringMatch(s, IndexField.Title.entryName),
         podcastTitle = SolrMapper.firstStringMatch(s, IndexField.PodcastTitle.entryName),
         link         = SolrMapper.firstStringMatch(s, IndexField.Link.entryName),
-        pubDate      = SolrMapper.firstDateMatch(s, IndexField.PubDate.entryName).flatMap(x => DateMapper.asMilliseconds(x)),
+        pubDate      = SolrMapper.firstLongMatch(s, IndexField.PubDate.entryName),
         description  = SolrMapper.firstStringMatch(s, IndexField.Description.entryName),
         image        = SolrMapper.firstStringMatch(s, IndexField.ItunesImage.entryName),
         itunes = EpisodeItunes(
