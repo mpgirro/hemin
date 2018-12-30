@@ -18,7 +18,6 @@ import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, 
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (keyCode, on, onInput, onSubmit, onClick)
-import Html.Events.Extra exposing (onEnter)
 import Http
 import Maybe.Extra
 import Page.Error as ErrorPage
@@ -257,7 +256,6 @@ viewSearchInput state =
         , autocomplete False
         , spellcheck False
         , onInput (updateStateQuery state)
-        , onEnter (updateSearchUrl state)
         ]
         []
 

@@ -11,7 +11,6 @@ import Html exposing (Html, button, div, form, input, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
 import Html.Events exposing (onClick, onInput, onSubmit)
-import Html.Events.Extra exposing (onEnter)
 import Http
 import Page.Error as ErrorPage
 import RestApi
@@ -149,7 +148,6 @@ viewInput url =
         , spellcheck False
         , ariaLabel placeholderValue
         , onInput NewUrl
-        , onEnter Propose
         ]
         []
 
