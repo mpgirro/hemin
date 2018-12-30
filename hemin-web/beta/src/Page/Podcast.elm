@@ -14,6 +14,7 @@ import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
 import Podlove.SubscribeButton as PodloveButton
+import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectToEpisode)
 import Skeleton exposing (Page)
@@ -26,11 +27,9 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
 type alias Model =
-    { status : Status
-    , failure : Maybe Http.Error
-    , podcast : Maybe Podcast
-    , episodes : List Episode
-    , feeds : List Feed
+    { podcast : WebData Podcast
+    , episodes : WebData (List Episode)
+    , feeds : WebData (List Feed)
     }
 
 
@@ -44,11 +43,9 @@ init id =
     let
         model : Model
         model =
-            { status = Loading
-            , failure = Nothing
-            , podcast = Nothing
-            , episodes = []
-            , feeds = []
+            { podcast = RemoteData.NotAsked
+            , episodes = RemoteData.NotAsked
+            , feeds = RemoteData.NotAsked
             }
 
         ( _, podloveButtonCmd ) =
@@ -71,11 +68,11 @@ init id =
 
 type Msg
     = LoadPodcast String
-    | LoadedPodcast (Result Http.Error Podcast)
+    | LoadedPodcast (WebData Podcast)
     | LoadEpisodes String
-    | LoadedEpisodes (Result Http.Error (List Episode))
+    | LoadedEpisodes (WebData (List Episode))
     | LoadFeeds String
-    | LoadedFeeds (Result Http.Error (List Feed))
+    | LoadedFeeds (WebData (List Feed))
     | PodloveButtonMsg PodloveButton.Msg
 
 
@@ -85,53 +82,38 @@ update msg model =
         LoadPodcast id ->
             ( model, getPodcast id )
 
-        LoadedPodcast result ->
-            case result of
-                Ok podcast ->
-                    let
-                        mod : Model
-                        mod =
-                            { model | podcast = Just podcast, status = Ready }
+        LoadedPodcast podcast ->
+            let
+                                    mod : Model
+                                    mod =
+                                        { model | podcast = podcast }
 
-                        cmd : Cmd Msg
-                        cmd =
-                            sendPodloveButtonModelToJs mod
-                    in
-                    ( mod, Cmd.none )
-
-                Err error ->
-                    ( { model | failure = Just error, status = Ready }, Cmd.none )
+                                    cmd : Cmd Msg
+                                    cmd =
+                                        sendPodloveButtonModelToJs mod
+                                in
+                                ( mod, Cmd.none )
 
         LoadEpisodes id ->
             ( model, getEpisodes id )
 
-        LoadedEpisodes result ->
-            case result of
-                Ok episodes ->
-                    ( { model | episodes = episodes }, Cmd.none )
-
-                Err error ->
-                    ( { model | failure = Just error }, Cmd.none )
+        LoadedEpisodes episodes ->
+            ( { model | episodes = episodes }, Cmd.none )
 
         LoadFeeds id ->
             ( model, getFeeds id )
 
-        LoadedFeeds result ->
-            case result of
-                Ok feeds ->
-                    let
-                        mod : Model
-                        mod =
-                            { model | feeds = feeds }
+        LoadedFeeds feeds ->
+            let
+                                    mod : Model
+                                    mod =
+                                        { model | feeds = feeds }
 
-                        cmd : Cmd Msg
-                        cmd =
-                            sendPodloveButtonModelToJs mod
-                    in
-                    ( mod, Cmd.none )
-
-                Err error ->
-                    ( { model | failure = Just error }, Cmd.none )
+                                    cmd : Cmd Msg
+                                    cmd =
+                                        sendPodloveButtonModelToJs mod
+                                in
+                                ( mod, Cmd.none )
 
         PodloveButtonMsg buttonMsg ->
             --updatePodloveButton model buttonMsg
@@ -175,24 +157,19 @@ view model =
 
         body : Html Msg
         body =
-            case model.status of
-                Loading ->
-                    text "Loading..."
+            div
+                                    [ class "col-sm-8"
+                                    , class "col-md-6"
+                                    , class "col-lg-6"
+                                    , class "p-2"
+                                    , class "mx-auto"
+                                    ]
+                                    [ viewPodcast model.podcast
+                                    , viewPodloveButton model
+                                    , viewEpisodes model.episodes
+                                    , viewFeeds model.feeds
+                                    ]
 
-                Ready ->
-                    div
-                        [ class "col-sm-8"
-                        , class "col-md-6"
-                        , class "col-lg-6"
-                        , class "p-2"
-                        , class "mx-auto"
-                        ]
-                        [ viewHttpError model.failure
-                        , viewPodcast model.podcast
-                        , viewPodloveButton model
-                        , viewEpisodes model.episodes
-                        , viewFeeds model.feeds
-                        ]
     in
     ( title, body )
 
@@ -208,10 +185,19 @@ viewHttpError maybeError =
             emptyHtml
 
 
-viewPodcast : Maybe Podcast -> Html Msg
-viewPodcast maybePodcast =
-    case maybePodcast of
-        Just podcast ->
+viewPodcast : WebData Podcast -> Html Msg
+viewPodcast webdata =
+    case webdata of
+        RemoteData.NotAsked ->
+            text "Initialising..."
+
+        RemoteData.Loading ->
+            text "Loading..."
+
+        RemoteData.Failure error ->
+            viewHttpError (Just error)
+
+        RemoteData.Success podcast ->
             div []
                 [ viewCoverImage podcast
                 , viewTitle podcast
@@ -219,9 +205,6 @@ viewPodcast maybePodcast =
                 , viewDecription podcast
                 , viewCategories podcast
                 ]
-
-        Nothing ->
-            emptyHtml
 
 
 viewCoverImage : Podcast -> Html Msg
@@ -297,7 +280,7 @@ viewCategory category =
 viewPodloveButton : Model -> Html Msg
 viewPodloveButton model =
     case ( model.podcast, model.feeds ) of
-        ( Just podcast, head :: _ ) ->
+        ( RemoteData.Success _, RemoteData.Success (head :: _) ) ->
             let
                 buttonModel : PodloveButton.Model
                 buttonModel =
@@ -309,19 +292,30 @@ viewPodloveButton model =
             emptyHtml
 
 
-viewEpisodes : List Episode -> Html Msg
-viewEpisodes episodes =
-    case episodes of
-        [] ->
-            emptyHtml
+viewEpisodes : WebData (List Episode) -> Html Msg
+viewEpisodes webdata =
+    case webdata of
+        RemoteData.NotAsked ->
+            text "Initialising..."
 
-        first :: _ ->
-            div [ class "mt-4" ]
-                [ div [ class "Subhead" ]
-                    [ div [ class "Subhead-heading" ] [ text "Episodes" ] ]
-                , ul [ class "list-style-none" ] <|
-                    List.map viewEpisodeTeaser episodes
-                ]
+        RemoteData.Loading ->
+            text "Loading..."
+
+        RemoteData.Failure error ->
+            viewHttpError (Just error)
+
+        RemoteData.Success episodes ->
+            case episodes of
+                [] ->
+                    emptyHtml
+
+                first :: _ ->
+                    div [ class "mt-4" ]
+                        [ div [ class "Subhead" ]
+                            [ div [ class "Subhead-heading" ] [ text "Episodes" ] ]
+                        , ul [ class "list-style-none" ] <|
+                            List.map viewEpisodeTeaser episodes
+                        ]
 
 
 viewEpisodeTeaser : Episode -> Html Msg
@@ -402,25 +396,37 @@ viewEpisodeTeaser episode =
         ]
 
 
-viewFeeds : List Feed -> Html Msg
-viewFeeds feeds =
-    let
-        viewFeed : Feed -> String
-        viewFeed feed =
-            maybeAsString feed.url
-    in
-    case feeds of
-        [] ->
-            emptyHtml
+viewFeeds : WebData (List Feed) -> Html Msg
+viewFeeds webdata =
+    case webdata of
+            RemoteData.NotAsked ->
+                text "Initialising..."
 
-        first :: _ ->
-            div [ class "mt-4" ]
-                [ div [ class "Subhead" ]
-                    [ div [ class "Subhead-heading" ] [ text "Feeds" ] ]
-                , pre []
-                    [ text (String.join "\n" (List.map viewFeed feeds))
-                    ]
-                ]
+            RemoteData.Loading ->
+                text "Loading..."
+
+            RemoteData.Failure error ->
+                viewHttpError (Just error)
+
+            RemoteData.Success feeds ->
+
+                let
+                    viewFeed : Feed -> String
+                    viewFeed feed =
+                        maybeAsString feed.url
+                in
+                case feeds of
+                    [] ->
+                        emptyHtml
+
+                    first :: _ ->
+                        div [ class "mt-4" ]
+                            [ div [ class "Subhead" ]
+                                [ div [ class "Subhead-heading" ] [ text "Feeds" ] ]
+                            , pre []
+                                [ text (String.join "\n" (List.map viewFeed feeds))
+                                ]
+                            ]
 
 
 
@@ -429,17 +435,17 @@ viewFeeds feeds =
 
 getPodcast : String -> Cmd Msg
 getPodcast id =
-    RestApi.getPodcast LoadedPodcast id
+    RestApi.getPodcast (RemoteData.fromResult >> LoadedPodcast) id
 
 
 getEpisodes : String -> Cmd Msg
 getEpisodes id =
-    RestApi.getEpisodesByPodcast LoadedEpisodes id
+    RestApi.getEpisodesByPodcast (RemoteData.fromResult >> LoadedEpisodes) id
 
 
 getFeeds : String -> Cmd Msg
 getFeeds id =
-    RestApi.getFeedsByPodcast LoadedFeeds id
+    RestApi.getFeedsByPodcast (RemoteData.fromResult >> LoadedFeeds) id
 
 
 
@@ -459,17 +465,25 @@ wrapPodloveButtonHtml msg =
 toPodloveButtonModel : Model -> PodloveButton.Model
 toPodloveButtonModel model =
     let
-        toButtonModel : Podcast -> List Feed -> PodloveButton.Model
-        toButtonModel podcast feeds =
+        feeds : List Feed
+        feeds =
+            case model.feeds of
+                RemoteData.Success fs ->
+                    fs
+                _ ->
+                    []
+
+        toButtonModel : Podcast -> PodloveButton.Model
+        toButtonModel podcast =
             { title = podcast.title
             , subtitle = podcast.itunes.subtitle
             , description = podcast.description
             , cover = podcast.image
-            , feeds = toButtonFeeds feeds
+            , feeds = toButtonFeeds
             }
 
-        toButtonFeeds : List Feed -> List PodloveButton.Feed
-        toButtonFeeds feeds =
+        toButtonFeeds : List PodloveButton.Feed
+        toButtonFeeds =
             List.map toButtonFeed feeds
 
         toButtonFeed : Feed -> PodloveButton.Feed
@@ -481,9 +495,9 @@ toPodloveButtonModel model =
             , directoryUrlItunes = Nothing
             }
     in
-    case ( model.podcast, model.feeds ) of
-        ( Just podcast, head :: _ ) ->
-            toButtonModel podcast model.feeds
+    case ( model.podcast, feeds ) of
+        ( RemoteData.Success podcast, head :: _ ) ->
+            toButtonModel podcast
 
         ( _, _ ) ->
             PodloveButton.emptyModel
