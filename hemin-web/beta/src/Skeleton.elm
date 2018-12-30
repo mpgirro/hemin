@@ -1,7 +1,8 @@
 module Skeleton exposing (Page, view, viewLink)
 
 import Const
-import Html exposing (Html, a, b, div, img, li, nav, p, text, ul)
+import FeatherIcons
+import Html exposing (Html, a, b, div, img, li, nav, p, text, ul, span)
 import Html.Attributes exposing (alt, class, height, href, src, width)
 import Http
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
@@ -135,6 +136,11 @@ footerRight =
                 [ class "list-style-none" ]
                 [ li [] [ a [ href "https://blog.hemin.io" ] [ text "Blog" ] ]
                 , li [] [ a [ href "https://changelog.hemin.io" ] [ text "Changelog" ] ]
+                , li [] [ a [ href "https://twitter.com/hemin_io" ]
+                    [ FeatherIcons.twitter
+                        |> FeatherIcons.toHtml [ width 10, height 10 ]
+                    , span [ class "ml-1" ] [ text "Twitter" ] ]
+                    ]
                 , li [] [ a [ href "" ] [ text "TODO" ] ]
                 ]
             ]

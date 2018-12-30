@@ -6,9 +6,12 @@ module Page.Home exposing
     , view
     )
 
+import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Attributes.Aria exposing (role)
+import Html.Attributes.Aria exposing (role, ariaLabel)
+import Html.Events exposing (onClick, onInput)
+import Html.Events.Extra exposing (onEnter)
 import Http
 import Skeleton exposing (Page)
 
@@ -57,9 +60,8 @@ view model =
         body : Html Msg
         body =
             div []
-                [ viewSearchInput
-                , viewSearchNote
-                , viewButtonRow
+                [ viewSearchForm
+                , viewNavButtonRow
                 , viewNewestEpisodes
                 , viewRecentlyAddedPodcast
                 , viewNews
@@ -68,34 +70,59 @@ view model =
     ( title, body )
 
 
+viewSearchForm : Html Msg
+viewSearchForm =
+    Html.form [ class "col-md-10", class "p-2", class "mx-auto" ]
+        [ div
+            [ class "input-group"
+            , class "mt-5"
+            ]
+            [ viewSearchInput
+            , viewSearchButton
+            ]
+        , viewSearchNote
+        ]
+
 viewSearchInput : Html Msg
 viewSearchInput =
-    div []
-        [ input
-            [ class "form-control"
-            , class "input-block"
-            , class "input-lg"
-            , class "mt-5"
-            , type_ "text"
-            , value ""
-            , placeholder "What are you looking for?"
-            , autocomplete False
-            , spellcheck False
+    input
+        [ class "form-control"
+        , class "input"
+        --, height 44
+        , attribute "style" "height: 44px !important"
+        , type_ "text"
+        , value ""
+        , placeholder "What are you looking for?"
+        , autocomplete False
+        , spellcheck False
+        --, onInput (updateStateQuery state)
+        --, onEnter (updateSearchUrl state)
+        ]
+        []
 
-            --, onInput (updateStateQuery state)
-            --, onEnter (updateSearchUrl state)
+viewSearchButton : Html Msg
+viewSearchButton =
+    span [ class "input-group-button" ]
+        [ button
+            [ class "btn"
+            , class "text-normal"
+            , type_ "button"
+            , ariaLabel "Search"
+            --, onClick Propose
             ]
-            []
+            [ FeatherIcons.search
+                |> FeatherIcons.toHtml []
+            ]
         ]
 
 viewSearchNote : Html Msg
 viewSearchNote =
     let
-      podcastCount = "XXX"
+        episodeCount = "XXX"
 
-      episodeCount = "YYY"
+        podcastCount = "YYY"
 
-      msg = episodeCount ++ " episodes in " ++ podcastCount ++ "podcasts"
+        msg = episodeCount ++ " episodes in " ++ podcastCount ++ " podcasts"
     in
     div
         [ class "note"
@@ -104,42 +131,51 @@ viewSearchNote =
         ]
         [ text msg ]
 
-viewButtonRow : Html Msg
-viewButtonRow =
+viewNavButtonRow : Html Msg
+viewNavButtonRow =
     div
         [ class "mt-5"
         , class "d-flex"
         , class "flex-justify-center"
         ]
-        [ p [ class "f3", class "mr-5" ]
+        [ p [ class "f3-light", class "mr-5" ]
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline-purple"
+                , class "btn-outline"
                 , href ""
                 , role "button"
                 ]
-                [ text "Categories" ]
+                [ FeatherIcons.tag
+                    |> FeatherIcons.toHtml [ width 18, height 18 ]
+                , span [ class "ml-2" ] [ text "Categories" ]
+                ]
             ]
-        , p [ class "f3" ]
+        , p [ class "f3-light" ]
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline-purple"
+                , class "btn-outline"
                 , href ""
                 , role "button"
                 ]
-                [ text "Recent" ]
+                [ FeatherIcons.clock
+                    |> FeatherIcons.toHtml [ width 18, height 18 ]
+                , span [ class "ml-2" ] [ text "Recent" ]
+                ]
             ]
-        , p [ class "f3", class "ml-5" ]
+        , p [ class "f3-light", class "ml-5" ]
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline-purple"
-                , href ""
+                , class "btn-outline"
+                , href "/discover"
                 , role "button"
                 ]
-                [ text "All Podcasts" ]
+                [ FeatherIcons.grid
+                    |> FeatherIcons.toHtml [ width 18, height 18 ]
+                , span [ class "ml-2" ] [ text "All Podcasts" ]
+                ]
             ]
         ]
 

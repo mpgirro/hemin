@@ -19,6 +19,7 @@
             "elm-community/maybe-extra": "5.0.0",
             "elm-community/string-extra": "4.0.0",
             "fapian/elm-html-aria": "1.4.0",
+            "feathericons/elm-feather": "1.2.0",
             "rtfeldman/elm-iso8601-date-strings": "1.1.2",
             "ryannhg/date-format": "2.3.0"
         },
@@ -27,6 +28,7 @@
             "elm/file": "1.0.1",
             "elm/parser": "1.1.0",
             "elm/regex": "1.0.0",
+            "elm/svg": "1.0.1",
             "elm/virtual-dom": "1.0.0"
         }
     },
