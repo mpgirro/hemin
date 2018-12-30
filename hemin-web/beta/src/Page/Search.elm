@@ -13,10 +13,11 @@ import Data.Episode exposing (Episode, episodeDecoder)
 import Data.IndexDoc exposing (IndexDoc)
 import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.SearchResult exposing (SearchResult, searchResultDecoder)
-import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, li, nav, p, span, text, ul)
+import FeatherIcons
+import Html exposing (Attribute, Html, a, b, br, div, em, form, h1, img, input, li, nav, p, span, text, ul, button)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
-import Html.Events exposing (keyCode, on, onInput, onSubmit)
+import Html.Events exposing (keyCode, on, onInput, onSubmit, onClick)
 import Html.Events.Extra exposing (onEnter)
 import Http
 import Maybe.Extra
@@ -206,12 +207,12 @@ view model =
         childNodes =
             case model of
                 Failure cause ->
-                    [ viewSearchInput emptySearchState
+                    [ viewSearchForm emptySearchState
                     , ErrorPage.view (ErrorPage.HttpFailure cause)
                     ]
 
                 Loading state ->
-                    [ viewSearchInput state ]
+                    [ viewSearchForm state ]
 
                 Content state ->
                     case state.result of
@@ -219,23 +220,37 @@ view model =
                             [ viewSearchInput state ]
 
                         Just searchResults ->
-                            [ viewSearchInput state
+                            [ viewSearchForm state
                             , viewSearchResult state.query state.pageNumber state.pageSize searchResults
                             ]
 
         body : Html Msg
         body =
-            div [ class "col-md-9", class "p-2", class "mx-auto" ] childNodes
+            div [ class "col-md-10", class "p-2", class "mx-auto" ] childNodes
     in
     ( title, body )
 
+
+viewSearchForm : SearchState -> Html Msg
+viewSearchForm state =
+    Html.form
+        [ onSubmit (updateSearchUrl state) ]
+        [ div
+            [ class "input-group"
+            , class "mt-5"
+            ]
+            [ viewSearchInput state
+            , viewSearchButton state
+            ]
+        ]
 
 viewSearchInput : SearchState -> Html Msg
 viewSearchInput state =
     input
         [ class "form-control"
-        , class "input-block"
-        , class "mb-3"
+        --, class "input-block"
+        , class "input"
+        , attribute "style" "height: 44px !important"
         , type_ "text"
         , value (maybeAsString state.query)
         , placeholder "What are you looking for?"
@@ -246,6 +261,20 @@ viewSearchInput state =
         ]
         []
 
+viewSearchButton : SearchState -> Html Msg
+viewSearchButton state =
+    span [ class "input-group-button" ]
+        [ button
+            [ class "btn"
+            , class "text-normal"
+            , type_ "button"
+            , ariaLabel "Search"
+            , onClick (updateSearchUrl state)
+            ]
+            [ FeatherIcons.search
+                |> FeatherIcons.toHtml []
+            ]
+        ]
 
 viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =

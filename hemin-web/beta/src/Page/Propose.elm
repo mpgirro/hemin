@@ -10,7 +10,7 @@ import Const
 import Html exposing (Html, button, div, form, input, p, span, text)
 import Html.Attributes exposing (..)
 import Html.Attributes.Aria exposing (..)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
 import Http
 import Page.Error as ErrorPage
@@ -123,7 +123,8 @@ viewForm url =
             , text Const.siteName
             , text ":"
             ]
-        , Html.form []
+        , Html.form
+            [ onSubmit Propose ]
             [ div [ class "input-group" ]
                 [ viewInput url
                 , viewSubmitButton
@@ -159,6 +160,7 @@ viewSubmitButton =
         [ button
             [ class "btn"
             , class "text-normal"
+            --, attribute "style" "padding: 0"
             , type_ "button"
             , ariaLabel "Submit"
             , onClick Propose
