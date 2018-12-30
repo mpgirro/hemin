@@ -12,6 +12,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
+import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectToParent)
 import Skeleton exposing (Page)
@@ -22,10 +23,8 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText, prettyDateHtml, vie
 ---- MODEL ----
 
 
-type Model
-    = Failure Http.Error
-    | Loading
-    | Content Episode
+type alias Model
+    = { episode : WebData Episode }
 
 
 init : String -> ( Model, Cmd Msg )
@@ -33,7 +32,7 @@ init id =
     let
         model : Model
         model =
-            Loading
+            { episode = RemoteData.NotAsked }
 
         cmd : Cmd Msg
         cmd =
@@ -48,7 +47,7 @@ init id =
 
 type Msg
     = LoadEpisode String
-    | LoadedEpisode (Result Http.Error Episode)
+    | LoadedEpisode (WebData Episode)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -57,13 +56,8 @@ update msg model =
         LoadEpisode id ->
             ( model, getEpisode id )
 
-        LoadedEpisode result ->
-            case result of
-                Ok episode ->
-                    ( Content episode, Cmd.none )
-
-                Err cause ->
-                    ( Failure cause, Cmd.none )
+        LoadedEpisode episode ->
+            ({ model | episode = episode }, Cmd.none )
 
 
 
@@ -78,18 +72,31 @@ view model =
 
         body : Html Msg
         body =
-            case model of
-                Failure cause ->
-                    ErrorPage.view (ErrorPage.HttpFailure cause)
+            case model.episode of
+                RemoteData.NotAsked ->
+                            text "Initialising..."
 
-                Loading ->
-                    text "Loading..."
+                RemoteData.Loading ->
+                            text "Loading..."
 
-                Content episode ->
+                RemoteData.Failure error ->
+                    viewHttpError (Just error)
+
+                RemoteData.Success episode ->
                     viewEpisode episode
     in
     ( title, body )
 
+
+viewHttpError : Maybe Http.Error -> Html Msg
+viewHttpError maybeError =
+    case maybeError of
+        Just error ->
+            div [ class "flash", class "flash-full", class "flash-error" ]
+                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
+
+        Nothing ->
+            emptyHtml
 
 viewEpisode : Episode -> Html Msg
 viewEpisode episode =
@@ -229,7 +236,7 @@ viewItunesDuration episode =
 
 getEpisode : String -> Cmd Msg
 getEpisode id =
-    RestApi.getEpisode LoadedEpisode id
+    RestApi.getEpisode (RemoteData.fromResult >> LoadedEpisode) id
 
 
 

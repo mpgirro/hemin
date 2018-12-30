@@ -1,7 +1,6 @@
 module Page.Search exposing
     ( Model
     , Msg
-    , SearchState
     , init
     , update
     , view
@@ -21,6 +20,7 @@ import Html.Events exposing (keyCode, on, onInput, onSubmit, onClick)
 import Http
 import Maybe.Extra
 import Page.Error as ErrorPage
+import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectByIndexDocType)
 import Skeleton exposing (Page)
@@ -33,41 +33,31 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberPara
 --- MODEL ---
 
 
-type Model
-    = Failure Http.Error
-    | Loading SearchState
-    | Content SearchState
-
-
-type alias SearchState =
+type alias Model =
     { key : Maybe Browser.Navigation.Key
     , query : Maybe String
     , pageNumber : Maybe Int
     , pageSize : Maybe Int
-    , result : Maybe SearchResult
+    , result : WebData SearchResult
     }
 
 
-emptySearchState : SearchState
-emptySearchState =
+emptyModel : Model
+emptyModel =
     { key = Nothing
     , query = Nothing
     , pageNumber = Nothing
     , pageSize = Nothing
-    , result = Nothing
+    , result = RemoteData.NotAsked
     }
 
 
 init : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Maybe SearchResult -> ( Model, Cmd Msg )
 init key query pageNumber pageSize result =
     let
-        state : SearchState
-        state =
-            SearchState key query pageNumber pageSize result
-
         model : Model
         model =
-            Loading state
+           initModelFromParams key query pageNumber pageSize
 
         cmd : Cmd Msg
         cmd =
@@ -81,92 +71,60 @@ init key query pageNumber pageSize result =
 
 
 type Msg
-    = UpdateState SearchState
+    = UpdateModel Model
     | UpdateSearchUrl (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
     | LoadSearchResult (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
-    | LoadedSearchResult (Result Http.Error SearchResult)
+    | LoadedSearchResult (WebData SearchResult)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        UpdateState state ->
-            case model of
-                Failure cause ->
-                    -- TODO this is bullshit and must be changed
-                    ( Failure cause, Cmd.none )
-
-                _ ->
-                    ( Loading state, Cmd.none )
+        UpdateModel m ->
+            ( m, Cmd.none )
 
         UpdateSearchUrl key query pageNumber pageSize ->
             let
-                s : SearchState
-                s =
-                    stateFromParams key query pageNumber pageSize
+                m : Model
+                m =
+                   loadingModelFromParams key query pageNumber pageSize
             in
-            ( Loading s, redirectLocalUrl s )
+            ( m, redirectLocalUrl m )
 
         LoadSearchResult key query pageNumber pageSize ->
             let
-                s : SearchState
-                s =
-                    stateFromParams key query pageNumber pageSize
+                m : Model
+                m =
+                    loadingModelFromParams key query pageNumber pageSize
             in
-            ( Loading s, getSearchResult query pageNumber pageSize )
+            ( m, getSearchResult query pageNumber pageSize )
 
         -- TODO send HTTP request!
         LoadedSearchResult result ->
-            case result of
-                Ok searchResult ->
-                    -- This is a weired special case: we should not be receiving a search results if our
-                    -- previous state was a failure. But hey, if we get something, just display it.
-                    case model of
-                        Failure _ ->
-                            let
-                                s : SearchState
-                                s =
-                                    { key = Nothing
-                                    , query = Nothing
-                                    , pageNumber = Nothing
-                                    , pageSize = Nothing
-                                    , result = Just searchResult
-                                    }
-                            in
-                            ( Content s, Cmd.none )
-
-                        Loading state ->
-                            ( Content { state | result = Just searchResult }, Cmd.none )
-
-                        -- TODO should I be receiving a Loaded msg in a Content state anyway?
-                        Content state ->
-                            ( Content { state | result = Just searchResult }, Cmd.none )
-
-                Err cause ->
-                    ( Failure cause, Cmd.none )
+            ( { model | result = result }, Cmd.none )
 
 
-updateStateQuery : SearchState -> String -> Msg
-updateStateQuery state query =
-    UpdateState { state | query = Just query }
+updateModelQuery : Model -> String -> Msg
+updateModelQuery model query =
+    UpdateModel { model | query = Just query }
 
 
-updateSearchUrl : SearchState -> Msg
-updateSearchUrl state =
-    UpdateSearchUrl state.key state.query Nothing Nothing
+updateSearchUrl : Model -> Msg
+updateSearchUrl model =
+    UpdateSearchUrl model.key model.query Nothing Nothing
 
 
-redirectLocalUrl : SearchState -> Cmd Msg
-redirectLocalUrl state =
+redirectLocalUrl : Model -> Cmd Msg
+redirectLocalUrl model =
     let
         q =
-            maybeQueryParam state.query
+            maybeQueryParam model.query
 
         p =
-            maybePageNumberParam state.pageNumber
+            maybePageNumberParam model.pageNumber
 
         s =
-            maybePageSizeParam state.pageSize
+            maybePageSizeParam model.pageSize
 
         params : String
         params =
@@ -184,7 +142,7 @@ redirectLocalUrl state =
         path =
             (++) "/search" urlQuery
     in
-    case state.key of
+    case model.key of
         Just key ->
             Browser.Navigation.pushUrl key path
 
@@ -204,24 +162,24 @@ view model =
 
         childNodes : List (Html Msg)
         childNodes =
-            case model of
-                Failure cause ->
-                    [ viewSearchForm emptySearchState
-                    , ErrorPage.view (ErrorPage.HttpFailure cause)
+            case model.result of
+                RemoteData.NotAsked ->
+                    [ viewSearchForm model ]
+
+                RemoteData.Loading ->
+                    [ viewSearchForm model
+                    , text "Loading..."
                     ]
 
-                Loading state ->
-                    [ viewSearchForm state ]
+                RemoteData.Failure error ->
+                    [ viewSearchForm emptyModel
+                    , ErrorPage.view (ErrorPage.HttpFailure error)
+                    ]
 
-                Content state ->
-                    case state.result of
-                        Nothing ->
-                            [ viewSearchInput state ]
-
-                        Just searchResults ->
-                            [ viewSearchForm state
-                            , viewSearchResult state.query state.pageNumber state.pageSize searchResults
-                            ]
+                RemoteData.Success result ->
+                    [ viewSearchForm model
+                    , viewSearchResult model.query model.pageNumber model.pageSize result
+                    ]
 
         body : Html Msg
         body =
@@ -230,44 +188,44 @@ view model =
     ( title, body )
 
 
-viewSearchForm : SearchState -> Html Msg
-viewSearchForm state =
+viewSearchForm : Model -> Html Msg
+viewSearchForm model =
     Html.form
-        [ onSubmit (updateSearchUrl state) ]
+        [ onSubmit (updateSearchUrl model) ]
         [ div
             [ class "input-group"
             , class "mt-5"
             ]
-            [ viewSearchInput state
-            , viewSearchButton state
+            [ viewSearchInput model
+            , viewSearchButton model
             ]
         ]
 
-viewSearchInput : SearchState -> Html Msg
-viewSearchInput state =
+viewSearchInput : Model -> Html Msg
+viewSearchInput model =
     input
         [ class "form-control"
         --, class "input-block"
         , class "input"
         , attribute "style" "height: 44px !important"
         , type_ "text"
-        , value (maybeAsString state.query)
+        , value (maybeAsString model.query)
         , placeholder "What are you looking for?"
         , autocomplete False
         , spellcheck False
-        , onInput (updateStateQuery state)
+        , onInput (updateModelQuery model)
         ]
         []
 
-viewSearchButton : SearchState -> Html Msg
-viewSearchButton state =
+viewSearchButton : Model -> Html Msg
+viewSearchButton model =
     span [ class "input-group-button" ]
         [ button
             [ class "btn"
             , class "text-normal"
             , type_ "button"
             , ariaLabel "Search"
-            , onClick (updateSearchUrl state)
+            , onClick (updateSearchUrl model)
             ]
             [ FeatherIcons.search
                 |> FeatherIcons.toHtml []
@@ -482,18 +440,28 @@ getSearchResult query pageNumber pageSize =
             Cmd.none
 
         ( _, _, _ ) ->
-            RestApi.getSearchResult LoadedSearchResult query pageNumber pageSize
+            RestApi.getSearchResult (RemoteData.fromResult >> LoadedSearchResult) query pageNumber pageSize
 
 
 
 --- INTERNAL HELPERS ---
 
 
-stateFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> SearchState
-stateFromParams key query pageNumber pageSize =
+initModelFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Model
+initModelFromParams key query pageNumber pageSize =
     { key = key
     , query = query
     , pageNumber = pageNumber
     , pageSize = pageSize
-    , result = Nothing
+    , result = RemoteData.NotAsked
+    }
+
+
+loadingModelFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Model
+loadingModelFromParams key query pageNumber pageSize =
+    { key = key
+    , query = query
+    , pageNumber = pageNumber
+    , pageSize = pageSize
+    , result = RemoteData.Loading
     }

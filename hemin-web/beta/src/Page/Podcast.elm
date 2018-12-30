@@ -33,11 +33,6 @@ type alias Model =
     }
 
 
-type Status
-    = Loading
-    | Ready
-
-
 init : String -> ( Model, Cmd Msg )
 init id =
     let
