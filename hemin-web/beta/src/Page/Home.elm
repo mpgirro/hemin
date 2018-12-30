@@ -9,7 +9,7 @@ module Page.Home exposing
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Html.Attributes.Aria exposing (role, ariaLabel)
+import Html.Attributes.Aria exposing (ariaLabel, role)
 import Html.Events exposing (onClick, onInput)
 import Html.Events.Extra exposing (onEnter)
 import Http
@@ -83,11 +83,13 @@ viewSearchForm =
         , viewSearchNote
         ]
 
+
 viewSearchInput : Html Msg
 viewSearchInput =
     input
         [ class "form-control"
         , class "input"
+
         --, height 44
         , attribute "style" "height: 44px !important"
         , type_ "text"
@@ -95,10 +97,12 @@ viewSearchInput =
         , placeholder "What are you looking for?"
         , autocomplete False
         , spellcheck False
+
         --, onInput (updateStateQuery state)
         --, onEnter (updateSearchUrl state)
         ]
         []
+
 
 viewSearchButton : Html Msg
 viewSearchButton =
@@ -108,6 +112,7 @@ viewSearchButton =
             , class "text-normal"
             , type_ "button"
             , ariaLabel "Search"
+
             --, onClick Propose
             ]
             [ FeatherIcons.search
@@ -115,21 +120,30 @@ viewSearchButton =
             ]
         ]
 
+
 viewSearchNote : Html Msg
 viewSearchNote =
     let
-        episodeCount = "XXX"
+        episodeCount =
+            "XXX"
 
-        podcastCount = "YYY"
+        podcastCount =
+            "YYY"
 
-        msg = episodeCount ++ " episodes in " ++ podcastCount ++ " podcasts"
+        msg =
+            episodeCount ++ " episodes in " ++ podcastCount ++ " podcasts"
     in
     div
         [ class "note"
         , class "text-center"
         , class "mt-2"
         ]
-        [ text msg ]
+        [ span [ class "Label", class "bg-red" ] [ text episodeCount ]
+        , text " episodes in "
+        , span [ class "Label", class "bg-red" ] [ text podcastCount ]
+        , text " podcasts"
+        ]
+
 
 viewNavButtonRow : Html Msg
 viewNavButtonRow =

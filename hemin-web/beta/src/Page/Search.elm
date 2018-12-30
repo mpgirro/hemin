@@ -160,30 +160,13 @@ view model =
         title =
             "Search"
 
-        childNodes : List (Html Msg)
-        childNodes =
-            case model.result of
-                RemoteData.NotAsked ->
-                    [ viewSearchForm model ]
-
-                RemoteData.Loading ->
-                    [ viewSearchForm model
-                    , text "Loading..."
-                    ]
-
-                RemoteData.Failure error ->
-                    [ viewSearchForm emptyModel
-                    , ErrorPage.view (ErrorPage.HttpFailure error)
-                    ]
-
-                RemoteData.Success result ->
-                    [ viewSearchForm model
-                    , viewSearchResult model.query model.pageNumber model.pageSize result
-                    ]
-
         body : Html Msg
         body =
-            div [ class "col-md-10", class "p-2", class "mx-auto" ] childNodes
+            div
+                [ class "col-md-10", class "p-2", class "mx-auto" ]
+                [ viewSearchForm model
+                , viewSearchResults model
+                ]
     in
     ( title, body )
 
@@ -236,6 +219,22 @@ viewSearchButton model =
         ]
 
 
+viewSearchResults : Model -> Html Msg
+viewSearchResults model =
+    case model.result of
+        RemoteData.NotAsked ->
+            emptyHtml
+
+        RemoteData.Loading ->
+            text "Loading..."
+
+        RemoteData.Failure error ->
+            ErrorPage.view (ErrorPage.HttpFailure error)
+
+        RemoteData.Success result ->
+            viewSearchResult model.query model.pageNumber model.pageSize result
+
+
 viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewSearchResult query pageNumber pageSize searchResult =
     div []
@@ -259,7 +258,7 @@ viewTotalHits searchResult =
 viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
     li [ class "py-2" ]
-        [ div [ class "clearfix", class "p-2" ]
+        [ div [ class "clearfix" ]
             [ viewCoverImage doc
             , div [ class "overflow-hidden" ]
                 [ viewIndexDocTitleAsLink doc
