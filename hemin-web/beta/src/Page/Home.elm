@@ -9,8 +9,8 @@ module Page.Home exposing
 import Data.Episode exposing (Episode)
 import Data.Podcast exposing (Podcast)
 import FeatherIcons
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, button, div, img, input, li, p, span, text, ul)
+import Html.Attributes exposing (alt, attribute, autocomplete, class, height, href, placeholder, spellcheck, src, type_, value, width)
 import Html.Attributes.Aria exposing (ariaLabel, role)
 import Html.Events exposing (onClick, onInput)
 import Html.Events.Extra exposing (onEnter)
@@ -19,7 +19,8 @@ import Page.Error as ErrorPage
 import RemoteData exposing (WebData)
 import Router exposing (redirectToEpisode, redirectToPodcast)
 import Skeleton exposing (Page)
-import Util exposing (maybeAsString, emptyHtml)
+import Util exposing (emptyHtml, maybeAsString)
+
 
 
 ---- MODEL ----
@@ -41,6 +42,7 @@ emptyModel =
 init : ( Model, Cmd Msg )
 init =
     ( emptyModel, Cmd.none )
+
 
 
 ---- UPDATE ----
@@ -207,23 +209,22 @@ viewNavButtonRow =
 viewLatestEpisodes : WebData (List Episode) -> Html Msg
 viewLatestEpisodes latestEpisodes =
     let
-       viewEpisodeCover : Episode -> Html Msg
-       viewEpisodeCover episode =
-           li [ class "d-inline-block", class "col-2", class "p-2" ]
-               [ a [ href (redirectToEpisode episode) ]
-                   [ img
-                       [ class "width-full"
-                       , class "avatar"
-                       , src (maybeAsString episode.image)
-                       , alt (maybeAsString episode.title)
-                       ]
-                       []
-                   ]
-               ]
+        viewEpisodeCover : Episode -> Html Msg
+        viewEpisodeCover episode =
+            li [ class "d-inline-block", class "col-2", class "p-2" ]
+                [ a [ href (redirectToEpisode episode) ]
+                    [ img
+                        [ class "width-full"
+                        , class "avatar"
+                        , src (maybeAsString episode.image)
+                        , alt (maybeAsString episode.title)
+                        ]
+                        []
+                    ]
+                ]
 
-
-       viewCoverGrid : Html Msg
-       viewCoverGrid =
+        viewCoverGrid : Html Msg
+        viewCoverGrid =
             case latestEpisodes of
                 RemoteData.NotAsked ->
                     text "Initialising ..."
@@ -254,18 +255,17 @@ viewNewestPodcast newestPodcasts =
     let
         viewPodcastCover : Podcast -> Html Msg
         viewPodcastCover podcast =
-           li [ class "d-inline-block", class "col-2", class "p-2" ]
-               [ a [ href (redirectToPodcast podcast) ]
-                   [ img
-                       [ class "width-full"
-                       , class "avatar"
-                       , src (maybeAsString podcast.image)
-                       , alt (maybeAsString podcast.title)
-                       ]
-                       []
-                   ]
-               ]
-
+            li [ class "d-inline-block", class "col-2", class "p-2" ]
+                [ a [ href (redirectToPodcast podcast) ]
+                    [ img
+                        [ class "width-full"
+                        , class "avatar"
+                        , src (maybeAsString podcast.image)
+                        , alt (maybeAsString podcast.title)
+                        ]
+                        []
+                    ]
+                ]
 
         viewCoverGrid : Html Msg
         viewCoverGrid =

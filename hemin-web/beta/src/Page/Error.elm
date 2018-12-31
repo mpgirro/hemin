@@ -1,7 +1,7 @@
 module Page.Error exposing (Model(..), Msg(..), update, view, viewHttpFailure)
 
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, b, div, h1, p, pre, text)
+import Html.Attributes exposing (class)
 import Http
 import Skeleton exposing (Page)
 import Util exposing (emptyHtml)
@@ -46,7 +46,8 @@ viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure error =
     let
         info : String
-        info = "Unable to load data"
+        info =
+            "Unable to load data"
     in
     case error of
         Http.BadUrl msg ->
@@ -67,7 +68,8 @@ viewHttpFailure error =
 
 viewErrorExplanation : String -> String -> Maybe String -> Html msg
 viewErrorExplanation info reason body =
-    div [ class "flash"
+    div
+        [ class "flash"
         , class "flash-full"
         , class "flash-error"
         ]

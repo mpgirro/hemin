@@ -9,8 +9,8 @@ module Page.Podcast exposing
 import Data.Episode exposing (Episode)
 import Data.Feed exposing (Feed)
 import Data.Podcast exposing (Podcast)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, br, div, h1, img, li, p, pre, span, text, ul)
+import Html.Attributes exposing (alt, class, height, href, src, width)
 import Http
 import Page.Error as ErrorPage
 import Podlove.SubscribeButton as PodloveButton
@@ -100,6 +100,7 @@ update msg model =
                     case episodes of
                         RemoteData.Success es ->
                             RemoteData.Success (sortEpisodes es)
+
                         _ ->
                             episodes
             in
@@ -507,21 +508,26 @@ sortEpisodes episodes =
         inverseCompare a b =
             if a > b then
                 LT
+
             else if a < b then
                 GT
+
             else
                 EQ
 
         compareEpisodes : Episode -> Episode -> Order
         compareEpisodes e1 e2 =
-            case (e1.pubDate, e2.pubDate) of
-                (Just d1, Just d2) ->
+            case ( e1.pubDate, e2.pubDate ) of
+                ( Just d1, Just d2 ) ->
                     inverseCompare (posixToInt d1) (posixToInt d2)
-                (Just _, Nothing) ->
+
+                ( Just _, Nothing ) ->
                     GT
-                (Nothing, Just _) ->
+
+                ( Nothing, Just _ ) ->
                     LT
-                (Nothing, Nothing) ->
+
+                ( Nothing, Nothing ) ->
                     EQ
     in
     List.sortWith compareEpisodes episodes

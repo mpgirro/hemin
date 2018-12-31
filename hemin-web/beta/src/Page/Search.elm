@@ -14,8 +14,8 @@ import Data.Podcast exposing (Podcast, podcastDecoder)
 import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import FeatherIcons
 import Html exposing (Attribute, Html, a, b, br, button, div, em, form, h1, img, input, li, nav, p, span, text, ul)
-import Html.Attributes exposing (..)
-import Html.Attributes.Aria exposing (..)
+import Html.Attributes exposing (alt, attribute, autocomplete, class, height, href, placeholder, rel, spellcheck, src, type_, value, width)
+import Html.Attributes.Aria exposing (ariaLabel)
 import Html.Events exposing (keyCode, on, onClick, onInput, onSubmit)
 import Http
 import Maybe.Extra

@@ -8,8 +8,8 @@ module Page.Episode exposing
 
 import Browser
 import Data.Episode exposing (Episode)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, div, h1, img, p, small, span, text)
+import Html.Attributes exposing (alt, class, href, src)
 import Http
 import Page.Error as ErrorPage
 import RemoteData exposing (WebData)

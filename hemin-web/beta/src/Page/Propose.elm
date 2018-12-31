@@ -8,8 +8,8 @@ module Page.Propose exposing
 
 import Const
 import Html exposing (Html, button, div, form, input, p, span, text)
-import Html.Attributes exposing (..)
-import Html.Attributes.Aria exposing (..)
+import Html.Attributes exposing (autocomplete, class, placeholder, spellcheck, type_, value)
+import Html.Attributes.Aria exposing (ariaLabel)
 import Html.Events exposing (onClick, onInput, onSubmit)
 import Http
 import Page.Error as ErrorPage

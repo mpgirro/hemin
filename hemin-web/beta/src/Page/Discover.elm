@@ -7,8 +7,8 @@ module Page.Discover exposing
     )
 
 import Data.Podcast exposing (Podcast)
-import Html exposing (..)
-import Html.Attributes exposing (..)
+import Html exposing (Html, a, div, img, li, text, ul)
+import Html.Attributes exposing (alt, class, href, src)
 import Http
 import Page.Error as ErrorPage
 import RemoteData exposing (WebData)
