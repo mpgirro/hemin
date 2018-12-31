@@ -11,6 +11,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Http
 import Page.Error as ErrorPage
+import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectToPodcast)
 import Skeleton exposing (Page)
@@ -21,10 +22,8 @@ import Util exposing (maybeAsString, maybeAsText)
 ---- MODEL ----
 
 
-type Model
-    = Failure Http.Error
-    | Loading
-    | Content (List Podcast)
+type alias Model =
+    { podcasts : WebData (List Podcast) }
 
 
 init : ( Model, Cmd Msg )
@@ -32,7 +31,7 @@ init =
     let
         model : Model
         model =
-            Loading
+            { podcasts = RemoteData.NotAsked }
 
         cmd : Cmd Msg
         cmd =
@@ -47,7 +46,7 @@ init =
 
 type Msg
     = LoadDiscover Int Int
-    | LoadedDiscover (Result Http.Error (List Podcast))
+    | LoadedDiscover (WebData (List Podcast))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -56,13 +55,8 @@ update msg model =
         LoadDiscover pageNumber pageSize ->
             ( model, getAllPodcast pageNumber pageSize )
 
-        LoadedDiscover result ->
-            case result of
-                Ok podcasts ->
-                    ( Content podcasts, Cmd.none )
-
-                Err cause ->
-                    ( Failure cause, Cmd.none )
+        LoadedDiscover podcasts ->
+            ( { model | podcasts = podcasts }, Cmd.none )
 
 
 
@@ -77,14 +71,17 @@ view model =
 
         body : Html Msg
         body =
-            case model of
-                Failure cause ->
-                    ErrorPage.view (ErrorPage.HttpFailure cause)
+            case model.podcasts of
+                RemoteData.NotAsked ->
+                    text "Initialising..."
 
-                Loading ->
+                RemoteData.Loading ->
                     text "Loading..."
 
-                Content podcasts ->
+                RemoteData.Failure error ->
+                    ErrorPage.viewHttpFailure error
+
+                RemoteData.Success podcasts ->
                     viewDiscover podcasts
     in
     ( title, body )
@@ -125,4 +122,4 @@ viewPodcastCover podcast =
 
 getAllPodcast : Int -> Int -> Cmd Msg
 getAllPodcast pageNumber pageSize =
-    RestApi.getAllPodcasts LoadedDiscover pageNumber pageSize
+    RestApi.getAllPodcasts (RemoteData.fromResult >> LoadedDiscover) pageNumber pageSize

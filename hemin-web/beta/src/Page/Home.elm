@@ -80,18 +80,6 @@ view model =
     ( title, body )
 
 
-viewHttpError : Maybe Http.Error -> Html Msg
-viewHttpError maybeError =
-    case maybeError of
-        Just error ->
-            div [ class "flash", class "flash-full", class "flash-error" ]
-                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
-
-        Nothing ->
-            emptyHtml
-
-
-
 viewSearchForm : Html Msg
 viewSearchForm =
     Html.form [ class "col-md-10", class "p-2", class "mx-auto" ]
@@ -244,7 +232,7 @@ viewLatestEpisodes latestEpisodes =
                     text "Loading ..."
 
                 RemoteData.Failure error ->
-                    viewHttpError (Just error)
+                    ErrorPage.viewHttpFailure error
 
                 RemoteData.Success es ->
                     ul [ class "list-style-none" ] <|
@@ -289,7 +277,7 @@ viewNewestPodcast newestPodcasts =
                     text "Loading ..."
 
                 RemoteData.Failure error ->
-                    viewHttpError (Just error)
+                    ErrorPage.viewHttpFailure error
 
                 RemoteData.Success ps ->
                     ul [ class "list-style-none" ] <|

@@ -229,7 +229,7 @@ viewSearchResults model =
             text "Loading..."
 
         RemoteData.Failure error ->
-            ErrorPage.view (ErrorPage.HttpFailure error)
+            ErrorPage.viewHttpFailure error
 
         RemoteData.Success result ->
             viewSearchResult model.query model.pageNumber model.pageSize result

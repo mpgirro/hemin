@@ -178,17 +178,6 @@ view model =
     ( title, body )
 
 
-viewHttpError : Maybe Http.Error -> Html Msg
-viewHttpError maybeError =
-    case maybeError of
-        Just error ->
-            div [ class "flash", class "flash-full", class "flash-error" ]
-                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
-
-        Nothing ->
-            emptyHtml
-
-
 viewPodcast : WebData Podcast -> Html Msg
 viewPodcast webdata =
     case webdata of
@@ -199,7 +188,7 @@ viewPodcast webdata =
             text "Loading..."
 
         RemoteData.Failure error ->
-            viewHttpError (Just error)
+            ErrorPage.viewHttpFailure error
 
         RemoteData.Success podcast ->
             div []
@@ -306,7 +295,7 @@ viewEpisodes webdata =
             text "Loading..."
 
         RemoteData.Failure error ->
-            viewHttpError (Just error)
+            ErrorPage.viewHttpFailure error
 
         RemoteData.Success episodes ->
             case episodes of
@@ -410,7 +399,7 @@ viewFeeds webdata =
             text "Loading..."
 
         RemoteData.Failure error ->
-            viewHttpError (Just error)
+            ErrorPage.viewHttpFailure error
 
         RemoteData.Success feeds ->
             let

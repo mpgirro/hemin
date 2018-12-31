@@ -1,4 +1,4 @@
-module Page.Error exposing (Model(..), Msg(..), update, view)
+module Page.Error exposing (Model(..), Msg(..), update, view, viewHttpFailure)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -44,27 +44,38 @@ viewGenericFailure =
 
 viewHttpFailure : Http.Error -> Html msg
 viewHttpFailure error =
+    let
+        info : String
+        info = "Unable to load data"
+    in
     case error of
         Http.BadUrl msg ->
-            viewErrorExplanation "Unable to load data" msg Nothing
+            viewErrorExplanation info msg Nothing
 
         Http.Timeout ->
-            viewErrorExplanation "Unable to load data" "timeout" Nothing
+            viewErrorExplanation info "timeout" Nothing
 
         Http.NetworkError ->
-            viewErrorExplanation "Unable to load data" "network error" Nothing
+            viewErrorExplanation info "network error" Nothing
 
         Http.BadStatus status ->
-            viewErrorExplanation "Unable to load data" ("HTTP status " ++ String.fromInt status) Nothing
+            viewErrorExplanation info ("HTTP status " ++ String.fromInt status) Nothing
 
         Http.BadBody msg ->
-            viewErrorExplanation "Unable to load data" "bad body" (Just msg)
+            viewErrorExplanation info "bad body" (Just msg)
 
 
 viewErrorExplanation : String -> String -> Maybe String -> Html msg
 viewErrorExplanation info reason body =
-    div []
-        [ h1 [ class "f1-light", class "mb-3" ] [ text "Error" ]
+    div [ class "flash"
+        , class "flash-full"
+        , class "flash-error"
+        ]
+        [ h1
+            [ class "f1-light"
+            , class "mb-3"
+            ]
+            [ text "Error" ]
         , viewErrorInfo info
         , viewErrorReason reason
         , viewErrorBody body

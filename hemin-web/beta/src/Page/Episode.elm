@@ -80,23 +80,12 @@ view model =
                     text "Loading..."
 
                 RemoteData.Failure error ->
-                    viewHttpError (Just error)
+                    ErrorPage.viewHttpFailure error
 
                 RemoteData.Success episode ->
                     viewEpisode episode
     in
     ( title, body )
-
-
-viewHttpError : Maybe Http.Error -> Html Msg
-viewHttpError maybeError =
-    case maybeError of
-        Just error ->
-            div [ class "flash", class "flash-full", class "flash-error" ]
-                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
-
-        Nothing ->
-            emptyHtml
 
 
 viewEpisode : Episode -> Html Msg

@@ -135,15 +135,8 @@ footerRight =
             [ ul
                 [ class "list-style-none" ]
                 [ li [] [ a [ href "https://blog.hemin.io" ] [ text "Blog" ] ]
-                , li [] [ a [ href "https://changelog.hemin.io" ] [ text "Changelog" ] ]
-                , li []
-                    [ a [ href "https://twitter.com/hemin_io" ]
-                        [ FeatherIcons.twitter
-                            |> FeatherIcons.toHtml [ width 10, height 10 ]
-                        , span [ class "ml-1" ] [ text "Twitter" ]
-                        ]
-                    ]
-                , li [] [ a [ href "" ] [ text "TODO" ] ]
+                , li [] [ a [ href "https://github.com/mpgirro/hemin/blob/master/CHANGELOG.md" ] [ text "Changelog" ] ]
+                , li [] [ a [ href "https://twitter.com/hemin_io" ] [ text "Twitter" ] ]
                 ]
             ]
         ]
