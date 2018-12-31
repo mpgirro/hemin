@@ -6,6 +6,8 @@ module Page.Home exposing
     , view
     )
 
+import Data.Episode exposing (Episode)
+import Data.Podcast exposing (Podcast)
 import FeatherIcons
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -13,42 +15,50 @@ import Html.Attributes.Aria exposing (ariaLabel, role)
 import Html.Events exposing (onClick, onInput)
 import Html.Events.Extra exposing (onEnter)
 import Http
+import Page.Error as ErrorPage
+import RemoteData exposing (WebData)
+import Router exposing (redirectToEpisode, redirectToPodcast)
 import Skeleton exposing (Page)
+import Util exposing (maybeAsString, emptyHtml)
 
 
+---- MODEL ----
 
--- MODEL
+
+type alias Model =
+    { newestPodcasts : WebData (List Podcast)
+    , latestEpisodes : WebData (List Episode)
+    }
 
 
-type Model
-    = Failure Http.Error
-    | Loading
-    | Content
+emptyModel : Model
+emptyModel =
+    { newestPodcasts = RemoteData.NotAsked
+    , latestEpisodes = RemoteData.NotAsked
+    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Loading, Cmd.none )
+    ( emptyModel, Cmd.none )
+
+
+---- UPDATE ----
 
 
 type Msg
-    = LoadHome
-    | LoadedHome (Result Http.Error String)
+    = LoadedNewestPodcasts (WebData (List Podcast))
+    | LoadedLatestEpisodes (WebData (List Episode))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadHome ->
-            ( model, Cmd.none )
+        LoadedNewestPodcasts newestPodcasts ->
+            ( { model | newestPodcasts = newestPodcasts }, Cmd.none )
 
-        LoadedHome result ->
-            case result of
-                Ok podcast ->
-                    ( Content, Cmd.none )
-
-                Err cause ->
-                    ( Failure cause, Cmd.none )
+        LoadedLatestEpisodes latestEpisodes ->
+            ( { model | latestEpisodes = latestEpisodes }, Cmd.none )
 
 
 view : Model -> ( String, Html Msg )
@@ -62,12 +72,24 @@ view model =
             div []
                 [ viewSearchForm
                 , viewNavButtonRow
-                , viewNewestEpisodes
-                , viewRecentlyAddedPodcast
+                , viewLatestEpisodes model.latestEpisodes
+                , viewNewestPodcast model.newestPodcasts
                 , viewNews
                 ]
     in
     ( title, body )
+
+
+viewHttpError : Maybe Http.Error -> Html Msg
+viewHttpError maybeError =
+    case maybeError of
+        Just error ->
+            div [ class "flash", class "flash-full", class "flash-error" ]
+                [ ErrorPage.view (ErrorPage.HttpFailure error) ]
+
+        Nothing ->
+            emptyHtml
+
 
 
 viewSearchForm : Html Msg
@@ -194,8 +216,40 @@ viewNavButtonRow =
         ]
 
 
-viewNewestEpisodes : Html Msg
-viewNewestEpisodes =
+viewLatestEpisodes : WebData (List Episode) -> Html Msg
+viewLatestEpisodes latestEpisodes =
+    let
+       viewEpisodeCover : Episode -> Html Msg
+       viewEpisodeCover episode =
+           li [ class "d-inline-block", class "col-2", class "p-2" ]
+               [ a [ href (redirectToEpisode episode) ]
+                   [ img
+                       [ class "width-full"
+                       , class "avatar"
+                       , src (maybeAsString episode.image)
+                       , alt (maybeAsString episode.title)
+                       ]
+                       []
+                   ]
+               ]
+
+
+       viewCoverGrid : Html Msg
+       viewCoverGrid =
+            case latestEpisodes of
+                RemoteData.NotAsked ->
+                    text "Initialising ..."
+
+                RemoteData.Loading ->
+                    text "Loading ..."
+
+                RemoteData.Failure error ->
+                    viewHttpError (Just error)
+
+                RemoteData.Success es ->
+                    ul [ class "list-style-none" ] <|
+                        List.map viewEpisodeCover es
+    in
     div []
         [ div [ class "Subhead", class "Subhead--spacious" ]
             [ div [ class "Subhead-heading" ] [ text "Latests Episodes" ]
@@ -203,12 +257,44 @@ viewNewestEpisodes =
                 [ a [ href "" ] [ text "more" ]
                 ]
             ]
-        , text "TODO"
+        , viewCoverGrid
         ]
 
 
-viewRecentlyAddedPodcast : Html Msg
-viewRecentlyAddedPodcast =
+viewNewestPodcast : WebData (List Podcast) -> Html Msg
+viewNewestPodcast newestPodcasts =
+    let
+        viewPodcastCover : Podcast -> Html Msg
+        viewPodcastCover podcast =
+           li [ class "d-inline-block", class "col-2", class "p-2" ]
+               [ a [ href (redirectToPodcast podcast) ]
+                   [ img
+                       [ class "width-full"
+                       , class "avatar"
+                       , src (maybeAsString podcast.image)
+                       , alt (maybeAsString podcast.title)
+                       ]
+                       []
+                   ]
+               ]
+
+
+        viewCoverGrid : Html Msg
+        viewCoverGrid =
+            case newestPodcasts of
+                RemoteData.NotAsked ->
+                    text "Initialising ..."
+
+                RemoteData.Loading ->
+                    text "Loading ..."
+
+                RemoteData.Failure error ->
+                    viewHttpError (Just error)
+
+                RemoteData.Success ps ->
+                    ul [ class "list-style-none" ] <|
+                        List.map viewPodcastCover ps
+    in
     div []
         [ div [ class "Subhead", class "Subhead--spacious" ]
             [ div [ class "Subhead-heading" ] [ text "Poscasts new to Hemin" ]
@@ -216,7 +302,7 @@ viewRecentlyAddedPodcast =
                 [ a [ href "" ] [ text "more" ]
                 ]
             ]
-        , text "TODO"
+        , viewCoverGrid
         ]
 
 
@@ -226,5 +312,7 @@ viewNews =
         [ div [ class "Subhead", class "Subhead--spacious" ]
             [ div [ class "Subhead-heading" ] [ text "News" ]
             ]
-        , text "TODO"
+        , ul [ class "ml-5" ]
+            [ li [] [ a [ href "" ] [ text "Great news, everyone!" ] ]
+            ]
         ]
