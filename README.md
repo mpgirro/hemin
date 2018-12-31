@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  Podcast Catalog & Search Engine System
+  Podcast Catalog & Search Engine
 </h3>
 
 <div align="center">
@@ -34,7 +34,8 @@ The system currently supports the following standards:
 Support for the following standards is planned:
 
 * Paged Feeds ([RFC 5005](https://tools.ietf.org/html/rfc5005))
-* [JSON:API](https://jsonapi.org)
+* Adhere to [JSON:API](https://jsonapi.org) standards
+* Add feeds by importing [OPML](http://dev.opml.org) files
 
 Further roadmap information for the subprojects is documented in their respective [GitHub projects](https://github.com/mpgirro/hemin/projects) board.
 
