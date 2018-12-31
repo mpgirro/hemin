@@ -3,7 +3,7 @@
 </h1>
 
 <h3 align="center">
-  Podcast Catalog & Search Engine
+  Podcast Catalog & Search Engine System
 </h3>
 
 <div align="center">
@@ -47,7 +47,7 @@ The WebApp is available at [hemin.io](https://hemin.io)
 
 There are several different frontend variant implementations for the HEMIN system. These exist primarily for experimental and educational reasons. The webapps are named after the letters in the greek alphabet. Currently there are these:
 
-* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). The initial prototype UI back from when Hemin's engine was a scientifc guinea pig (documented [here](https://github.com/mpgirro/dipl)). Alpha is now outated.
+* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). The initial prototype UI back from when Hemin's engine was a scientifc guinea pig (more about this [here](https://github.com/mpgirro/dipl)). Alpha is now deprecated.
 * [Beta](hemin-web/beta) &ndash; written in [Elm](https://elm-lang.org). Still at an early stage, but the current frontend and planned to become the production implementation.
 <!--
 * [Gamma](hemin-web/gamma) &ndash; proposition of a [React](https://reactjs.org) based implementation.  
