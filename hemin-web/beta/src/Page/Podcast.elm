@@ -19,6 +19,7 @@ import RestApi
 import Router exposing (redirectToEpisode)
 import Skeleton exposing (Page)
 import String.Extra
+import Time exposing (Posix)
 import Util exposing (emptyHtml, maybeAsString, maybeAsText)
 
 
@@ -93,7 +94,16 @@ update msg model =
             ( model, getEpisodes id )
 
         LoadedEpisodes episodes ->
-            ( { model | episodes = episodes }, Cmd.none )
+            let
+                sortedEpisodes : WebData (List Episode)
+                sortedEpisodes =
+                    case episodes of
+                        RemoteData.Success es ->
+                            RemoteData.Success (sortEpisodes es)
+                        _ ->
+                            episodes
+            in
+            ( { model | episodes = sortedEpisodes }, Cmd.none )
 
         LoadFeeds id ->
             ( model, getFeeds id )
@@ -495,3 +505,34 @@ toPodloveButtonModel model =
 
         ( _, _ ) ->
             PodloveButton.emptyModel
+
+
+sortEpisodes : List Episode -> List Episode
+sortEpisodes episodes =
+    let
+        posixToInt : Posix -> Int
+        posixToInt posix =
+            Time.posixToMillis posix
+
+        inverseCompare : Int -> Int -> Order
+        inverseCompare a b =
+            if a > b then
+                LT
+            else if a < b then
+                GT
+            else
+                EQ
+
+        compareEpisodes : Episode -> Episode -> Order
+        compareEpisodes e1 e2 =
+            case (e1.pubDate, e2.pubDate) of
+                (Just d1, Just d2) ->
+                    inverseCompare (posixToInt d1) (posixToInt d2)
+                (Just _, Nothing) ->
+                    GT
+                (Nothing, Just _) ->
+                    LT
+                (Nothing, Nothing) ->
+                    EQ
+    in
+    List.sortWith compareEpisodes episodes
