@@ -73,8 +73,8 @@ init key query pageNumber pageSize result =
 type Msg
     = UpdateModel Model
     | UpdateSearchUrl (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
-    | LoadSearchResult (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
-    | LoadedSearchResult (WebData SearchResult)
+    | GetSearchResult (Maybe Browser.Navigation.Key) (Maybe String) (Maybe Int) (Maybe Int)
+    | GotSearchResultData (WebData SearchResult)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -91,7 +91,7 @@ update msg model =
             in
             ( m, redirectLocalUrl m )
 
-        LoadSearchResult key query pageNumber pageSize ->
+        GetSearchResult key query pageNumber pageSize ->
             let
                 m : Model
                 m =
@@ -100,7 +100,7 @@ update msg model =
             ( m, getSearchResult query pageNumber pageSize )
 
         -- TODO send HTTP request!
-        LoadedSearchResult result ->
+        GotSearchResultData result ->
             ( { model | result = result }, Cmd.none )
 
 
@@ -231,18 +231,13 @@ viewSearchResults model =
         RemoteData.Failure error ->
             ErrorPage.viewHttpFailure error
 
-        RemoteData.Success result ->
-            viewSearchResult model.query model.pageNumber model.pageSize result
-
-
-viewSearchResult : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
-viewSearchResult query pageNumber pageSize searchResult =
-    div []
-        [ viewTotalHits searchResult
-        , ul [ class "list-style-none" ] <|
-            List.map viewIndexDoc searchResult.results
-        , viewPagination query pageNumber pageSize searchResult
-        ]
+        RemoteData.Success searchResult ->
+            div []
+                [ viewTotalHits searchResult
+                , ul [ class "list-style-none" ] <|
+                    List.map viewIndexDoc searchResult.results
+                , viewPagination model.query model.pageNumber model.pageSize searchResult
+                ]
 
 
 viewTotalHits : SearchResult -> Html Msg
@@ -265,8 +260,6 @@ viewIndexDoc doc =
                 , br [] []
                 , viewDocType doc
                 , viewStrippedDescription doc
-
-                --, viewInnerHtml (maybeAsString doc.description)
                 ]
             ]
         ]
@@ -443,7 +436,7 @@ getSearchResult query pageNumber pageSize =
             Cmd.none
 
         ( _, _, _ ) ->
-            RestApi.getSearchResult (RemoteData.fromResult >> LoadedSearchResult) query pageNumber pageSize
+            RestApi.getSearchResult (RemoteData.fromResult >> GotSearchResultData) query pageNumber pageSize
 
 
 

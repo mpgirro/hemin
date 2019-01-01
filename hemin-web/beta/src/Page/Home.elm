@@ -49,17 +49,17 @@ init =
 
 
 type Msg
-    = LoadedNewestPodcasts (WebData (List Podcast))
-    | LoadedLatestEpisodes (WebData (List Episode))
+    = GotNewestPodcastListData (WebData (List Podcast))
+    | GotLatestEpisodeListData (WebData (List Episode))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadedNewestPodcasts newestPodcasts ->
+        GotNewestPodcastListData newestPodcasts ->
             ( { model | newestPodcasts = newestPodcasts }, Cmd.none )
 
-        LoadedLatestEpisodes latestEpisodes ->
+        GotLatestEpisodeListData latestEpisodes ->
             ( { model | latestEpisodes = latestEpisodes }, Cmd.none )
 
 

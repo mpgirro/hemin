@@ -46,17 +46,13 @@ init id =
 
 
 type Msg
-    = LoadEpisode String
-    | LoadedEpisode (WebData Episode)
+    = GotEpisodeData (WebData Episode)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadEpisode id ->
-            ( model, getEpisode id )
-
-        LoadedEpisode episode ->
+        GotEpisodeData episode ->
             ( { model | episode = episode }, Cmd.none )
 
 
@@ -226,7 +222,7 @@ viewItunesDuration episode =
 
 getEpisode : String -> Cmd Msg
 getEpisode id =
-    RestApi.getEpisode (RemoteData.fromResult >> LoadedEpisode) id
+    RestApi.getEpisode (RemoteData.fromResult >> GotEpisodeData) id
 
 
 

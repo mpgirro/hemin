@@ -1,4 +1,4 @@
-module Page.Error exposing (Model(..), Msg(..), update, view, viewHttpFailure)
+module Page.Error exposing (Model, Msg, update, view, viewHttpFailure)
 
 import Html exposing (Html, b, div, h1, p, pre, text)
 import Html.Attributes exposing (class)

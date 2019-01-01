@@ -63,22 +63,16 @@ init id =
 
 
 type Msg
-    = LoadPodcast String
-    | LoadedPodcast (WebData Podcast)
-    | LoadEpisodes String
-    | LoadedEpisodes (WebData (List Episode))
-    | LoadFeeds String
-    | LoadedFeeds (WebData (List Feed))
+    = GotPodcastData (WebData Podcast)
+    | GotEpisodeListData (WebData (List Episode))
+    | GotFeedListData (WebData (List Feed))
     | PodloveButtonMsg PodloveButton.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadPodcast id ->
-            ( model, getPodcast id )
-
-        LoadedPodcast podcast ->
+        GotPodcastData podcast ->
             let
                 mod : Model
                 mod =
@@ -90,10 +84,7 @@ update msg model =
             in
             ( mod, Cmd.none )
 
-        LoadEpisodes id ->
-            ( model, getEpisodes id )
-
-        LoadedEpisodes episodes ->
+        GotEpisodeListData episodes ->
             let
                 sortedEpisodes : WebData (List Episode)
                 sortedEpisodes =
@@ -106,10 +97,7 @@ update msg model =
             in
             ( { model | episodes = sortedEpisodes }, Cmd.none )
 
-        LoadFeeds id ->
-            ( model, getFeeds id )
-
-        LoadedFeeds feeds ->
+        GotFeedListData feeds ->
             let
                 mod : Model
                 mod =
@@ -428,17 +416,17 @@ viewFeeds webdata =
 
 getPodcast : String -> Cmd Msg
 getPodcast id =
-    RestApi.getPodcast (RemoteData.fromResult >> LoadedPodcast) id
+    RestApi.getPodcast (RemoteData.fromResult >> GotPodcastData) id
 
 
 getEpisodes : String -> Cmd Msg
 getEpisodes id =
-    RestApi.getEpisodesByPodcast (RemoteData.fromResult >> LoadedEpisodes) id
+    RestApi.getEpisodesByPodcast (RemoteData.fromResult >> GotEpisodeListData) id
 
 
 getFeeds : String -> Cmd Msg
 getFeeds id =
-    RestApi.getFeedsByPodcast (RemoteData.fromResult >> LoadedFeeds) id
+    RestApi.getFeedsByPodcast (RemoteData.fromResult >> GotFeedListData) id
 
 
 

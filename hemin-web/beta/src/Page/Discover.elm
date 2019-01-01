@@ -7,8 +7,9 @@ module Page.Discover exposing
     )
 
 import Data.Podcast exposing (Podcast)
-import Html exposing (Html, a, div, img, li, text, ul)
+import Html exposing (Html, a, div, img, li, text, ul, span)
 import Html.Attributes exposing (alt, class, href, src)
+import Html.Attributes.Aria exposing (ariaLabel)
 import Http
 import Page.Error as ErrorPage
 import RemoteData exposing (WebData)
@@ -45,17 +46,13 @@ init =
 
 
 type Msg
-    = LoadDiscover Int Int
-    | LoadedDiscover (WebData (List Podcast))
+    = GotPodcastListData (WebData (List Podcast))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        LoadDiscover pageNumber pageSize ->
-            ( model, getAllPodcast pageNumber pageSize )
-
-        LoadedDiscover podcasts ->
+        GotPodcastListData podcasts ->
             ( { model | podcasts = podcasts }, Cmd.none )
 
 
@@ -103,8 +100,25 @@ viewDiscover podcasts =
 
 viewPodcastCover : Podcast -> Html Msg
 viewPodcastCover podcast =
-    li [ class "d-inline-block", class "col-2", class "p-2" ]
-        [ a [ href (redirectToPodcast podcast) ]
+    let
+        tooltip : String
+        tooltip =
+            case podcast.title of
+                Just title ->
+                    title
+                Nothing ->
+                    ""
+    in
+    li
+        [ class "d-inline-block"
+        , class "col-2"
+        ]
+        [ a [ href (redirectToPodcast podcast)
+            , class "tooltipped"
+            , class "tooltipped-multiline"
+            , class "tooltipped-s"
+            , ariaLabel tooltip
+            ]
             [ img
                 [ class "width-full"
                 , class "avatar"
@@ -122,4 +136,4 @@ viewPodcastCover podcast =
 
 getAllPodcast : Int -> Int -> Cmd Msg
 getAllPodcast pageNumber pageSize =
-    RestApi.getAllPodcasts (RemoteData.fromResult >> LoadedDiscover) pageNumber pageSize
+    RestApi.getAllPodcasts (RemoteData.fromResult >> GotPodcastListData) pageNumber pageSize

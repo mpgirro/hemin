@@ -108,8 +108,8 @@ view model =
                         --, p [ class "mt-2" ] [ text "Feed successfully proposed. HEMIN will process it shortly." ]
                         ]
 
-                Failure cause ->
-                    ErrorPage.view (ErrorPage.HttpFailure cause)
+                Failure error ->
+                    ErrorPage.viewHttpFailure error
     in
     ( title, body )
 
