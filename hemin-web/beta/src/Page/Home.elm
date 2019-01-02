@@ -285,7 +285,7 @@ viewNewestPodcast newestPodcasts =
     in
     div []
         [ div [ class "Subhead", class "Subhead--spacious" ]
-            [ div [ class "Subhead-heading" ] [ text "Poscasts new to Hemin" ]
+            [ div [ class "Subhead-heading" ] [ text "Podcasts new to Hemin" ]
             , div [ class "Subhead-actions" ]
                 [ a [ href "" ] [ text "more" ]
                 ]
