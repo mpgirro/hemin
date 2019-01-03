@@ -21,7 +21,7 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Podcast] = BsonConversion.podcastReader
 
-  override protected[this] val sort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
+  override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
 
@@ -48,7 +48,7 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
-    findAll(Query("registrationComplete" -> toBsonB(true)), page, size)
+    findAll(Query("registration.complete" -> toBsonB(true)), page, size)
   }
 
   /** Finds all Podcasts by the reference they currently hold to an image. Depending
@@ -61,6 +61,22 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
   def findAllByImage(image: String): Future[List[Podcast]] = {
     log.debug("Request to get all Podcasts where image is : {}", image)
     findAll(Query("image" -> toBsonS(image)))
+  }
+
+  /** Find podcasts in the window (pageNumber,pageSize) where registration is complete,
+    * sorted descending by
+    *
+    * @param pageNumber
+    * @param pageSize
+    * @return
+    */
+  def findNewest(pageNumber: Int, pageSize: Int): Future[List[Podcast]] = {
+    log.debug("Request to get newest Podcasts where registration is complete by pageNumber : {} and pageSize : {}", pageNumber, pageSize)
+
+    val query = Query("registration.complete" -> toBsonB(true))
+    val sort = BSONDocument("registration.timestamp" -> -1)
+
+    findAll(query, pageNumber, pageSize, sort)
   }
 
 }

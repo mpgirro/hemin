@@ -54,6 +54,7 @@ object CatalogStore {
   final case class GetFeed(id: String) extends CatalogQuery
   final case class GetImage(id: String) extends CatalogQuery
   final case class GetImageByUrl(url: String) extends CatalogQuery
+  final case class GetNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   //final case class GetImageByPodcast(id: String) extends CatalogQuery
   //final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
@@ -70,6 +71,7 @@ object CatalogStore {
   final case class ChaptersByEpisodeResult(chapters: List[Chapter]) extends CatalogQueryResult
   final case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
   final case class ImageResult(image: Option[Image]) extends CatalogQueryResult
+  final case class NewestPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -231,6 +233,8 @@ class CatalogStore(config: CatalogConfig)
     */
 
     case GetImageByUrl(url) => onGetImageByUrl(url)
+
+    case GetNewestPodcasts(pageNumber, pageSize) => onGetNewestPodcasts(pageNumber, pageSize)
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -716,6 +720,27 @@ class CatalogStore(config: CatalogConfig)
       .foreach(i => theSender ! ImageResult(i))
   }
   */
+
+  private def onGetNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Unit = {
+    log.debug("Received GetNewestPodcasts({},{})", pageNumber, pageSize)
+
+    // TODO do we want to use __different__ page/size values for the Newest view?
+    val p: Int = pageNumber.getOrElse(config.defaultPage)
+    val s: Int = pageSize.getOrElse(config.defaultSize)
+
+    val theSender = sender()
+    podcasts
+      .findNewest(p, s)
+      .andThen {
+        case Success(ps) => ps
+        case Failure(ex) =>
+          onError(s"Could not get newest Podcasts by page=$pageNumber and size=$pageSize", ex)
+          Nil // we have no results to return
+      }
+      .map { ps =>
+        theSender ! NewestPodcastsResult(ps)
+      }
+  }
 
   private def onCheckPodcast(podcastId: String): Unit = {
     log.debug("Received CheckPodcast({})", podcastId)
