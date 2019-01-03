@@ -15,6 +15,8 @@ GET   /json-examples/*file            controllers.Assets.at(path="/public/json-e
 # API resources
 GET   /api/v1/search                  api.v1.controllers.SearchController.search(q: String, p: Option[Int], s: Option[Int])
 GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast/teaser          api.v1.controllers.PodcastController.allAsTeaser(p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast/newest          api.v1.controllers.PodcastController.newest(pageNumber: Option[Int], pageSize: Option[Int])
 GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
 GET   /api/v1/podcast/:id/episodes    api.v1.controllers.PodcastController.episodes(id: String)
 GET   /api/v1/podcast/:id/feeds       api.v1.controllers.PodcastController.feeds(id: String)

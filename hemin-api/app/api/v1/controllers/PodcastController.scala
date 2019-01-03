@@ -71,4 +71,11 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
         }
     }
 
+  def newest(pageNumber: Option[Int], pageSize: Option[Int]): Action[AnyContent] =
+    PodcastAction.async { implicit request =>
+      log.trace(s"GET newest podcasts: pageNumber = $pageNumber & pageSize = $pageSize")
+      podcastService
+        .newest(pageNumber, pageSize)
+        .map(ps => Ok(Json.toJson(ArrayWrapper(ps))))
+    }
 }

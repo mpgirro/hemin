@@ -14,12 +14,19 @@ class PodcastService @Inject()(engineService: EngineService)
 
   private val engine = engineService.engine
 
-  def find(id: String)(implicit mc: MarkerContext): Future[Option[Podcast]] = engine.findPodcast(id)
+  def find(id: String)(implicit mc: MarkerContext): Future[Option[Podcast]] =
+    engine.findPodcast(id)
 
-  def all(p: Option[Int], s: Option[Int])(implicit mc: MarkerContext): Future[List[Podcast]] = engine.findAllPodcasts(p, s)
+  def all(p: Option[Int], s: Option[Int])(implicit mc: MarkerContext): Future[List[Podcast]] =
+    engine.findAllPodcasts(p, s)
 
-  def episodes(id: String)(implicit mc: MarkerContext): Future[List[Episode]] = engine.findEpisodesByPodcast(id)
+  def newest(pageNumber: Option[Int], pageSize: Option[Int])(implicit mc: MarkerContext): Future[List[Podcast]] =
+    engine.findNewestPodcasts(pageNumber, pageSize)
 
-  def feeds(id: String)(implicit mc: MarkerContext): Future[List[Feed]] = engine.findFeedsByPodcast(id)
+  def episodes(id: String)(implicit mc: MarkerContext): Future[List[Episode]] =
+    engine.findEpisodesByPodcast(id)
+
+  def feeds(id: String)(implicit mc: MarkerContext): Future[List[Feed]] =
+    engine.findFeedsByPodcast(id)
 
 }
