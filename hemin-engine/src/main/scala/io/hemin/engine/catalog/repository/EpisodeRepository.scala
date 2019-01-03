@@ -21,7 +21,7 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Episode] = BsonConversion.episodeReader
 
-  override protected[this] val sort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
+  override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("episodes"))
 
@@ -63,11 +63,11 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
     findOneByEnclosure(Option(enclosureUrl), Option(enclosureLength), Option(enclosureType))
 
   def findOneByEnclosure(enclosureUrl: Option[String], enclosureLength: Option[Long], enclosureType: Option[String]): Future[List[Episode]] = {
-    log.debug("Request to get Episode by enclosureUrl : '{}' and enclosureLength : {} and enclosureType : {}", enclosureUrl, enclosureLength, enclosureType)
+    log.debug("Request to get Episode by enclosure.url : '{}' and enclosure.length : {} and enclosure.typ : {}", enclosureUrl, enclosureLength, enclosureType)
     findAll(
-      "enclosureUrl"    -> toBsonS(enclosureUrl),
-      "enclosureLength" -> toBsonL(enclosureLength),
-      "enclosureType"   -> toBsonS(enclosureType)
+      "enclosure.url"    -> toBsonS(enclosureUrl),
+      "enclosure.length" -> toBsonL(enclosureLength),
+      "enclosure.typ"   -> toBsonS(enclosureType)
     )
   }
 

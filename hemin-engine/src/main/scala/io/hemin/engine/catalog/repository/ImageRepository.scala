@@ -22,7 +22,7 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Image] = BsonConversion.imageReader
 
-  override protected[this] val sort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
+  override protected[this] val defaultSort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 

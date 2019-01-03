@@ -16,7 +16,7 @@ trait MongoRepository[T] {
 
   protected[this] val log: Logger
 
-  protected[this] val sort: BSONDocument
+  protected[this] val defaultSort: BSONDocument
 
   protected[this] def collection: Future[BSONCollection]
 
@@ -100,10 +100,12 @@ trait MongoRepository[T] {
 
   protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] = findAll(Query(selectors.toMap))
 
-  protected[this] def findAll(query: BSONDocument): Future[List[T]] =
+  protected[this] def findAll(query: BSONDocument): Future[List[T]] = findAll(query, defaultSort)
+
+  protected[this] def findAll(query: BSONDocument, sort: BSONDocument): Future[List[T]] =
     collection.flatMap { _
       .find(query)
-      .sort(sort)
+      .sort(defaultSort)
       .cursor[T]()
       .collect[List](-1, Cursor.FailOnError[List[T]]())
       .recover {
@@ -113,8 +115,11 @@ trait MongoRepository[T] {
       }
     }
 
-  // TODO does not seem to work!
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
+    findAll(query, page, size, defaultSort)
+
+  // TODO does not seem to work!
+  protected[this] def findAll(query: BSONDocument, page: Int, size: Int, sort: BSONDocument): Future[List[T]] =
     collection.flatMap { _
       .find(BSONDocument.empty)
       .sort(sort)

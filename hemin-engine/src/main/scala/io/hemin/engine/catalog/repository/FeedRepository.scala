@@ -21,7 +21,7 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Feed] = BsonConversion.feedReader
 
-  override protected[this] val sort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
+  override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
