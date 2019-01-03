@@ -17,6 +17,7 @@ import Html.Events.Extra exposing (onEnter)
 import Http
 import Page.Error as ErrorPage
 import RemoteData exposing (WebData)
+import RestApi
 import Router exposing (redirectToEpisode, redirectToPodcast)
 import Skeleton exposing (Page)
 import Util exposing (emptyHtml, maybeAsString)
@@ -41,7 +42,12 @@ emptyModel =
 
 init : ( Model, Cmd Msg )
 init =
-    ( emptyModel, Cmd.none )
+    let
+        cmd : Cmd Msg
+        cmd =
+            getNewestPodcasts 1 6
+    in
+    ( emptyModel, cmd )
 
 
 
@@ -253,10 +259,23 @@ viewLatestEpisodes latestEpisodes =
 viewNewestPodcast : WebData (List Podcast) -> Html Msg
 viewNewestPodcast newestPodcasts =
     let
+        tooltip : Podcast -> String
+        tooltip podcast =
+            case podcast.title of
+                Just title ->
+                    title
+                Nothing ->
+                    ""
+
         viewPodcastCover : Podcast -> Html Msg
         viewPodcastCover podcast =
-            li [ class "d-inline-block", class "col-2", class "p-2" ]
-                [ a [ href (redirectToPodcast podcast) ]
+            li [ class "d-inline-block", class "col-2" ]
+                [ a [ href (redirectToPodcast podcast)
+                    , class "tooltipped"
+                    , class "tooltipped-multiline"
+                    , class "tooltipped-s"
+                    , ariaLabel (tooltip podcast)
+                    ]
                     [ img
                         [ class "width-full"
                         , class "avatar"
@@ -304,3 +323,11 @@ viewNews =
             [ li [] [ a [ href "" ] [ text "Great news, everyone!" ] ]
             ]
         ]
+
+
+--- HTTP ---
+
+
+getNewestPodcasts : Int -> Int -> Cmd Msg
+getNewestPodcasts pageNumber pageSize =
+    RestApi.getNewestPodcasts (RemoteData.fromResult >> GotNewestPodcastListData) pageNumber pageSize

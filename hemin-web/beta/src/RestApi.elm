@@ -4,6 +4,7 @@ module RestApi exposing
     , getEpisode
     , getEpisodesByPodcast
     , getFeedsByPodcast
+    , getNewestPodcasts
     , getPodcast
     , getSearchResult
     , proposeFeed
@@ -73,6 +74,21 @@ getAllPodcasts resultWrapper pageNumber pageSize =
         , expect = Http.expectJson resultWrapper podcastListDecoder
         }
 
+getNewestPodcasts : (Result Http.Error (List Podcast) -> msg) -> Int -> Int -> Cmd msg
+getNewestPodcasts resultWrapper pageNumber pageSize =
+    let
+        p : String
+        p =
+            "pageNumber=" ++ String.fromInt pageNumber
+
+        s : String
+        s =
+            "pageSize=" ++ String.fromInt pageSize
+    in
+    Http.get
+        { url = apiBase ++ "/podcast/newest?" ++ p ++ "&" ++ s
+        , expect = Http.expectJson resultWrapper podcastListDecoder
+        }
 
 getSearchResult : (Result Http.Error SearchResult -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
 getSearchResult resultWrapper query pageNumber pageSize =
