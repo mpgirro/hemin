@@ -361,7 +361,7 @@ class CatalogStore(config: CatalogConfig)
           log.debug("Podcast to update is not yet in database, therefore it will be added : {}", podcast.id)
           podcast
       }
-      .map(_.copy(registration = PodcastRegistration(complete = Some(true))))
+      .map(p => p.copy(registration = p.registration.copy(complete = Some(true))))
       .foreach(p => {
         podcasts.save(p)
 
