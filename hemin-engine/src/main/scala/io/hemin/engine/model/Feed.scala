@@ -1,13 +1,11 @@
 package io.hemin.engine.model
 
-import java.time.ZonedDateTime
-
 final case class Feed(
-  id: Option[String]                           = None,
-  podcastId: Option[String]                    = None,
-  url: Option[String]                          = None,
+  id: Option[String]                  = None,
+  podcastId: Option[String]           = None,
+  url: Option[String]                 = None,
   lastChecked: Option[Long]           = None,
-  lastStatus: Option[FeedStatus]               = None,
+  lastStatus: Option[FeedStatus]      = None,
   registrationTimestamp: Option[Long] = None,
 ) extends Patchable[Feed] {
 

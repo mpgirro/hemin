@@ -1,15 +1,13 @@
 package io.hemin.engine.model
 
-import java.time.ZonedDateTime
-
 final case class Image (
-  id: Option[String]               = None,
-  url: Option[String]              = None,
-  data: Option[String]             = None,
-  hash: Option[String]             = None,
-  name: Option[String]             = None,
-  contentType: Option[String]      = None,
-  size: Option[Long]               = None,
+  id: Option[String]          = None,
+  url: Option[String]         = None,
+  data: Option[String]        = None,
+  hash: Option[String]        = None,
+  name: Option[String]        = None,
+  contentType: Option[String] = None,
+  size: Option[Long]          = None,
   createdAt: Option[Long] = None,
 ) extends Patchable[Image] {
 

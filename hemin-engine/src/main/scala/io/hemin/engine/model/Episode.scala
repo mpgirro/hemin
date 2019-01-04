@@ -1,14 +1,12 @@
 package io.hemin.engine.model
 
-import java.time.ZonedDateTime
-
 final case class Episode(
   id: Option[String]                = None,
   podcastId: Option[String]         = None,
   podcastTitle: Option[String]      = None,
   title: Option[String]             = None,
   link: Option[String]              = None,
-  pubDate: Option[Long]    = None,
+  pubDate: Option[Long]             = None,
   guid: Option[String]              = None,
   guidIsPermalink: Option[Boolean]  = None,
   description: Option[String]       = None,

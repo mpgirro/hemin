@@ -1,7 +1,5 @@
 package io.hemin.engine.model
 
-import java.time.ZonedDateTime
-
 final case class EpisodeRegistration(
   timestamp: Option[Long] = None,
 ) extends Patchable[EpisodeRegistration] {
