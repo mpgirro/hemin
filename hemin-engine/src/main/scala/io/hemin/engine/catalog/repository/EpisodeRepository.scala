@@ -83,4 +83,20 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
     findAll(Query("image" -> toBsonS(image)))
   }
 
+  /** Find podcasts in the window (pageNumber,pageSize) where registration is complete,
+    * sorted descending by
+    *
+    * @param pageNumber
+    * @param pageSize
+    * @return
+    */
+  def findLatest(pageNumber: Int, pageSize: Int): Future[List[Episode]] = {
+    log.debug("Request to get latest Episodes by pageNumber : {} and pageSize : {}", pageNumber, pageSize)
+
+    val query = Query()
+    val sort = BSONDocument("registration.timestamp" -> -1)
+
+    findAll(query, pageNumber, pageSize, sort)
+  }
+
 }

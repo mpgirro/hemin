@@ -55,6 +55,7 @@ object CatalogStore {
   final case class GetImage(id: String) extends CatalogQuery
   final case class GetImageByUrl(url: String) extends CatalogQuery
   final case class GetNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
+  final case class GetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   //final case class GetImageByPodcast(id: String) extends CatalogQuery
   //final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
@@ -72,6 +73,7 @@ object CatalogStore {
   final case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
   final case class ImageResult(image: Option[Image]) extends CatalogQueryResult
   final case class NewestPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
+  final case class LatestEpisodesResult(episodes: List[Podcast]) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -235,6 +237,8 @@ class CatalogStore(config: CatalogConfig)
     case GetImageByUrl(url) => onGetImageByUrl(url)
 
     case GetNewestPodcasts(pageNumber, pageSize) => onGetNewestPodcasts(pageNumber, pageSize)
+
+    case GetLatestEpisodes(pageNumber, pageSize) => onGetLatestEpisodes(pageNumber, pageSize)
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -740,6 +744,10 @@ class CatalogStore(config: CatalogConfig)
       .map { ps =>
         theSender ! NewestPodcastsResult(ps)
       }
+  }
+
+  private def onGetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Unit = {
+    // TODO
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {
