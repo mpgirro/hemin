@@ -94,7 +94,7 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
     log.debug("Request to get latest Episodes by pageNumber : {} and pageSize : {}", pageNumber, pageSize)
 
     val query = Query()
-    val sort = BSONDocument("registration.timestamp" -> -1)
+    val sort = BSONDocument("pubDate" -> -1)
 
     findAll(query, pageNumber, pageSize, sort)
   }
