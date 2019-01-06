@@ -200,7 +200,7 @@ viewPubDate : Episode -> Html Msg
 viewPubDate episode =
     case episode.pubDate of
         Just pubDate ->
-            span [ class "mr-2" ] [ prettyDateHtml pubDate ]
+            span [ class "mr-2" ] [ text "date:", prettyDateHtml pubDate ]
 
         Nothing ->
             text "n/a"
@@ -210,7 +210,7 @@ viewItunesDuration : Episode -> Html Msg
 viewItunesDuration episode =
     case episode.itunes.duration of
         Just duration ->
-            span [ class "mr-2" ] [ text duration ]
+            span [ class "mr-2" ] [ text "duration:", text duration ]
 
         Nothing ->
             text "n/a"

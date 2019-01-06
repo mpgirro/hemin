@@ -1,6 +1,6 @@
 module Page.Error exposing (Model, Msg, update, view, viewHttpFailure)
 
-import Html exposing (Html, b, div, h1, p, pre, text, span)
+import Html exposing (Html, b, div, h1, p, pre, span, text)
 import Html.Attributes exposing (class)
 import Http
 import Skeleton exposing (Page)
@@ -69,13 +69,13 @@ viewHttpFailure error =
 viewErrorExplanation : String -> String -> Maybe String -> Html msg
 viewErrorExplanation info reason body =
     div
-                [ class "flash"
-                , class "flash-error"
-                ]
-                [ viewErrorInfo info
-                , viewErrorReason reason
-                , viewErrorBody body
-                ]
+        [ class "flash"
+        , class "flash-error"
+        ]
+        [ viewErrorInfo info
+        , viewErrorReason reason
+        , viewErrorBody body
+        ]
 
 
 viewErrorInfo : String -> Html msg

@@ -7,7 +7,7 @@ module Page.Discover exposing
     )
 
 import Data.Podcast exposing (Podcast)
-import Html exposing (Html, a, div, img, li, text, ul, span)
+import Html exposing (Html, a, div, img, li, span, text, ul)
 import Html.Attributes exposing (alt, class, href, src)
 import Html.Attributes.Aria exposing (ariaLabel)
 import Http
@@ -106,6 +106,7 @@ viewPodcastCover podcast =
             case podcast.title of
                 Just title ->
                     title
+
                 Nothing ->
                     ""
     in
@@ -113,7 +114,8 @@ viewPodcastCover podcast =
         [ class "d-inline-block"
         , class "col-2"
         ]
-        [ a [ href (redirectToPodcast podcast)
+        [ a
+            [ href (redirectToPodcast podcast)
             , class "tooltipped"
             , class "tooltipped-multiline"
             , class "tooltipped-s"
