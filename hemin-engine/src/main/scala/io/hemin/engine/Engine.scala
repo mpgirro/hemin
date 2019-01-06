@@ -242,6 +242,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.podcasts)
   }
 
+  def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = guarded {
+    (bus ? GetLatestEpisodes(pageNumber, pageSize))
+      .mapTo[LatestEpisodesResult]
+      .map(_.episodes)
+  }
+
   // The call to warmup() will tap the lazy values, and wait until all
   // subsystems in the actor hierarchy report that they are up and running
   private def bootSequence(): Try[Unit] = {

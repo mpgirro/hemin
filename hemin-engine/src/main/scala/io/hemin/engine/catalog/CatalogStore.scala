@@ -73,7 +73,7 @@ object CatalogStore {
   final case class FeedResult(feed: Option[Feed]) extends CatalogQueryResult
   final case class ImageResult(image: Option[Image]) extends CatalogQueryResult
   final case class NewestPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
-  final case class LatestEpisodesResult(episodes: List[Podcast]) extends CatalogQueryResult
+  final case class LatestEpisodesResult(episodes: List[Episode]) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -742,12 +742,29 @@ class CatalogStore(config: CatalogConfig)
           Nil // we have no results to return
       }
       .map { ps =>
-        theSender ! NewestPodcastsResult(ps)
+        theSender ! CatalogStore.NewestPodcastsResult(ps)
       }
   }
 
   private def onGetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Unit = {
-    // TODO
+    log.debug("Received GetLatestEpisodes({},{})", pageNumber, pageSize)
+
+    // TODO do we want to use __different__ page/size values for the Newest view?
+    val p: Int = pageNumber.getOrElse(config.defaultPage)
+    val s: Int = pageSize.getOrElse(config.defaultSize)
+
+    val theSender = sender()
+    episodes
+      .findLatest(p, s)
+      .andThen {
+        case Success(es) => es
+        case Failure(ex) =>
+          onError(s"Could not get latest Episodes by page=$pageNumber and size=$pageSize", ex)
+          Nil // we have no results to return
+      }
+      .map { es =>
+        theSender ! CatalogStore.LatestEpisodesResult(es)
+      }
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {
