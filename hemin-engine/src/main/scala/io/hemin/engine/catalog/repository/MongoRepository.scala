@@ -11,7 +11,9 @@ import scala.concurrent.{ExecutionContext, Future}
 trait MongoRepository[T] {
 
   protected[this] implicit val executionContext: ExecutionContext
+
   protected[this] implicit val bsonWriter: BSONDocumentWriter[T]
+
   protected[this] implicit val bsonReader: BSONDocumentReader[T]
 
   protected[this] val log: Logger
@@ -98,37 +100,28 @@ trait MongoRepository[T] {
       findAll(query, page, size)
     }
 
-  protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] = findAll(Query(selectors.toMap))
+  protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] =
+    findAll(Query(selectors.toMap))
 
-  protected[this] def findAll(query: BSONDocument): Future[List[T]] = findAll(query, defaultSort)
+  protected[this] def findAll(query: BSONDocument): Future[List[T]] =
+    findAll(query, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, sort: BSONDocument): Future[List[T]] =
-    collection.flatMap { _
-      .find(query)
-      .sort(defaultSort)
-      .cursor[T]()
-      .collect[List](-1, Cursor.FailOnError[List[T]]())
-      .recover {
-        case ex: Exception =>
-          log.error("Error on findAll({}) : {}", query, ex)
-          Nil
-      }
-    }
+    findAll(query, 1, -1, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
     findAll(query, page, size, defaultSort)
 
-  // TODO does not seem to work!
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int, sort: BSONDocument): Future[List[T]] =
     collection.flatMap { _
-      .find(BSONDocument.empty)
+      .find(query)
       .sort(sort)
       .skip((page-1) * size)
       .cursor[T](ReadPreference.primaryPreferred)
       .collect[List](size, Cursor.FailOnError[List[T]]())
       .recover {
         case ex: Exception =>
-          log.error("Error on findAll({}) : {}", query, ex)
+          log.error("Error on findAll(query = {}, page = {}, size = {}, sort = {}) : {}", query, page, size, sort, ex)
           Nil
       }
     }
