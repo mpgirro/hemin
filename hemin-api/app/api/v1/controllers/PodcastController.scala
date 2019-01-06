@@ -54,7 +54,7 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
       log.trace(s"GET episodes by podcast (reduced to teasers): id = $id")
       podcastService
         .episodes(id)
-        .map(es => es.map(EpisodeMapper.toTeaser))
+        .map(_.map(EpisodeMapper.toTeaser))
         .map(_.flatten)
         .map { es =>
           Ok(Json.toJson(ArrayWrapper(es)))

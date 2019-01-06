@@ -36,4 +36,12 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
         }
     }
 
+  def latest(pageNumber: Option[Int], pageSize: Option[Int]): Action[AnyContent] =
+    EpisodeAction.async { implicit request =>
+      log.trace(s"GET latest episodes: pageNumber = $pageNumber & pageSize = $pageSize")
+      episodeService
+        .latest(pageNumber, pageSize)
+        .map(es => Ok(Json.toJson(ArrayWrapper(es))))
+    }
+
 }

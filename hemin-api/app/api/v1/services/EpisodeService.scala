@@ -16,6 +16,9 @@ class EpisodeService @Inject()(engineService: EngineService)
 
   def find(id: String)(implicit mc: MarkerContext): Future[Option[Episode]] = engine.findEpisode(id)
 
+  def latest(pageNumber: Option[Int], pageSize: Option[Int])(implicit mc: MarkerContext): Future[List[Episode]] =
+    engine.findLatestEpisodes(pageNumber, pageSize)
+
   def chapters(id: String)(implicit mc: MarkerContext): Future[List[Chapter]] = engine.findChaptersByEpisode(id)
 
 }

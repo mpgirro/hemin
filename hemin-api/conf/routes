@@ -20,6 +20,7 @@ GET   /api/v1/podcast/newest          api.v1.controllers.PodcastController.newes
 GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
 GET   /api/v1/podcast/:id/episodes    api.v1.controllers.PodcastController.episodes(id: String)
 GET   /api/v1/podcast/:id/feeds       api.v1.controllers.PodcastController.feeds(id: String)
+GET   /api/v1/episode/latest          api.v1.controllers.EpisodeController.latest(pageNumber: Option[Int], pageSize: Option[Int])
 GET   /api/v1/episode/:id             api.v1.controllers.EpisodeController.find(id: String)
 GET   /api/v1/episode/:id/chapters    api.v1.controllers.EpisodeController.chapters(id: String)
 GET   /api/v1/feed/:id                api.v1.controllers.FeedController.find(id: String)
