@@ -20,6 +20,8 @@ trait MongoRepository[T] {
 
   protected[this] val defaultSort: BSONDocument
 
+  protected[this] def querySafeguard: BSONDocument
+
   protected[this] def collection: Future[BSONCollection]
 
   protected[this] def saveError(value: T): EngineException
@@ -107,14 +109,14 @@ trait MongoRepository[T] {
     findAll(query, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, sort: BSONDocument): Future[List[T]] =
-    findAll(query, 1, -1, defaultSort)
+    findAll(query, page = 1, size = -1, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
     findAll(query, page, size, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, page: Int, size: Int, sort: BSONDocument): Future[List[T]] =
     collection.flatMap { _
-      .find(query)
+      .find(querySafeguard.merge(query))
       .sort(sort)
       .skip((page-1) * size)
       .cursor[T](ReadPreference.primaryPreferred)

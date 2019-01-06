@@ -4,6 +4,7 @@ import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineException
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Podcast
+import io.hemin.engine.util.TimeUtil
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
@@ -22,6 +23,8 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
   override protected[this] implicit val bsonReader: BSONDocumentReader[Podcast] = BsonConversion.podcastReader
 
   override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
+
+  override protected[this] def querySafeguard: BSONDocument = BSONDocument("pubDate" -> BSONDocument("$lt" -> TimeUtil.now))
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
 

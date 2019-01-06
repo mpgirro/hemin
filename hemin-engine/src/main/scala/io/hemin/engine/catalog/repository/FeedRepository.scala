@@ -23,6 +23,8 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
+  override protected[this] def querySafeguard: BSONDocument = BSONDocument()
+
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
   override protected[this] def saveError(value: Feed): EngineException =

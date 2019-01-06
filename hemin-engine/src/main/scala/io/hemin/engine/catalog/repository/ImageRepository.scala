@@ -24,6 +24,8 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] val defaultSort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
 
+  override protected[this] def querySafeguard: BSONDocument = BSONDocument()
+
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 
   override protected[this] def saveError(value: Image): EngineException =
