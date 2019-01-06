@@ -45,7 +45,7 @@ init =
     let
         cmd : Cmd Msg
         cmd =
-            getNewestPodcasts 1 6
+            Cmd.batch [ getNewestPodcasts 1 6, getLatestEpisodes 1 6 ]
     in
     ( emptyModel, cmd )
 
@@ -215,10 +215,25 @@ viewNavButtonRow =
 viewLatestEpisodes : WebData (List Episode) -> Html Msg
 viewLatestEpisodes latestEpisodes =
     let
+        tooltip : Episode -> String
+        tooltip episode =
+            case episode.title of
+                Just title ->
+                    title
+
+                Nothing ->
+                    ""
+
         viewEpisodeCover : Episode -> Html Msg
         viewEpisodeCover episode =
-            li [ class "d-inline-block", class "col-2", class "p-2" ]
-                [ a [ href (redirectToEpisode episode) ]
+            li [ class "d-inline-block", class "col-2" ]
+                [ a
+                    [ href (redirectToEpisode episode)
+                    , class "tooltipped"
+                    , class "tooltipped-multiline"
+                    , class "tooltipped-s"
+                    , ariaLabel (tooltip episode)
+                    ]
                     [ img
                         [ class "width-full"
                         , class "avatar"
@@ -264,13 +279,15 @@ viewNewestPodcast newestPodcasts =
             case podcast.title of
                 Just title ->
                     title
+
                 Nothing ->
                     ""
 
         viewPodcastCover : Podcast -> Html Msg
         viewPodcastCover podcast =
             li [ class "d-inline-block", class "col-2" ]
-                [ a [ href (redirectToPodcast podcast)
+                [ a
+                    [ href (redirectToPodcast podcast)
                     , class "tooltipped"
                     , class "tooltipped-multiline"
                     , class "tooltipped-s"
@@ -325,9 +342,15 @@ viewNews =
         ]
 
 
+
 --- HTTP ---
 
 
 getNewestPodcasts : Int -> Int -> Cmd Msg
 getNewestPodcasts pageNumber pageSize =
     RestApi.getNewestPodcasts (RemoteData.fromResult >> GotNewestPodcastListData) pageNumber pageSize
+
+
+getLatestEpisodes : Int -> Int -> Cmd Msg
+getLatestEpisodes pageNumber pageSize =
+    RestApi.getLatestEpisodes (RemoteData.fromResult >> GotLatestEpisodeListData) pageNumber pageSize
