@@ -1,7 +1,5 @@
 package io.hemin.engine.catalog
 
-import java.time.{LocalDateTime, ZonedDateTime}
-
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository._
@@ -10,11 +8,10 @@ import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
 import io.hemin.engine.updater.Updater.ProcessFeed
-import io.hemin.engine.util.{IdGenerator, TimeUtil}
 import io.hemin.engine.util.mapper.IndexMapper
-import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
+import io.hemin.engine.util.{IdGenerator, TimeUtil}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
 object CatalogStore {
@@ -56,6 +53,7 @@ object CatalogStore {
   final case class GetImageByUrl(url: String) extends CatalogQuery
   final case class GetNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   final case class GetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
+  final case class GetDatabaseStats() extends CatalogQuery
   //final case class GetImageByPodcast(id: String) extends CatalogQuery
   //final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
@@ -74,6 +72,7 @@ object CatalogStore {
   final case class ImageResult(image: Option[Image]) extends CatalogQueryResult
   final case class NewestPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
   final case class LatestEpisodesResult(episodes: List[Episode]) extends CatalogQueryResult
+  final case class DatabaseStatsResult(stats: DatabaseStats) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -214,6 +213,8 @@ class CatalogStore(config: CatalogConfig)
     case GetNewestPodcasts(pageNumber, pageSize) => onGetNewestPodcasts(pageNumber, pageSize)
 
     case GetLatestEpisodes(pageNumber, pageSize) => onGetLatestEpisodes(pageNumber, pageSize)
+
+    case GetDatabaseStats() => onGetDatabaseStats()
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -740,6 +741,31 @@ class CatalogStore(config: CatalogConfig)
       .map { es =>
         theSender ! CatalogStore.LatestEpisodesResult(es)
       }
+  }
+
+  private def onGetDatabaseStats(): Unit = {
+    log.debug("Received GetDatabaseStats()")
+
+    val theSender = sender()
+
+    val podcastCount = podcasts.countDocuments
+    val episodeCount = episodes.countDocuments
+    val feedCount = feeds.countDocuments
+    val imageCount = images.countDocuments
+
+    (for {
+      pc <- podcastCount
+      ec <- episodeCount
+      fc <- feedCount
+      ic <- imageCount
+    } yield DatabaseStats(
+      podcastCount = pc,
+      episodeCount = ec,
+      feedCount = fc,
+      imageCount = ic,
+    )).map { stats =>
+      theSender ! CatalogStore.DatabaseStatsResult(stats)
+    }
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {

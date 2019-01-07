@@ -60,6 +60,8 @@ trait MongoRepository[T] {
       c.drop(failIfNotFound = true) }
   }
 
+  def countDocuments: Future[Int] = collection.flatMap(_.count(None))
+
   /** Find one by example
     *
     * @param example The example object
@@ -82,7 +84,7 @@ trait MongoRepository[T] {
       .one[T]
       .recover {
         case ex: Exception =>
-          log.error("Error on findOne({}) : {}", query, ex)
+          log.error("Error on findOne('{}') : {}", query, ex)
           None
       }
     }
@@ -123,7 +125,7 @@ trait MongoRepository[T] {
       .collect[List](size, Cursor.FailOnError[List[T]]())
       .recover {
         case ex: Exception =>
-          log.error("Error on findAll(query = {}, page = {}, size = {}, sort = {}) : {}", query, page, size, sort, ex)
+          log.error("Error on findAll(query = '{}', page = {}, size = {}, sort = {}) : {}", query, page, size, sort, ex)
           Nil
       }
     }

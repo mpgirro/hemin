@@ -248,6 +248,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.episodes)
   }
 
+  def getDatabaseStats: Future[DatabaseStats] = guarded {
+    (bus ? GetDatabaseStats())
+      .mapTo[DatabaseStatsResult]
+      .map(_.stats)
+  }
+
   // The call to warmup() will tap the lazy values, and wait until all
   // subsystems in the actor hierarchy report that they are up and running
   private def bootSequence(): Try[Unit] = {
