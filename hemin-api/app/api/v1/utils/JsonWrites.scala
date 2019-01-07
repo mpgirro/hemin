@@ -39,6 +39,8 @@ object JsonWrites {
 
   implicit val imageWrites: Writes[Image] = Json.writes[Image]
 
+  implicit val databaseStatsWrites: Writes[DatabaseStats] = Json.writes[DatabaseStats]
+
   implicit def arrayWrites[T](implicit fmt: Writes[T]): Writes[ArrayWrapper[T]] =
     (as: ArrayWrapper[T]) => JsObject(Seq(
       "results" -> JsArray(as.results.map(fmt.writes).toVector)
