@@ -367,7 +367,7 @@ viewEpisodeTeaser episode =
             p [] [ text teaser ]
     in
     li [ class "py-2" ]
-        [ div [ class "clearfix", class "p-2" ]
+        [ div [ class "clearfix" ]
             [ viewEpisodeTeaserCover
             , div [ class "overflow-hidden" ]
                 [ viewEpisodeTeaserTitle

@@ -119,7 +119,7 @@ footerLeft =
             , a [ href "https://github.com/mpgirro/hemin" ] [ text "GitHub" ]
             , text ". This site is written in "
             , a [ href "https://elm-lang.org" ] [ text "Elm" ]
-            , text ". The podcasts and artworks embedded on this page are properties of their owners."
+            , text ". The podcasts and artworks embedded on this page are properties of their owners, and all audio is streamed directly from their servers."
             ]
         ]
 

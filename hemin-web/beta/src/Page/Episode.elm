@@ -104,23 +104,29 @@ viewEpisode episode =
 
 viewPodcastTitle : Episode -> Html Msg
 viewPodcastTitle episode =
-    case episode.podcastTitle of
-        Just title ->
-            div
-                [ class "text-center"
-                , class "f4"
-                , class "lh-condensed-ultra"
-                , class "mb-2"
-                ]
-                [ a
-                    [ href (redirectToParent episode)
-                    , class "link-gray"
-                    ]
-                    [ text title ]
-                ]
+    let
+        txt : String
+        txt =
+            case episode.podcastTitle of
+                Just title ->
+                    title
 
-        Nothing ->
-            emptyHtml
+                Nothing ->
+                    "Go to Podcast"
+    in
+    div
+                    [ class "text-center"
+                    , class "f4"
+                    , class "lh-condensed-ultra"
+                    , class "mb-2"
+                    ]
+                    [ a
+                        [ href (redirectToParent episode)
+                        , class "link-gray"
+                        ]
+                        [ text txt ]
+                    ]
+
 
 
 viewCoverImage : Episode -> Html Msg
@@ -198,22 +204,32 @@ viewSmallInfos episode =
 
 viewPubDate : Episode -> Html Msg
 viewPubDate episode =
-    case episode.pubDate of
-        Just pubDate ->
-            span [ class "mr-2" ] [ text "date:", prettyDateHtml pubDate ]
+    let
+        value : Html Msg
+        value =
+            case episode.pubDate of
+                Just pubDate ->
+                    prettyDateHtml pubDate
 
-        Nothing ->
-            text "n/a"
+                Nothing ->
+                    text "n/a"
+    in
+    span [ class "mr-2" ] [ text "date:", value ]
 
 
 viewItunesDuration : Episode -> Html Msg
 viewItunesDuration episode =
-    case episode.itunes.duration of
-        Just duration ->
-            span [ class "mr-2" ] [ text "duration:", text duration ]
+    let
+        value : Html Msg
+        value =
+           case episode.itunes.duration of
+            Just duration ->
+                text duration
 
-        Nothing ->
-            text "n/a"
+            Nothing ->
+                text "n/a"
+    in
+    span [ class "mr-2" ] [ text "duration:", value ]
 
 
 
