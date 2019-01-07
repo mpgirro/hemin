@@ -4,7 +4,7 @@ import java.time.{LocalDateTime, ZonedDateTime}
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.catalog.repository.{EpisodeRepository, FeedRepository, ImageRepository, PodcastRepository}
+import io.hemin.engine.catalog.repository._
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.index.IndexStore.AddDocIndexEvent
 import io.hemin.engine.model._
@@ -93,37 +93,12 @@ class CatalogStore(config: CatalogConfig)
   private var updater: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private lazy val (connection, dbName) = {
-    val driver = MongoDriver()
+  private val repositoryFactory: RepositoryFactory = new RepositoryFactory(config, executionContext)
 
-    //registerDriverShutdownHook(driver)
-
-    (for {
-      parsedUri <- MongoConnection.parseURI(config.mongoUri)
-      con <- driver.connection(parsedUri, strictUri = true)
-      db <- parsedUri.db match {
-        case Some(dbName) => Success(dbName)
-        case _            => Failure[String](new IllegalArgumentException(
-          s"cannot resolve connection from URI: $parsedUri"
-        ))
-      }
-    } yield con -> db).get
-  }
-
-  private lazy val lnm = s"${connection.supervisor}/${connection.name}"
-
-  @inline private def resolveDB: Future[DefaultDB] =
-    connection.database(dbName).andThen {
-      case _ => /*logger.debug*/ log.debug(s"[$lnm] MongoDB resolved: $dbName")
-    }
-
-  //private def db(implicit ec: ExecutionContext): DefaultDB = Await.result(resolveDB(ec), 10.seconds)
-
-  private val podcasts: PodcastRepository = new PodcastRepository(resolveDB, executionContext)
-  private val episodes: EpisodeRepository = new EpisodeRepository(resolveDB, executionContext)
-  private val feeds: FeedRepository = new FeedRepository(resolveDB, executionContext)
-  private val images: ImageRepository = new ImageRepository(resolveDB, executionContext)
-  //private val chapters: ChapterRepository = new ChapterRepository(db, executionContext)
+  private val podcasts: PodcastRepository = repositoryFactory.getPodcastRepository
+  private val episodes: EpisodeRepository = repositoryFactory.getEpisodeRepository
+  private val feeds: FeedRepository = repositoryFactory.getFeedRepository
+  private val images: ImageRepository = repositoryFactory.getImageRepository
 
   // white all data if we please
   if (config.createDatabase) {
@@ -278,7 +253,7 @@ class CatalogStore(config: CatalogConfig)
       .onComplete {
         case Success(fs) =>
           if (fs.isEmpty) {
-            val now = System.currentTimeMillis()
+            val now = TimeUtil.now
 
             val podcastId = idGenerator.newId
             val podcast = Podcast(
@@ -858,7 +833,7 @@ class CatalogStore(config: CatalogConfig)
                     podcastId    = Some(podcastId),
                     podcastTitle = p.title,
                     registration = EpisodeRegistration(
-                      timestamp = Some(System.currentTimeMillis())
+                      timestamp = Some(TimeUtil.now)
                     ),
                     chapters = episode.chapters.map(_.copy(episodeId = Some(episodeId))), // TODO are chapters now embedded, remove episodeId
                   )
