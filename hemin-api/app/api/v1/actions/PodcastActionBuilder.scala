@@ -11,13 +11,14 @@ import api.v1.utils.RequestMarkerContext
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * The action builder for Podcasts.
+  * The action builder for Podcast requests.
   *
   * This is the place to put logging, metrics, to augment
   * the request with contextual data, and manipulate the
   * result.
   */
-class PodcastActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: PlayBodyParsers)
+class PodcastActionBuilder @Inject()(messagesApi: MessagesApi,
+                                     playBodyParsers: PlayBodyParsers)
                                     (implicit val executionContext: ExecutionContext)
   extends ActionBuilder[PodcastRequest, AnyContent]
     with RequestMarkerContext

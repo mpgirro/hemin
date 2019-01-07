@@ -17,7 +17,8 @@ import scala.concurrent.{ExecutionContext, Future}
   * the request with contextual data, and manipulate the
   * result.
   */
-class CliActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: PlayBodyParsers)
+class CliActionBuilder @Inject()(messagesApi: MessagesApi,
+                                 playBodyParsers: PlayBodyParsers)
                                 (implicit val executionContext: ExecutionContext)
   extends ActionBuilder[CliRequest, AnyContent]
     with RequestMarkerContext

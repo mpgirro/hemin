@@ -9,6 +9,9 @@ import play.api.mvc.{BaseController, ControllerComponents}
 
 import scala.concurrent.ExecutionContext
 
+/**
+  * Exposes actions and handler to the CliController by wiring the injected state into the base class.
+  */
 class CliBaseController @Inject()(cc: CliControllerComponents)
   extends BaseController with RequestMarkerContext {
 

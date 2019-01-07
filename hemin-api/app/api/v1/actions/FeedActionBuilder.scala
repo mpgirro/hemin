@@ -11,13 +11,14 @@ import api.v1.utils.RequestMarkerContext
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * The action builder for Feeds.
+  * The action builder for Feed requests.
   *
   * This is the place to put logging, metrics, to augment
   * the request with contextual data, and manipulate the
   * result.
   */
-class FeedActionBuilder @Inject()(messagesApi: MessagesApi, playBodyParsers: PlayBodyParsers)
+class FeedActionBuilder @Inject()(messagesApi: MessagesApi,
+                                  playBodyParsers: PlayBodyParsers)
                                  (implicit val executionContext: ExecutionContext)
   extends ActionBuilder[FeedRequest, AnyContent]
     with RequestMarkerContext

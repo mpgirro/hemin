@@ -9,7 +9,7 @@ import play.api.i18n.{Langs, MessagesApi}
 import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 
 /**
-  * Packages up the component dependencies for the post controller.
+  * Packages up the component dependencies for the Search controller.
   *
   * This is a good way to minimize the surface area exposed to the controller, so the
   * controller only has to have one thing injected.

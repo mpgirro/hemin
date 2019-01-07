@@ -12,7 +12,7 @@ import play.api.mvc.{BaseController, ControllerComponents}
 import scala.concurrent.ExecutionContext
 
 /**
-  * Exposes actions and handler to the PostController by wiring the injected state into the base class.
+  * Exposes actions and handler to the FeedController by wiring the injected state into the base class.
   */
 class FeedBaseController @Inject()(cc: FeedControllerComponents)
     extends BaseController with RequestMarkerContext {

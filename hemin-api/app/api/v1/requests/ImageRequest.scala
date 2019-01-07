@@ -5,7 +5,7 @@ import play.api.mvc.{MessagesRequestHeader, PreferredMessagesProvider, Request, 
 
 
 /**
-  * A wrapped request for post resources.
+  * A wrapped request for Image resources.
   *
   * This is commonly used to hold request-specific information like
   * security credentials, and useful shortcut methods.
