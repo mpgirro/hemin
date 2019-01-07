@@ -20,36 +20,19 @@ class EngineSpec
     with MongoEmbedDatabase
     with BeforeAndAfter {
 
-  def defaultConfig(mongoUri: String): Config = ConfigFactory
-    .parseMap(Map("hemin.catalog.mongo-uri" -> mongoUri).asJava)
-    .withFallback(EngineConfig.defaultConfig)
-
-  var mongoProps: MongodProps = null
-
-  def mongoHost: String = Option(mongoProps)
-    .map(_.mongodProcess)
-    .map(_.getConfig)
-    .map(_.net)
-    .map(_.getServerAddress)
-    .map(_.getCanonicalHostName)
-    .getOrElse("localhost")
-  def mongoPort: Int = Option(mongoProps)
-    .map(_.mongodProcess)
-    .map(_.getConfig)
-    .map(_.net)
-    .map(_.getPort)
-    .getOrElse(12345)
-  def mongoUri: String =  s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
-
-  def newEngine(): Engine = Engine.boot(defaultConfig(mongoUri)) match {
-    case Success(e)  => e
+  def newEngine(): Engine = Engine.boot(testContext.engineConfig) match {
+    case Success(engine) => engine
     case Failure(ex) =>
       assert(false, s"Failed to startup engine; reason : ${ex.getMessage}")
       null // TODO can I return a better result value (just to please the compiler?)
   }
 
+  var mongoProps: MongodProps = _
+  var testContext: TestContext = _
+
   before {
     mongoProps = mongoStart()
+    testContext = new TestContext(mongoProps)
   }
 
   after {
