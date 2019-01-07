@@ -6,10 +6,12 @@ module Page.Home exposing
     , view
     )
 
+import Const
+import Data.DatabaseStats exposing (DatabaseStats)
 import Data.Episode exposing (Episode)
 import Data.Podcast exposing (Podcast)
 import FeatherIcons
-import Html exposing (Html, a, button, div, img, input, li, p, span, text, ul)
+import Html exposing (Html, a, button, div, img, input, li, p, span, text, ul, h1, h2)
 import Html.Attributes exposing (alt, attribute, autocomplete, class, height, href, placeholder, spellcheck, src, type_, value, width)
 import Html.Attributes.Aria exposing (ariaLabel, role)
 import Html.Events exposing (onClick, onInput)
@@ -30,6 +32,7 @@ import Util exposing (emptyHtml, maybeAsString)
 type alias Model =
     { newestPodcasts : WebData (List Podcast)
     , latestEpisodes : WebData (List Episode)
+    , databaseStats : WebData DatabaseStats
     }
 
 
@@ -37,6 +40,7 @@ emptyModel : Model
 emptyModel =
     { newestPodcasts = RemoteData.NotAsked
     , latestEpisodes = RemoteData.NotAsked
+    , databaseStats = RemoteData.NotAsked
     }
 
 
@@ -45,7 +49,11 @@ init =
     let
         cmd : Cmd Msg
         cmd =
-            Cmd.batch [ getNewestPodcasts 1 6, getLatestEpisodes 1 6 ]
+            Cmd.batch
+                [ getNewestPodcasts 1 6
+                , getLatestEpisodes 1 6
+                , getDatabaseStats
+                ]
     in
     ( emptyModel, cmd )
 
@@ -57,6 +65,7 @@ init =
 type Msg
     = GotNewestPodcastListData (WebData (List Podcast))
     | GotLatestEpisodeListData (WebData (List Episode))
+    | GotDatabaseStats (WebData DatabaseStats)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -68,6 +77,9 @@ update msg model =
         GotLatestEpisodeListData latestEpisodes ->
             ( { model | latestEpisodes = latestEpisodes }, Cmd.none )
 
+        GotDatabaseStats stats ->
+            ( { model | databaseStats = stats }, Cmd.none )
+
 
 view : Model -> ( String, Html Msg )
 view model =
@@ -78,7 +90,8 @@ view model =
         body : Html Msg
         body =
             div []
-                [ viewSearchForm
+                [ viewPageTitle
+                , viewSearchForm model.databaseStats
                 , viewNavButtonRow
                 , viewLatestEpisodes model.latestEpisodes
                 , viewNewestPodcast model.newestPodcasts
@@ -87,10 +100,16 @@ view model =
     in
     ( title, body )
 
+viewPageTitle : Html Msg
+viewPageTitle =
+    div [ class "text-center" ]
+        [ h1 [ class "f1" ] [ text Const.siteName ]
+        , h2 [ class "f3" ] [ text "Podcast Catalog & Search Engine" ]
+        ]
 
-viewSearchForm : Html Msg
-viewSearchForm =
-    Html.form [ class "col-md-10", class "p-2", class "mx-auto" ]
+viewSearchForm : WebData DatabaseStats -> Html Msg
+viewSearchForm stats =
+    Html.form [ class "col-md-10", class "mx-auto" ]
         [ div
             [ class "input-group"
             , class "mt-5"
@@ -98,7 +117,7 @@ viewSearchForm =
             [ viewSearchInput
             , viewSearchButton
             ]
-        , viewSearchNote
+        , viewSearchNote stats
         ]
 
 
@@ -139,28 +158,29 @@ viewSearchButton =
         ]
 
 
-viewSearchNote : Html Msg
-viewSearchNote =
+viewSearchNote : WebData DatabaseStats -> Html Msg
+viewSearchNote dbStats =
     let
-        episodeCount =
-            "XXX"
-
-        podcastCount =
-            "YYY"
-
-        msg =
-            episodeCount ++ " episodes in " ++ podcastCount ++ " podcasts"
+        info : DatabaseStats -> String
+        info stats =
+            (String.fromInt stats.episodeCount) ++ " episodes in " ++ (String.fromInt stats.podcastCount) ++ " podcasts"
     in
-    div
-        [ class "note"
-        , class "text-center"
-        , class "mt-2"
-        ]
-        [ span [ class "Label", class "bg-red" ] [ text episodeCount ]
-        , text " episodes in "
-        , span [ class "Label", class "bg-red" ] [ text podcastCount ]
-        , text " podcasts"
-        ]
+    case dbStats of
+        RemoteData.NotAsked ->
+            text "Initialising ..."
+
+        RemoteData.Loading ->
+            text "Loading ..."
+
+        RemoteData.Failure error ->
+            ErrorPage.viewHttpFailure error
+
+        RemoteData.Success stats ->
+            div [ class "note"
+                , class "text-center"
+                , class "mt-2"
+                ]
+                [ text (info stats) ]
 
 
 viewNavButtonRow : Html Msg
@@ -354,3 +374,8 @@ getNewestPodcasts pageNumber pageSize =
 getLatestEpisodes : Int -> Int -> Cmd Msg
 getLatestEpisodes pageNumber pageSize =
     RestApi.getLatestEpisodes (RemoteData.fromResult >> GotLatestEpisodeListData) pageNumber pageSize
+
+
+getDatabaseStats : Cmd Msg
+getDatabaseStats =
+    RestApi.getDatabaseStats (RemoteData.fromResult >> GotDatabaseStats)

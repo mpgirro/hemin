@@ -1,6 +1,7 @@
 module RestApi exposing
     ( apiBase
     , getAllPodcasts
+    , getDatabaseStats
     , getEpisode
     , getEpisodesByPodcast
     , getFeedsByPodcast
@@ -11,6 +12,7 @@ module RestApi exposing
     , proposeFeed
     )
 
+import Data.DatabaseStats exposing (DatabaseStats, databaseStatsDecoder)
 import Data.Episode exposing (Episode, episodeDecoder, episodeListDecoder)
 import Data.Feed exposing (Feed, feedDecoder, feedListDecoder)
 import Data.IndexDoc exposing (IndexDoc)
@@ -147,3 +149,11 @@ proposeFeed resultWrapper feed =
         , body = Http.stringBody "text/plain" feed
         , expect = Http.expectWhatever resultWrapper
         }
+
+
+getDatabaseStats : (Result Http.Error DatabaseStats -> msg) -> Cmd msg
+getDatabaseStats resultWrapper =
+    Http.get
+            { url = apiBase ++ "/stats/database"
+            , expect = Http.expectJson resultWrapper databaseStatsDecoder
+            }
