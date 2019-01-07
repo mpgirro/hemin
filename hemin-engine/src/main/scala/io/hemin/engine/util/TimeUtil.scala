@@ -1,11 +1,11 @@
 package io.hemin.engine.util
 
-import java.time.{ZoneId, ZonedDateTime}
+import java.time.ZoneId
 
 object TimeUtil {
 
   val ZONE: ZoneId = ZoneId.of("Europe/Vienna")
 
-  def now(): ZonedDateTime = ZonedDateTime.now(ZONE)
+  def now(): Long = System.currentTimeMillis()
 
 }
