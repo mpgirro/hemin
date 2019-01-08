@@ -28,5 +28,6 @@ POST  /api/v1/feed/propose            api.v1.controllers.FeedController.propose
 GET   /api/v1/image/:id               api.v1.controllers.ImageController.find(id: String)
 POST  /api/v1/cli                     api.v1.controllers.CliController.eval
 GET   /api/v1/stats/database          api.v1.controllers.StatsController.database
+GET   /api/v1/category/distinct       api.v1.controllers.CategoryController.distinct
 ->    /api/v1/posts                   example.post.PostRouter
 
