@@ -82,4 +82,9 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
     findAll(query, pageNumber, pageSize, sort)
   }
 
+  def distinctItunesCategories: Future[Set[String]] = {
+    log.debug("Request to get all Categories")
+    collection.flatMap(_.distinct[String, Set]("itunes.categories"))
+  }
+
 }

@@ -252,6 +252,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
       .map(_.stats)
   }
 
+  def getDistinctCategories: Future[Set[String]] = guarded {
+    (bus ? CatalogStore.GetCategories())
+      .mapTo[CatalogStore.CategoriesResult]
+      .map(_.categories)
+  }
+
   // The call to warmup() will tap the lazy values, and wait until all
   // subsystems in the actor hierarchy report that they are up and running
   private def bootSequence(): Try[Unit] = {

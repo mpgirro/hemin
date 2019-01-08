@@ -54,6 +54,7 @@ object CatalogStore {
   final case class GetNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   final case class GetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   final case class GetDatabaseStats() extends CatalogQuery
+  final case class GetCategories() extends CatalogQuery
   //final case class GetImageByPodcast(id: String) extends CatalogQuery
   //final case class GetImageByEpisode(id: String) extends CatalogQuery
   final case class CheckPodcast(id: String) extends CatalogQuery
@@ -73,6 +74,7 @@ object CatalogStore {
   final case class NewestPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
   final case class LatestEpisodesResult(episodes: List[Episode]) extends CatalogQueryResult
   final case class DatabaseStatsResult(stats: DatabaseStats) extends CatalogQueryResult
+  final case class CategoriesResult(categories: Set[String]) extends CatalogQueryResult
   //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
@@ -99,7 +101,7 @@ class CatalogStore(config: CatalogConfig)
   private val feeds: FeedRepository = repositoryFactory.getFeedRepository
   private val images: ImageRepository = repositoryFactory.getImageRepository
 
-  // white all data if we please
+  // wipe all data if it pleases and sparkles
   if (config.createDatabase) {
     log.info("Dropping database collections on startup")
     podcasts.drop
@@ -215,6 +217,8 @@ class CatalogStore(config: CatalogConfig)
     case GetLatestEpisodes(pageNumber, pageSize) => onGetLatestEpisodes(pageNumber, pageSize)
 
     case GetDatabaseStats() => onGetDatabaseStats()
+
+    case GetCategories() => onGetCategories()
 
     case RegisterEpisodeIfNew(podcastId, episode) => onRegisterEpisodeIfNew(podcastId, episode)
 
@@ -766,6 +770,23 @@ class CatalogStore(config: CatalogConfig)
     )).map { stats =>
       theSender ! CatalogStore.DatabaseStatsResult(stats)
     }
+  }
+
+  private def onGetCategories(): Unit = {
+    log.debug("Received GetCategories()")
+
+    val theSender = sender()
+    podcasts
+      .distinctItunesCategories
+      .andThen {
+        case Success(es) => es
+        case Failure(ex) =>
+          onError(s"Could not get all itunes categories", ex)
+          Nil // we have no results to return
+      }
+      .map {
+        theSender ! CatalogStore.CategoriesResult(_)
+      }
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {
