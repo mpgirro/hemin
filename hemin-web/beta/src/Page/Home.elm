@@ -167,10 +167,10 @@ viewSearchNote dbStats =
     in
     case dbStats of
         RemoteData.NotAsked ->
-            text "Initialising ..."
+            Skeleton.viewInitializingText
 
         RemoteData.Loading ->
-            text "Loading ..."
+           Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
             ErrorPage.viewHttpFailure error
@@ -268,10 +268,10 @@ viewLatestEpisodes latestEpisodes =
         viewCoverGrid =
             case latestEpisodes of
                 RemoteData.NotAsked ->
-                    text "Initialising ..."
+                    Skeleton.viewInitializingText
 
                 RemoteData.Loading ->
-                    text "Loading ..."
+                    Skeleton.viewLoadingText
 
                 RemoteData.Failure error ->
                     ErrorPage.viewHttpFailure error
@@ -327,10 +327,10 @@ viewNewestPodcast newestPodcasts =
         viewCoverGrid =
             case newestPodcasts of
                 RemoteData.NotAsked ->
-                    text "Initialising ..."
+                    Skeleton.viewInitializingText
 
                 RemoteData.Loading ->
-                    text "Loading ..."
+                    Skeleton.viewLoadingText
 
                 RemoteData.Failure error ->
                     ErrorPage.viewHttpFailure error

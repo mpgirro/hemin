@@ -226,7 +226,7 @@ viewSearchResults model =
             emptyHtml
 
         RemoteData.Loading ->
-            text "Loading..."
+            Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
             ErrorPage.viewHttpFailure error

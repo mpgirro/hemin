@@ -1,4 +1,10 @@
-module Skeleton exposing (Page, view, viewLink)
+module Skeleton exposing
+    ( Page
+    , view
+    , viewInitializingText
+    , viewLink
+    , viewLoadingText
+    )
 
 import Const
 import FeatherIcons
@@ -47,6 +53,15 @@ viewLink externalLink =
         Nothing ->
             emptyHtml
 
+
+viewInitializingText : Html msg
+viewInitializingText =
+    text "Initialising ..."
+
+
+viewLoadingText : Html msg
+viewLoadingText =
+    text "Loading ..."
 
 
 -- INTERNAL

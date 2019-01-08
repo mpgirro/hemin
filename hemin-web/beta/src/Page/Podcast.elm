@@ -171,10 +171,10 @@ viewPodcast : WebData Podcast -> Html Msg
 viewPodcast webdata =
     case webdata of
         RemoteData.NotAsked ->
-            text "Initialising..."
+            Skeleton.viewInitializingText
 
         RemoteData.Loading ->
-            text "Loading..."
+            Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
             ErrorPage.viewHttpFailure error
@@ -382,10 +382,10 @@ viewFeeds : WebData (List Feed) -> Html Msg
 viewFeeds webdata =
     case webdata of
         RemoteData.NotAsked ->
-            text "Initialising..."
+            Skeleton.viewInitializingText
 
         RemoteData.Loading ->
-            text "Loading..."
+            Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
             ErrorPage.viewHttpFailure error

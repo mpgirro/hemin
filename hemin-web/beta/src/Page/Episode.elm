@@ -70,10 +70,10 @@ view model =
         body =
             case model.episode of
                 RemoteData.NotAsked ->
-                    text "Initialising..."
+                    Skeleton.viewInitializingText
 
                 RemoteData.Loading ->
-                    text "Loading..."
+                    Skeleton.viewLoadingText
 
                 RemoteData.Failure error ->
                     ErrorPage.viewHttpFailure error
