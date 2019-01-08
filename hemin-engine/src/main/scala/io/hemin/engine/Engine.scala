@@ -8,12 +8,10 @@ import akka.pattern.{CircuitBreaker, ask}
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.catalog.CatalogStore._
+import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.model._
 import io.hemin.engine.node.Node
-import io.hemin.engine.node.Node.{CliInput, CliOutput, EngineOperational, StartupStatus}
-import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import io.hemin.engine.util.mapper.MapperErrors
+import io.hemin.engine.searcher.Searcher
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -129,14 +127,14 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   /** Proposes a feed's URL to the system, which will
     * process it if the URL is yet unknown to the database. */
   def propose(url: String): Try[Unit] = guarded {
-    bus ! ProposeNewFeed(url)
+    bus ! CatalogStore.ProposeNewFeed(url)
   }
 
   /** Eventually returns the data resulting from processing the
     * arguments by the Command Language Interpreter as text */
   def cli(args: String): Future[String] = guarded {
-    (bus ? CliInput(args))
-      .mapTo[CliOutput]
+    (bus ? Node.CliInput(args))
+      .mapTo[Node.CliOutput]
       .map(_.output)
   }
 
@@ -154,49 +152,49 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
   def search(query: String, page: Option[Int], size: Option[Int]): Future[SearchResult] = guarded {
-    (bus ? SearchRequest(query, page, size))
-      .mapTo[SearchResults]
+    (bus ? Searcher.SearchRequest(query, page, size))
+      .mapTo[Searcher.SearchResults]
       .map(_.results)
   }
 
   /** Finds a [[io.hemin.engine.model.Podcast]] by ID */
   def findPodcast(id: String): Future[Option[Podcast]] = guarded {
-    (bus ? GetPodcast(id))
-      .mapTo[PodcastResult]
+    (bus ? CatalogStore.GetPodcast(id))
+      .mapTo[CatalogStore.PodcastResult]
       .map(_.podcast)
   }
 
   /** Finds an [[io.hemin.engine.model.Episode]] by ID */
   def findEpisode(id: String): Future[Option[Episode]] = guarded {
-    (bus ? GetEpisode(id))
-      .mapTo[EpisodeResult]
+    (bus ? CatalogStore.GetEpisode(id))
+      .mapTo[CatalogStore.EpisodeResult]
       .map(_.episode)
   }
 
   /** Finds a [[io.hemin.engine.model.Feed]] by ID */
   def findFeed(id: String): Future[Option[Feed]] = guarded {
-    (bus ? GetFeed(id))
-      .mapTo[FeedResult]
+    (bus ? CatalogStore.GetFeed(id))
+      .mapTo[CatalogStore.FeedResult]
       .map(_.feed)
   }
 
   /** Finds an [[io.hemin.engine.model.Image]] by ID */
   def findImage(id: String): Future[Option[Image]] = guarded {
-    (bus ? GetImage(id))
-      .mapTo[ImageResult]
+    (bus ? CatalogStore.GetImage(id))
+      .mapTo[CatalogStore.ImageResult]
       .map(_.image)
   }
 
   /*
   def findImageByPodcast(id: String): Future[Option[Image]] = guarded {
-    (bus ? GetImageByPodcast(id))
-      .mapTo[ImageResult]
+    (bus ? CatalogStore.GetImageByPodcast(id))
+      .mapTo[CatalogStore.ImageResult]
       .map(_.image)
   }
 
   def findImageByEpisode(id: String): Future[Option[Image]] = guarded {
-    (bus ? GetImageByEpisode(id))
-      .mapTo[ImageResult]
+    (bus ? CatalogStore.GetImageByEpisode(id))
+      .mapTo[CatalogStore.ImageResult]
       .map(_.image)
   }
   */
@@ -209,48 +207,48 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * @return
     */
   def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = guarded {
-    (bus ? GetAllPodcastsRegistrationComplete(page, size))
-      .mapTo[AllPodcastsResult]
+    (bus ? CatalogStore.GetAllPodcastsRegistrationComplete(page, size))
+      .mapTo[CatalogStore.AllPodcastsResult]
       .map(_.podcasts)
   }
 
   /** Finds an [[io.hemin.engine.model.Episode]] by its belonging Podcast's ID */
   def findEpisodesByPodcast(id: String): Future[List[Episode]] = guarded {
-    (bus ? GetEpisodesByPodcast(id))
-      .mapTo[EpisodesByPodcastResult]
+    (bus ? CatalogStore.GetEpisodesByPodcast(id))
+      .mapTo[CatalogStore.EpisodesByPodcastResult]
       .map(_.episodes)
   }
 
   /** Finds an [[io.hemin.engine.model.Feed]] by its belonging Podcast's ID */
   def findFeedsByPodcast(id: String): Future[List[Feed]] = guarded {
-    (bus ? GetFeedsByPodcast(id))
-      .mapTo[FeedsByPodcastResult]
+    (bus ? CatalogStore.GetFeedsByPodcast(id))
+      .mapTo[CatalogStore.FeedsByPodcastResult]
       .map(_.feeds)
   }
 
   // TODO unused and deprecated, since Chapters are embedded directly into Episode's
   /** Finds all [[io.hemin.engine.model.Chapter]] by their belonging Episode's ID */
   def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
-    (bus ? GetChaptersByEpisode(id))
-      .mapTo[ChaptersByEpisodeResult]
+    (bus ? CatalogStore.GetChaptersByEpisode(id))
+      .mapTo[CatalogStore.ChaptersByEpisodeResult]
       .map(_.chapters)
   }
 
   def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
-    (bus ? GetNewestPodcasts(pageNumber, pageSize))
-      .mapTo[NewestPodcastsResult]
+    (bus ? CatalogStore.GetNewestPodcasts(pageNumber, pageSize))
+      .mapTo[CatalogStore.NewestPodcastsResult]
       .map(_.podcasts)
   }
 
   def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = guarded {
-    (bus ? GetLatestEpisodes(pageNumber, pageSize))
-      .mapTo[LatestEpisodesResult]
+    (bus ? CatalogStore.GetLatestEpisodes(pageNumber, pageSize))
+      .mapTo[CatalogStore.LatestEpisodesResult]
       .map(_.episodes)
   }
 
   def getDatabaseStats: Future[DatabaseStats] = guarded {
-    (bus ? GetDatabaseStats())
-      .mapTo[DatabaseStatsResult]
+    (bus ? CatalogStore.GetDatabaseStats())
+      .mapTo[CatalogStore.DatabaseStatsResult]
       .map(_.stats)
   }
 
@@ -262,12 +260,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   }
 
   private def warmup(): Try[Unit] = {
-    val startup = bus ? EngineOperational
+    val startup = bus ? Node.EngineOperational
     Await.result(startup, internalTimeout.duration) match {
-      case StartupStatus(true) =>
+      case Node.StartupStatus(true) =>
         running.set(true)
         Success(Unit)
-      case StartupStatus(false) =>
+      case Node.StartupStatus(false) =>
         Thread.sleep(25) // don't wait too busy
         warmup()
     }
