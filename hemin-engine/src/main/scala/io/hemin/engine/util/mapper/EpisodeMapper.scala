@@ -76,10 +76,13 @@ object EpisodeMapper {
         title = e.title,
         link = e.link,
         pubDate = e.pubDate,
+        description = (e.description, e.itunes.summary, e.contentEncoded) match {
+          case (Some(d), _, _)       => Some(d)
+          case (None, Some(s), _)    => Some(s)
+          case (None, None, Some(c)) => Some(c)
+          case (_, _, _)             => None
+        },
         image = e.image,
-        itunes = EpisodeItunes(
-          summary = e.itunes.summary,
-        )
       )
     }
 
