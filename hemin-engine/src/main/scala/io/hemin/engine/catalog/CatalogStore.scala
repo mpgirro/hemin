@@ -502,9 +502,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Podcast (ID=$id) from database : ", ex)
           None // we have no results to return
       }
-      .map { p =>
-        theSender ! PodcastResult(p)
-      }
+      .map(theSender ! PodcastResult(_))
   }
 
   private def onGetAllPodcasts(page: Option[Int], size: Option[Int]): Unit = {
@@ -522,9 +520,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all Podcasts by page=$page and size=$size", ex)
           Nil // we have no results to return
       }
-      .map { ps =>
-        theSender ! AllPodcastsResult(ps)
-      }
+      .map(theSender ! AllPodcastsResult(_))
   }
 
   private def onGetAllPodcastsRegistrationComplete(page: Option[Int], size: Option[Int]): Unit = {
@@ -542,9 +538,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all Podcasts by page=$page and size=$size and registrationCompelete=TRUE", ex)
           Nil // we have no results to return
       }
-      .map { ps =>
-        theSender ! AllPodcastsResult(ps)
-      }
+      .map(theSender ! AllPodcastsResult(_))
   }
 
   private def onGetAllFeeds(page: Option[Int], size: Option[Int]): Unit = {
@@ -562,9 +556,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all Feeds by page=$page and size=$size", ex)
           Nil // we have no results to return
       }
-      .map { fs =>
-        theSender ! AllFeedsResult(fs)
-      }
+      .map(theSender ! AllFeedsResult(_))
   }
 
   private def onGetEpisode(id: String): Unit= {
@@ -579,9 +571,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Episode (ID=$id) from database : ", ex)
           None // we have no results to return
       }
-      .map { e =>
-        theSender ! EpisodeResult(e)
-      }
+      .map(theSender ! EpisodeResult(_))
   }
 
   private def onGetEpisodesByPodcast(podcastId: String): Unit = {
@@ -596,9 +586,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all Episodes by Podcast (ID=$podcastId)", ex)
           Nil // we have no results to return
       }
-      .map { es =>
-        theSender ! EpisodesByPodcastResult(es)
-      }
+      .map(theSender ! EpisodesByPodcastResult(_))
   }
 
   private def onGetFeedsByPodcast(podcastId: String): Unit = {
@@ -613,9 +601,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all Feeds by Podcast (ID=$podcastId)", ex)
           Nil // we have no results to return
       }
-      .map { fs =>
-        theSender ! FeedsByPodcastResult(fs)
-      }
+      .map(theSender ! FeedsByPodcastResult(_))
   }
 
   private def onGetChaptersByEpisode(episodeId: String): Unit = {
@@ -630,7 +616,7 @@ class CatalogStore(config: CatalogConfig)
           log.warning("Database does not contain Episode (ID) : {}", episodeId)
           Nil
       }
-      .foreach { cs => theSender ! ChaptersByEpisodeResult(cs) }
+      .foreach(theSender ! ChaptersByEpisodeResult(_))
   }
 
   private def onGetFeed(id: String): Unit = {
@@ -645,9 +631,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Feed (ID=$id) from database : ", ex)
           None // we have no results to return
       }
-      .map { f =>
-        theSender ! FeedResult(f)
-      }
+      .map(theSender ! FeedResult(_))
   }
 
   private def onGetImage(id: String): Unit = {
@@ -661,7 +645,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Image (ID=$id) from database : ", ex)
           None // we have no results to return
       }
-      .foreach(i => theSender ! ImageResult(i))
+      .foreach(theSender ! ImageResult(_))
   }
 
   private def onGetImageByUrl(url: String): Unit = {
@@ -675,7 +659,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Error on retrieving Image by URL = '$url' from database : ", ex)
           None // we have no results to return
       }
-      .foreach(i => theSender ! ImageResult(i))
+      .foreach(theSender ! ImageResult(_))
   }
 
   /*
@@ -726,9 +710,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get newest Podcasts by page=$pageNumber and size=$pageSize", ex)
           Nil // we have no results to return
       }
-      .map { ps =>
-        theSender ! CatalogStore.NewestPodcastsResult(ps)
-      }
+      .map(theSender ! NewestPodcastsResult(_))
   }
 
   private def onGetLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Unit = {
@@ -747,9 +729,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get latest Episodes by page=$pageNumber and size=$pageSize", ex)
           Nil // we have no results to return
       }
-      .map { es =>
-        theSender ! CatalogStore.LatestEpisodesResult(es)
-      }
+      .map(theSender ! LatestEpisodesResult(_))
   }
 
   private def onGetDatabaseStats(): Unit = {
@@ -772,9 +752,7 @@ class CatalogStore(config: CatalogConfig)
       episodeCount = ec,
       feedCount = fc,
       imageCount = ic,
-    )).map { stats =>
-      theSender ! CatalogStore.DatabaseStatsResult(stats)
-    }
+    )).map(theSender ! DatabaseStatsResult(_))
   }
 
   private def onGetCategories(): Unit = {
@@ -789,9 +767,7 @@ class CatalogStore(config: CatalogConfig)
           onError(s"Could not get all itunes categories", ex)
           Nil // we have no results to return
       }
-      .map {
-        theSender ! CatalogStore.CategoriesResult(_)
-      }
+      .map(theSender ! CategoriesResult(_))
   }
 
   private def onCheckPodcast(podcastId: String): Unit = {
