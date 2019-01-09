@@ -26,7 +26,7 @@ import Router exposing (redirectByIndexDocType)
 import Skeleton exposing (Page)
 import String.Extra
 import Url exposing (Url)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml)
+import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateHtml)
 
 
 
@@ -257,8 +257,11 @@ viewIndexDoc doc =
             [ viewCoverImage doc
             , div [ class "overflow-hidden" ]
                 [ viewIndexDocTitleAsLink doc
-                , br [] []
-                , viewDocType doc
+                , viewIndexDocSubtitle doc
+                , p []
+                    [ viewDocType doc
+                    , viewPubDate doc
+                    ]
                 , viewStrippedDescription doc
                 ]
             ]
@@ -298,14 +301,54 @@ viewIndexDocTitleAsLink doc =
         [ maybeAsText doc.title ]
 
 
+viewIndexDocSubtitle : IndexDoc -> Html Msg
+viewIndexDocSubtitle doc =
+    case (doc.docType, doc.podcastTitle) of
+        ("podcast", _) ->
+            emptyHtml
+
+        ("episode", Just podcastTitle) ->
+            p [ class "note" ] [ text podcastTitle ]
+
+        (_, _) ->
+            emptyHtml
+
 viewDocType : IndexDoc -> Html Msg
 viewDocType doc =
+    let
+        viewLabel : String -> Html Msg
+        viewLabel label =
+            span [ class "Label", class "Label--outline", class "mr-2" ] [ text label ]
+    in
     case doc.docType of
         "podcast" ->
-            span [ class "Label", class "Label--outline" ] [ text "PODCAST" ]
+            viewLabel "PODCAST"
 
         "episode" ->
-            span [ class "Label", class "Label--outline" ] [ text "EPISODE" ]
+            viewLabel "EPISODE"
+
+        _ ->
+            emptyHtml
+
+
+viewPubDate : IndexDoc -> Html Msg
+viewPubDate doc =
+    let
+        viewDate : Html Msg
+        viewDate =
+            case doc.pubDate of
+                Just pubDate ->
+                    span [ class "note", class "mr-2" ] [ text "date:", prettyDateHtml pubDate ]
+
+                Nothing ->
+                    emptyHtml
+    in
+    case doc.docType of
+        "podcast" ->
+            emptyHtml
+
+        "episode" ->
+            viewDate
 
         _ ->
             emptyHtml
