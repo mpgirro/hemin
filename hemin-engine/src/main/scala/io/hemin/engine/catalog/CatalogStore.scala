@@ -351,7 +351,29 @@ class CatalogStore(config: CatalogConfig)
 
         // TODO we will fetch feeds for checking new episodes, but not because we updated podcast metadata
         // crawler ! FetchFeedForUpdateEpisodes(feedUrl, podcastId)
+
+        // ensure that values that may have changed are propagated to the podcast
+        updateEpisodeFieldsRelatedToPodcast(p)
+        // TODO I must also update the same fields in the index
       })
+  }
+
+  private def updateEpisodeFieldsRelatedToPodcast(podcast: Podcast): Unit = {
+    log.debug("Updating all Episodes with fields related to Podcast : {}", podcast.id)
+    podcast.id match {
+      case Some(podcastId) =>
+        episodes
+          .findAllByPodcast(podcastId)
+          .foreach { _
+            .foreach { e =>
+              episodes.save(e.copy(
+                podcastTitle = podcast.title
+              ))
+            }
+          }
+      case None => log.warning("Cannot update related Episodes by Podcast; reason: the Podcast's ID is None")
+    }
+
   }
 
   private def onUpdateEpisode(episode: Episode): Unit = {
