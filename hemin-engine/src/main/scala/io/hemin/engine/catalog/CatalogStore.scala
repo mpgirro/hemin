@@ -26,11 +26,12 @@ object CatalogStore {
   trait CatalogCommand extends CatalogMessage
   trait CatalogQuery extends CatalogMessage
   trait CatalogQueryResult extends CatalogMessage
+
   // CatalogCommands
   final case class ProposeNewFeed(url: String) extends CatalogCommand                 // Web/CLI -> CatalogStore
   final case class RegisterEpisodeIfNew(podcastId: String, episode: Episode) extends CatalogCommand // Questions: Parser -> CatalogStore
+
   // CatalogEvents
-  //case class AddPodcastAndFeedIfUnknown(podcast: OldPodcast, feed: OldFeed) extends CatalogEvent
   final case class FeedStatusUpdate(podcastId: String, feedUrl: String, timestamp: Long, status: FeedStatus) extends CatalogEvent
   final case class UpdateFeedUrl(oldUrl: String, newUrl: String) extends CatalogEvent
   final case class UpdateLinkById(id: String, newUrl: String) extends CatalogEvent
@@ -39,6 +40,7 @@ object CatalogStore {
   final case class UpdateEpisode(episode: Episode) extends CatalogEvent
   final case class UpdateEpisodeWithChapters(podcastId: String, episode: Episode, chapter: List[Chapter]) extends CatalogEvent
   final case class UpdateImage(image: Image) extends CatalogEvent
+
   // CatalogQueries
   final case class GetPodcast(id: String) extends CatalogQuery
   final case class GetAllPodcasts(page: Option[Int], size: Option[Int]) extends CatalogQuery
@@ -61,6 +63,7 @@ object CatalogStore {
   final case class CheckFeed(id: String) extends CatalogQuery
   //case class CheckAllPodcasts() extends CatalogQuery
   final case class CheckAllFeeds() extends CatalogQuery
+
   // CatalogQueryResults
   final case class PodcastResult(podcast: Option[Podcast]) extends CatalogQueryResult
   final case class AllPodcastsResult(podcasts: List[Podcast]) extends CatalogQueryResult
@@ -75,7 +78,6 @@ object CatalogStore {
   final case class LatestEpisodesResult(episodes: List[Episode]) extends CatalogQueryResult
   final case class DatabaseStatsResult(stats: DatabaseStats) extends CatalogQueryResult
   final case class CategoriesResult(categories: Set[String]) extends CatalogQueryResult
-  //case class NothingFound(exo: String) extends CatalogQueryResult
 }
 
 class CatalogStore(config: CatalogConfig)
@@ -160,25 +162,15 @@ class CatalogStore(config: CatalogConfig)
 
     case CheckFeed(id) => onCheckFeed(id)
 
-    //case CheckAllPodcasts => onCheckAllPodcasts(0, config.maxPageSize)
-
     case CheckAllFeeds => onCheckAllFeeds(0, config.maxPageSize)
 
     case FeedStatusUpdate(podcastId, feedUrl, timestamp, status) => onFeedStatusUpdate(podcastId, feedUrl, timestamp, status)
-
-    //case SaveChapter(chapter) => onSaveChapter(chapter)
-
-    //case AddPodcastAndFeedIfUnknown(podcast, feed) => onAddPodcastAndFeedIfUnknown(podcast, feed)
 
     case UpdatePodcast(id, url, podcast) => onUpdatePodcast(id, url, podcast)
 
     case UpdateEpisode(episode) => onUpdateEpisode(episode)
 
     case UpdateImage(image) => onUpdateImage(image)
-
-    // TODO
-    //case UpdateFeed(podcastExo, feed) =>  ...
-    //case UpdateChapter(episodeExo, chapter) =>  ...
 
     case UpdateFeedUrl(oldUrl, newUrl) => onUpdateFeedMetadataUrl(oldUrl, newUrl)
 
@@ -263,8 +255,6 @@ class CatalogStore(config: CatalogConfig)
             val podcastId = idGenerator.newId
             val podcast = Podcast(
               id          = Some(podcastId),
-              //title       = Some(podcastId),
-              //description = Some(url),
               registration = PodcastRegistration(
                 complete  = Some(false),
                 timestamp = Some(now)
@@ -290,13 +280,6 @@ class CatalogStore(config: CatalogConfig)
                 feeds
                   .save(feed)
                   .foreach(_ => {
-                    /*
-                    val catalogEvent = AddPodcastAndFeedIfUnknown(
-                      idMapper.clearImmutable(podcast),
-                      idMapper.clearImmutable(feed))
-                    //emitCatalogEvent(catalogEvent)
-                    self ! catalogEvent
-                    */
                     updater ! ProcessFeed(podcastId, url, NewPodcastFetchJob())
                   })
               })
@@ -391,7 +374,7 @@ class CatalogStore(config: CatalogConfig)
             }
           }
 
-          episode.patchRight(e) // episodeMapper.update(episode, e)
+          episode.patchRight(e)
         case None =>
           log.debug("Episode to update is not yet in database, therefore it will be added : {}", episode.id)
           episode
