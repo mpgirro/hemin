@@ -1,11 +1,14 @@
 module Page.Home exposing
     ( Model
     , Msg
+    , emptyModel
     , init
     , update
     , view
     )
 
+import Browser
+import Browser.Navigation
 import Const
 import Data.DatabaseStats exposing (DatabaseStats)
 import Data.Episode exposing (Episode)
@@ -14,7 +17,7 @@ import FeatherIcons
 import Html exposing (Html, a, button, div, img, input, li, p, span, text, ul, h1, h2)
 import Html.Attributes exposing (alt, attribute, autocomplete, class, height, href, placeholder, spellcheck, src, type_, value, width)
 import Html.Attributes.Aria exposing (ariaLabel, role)
-import Html.Events exposing (onClick, onInput)
+import Html.Events exposing (onClick, onInput, onSubmit)
 import Html.Events.Extra exposing (onEnter)
 import Http
 import Page.Error as ErrorPage
@@ -30,7 +33,9 @@ import Util exposing (emptyHtml, maybeAsString)
 
 
 type alias Model =
-    { newestPodcasts : WebData (List Podcast)
+    { key : Maybe Browser.Navigation.Key
+    , searchQuery : Maybe String
+    , newestPodcasts : WebData (List Podcast)
     , latestEpisodes : WebData (List Episode)
     , databaseStats : WebData DatabaseStats
     }
@@ -38,14 +43,16 @@ type alias Model =
 
 emptyModel : Model
 emptyModel =
-    { newestPodcasts = RemoteData.NotAsked
+    { key = Nothing
+    , searchQuery = Nothing
+    , newestPodcasts = RemoteData.NotAsked
     , latestEpisodes = RemoteData.NotAsked
     , databaseStats = RemoteData.NotAsked
     }
 
 
-init : ( Model, Cmd Msg )
-init =
+init : Maybe Browser.Navigation.Key -> ( Model, Cmd Msg )
+init key =
     let
         cmd : Cmd Msg
         cmd =
@@ -55,7 +62,7 @@ init =
                 , getDatabaseStats
                 ]
     in
-    ( emptyModel, cmd )
+    ( { emptyModel | key = key }, cmd )
 
 
 
@@ -66,11 +73,16 @@ type Msg
     = GotNewestPodcastListData (WebData (List Podcast))
     | GotLatestEpisodeListData (WebData (List Episode))
     | GotDatabaseStats (WebData DatabaseStats)
+    | RedirectToSearch
+    | UpdateModel Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        UpdateModel m ->
+            ( m, Cmd.none)
+
         GotNewestPodcastListData newestPodcasts ->
             ( { model | newestPodcasts = newestPodcasts }, Cmd.none )
 
@@ -79,6 +91,19 @@ update msg model =
 
         GotDatabaseStats stats ->
             ( { model | databaseStats = stats }, Cmd.none )
+
+        RedirectToSearch ->
+            case (model.searchQuery, model.key) of
+                (Just query, Just key) ->
+                    ( model, Browser.Navigation.pushUrl key ("/search?q=" ++ query) )
+
+                (_, _) ->
+                    ( model, Cmd.none )
+
+
+updateModelQuery : Model -> String -> Msg
+updateModelQuery model query =
+    UpdateModel { model | searchQuery = Just query }
 
 
 view : Model -> ( String, Html Msg )
@@ -91,7 +116,7 @@ view model =
         body =
             div []
                 [ viewPageTitle
-                , viewSearchForm model.databaseStats
+                , viewSearchForm model
                 , viewNavButtonRow
                 , viewLatestEpisodes model.latestEpisodes
                 , viewNewestPodcast model.newestPodcasts
@@ -107,22 +132,26 @@ viewPageTitle =
         , h2 [ class "f3" ] [ text "Podcast Catalog & Search Engine" ]
         ]
 
-viewSearchForm : WebData DatabaseStats -> Html Msg
-viewSearchForm stats =
-    Html.form [ class "col-md-10", class "mx-auto" ]
+viewSearchForm : Model -> Html Msg
+viewSearchForm model =
+    Html.form
+        [ class "col-md-10"
+        , class "mx-auto"
+        , onSubmit RedirectToSearch
+        ]
         [ div
             [ class "input-group"
             , class "mt-5"
             ]
-            [ viewSearchInput
-            , viewSearchButton
+            [ viewSearchInput model
+            , viewSearchButton model
             ]
-        , viewSearchNote stats
+        , viewSearchNote model.databaseStats
         ]
 
 
-viewSearchInput : Html Msg
-viewSearchInput =
+viewSearchInput : Model -> Html Msg
+viewSearchInput model =
     input
         [ class "form-control"
         , class "input"
@@ -130,27 +159,24 @@ viewSearchInput =
         --, height 44
         , attribute "style" "height: 44px !important"
         , type_ "text"
-        , value ""
+        , value (maybeAsString model.searchQuery)
         , placeholder "What are you looking for?"
         , autocomplete False
         , spellcheck False
-
-        --, onInput (updateStateQuery state)
-        --, onEnter (updateSearchUrl state)
+        , onInput (updateModelQuery model)
         ]
         []
 
 
-viewSearchButton : Html Msg
-viewSearchButton =
+viewSearchButton : Model -> Html Msg
+viewSearchButton model =
     span [ class "input-group-button" ]
         [ button
             [ class "btn"
             , class "text-normal"
             , type_ "button"
             , ariaLabel "Search"
-
-            --, onClick Propose
+            , onClick RedirectToSearch
             ]
             [ FeatherIcons.search
                 |> FeatherIcons.toHtml []
@@ -173,7 +199,8 @@ viewSearchNote dbStats =
            Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
-            ErrorPage.viewHttpFailure error
+            --ErrorPage.viewHttpFailure error
+            emptyHtml
 
         RemoteData.Success stats ->
             div [ class "note"

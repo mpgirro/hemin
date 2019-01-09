@@ -73,7 +73,7 @@ init : () -> Url.Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
 init flags url key =
     let
         ( content, _ ) =
-            HomePage.init
+            HomePage.init (Just key)
 
         model =
             { key = key
@@ -140,7 +140,7 @@ updateUrlChanged model =
             -- TODO: here we do not dispatch a message that will replace the Loading model
             let
                 ( c, m ) =
-                    HomePage.init
+                    HomePage.init (Just model.key)
             in
             ( { model | content = wrapHomeContent c }, wrapHomeMsg m )
 

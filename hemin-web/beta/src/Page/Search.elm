@@ -285,9 +285,11 @@ viewCoverImage doc =
 viewStrippedDescription : IndexDoc -> Html Msg
 viewStrippedDescription doc =
     let
+        stripped : String
         stripped =
             String.Extra.stripTags (maybeAsString doc.description)
 
+        truncate : String
         truncate =
             String.left 280 stripped
     in
