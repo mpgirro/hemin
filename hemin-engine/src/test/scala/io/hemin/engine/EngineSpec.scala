@@ -1,12 +1,10 @@
 package io.hemin.engine
 
 import com.github.simplyscala.{MongoEmbedDatabase, MongodProps}
-import com.typesafe.config.{Config, ConfigFactory}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.tagobjects.Slow
 import org.scalatest.{BeforeAndAfter, FlatSpec, Ignore, Matchers}
 
-import scala.collection.JavaConverters._
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
 

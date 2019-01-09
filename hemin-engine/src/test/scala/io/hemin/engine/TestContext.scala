@@ -2,6 +2,10 @@ package io.hemin.engine
 
 import com.github.simplyscala.MongodProps
 import com.typesafe.config.{Config, ConfigFactory}
+import de.flapdoodle.embed.mongo.Command
+import de.flapdoodle.embed.mongo.config.RuntimeConfigBuilder
+import de.flapdoodle.embed.process.config.IRuntimeConfig
+import de.flapdoodle.embed.process.config.io.ProcessOutput
 import io.hemin.engine.catalog.repository.RepositoryFactory
 
 import scala.collection.JavaConverters._
@@ -29,11 +33,18 @@ class TestContext(mongoProps: MongodProps) {
 
   val mongoUri: String = s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
 
-  val Config: Config = ConfigFactory
-    .parseMap(Map("hemin.catalog.mongo-uri" -> mongoUri).asJava)
+  private val runtimeConfig: IRuntimeConfig = new RuntimeConfigBuilder()
+    .defaults(Command.MongoD)
+    .processOutput(ProcessOutput.getDefaultInstanceSilent)
+    .build()
+
+  val config: Config = ConfigFactory
+    .parseMap(Map(
+      "hemin.catalog.mongo-uri" -> mongoUri,
+    ).asJava)
     .withFallback(EngineConfig.defaultConfig)
 
-  val engineConfig: EngineConfig = EngineConfig.load(Config)
+  val engineConfig: EngineConfig = EngineConfig.load(config)
 
   val repositoryFactory: RepositoryFactory = new RepositoryFactory(engineConfig.catalog, executionContext)
 

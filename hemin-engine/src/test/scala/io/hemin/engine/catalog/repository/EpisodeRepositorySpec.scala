@@ -5,10 +5,10 @@ import io.hemin.engine.TestContext
 import io.hemin.engine.model.Episode
 import io.hemin.engine.util.TimeUtil
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfter, FlatSpec, Matchers}
+import org.scalatest.{AsyncFlatSpec, BeforeAndAfter, Matchers}
 
 class EpisodeRepositorySpec
-  extends FlatSpec
+  extends AsyncFlatSpec
     with Matchers
     with ScalaFutures
     with MongoEmbedDatabase
@@ -28,15 +28,15 @@ class EpisodeRepositorySpec
     mongoStop(mongoProps)
   }
 
-  "The EpisodeRepository" should "not retrieve episodes with a future pubDate" in {
+  "The EpisodeRepository" should "not eventually retrieve an episode with a future pubDate" in {
 
-    val now = TimeUtil.now()
+    val now = TimeUtil.now
     val tomorrow = now + 86400000L
 
     val episode1 = Episode(
       id = Some("id1"),
       title = Some("test episode 1"),
-      pubDate = Some(now)
+      pubDate = Some(now-1000)
     )
 
     val episode2 = Episode(
@@ -45,14 +45,21 @@ class EpisodeRepositorySpec
       pubDate = Some(tomorrow)
     )
 
-    episodeRepository.save(episode1)
-    episodeRepository.save(episode2)
-
-    // TODO wait unit save finished
-
-    // TODO query database and check that episodes is not in the results
-
     assert(true) // TODO
+
+    /*
+    // Note: we are aware of the sequencing that happens here, and we want it!
+    val results = for {
+      e1 <- episodeRepository.save(episode1)
+      e2 <- episodeRepository.save(episode2)
+      r <-  episodeRepository.findAll(1, -1)
+    } yield r
+
+    results.map { r =>
+        assert(r.exists(_.id.contains("id1")), "An episode with a valid pubDate was not retrieved")
+        assert(!r.exists(_.id.contains("id2")), "An episode with an invalid pubDate (in the future) was retrieved")
+      }
+    */
 
   }
 
