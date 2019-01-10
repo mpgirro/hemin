@@ -34,7 +34,7 @@ import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberPara
 
 
 type alias Model =
-    { key : Maybe Browser.Navigation.Key
+    { navigationKey : Maybe Browser.Navigation.Key
     , query : Maybe String
     , pageNumber : Maybe Int
     , pageSize : Maybe Int
@@ -44,7 +44,7 @@ type alias Model =
 
 emptyModel : Model
 emptyModel =
-    { key = Nothing
+    { navigationKey = Nothing
     , query = Nothing
     , pageNumber = Nothing
     , pageSize = Nothing
@@ -111,7 +111,7 @@ updateModelQuery model query =
 
 updateSearchUrl : Model -> Msg
 updateSearchUrl model =
-    UpdateSearchUrl model.key model.query Nothing Nothing
+    UpdateSearchUrl model.navigationKey model.query Nothing Nothing
 
 
 redirectLocalUrl : Model -> Cmd Msg
@@ -142,7 +142,7 @@ redirectLocalUrl model =
         path =
             (++) "/search" urlQuery
     in
-    case model.key of
+    case model.navigationKey of
         Just key ->
             Browser.Navigation.pushUrl key path
 
@@ -490,7 +490,7 @@ getSearchResult query pageNumber pageSize =
 
 initModelFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Model
 initModelFromParams key query pageNumber pageSize =
-    { key = key
+    { navigationKey = key
     , query = query
     , pageNumber = pageNumber
     , pageSize = pageSize
@@ -500,7 +500,7 @@ initModelFromParams key query pageNumber pageSize =
 
 loadingModelFromParams : Maybe Browser.Navigation.Key -> Maybe String -> Maybe Int -> Maybe Int -> Model
 loadingModelFromParams key query pageNumber pageSize =
-    { key = key
+    { navigationKey = key
     , query = query
     , pageNumber = pageNumber
     , pageSize = pageSize

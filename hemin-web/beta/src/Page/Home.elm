@@ -33,7 +33,7 @@ import Util exposing (emptyHtml, maybeAsString)
 
 
 type alias Model =
-    { key : Maybe Browser.Navigation.Key
+    { navigationKey : Maybe Browser.Navigation.Key
     , searchQuery : Maybe String
     , newestPodcasts : WebData (List Podcast)
     , latestEpisodes : WebData (List Episode)
@@ -43,7 +43,7 @@ type alias Model =
 
 emptyModel : Model
 emptyModel =
-    { key = Nothing
+    { navigationKey = Nothing
     , searchQuery = Nothing
     , newestPodcasts = RemoteData.NotAsked
     , latestEpisodes = RemoteData.NotAsked
@@ -62,7 +62,7 @@ init key =
                 , getDatabaseStats
                 ]
     in
-    ( { emptyModel | key = key }, cmd )
+    ( { emptyModel | navigationKey = key }, cmd )
 
 
 
@@ -93,7 +93,7 @@ update msg model =
             ( { model | databaseStats = stats }, Cmd.none )
 
         RedirectToSearch ->
-            case (model.searchQuery, model.key) of
+            case (model.searchQuery, model.navigationKey) of
                 (Just query, Just key) ->
                     ( model, Browser.Navigation.pushUrl key ("/search?q=" ++ query) )
 
