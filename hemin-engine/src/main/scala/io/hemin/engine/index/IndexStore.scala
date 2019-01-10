@@ -30,7 +30,7 @@ object IndexStore {
   // IndexCommands
   //case class CommitIndex() extends IndexCommand
   // IndexQueries
-  final case class IndexSearch(query: String, page: Int, size: Int) extends IndexQuery
+  final case class IndexSearch(query: String, pageNumber: Int, pageSize: Int) extends IndexQuery
   // IndexQueryResults
   final case class IndexSearchResults(results: SearchResult) extends IndexQueryResult
 }

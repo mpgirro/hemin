@@ -49,9 +49,9 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
     findOne("id" -> toBsonS(id))
   }
 
-  def findAllRegistrationCompleteAsTeaser(page: Int, size: Int): Future[List[Podcast]] = {
-    log.debug("Request to get all Podcasts where registration is complete by page : {} and size : {}", page, size)
-    findAll(Query("registration.complete" -> toBsonB(true)), page, size)
+  def findAllRegistrationCompleteAsTeaser(pageNumber: Int, pageSize: Int): Future[List[Podcast]] = {
+    log.debug("Request to get all Podcasts where registration is complete by pageNumber : {} and pageSize : {}", pageNumber, pageSize)
+    findAll(Query("registration.complete" -> toBsonB(true)), pageNumber, pageSize)
   }
 
   /** Finds all Podcasts by the reference they currently hold to an image. Depending

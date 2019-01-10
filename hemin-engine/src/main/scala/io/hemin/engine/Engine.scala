@@ -143,16 +143,16 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * page and size parameters.
     *
     * @param query The query to search the internal reverse index for.
-    * @param page  The page for the [[io.hemin.engine.model.SearchResult]]. If None, then
+    * @param pageNumber  The page for the [[io.hemin.engine.model.SearchResult]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
-    * @param size  The size (= maximum number of elements in the
+    * @param pageSize  The size (= maximum number of elements in the
     *              [[io.hemin.engine.model.SearchResult.results]] list) of the
     *              [[io.hemin.engine.model.SearchResult]]. If None, then
     *              [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
     * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
-  def search(query: String, page: Option[Int], size: Option[Int]): Future[SearchResult] = guarded {
-    (bus ? Searcher.SearchRequest(query, page, size))
+  def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = guarded {
+    (bus ? Searcher.SearchRequest(query, pageNumber, pageSize))
       .mapTo[Searcher.SearchResults]
       .map(_.results)
   }
@@ -202,12 +202,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   /** Finds a slice of all [[io.hemin.engine.model.Podcast]] starting
     * from (`page` * `size`) and with `size` elements.
     *
-    * @param page
-    * @param size
+    * @param pageNumber
+    * @param pageSize
     * @return
     */
-  def findAllPodcasts(page: Option[Int], size: Option[Int]): Future[List[Podcast]] = guarded {
-    (bus ? CatalogStore.GetAllPodcastsRegistrationComplete(page, size))
+  def findAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
+    (bus ? CatalogStore.GetAllPodcastsRegistrationComplete(pageNumber, pageSize))
       .mapTo[CatalogStore.AllPodcastsResult]
       .map(_.podcasts)
   }

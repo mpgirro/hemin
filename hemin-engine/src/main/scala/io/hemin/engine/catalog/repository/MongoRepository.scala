@@ -91,17 +91,17 @@ trait MongoRepository[T] {
 
   /**
     *
-    * @param page The page of the result frames to retrieve
-    * @param size The size of the frame to retrieve
+    * @param pageNumber The page of the result frames to retrieve
+    * @param pageSize The size of the frame to retrieve
     * @return The results within the window (page*size, size)
     */
-  def findAll(page: Int, size: Int): Future[List[T]] =
-    if (page < 1 || size < 1) {
-      log.warn("Window parameters are too small (page = {}, size = {})", page, size)
+  def findAll(pageNumber: Int, pageSize: Int): Future[List[T]] =
+    if (pageNumber < 1 || pageSize < 1) {
+      log.warn("Window parameters are too small (pageNumber = {}, pageSize = {})", pageNumber, pageSize)
       Future.successful(Nil)
     } else {
       val query = BSONDocument()
-      findAll(query, page, size)
+      findAll(query, pageNumber, pageSize)
     }
 
   protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] =
@@ -111,21 +111,21 @@ trait MongoRepository[T] {
     findAll(query, defaultSort)
 
   protected[this] def findAll(query: BSONDocument, sort: BSONDocument): Future[List[T]] =
-    findAll(query, page = 1, size = -1, defaultSort)
+    findAll(query, pageNumber = 1, pageSize = -1, defaultSort)
 
-  protected[this] def findAll(query: BSONDocument, page: Int, size: Int): Future[List[T]] =
-    findAll(query, page, size, defaultSort)
+  protected[this] def findAll(query: BSONDocument, pageNumber: Int, pageSize: Int): Future[List[T]] =
+    findAll(query, pageNumber, pageSize, defaultSort)
 
-  protected[this] def findAll(query: BSONDocument, page: Int, size: Int, sort: BSONDocument): Future[List[T]] =
+  protected[this] def findAll(query: BSONDocument, pageNumber: Int, pageSize: Int, sort: BSONDocument): Future[List[T]] =
     collection.flatMap { _
       .find(querySafeguard.merge(query))
       .sort(sort)
-      .skip((page-1) * size)
+      .skip((pageNumber-1) * pageSize)
       .cursor[T](ReadPreference.primaryPreferred)
-      .collect[List](size, Cursor.FailOnError[List[T]]())
+      .collect[List](pageSize, Cursor.FailOnError[List[T]]())
       .recover {
         case ex: Exception =>
-          log.error("Error on findAll(query = '{}', page = {}, size = {}, sort = {}) : {}", query, page, size, sort, ex)
+          log.error("Error on findAll(query = '{}', pageNumber = {}, pageSize = {}, sort = {}) : {}", query, pageNumber, pageSize, sort, ex)
           Nil
       }
     }

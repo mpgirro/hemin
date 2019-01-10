@@ -20,7 +20,7 @@ object Searcher {
   trait SearcherQuery extends SearcherMessage
   trait SearcherQueryResult extends SearcherMessage
   // SearchQueries
-  final case class SearchRequest(query: String, page: Option[Int], size: Option[Int]) extends SearcherQuery
+  final case class SearchRequest(query: String, pageNumber: Option[Int], pageSize: Option[Int]) extends SearcherQuery
   // SearchQueryResults
   final case class SearchResults(results: SearchResult) extends SearcherQueryResult
 }

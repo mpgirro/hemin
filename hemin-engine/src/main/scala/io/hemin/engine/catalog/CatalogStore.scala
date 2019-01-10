@@ -43,9 +43,9 @@ object CatalogStore {
 
   // CatalogQueries
   final case class GetPodcast(id: String) extends CatalogQuery
-  final case class GetAllPodcasts(page: Option[Int], size: Option[Int]) extends CatalogQuery
-  final case class GetAllPodcastsRegistrationComplete(page: Option[Int], size: Option[Int]) extends CatalogQuery
-  final case class GetAllFeeds(page: Option[Int], size: Option[Int]) extends CatalogQuery
+  final case class GetAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
+  final case class GetAllPodcastsRegistrationComplete(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
+  final case class GetAllFeeds(pageNumber: Option[Int], pageSize: Option[Int]) extends CatalogQuery
   final case class GetEpisode(id: String) extends CatalogQuery
   final case class GetEpisodesByPodcast(podcastId: String) extends CatalogQuery
   final case class GetFeedsByPodcast(podcastId: String) extends CatalogQuery
