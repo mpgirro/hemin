@@ -233,12 +233,10 @@ class RomeFeedParser private (private val xmlData: String) {
     .map { _.asScala
       .map { c =>
         Chapter(
-          id        = None,
-          episodeId = None,
-          start     = Option(c.getStart),
-          title     = Option(c.getTitle),
-          href      = Option(c.getHref),
-          image     = Option(c.getImage),
+          start = Option(c.getStart),
+          title = Option(c.getTitle),
+          href  = Option(c.getHref),
+          image = Option(c.getImage),
         )
       }.toList
     }.getOrElse(Nil)

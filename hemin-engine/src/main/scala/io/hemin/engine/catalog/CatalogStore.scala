@@ -864,7 +864,6 @@ class CatalogStore(config: CatalogConfig)
                     registration = EpisodeRegistration(
                       timestamp = Some(TimeUtil.now)
                     ),
-                    chapters = episode.chapters.map(_.copy(episodeId = Some(episodeId))), // TODO are chapters now embedded, remove episodeId
                   )
                   .patchLeft(Episode(
                     image = p.image
