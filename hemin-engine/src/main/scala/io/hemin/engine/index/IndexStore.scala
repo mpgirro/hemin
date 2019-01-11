@@ -1,6 +1,7 @@
 package io.hemin.engine.index
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter
 import io.hemin.engine.model.{IndexDoc, SearchResult}
@@ -36,8 +37,9 @@ object IndexStore {
 }
 
 class IndexStore (config: IndexConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
@@ -57,7 +59,7 @@ class IndexStore (config: IndexConfig)
   private var supervisor: ActorRef = _
 
   override def postRestart(cause: Throwable): Unit = {
-    log.warning("{} has been restarted or resumed", self.path.name)
+    log.warn("{} has been restarted or resumed", self.path.name)
     cause match {
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)

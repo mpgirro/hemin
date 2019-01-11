@@ -2,6 +2,7 @@ package io.hemin.engine.updater
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.google.common.base.Strings.isNullOrEmpty
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore.ProposeNewFeed
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
 import io.hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor, ActorRefSupervisor, ReportUpdaterStartupComplete}
@@ -21,8 +22,9 @@ object Updater {
 }
 
 class Updater (config: UpdaterConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))

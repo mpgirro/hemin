@@ -1,6 +1,7 @@
 package io.hemin.engine.catalog
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository._
 import io.hemin.engine.crawler.Crawler._
@@ -81,8 +82,9 @@ object CatalogStore {
 }
 
 class CatalogStore(config: CatalogConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
@@ -122,7 +124,7 @@ class CatalogStore(config: CatalogConfig)
    */
 
   override def postRestart(cause: Throwable): Unit = {
-    log.warning("{} has been restarted or resumed", self.path.name)
+    log.warn("{} has been restarted or resumed", self.path.name)
 
     //log.info(s"[$lnm] Stopping the MongoDriver...")
     //Future(mongoDriver.close())
@@ -300,7 +302,7 @@ class CatalogStore(config: CatalogConfig)
       .findOneByUrlAndPodcastId(url, podcastId)
       .foreach {
         case Some(f) => feeds.save(f.copy(lastChecked = Option(timestamp), lastStatus = Option(status)))
-        case None    => log.warning("No Feed found for Podcast (ID:{}) and URL : {}", podcastId, url)
+        case None    => log.warn("No Feed found for Podcast (ID:{}) and URL : {}", podcastId, url)
       }
   }
 
@@ -356,7 +358,7 @@ class CatalogStore(config: CatalogConfig)
               ))
             }
           }
-      case None => log.warning("Cannot update related Episodes by Podcast; reason: the Podcast's ID is None")
+      case None => log.warn("Cannot update related Episodes by Podcast; reason: the Podcast's ID is None")
     }
 
   }
@@ -390,9 +392,9 @@ class CatalogStore(config: CatalogConfig)
     log.debug("Updating the Image reference of Podcasts from URL = '{}' to ID = {}", url, id)
 
     (url, id) match {
-      case (None, None) => log.warning("Cannot update image reference in Podcast; reason: provided URL and ID are None")
-      case (None, _)    => log.warning("Cannot update image reference in Podcast; reason: provided URL is None")
-      case (_, None)    => log.warning("Cannot update image reference in Podcast; reason: provided ID is None")
+      case (None, None) => log.warn("Cannot update image reference in Podcast; reason: provided URL and ID are None")
+      case (None, _)    => log.warn("Cannot update image reference in Podcast; reason: provided URL is None")
+      case (_, None)    => log.warn("Cannot update image reference in Podcast; reason: provided ID is None")
       case (Some(u), Some(i)) =>
         podcasts
           .findAllByImage(u)
@@ -414,9 +416,9 @@ class CatalogStore(config: CatalogConfig)
     log.debug("Updating the Image reference of Episodes from URL = '{}' to ID = {}", url, id)
 
     (url, id) match {
-      case (None, None) => log.warning("Cannot update image reference in Episode; reason: provided URL and ID are None")
-      case (None, _)    => log.warning("Cannot update image reference in Episode; reason: provided URL is None")
-      case (_, None)    => log.warning("Cannot update image reference in Episode; reason: provided ID is None")
+      case (None, None) => log.warn("Cannot update image reference in Episode; reason: provided URL and ID are None")
+      case (None, _)    => log.warn("Cannot update image reference in Episode; reason: provided URL is None")
+      case (_, None)    => log.warn("Cannot update image reference in Episode; reason: provided ID is None")
       case (Some(u), Some(i)) =>
         episodes
           .findAllByImage(u)
@@ -615,7 +617,7 @@ class CatalogStore(config: CatalogConfig)
       .map {
         case Some(e) => e.chapters
         case None =>
-          log.warning("Database does not contain Episode (ID) : {}", episodeId)
+          log.warn("Database does not contain Episode (ID) : {}", episodeId)
           Nil
       }
       .foreach(theSender ! ChaptersByEpisodeResult(_))

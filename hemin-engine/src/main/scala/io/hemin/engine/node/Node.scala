@@ -2,6 +2,7 @@ package io.hemin.engine.node
 
 import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
 import akka.util.Timeout
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.catalog.CatalogStore.CatalogMessage
@@ -71,8 +72,9 @@ object Node {
 }
 
 class Node(config: EngineConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
@@ -97,7 +99,7 @@ class Node(config: EngineConfig)
   private var updater: ActorRef = _
 
   override def postRestart(cause: Throwable): Unit = {
-    log.warning("{} has been restarted or resumed", self.path.name)
+    log.warn("{} has been restarted or resumed", self.path.name)
     cause match {
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)

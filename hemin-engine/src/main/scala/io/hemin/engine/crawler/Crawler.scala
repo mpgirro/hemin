@@ -3,6 +3,7 @@ package io.hemin.engine.crawler
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.crawler.http.HttpClient
 import io.hemin.engine.node.Node._
 
@@ -39,8 +40,9 @@ object Crawler {
 }
 
 class Crawler (config: CrawlerConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.props.dispatcher)
   log.debug("{} running with mailbox : {}", self.path.name, context.props.mailbox)

@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
 import akka.stream._
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.crawler.api._
@@ -27,8 +28,9 @@ object CrawlerWorker {
 }
 
 class CrawlerWorker (config: CrawlerConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
@@ -59,7 +61,7 @@ class CrawlerWorker (config: CrawlerConfig)
   }
 
   override def postRestart(cause: Throwable): Unit = {
-    log.warning("{} has been restarted or resumed", self.path.name)
+    log.warn("{} has been restarted or resumed", self.path.name)
     cause match {
       case ex: Exception =>
         log.error("Unhandled Exception : {}", ex.getMessage)

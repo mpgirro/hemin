@@ -3,6 +3,7 @@ package io.hemin.engine.parser
 import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorLogging, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
+import com.typesafe.scalalogging.Logger
 import io.hemin.engine.node.Node._
 
 import scala.concurrent.ExecutionContext
@@ -26,8 +27,9 @@ object Parser {
 }
 
 class Parser (config: ParserConfig)
-  extends Actor
-    with ActorLogging {
+  extends Actor {
+
+  private val log: Logger = Logger(getClass)
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
