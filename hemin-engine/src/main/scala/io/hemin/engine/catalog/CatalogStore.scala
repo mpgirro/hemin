@@ -266,6 +266,7 @@ class CatalogStore(config: CatalogConfig)
             val feed = Feed(
               id                    = Some(feedId),
               podcastId             = Some(podcastId),
+              primary               = true,
               url                   = Some(url),
               lastChecked           = Some(now),
               lastStatus            = Some(FeedStatus.NeverChecked),
@@ -775,21 +776,10 @@ class CatalogStore(config: CatalogConfig)
     log.debug("Received CheckPodcast({})", podcastId)
 
     feeds
-      .findAllByPodcast(podcastId)
-      .onComplete {
-        case Success(fs) =>
-          if (fs.nonEmpty) {
-            val f = fs.head
-            (f.podcastId, f.url) match {
-              case (Some(id), Some(url)) => updater ! ProcessFeed(id, url, UpdateEpisodesFetchJob(null, null))
-              case (Some(_), None)       => log.error("Cannot check Feed -- Feed.url is None")
-              case (None, Some(_))       => log.error("Cannot check Feed -- Feed.podcastId is None")
-              case (None, None)          => log.error("Cannot check Feed -- Feed.podcastId and Feed.url are both None")
-            }
-          } else {
-            log.error(s"Chould not update Podcast (ID = $podcastId) -- No feed found")
-          }
-        case Failure(ex) => log.error(s"Could not retrieve Feeds by Podcast (ID = $podcastId) : {}", ex)
+      .findOnePrimaryByPodcast(podcastId)
+      .foreach {
+        case Some(f) => checkFeed(f)
+        case None    => log.error(s"Chould not update Podcast (ID = $podcastId); reason: no feed found for this podcast")
       }
   }
 
@@ -799,15 +789,20 @@ class CatalogStore(config: CatalogConfig)
     feeds
       .findOne(feedId)
       .foreach {
-        case Some(f) =>
-          (f.podcastId, f.url) match {
-            case (Some(id), Some(url)) => updater ! ProcessFeed(id, url, UpdateEpisodesFetchJob(null, null))
-            case (Some(_), None)       => log.error("Cannot check Feed -- Feed.url is None")
-            case (None, Some(_))       => log.error("Cannot check Feed -- Feed.podcastId is None")
-            case (None, None)          => log.error("Cannot check Feed -- Feed.podcastId and Feed.url are both None")
-          }
-        case None    => log.error("No Feed in Database (ID) : {}", feedId)
+        case Some(f) => checkFeed(f)
+        case None    => log.error("Could not check Feed; reason: no Feed in database with ID : {}", feedId)
       }
+  }
+
+  private def checkFeed(feed: Feed): Unit = {
+    (feed.podcastId, feed.url) match {
+      case (Some(id), Some(url)) =>
+        log.info(s"Checking feed (ID = $id) : $url")
+        updater ! ProcessFeed(id, url, UpdateEpisodesFetchJob(null, null))
+      case (Some(_), None)       => log.error("Cannot check Feed -- Feed.url is None")
+      case (None, Some(_))       => log.error("Cannot check Feed -- Feed.podcastId is None")
+      case (None, None)          => log.error("Cannot check Feed -- Feed.podcastId and Feed.url are both None")
+    }
   }
 
   private def onCheckAllFeeds(page: Int, size: Int): Unit = {

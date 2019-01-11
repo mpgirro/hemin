@@ -2,6 +2,7 @@ package io.hemin.engine.model
 
 final case class Feed(
   id: Option[String]                  = None,
+  primary: Boolean                    = false,
   podcastId: Option[String]           = None,
   url: Option[String]                 = None,
   lastChecked: Option[Long]           = None,

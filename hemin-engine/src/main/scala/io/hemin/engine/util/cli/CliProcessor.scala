@@ -5,8 +5,8 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig
-import io.hemin.engine.catalog.CatalogStore._
-import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
+import io.hemin.engine.catalog.CatalogStore
+import io.hemin.engine.searcher.Searcher
 import io.hemin.engine.util.cli.CliFormatter.{format, unhandled}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -68,6 +68,10 @@ class CliProcessor(bus: ActorRef,
       case "get" :: "episode-chapters" :: id :: Nil => getChaptersByEpisode(id)
       case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
 
+      case "podcast" :: "check" :: Nil       => usage("podcast check")
+      case "podcast" :: "check" :: id :: Nil => checkPodcast(id)
+      case "podcast" :: "check" :: id :: _   => usage("podcast check")
+
       case _ => help()
     }.getOrElse(emptyInput)
 
@@ -112,35 +116,40 @@ class CliProcessor(bus: ActorRef,
     val out = new StringBuilder
     feeds.foreach { f =>
       out ++= "proposing " + f
-      bus ! ProposeNewFeed(f)
+      bus ! CatalogStore.ProposeNewFeed(f)
     }
     Future.successful(out.mkString)
   }
 
   private def search(query: String): Future[String] =
-    result(bus ? SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
+    result(bus ? Searcher.SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
 
-  private def getPodcast(id: String): Future[String] = result(bus ? GetPodcast(id))
+  private def getPodcast(id: String): Future[String] = result(bus ? CatalogStore.GetPodcast(id))
 
-  private def getEpisode(id: String): Future[String] = result(bus ? GetEpisode(id))
+  private def getEpisode(id: String): Future[String] = result(bus ? CatalogStore.GetEpisode(id))
 
-  private def getFeed(id: String): Future[String] = result(bus ? GetFeed(id))
+  private def getFeed(id: String): Future[String] = result(bus ? CatalogStore.GetFeed(id))
 
-  private def getEpisodesByPodcast(id: String): Future[String] = result(bus ? GetEpisodesByPodcast(id))
+  private def getEpisodesByPodcast(id: String): Future[String] = result(bus ? CatalogStore.GetEpisodesByPodcast(id))
 
-  private def getFeedsByPodcast(id: String): Future[String] = result(bus ? GetFeedsByPodcast(id))
+  private def getFeedsByPodcast(id: String): Future[String] = result(bus ? CatalogStore.GetFeedsByPodcast(id))
 
-  private def getChaptersByEpisode(id: String): Future[String] = result(bus ? GetChaptersByEpisode(id))
+  private def getChaptersByEpisode(id: String): Future[String] = result(bus ? CatalogStore.GetChaptersByEpisode(id))
+
+  private def checkPodcast(id: String): Future[String] = Future {
+    bus ? CatalogStore.CheckPodcast(id)
+    "Attempting to check podcast" // we need this result type
+  }
 
   private def result(future: Future[Any]): Future[String] = future.map {
-    case PodcastResult(p)            => format(p)
-    case EpisodeResult(e)            => format(e)
-    case FeedResult(f)               => format(f)
-    case SearchResults(rs)           => format(rs)
-    case EpisodesByPodcastResult(es) => format(es)
-    case FeedsByPodcastResult(fs)    => format(fs)
-    case ChaptersByEpisodeResult(cs) => format(cs)
-    case other                       => unhandled(other)
+    case CatalogStore.PodcastResult(p)            => format(p)
+    case CatalogStore.EpisodeResult(e)            => format(e)
+    case CatalogStore.FeedResult(f)               => format(f)
+    case CatalogStore.EpisodesByPodcastResult(es) => format(es)
+    case CatalogStore.FeedsByPodcastResult(fs)    => format(fs)
+    case CatalogStore.ChaptersByEpisodeResult(cs) => format(cs)
+    case Searcher.SearchResults(rs)               => format(rs)
+    case other                                    => unhandled(other)
   }
 
 }

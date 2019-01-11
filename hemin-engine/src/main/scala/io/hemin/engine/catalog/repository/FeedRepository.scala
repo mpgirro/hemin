@@ -57,7 +57,16 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
     )
   }
 
+  def findOnePrimaryByPodcast(podcastId: String): Future[Option[Feed]] = {
+    log.debug("Request to get primary Feed by podcastId : {}", podcastId)
+    findOne(Query(
+      "primary"   -> toBsonB(true),
+      "podcastId" -> toBsonS(podcastId))
+    )
+  }
+
   def findAllByPodcast(podcastId: String): Future[List[Feed]] = {
+    log.debug("Request to get Feed by Podcast : {}", podcastId)
     findAll(Query("podcastId" -> toBsonS(podcastId)))
   }
 
