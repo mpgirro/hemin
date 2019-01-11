@@ -59,7 +59,8 @@ object Engine {
 
 }
 
-class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
+class Engine private (engineConfig: EngineConfig,
+                      akkaConfig: Config) {
 
   import io.hemin.engine.Engine._ // import the failures
 
@@ -143,12 +144,12 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
     * page and size parameters.
     *
     * @param query The query to search the internal reverse index for.
-    * @param pageNumber  The page for the [[io.hemin.engine.model.SearchResult]]. If None, then
-    *              [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
-    * @param pageSize  The size (= maximum number of elements in the
-    *              [[io.hemin.engine.model.SearchResult.results]] list) of the
-    *              [[io.hemin.engine.model.SearchResult]]. If None, then
-    *              [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
+    * @param pageNumber The page for the [[io.hemin.engine.model.SearchResult]]. If None, then
+    *                   [[io.hemin.engine.searcher.SearcherConfig.defaultPage]] is used.
+    * @param pageSize The size (= maximum number of elements in the
+    *                 [[io.hemin.engine.model.SearchResult.results]] list) of the
+    *                 [[io.hemin.engine.model.SearchResult]]. If None, then
+    *                 [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
     * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
   def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = guarded {
@@ -299,15 +300,5 @@ class Engine private (engineConfig: EngineConfig, akkaConfig: Config) {
   private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
 
   private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
-
-  // TODO delete
-  private def newExecutionContext: ExecutionContext = {
-    /*
-    ExecutionContext.fromExecutor(new ForkJoinPool(initialParallelism: Int))
-    ExecutionContext.fromExecutor(Executors.newFixedThreadPool(limit: Int))
-    */
-    ExecutionContext.fromExecutor(new ForkJoinPool(4))
-  }
-
 
 }

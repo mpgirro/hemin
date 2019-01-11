@@ -28,7 +28,7 @@ object EngineApp extends App {
   }
   private lazy val running: AtomicBoolean = new AtomicBoolean(true)
 
-  private implicit lazy val ec: ExecutionContext = ExecutionContext.global
+  private implicit lazy val executionContext: ExecutionContext = ExecutionContext.global
 
   private def shutdown(message: String): Unit = {
     val status: Int = Option(engine)

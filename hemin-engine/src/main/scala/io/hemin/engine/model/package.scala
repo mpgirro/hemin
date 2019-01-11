@@ -10,8 +10,8 @@ package io.hemin.engine
   * By default, an `Option` is `None` and a `List` is `Nil`.
   *
   * The models [[io.hemin.engine.model.Podcast]] and [[io.hemin.engine.model.Episode]]
-  * are structure more complex internally. The [[io.hemin.engine.model.info]]
-  * package provides the nested information classes.
+  * are structure more complex internally and hold nested models for additional
+  * XML namespaces.
   *
   * All models except the [[io.hemin.engine.model.SearchResult]] extend the
   * [[io.hemin.engine.model.Patchable]] trait. Hence they provide two methods,

@@ -27,7 +27,8 @@ object CrawlerWorker {
 }
 
 class CrawlerWorker (config: CrawlerConfig)
-  extends Actor with ActorLogging {
+  extends Actor
+    with ActorLogging {
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
@@ -109,7 +110,7 @@ class CrawlerWorker (config: CrawlerConfig)
 
   /*
   private def sendCatalogCommand(command: CatalogCommand): Unit = {
-      mediator ! Send("/user/node/"+CatalogBroker.name, command, localAffinity = true)
+      mediator ! Send("/user/node/"+CatalogStore.name, command, localAffinity = true)
   }
 
   private def emitCatalogEvent(event: CatalogEvent): Unit = {

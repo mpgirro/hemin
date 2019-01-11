@@ -18,19 +18,20 @@ object Crawler {
 
   trait CrawlerMessage
   trait FetchJob extends CrawlerMessage {
-    def mimeCheck(mime: String): Boolean
+    protected[this] def validate(mime: String): Boolean
+    def mimeCheck(mime: String): Boolean = validate(mime.toLowerCase)
   }
   final case class NewPodcastFetchJob() extends FetchJob {
-    def mimeCheck(mime: String): Boolean = HttpClient.isFeedMime(mime)
+    override def validate(mime: String): Boolean = HttpClient.isFeedMime(mime)
   }
   final case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob {
-    def mimeCheck(mime: String): Boolean = HttpClient.isFeedMime(mime)
+    override def validate(mime: String): Boolean = HttpClient.isFeedMime(mime)
   }
   final case class WebsiteFetchJob() extends FetchJob {
-    def mimeCheck(mime: String): Boolean = HttpClient.isHtmlMime(mime)
+    override def validate(mime: String): Boolean = HttpClient.isHtmlMime(mime)
   }
   final case class ImageFetchJob() extends FetchJob {
-    def mimeCheck(mime: String): Boolean = HttpClient.isImageMime(mime)
+    override def validate(mime: String): Boolean = HttpClient.isImageMime(mime)
   }
 
   final case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage
@@ -38,7 +39,8 @@ object Crawler {
 }
 
 class Crawler (config: CrawlerConfig)
-  extends Actor with ActorLogging {
+  extends Actor
+    with ActorLogging {
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.props.dispatcher)
   log.debug("{} running with mailbox : {}", self.path.name, context.props.mailbox)

@@ -71,7 +71,8 @@ object Node {
 }
 
 class Node(config: EngineConfig)
-  extends Actor with ActorLogging {
+  extends Actor
+    with ActorLogging {
 
   log.debug("{} running on dispatcher : {}", self.path.name, context.system.dispatchers.lookup(context.props.dispatcher))
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))

@@ -11,7 +11,8 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
-class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
+class HttpClient (timeout: Long,
+                  private val downloadMaxBytes: Long) {
 
   import io.hemin.engine.crawler.http.HttpClient._ // import the failures
 
@@ -28,7 +29,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
     sttpBackend.close()
   }
 
-  def headCheck(url: String, isValidMime: String => Boolean): Try[HeadResult] = Option(url)
+  def headCheck(url: String, isValidMime: String => Boolean): Try[HttpHeadResult] = Option(url)
     .map(_.split("://"))
     .map(Success(_))
     .getOrElse(headFailureUrlNull)
@@ -36,7 +37,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
       if (parts.length != 2) {
         headFailureInvalidUrl(url)
       } else {
-        Success(parts(0).toLowerCase + "://" + parts(1))
+        Success(s"${parts(0).toLowerCase}://${parts(1)}")
       }
     }
     .flatMap { ref =>
@@ -81,8 +82,6 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
 
   private def mimeType[T](response: Response[T]): Option[String] = mimeType(response.contentType)
 
-  //private def mimeType(response: Response[Array[Byte]]): Option[String] = mimeType(response.contentType)
-
   private def mimeType(contentType: Option[String]): Option[String] = contentType
     .map(_.split(";"))
     .map(_(0))    // the first element of the array is the mimeType
@@ -100,7 +99,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
           .replaceAll("\"", "") // remove quotation marks if any
           .trim)))
 
-  private def headCheckHTTP(url: String, isValidMime: String => Boolean): Try[HeadResult] =
+  private def headCheckHTTP(url: String, isValidMime: String => Boolean): Try[HttpHeadResult] =
     sendHeadRequest(url)
       .flatMap { response =>
         if (!response.isSuccess) {
@@ -122,7 +121,7 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
         }
       }
       .map { response =>
-        HeadResult(
+        HttpHeadResult(
           statusCode      = response.code,
           location        = response.header("location"),
           mimeType        = mimeType(response),
@@ -159,13 +158,13 @@ class HttpClient (timeout: Long, private val downloadMaxBytes: Long) {
 
   // this method is a remnant from the past and has become obsolete
 
-  private def headCheckFILE(url: String, isValidMime: String => Boolean): Try[HeadResult] = Try {
+  private def headCheckFILE(url: String, isValidMime: String => Boolean): Try[HttpHeadResult] = Try {
     val path: Path = Paths.get(url)
     val mimeType: String = java.nio.file.Files.probeContentType(path)
     if (isValidMime(mimeType)) {
       val file = path.toFile
       val status = if (file.exists()) 200 else 404
-      HeadResult(
+      HttpHeadResult(
         statusCode      = status,
         location        = Option(url),
         mimeType        = Option(mimeType).orElse(Some("text/xml")),

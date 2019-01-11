@@ -21,7 +21,9 @@ import scala.concurrent.{ExecutionContext, Future}
   * @param config
   * @param ec
   */
-class CliProcessor(bus: ActorRef, config: EngineConfig, ec: ExecutionContext) {
+class CliProcessor(bus: ActorRef,
+                   config: EngineConfig,
+                   ec: ExecutionContext) {
 
   private val log = Logger(getClass)
 

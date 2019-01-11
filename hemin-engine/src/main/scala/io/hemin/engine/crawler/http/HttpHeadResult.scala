@@ -1,6 +1,6 @@
 package io.hemin.engine.crawler.http
 
-case class HeadResult (
+final case class HttpHeadResult(
   statusCode: Int,
   location: Option[String],
   mimeType: Option[String],
