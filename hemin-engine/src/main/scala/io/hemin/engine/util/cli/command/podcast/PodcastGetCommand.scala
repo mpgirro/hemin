@@ -14,19 +14,22 @@ class PodcastGetCommand (bus: ActorRef)
                          override implicit val internalTimeout: Timeout)
   extends CliCommand {
 
+  private val podcastGetEpisodesCommand: PodcastGetEpisodesCommand = new PodcastGetEpisodesCommand(bus)
   private val podcastGetFeedsCommand: PodcastGetFeedsCommand = new PodcastGetFeedsCommand(bus)
 
-  override val usageString: String =
-    List(
-      podcastGetFeedsCommand.usageString,
-      "podcast get ID"
-    ).mkString("\n")
+  override lazy val usageDefs: List[String] = List(
+    "podcast get ID"
+  ) ++ List.concat(
+    podcastGetEpisodesCommand.usageDefs,
+    podcastGetFeedsCommand.usageDefs,
+  )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
-    case "feeds" :: args => podcastGetFeedsCommand.eval(args)
-    case id :: Nil       => getPodcast(id)
-    case id :: _         => unsupportedCommand(cmd)
-    case Nil             => usage
+    case "episodes" :: args => podcastGetEpisodesCommand.eval(args)
+    case "feeds"    :: args => podcastGetFeedsCommand.eval(args)
+    case id         :: Nil  => getPodcast(id)
+    case id         :: _    => unsupportedCommand(cmd)
+    case Nil                => usageResult
   }
 
   private def getPodcast(id: String): Future[String] =

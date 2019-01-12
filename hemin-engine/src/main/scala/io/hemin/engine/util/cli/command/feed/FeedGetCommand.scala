@@ -14,15 +14,14 @@ class FeedGetCommand (bus: ActorRef)
                       override implicit val internalTimeout: Timeout)
   extends CliCommand {
 
-  override val usageString: String =
-    List(
-      "feed get ID"
-    ).mkString("\n")
+  override lazy val usageDefs: List[String] = List(
+    "feed get ID",
+  )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
     case id :: Nil => getFeed(id)
     case id :: _   => unsupportedCommand(cmd)
-    case _         => usage
+    case _         => usageResult
   }
 
   private def getFeed(id: String): Future[String] =

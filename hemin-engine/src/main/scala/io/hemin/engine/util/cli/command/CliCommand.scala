@@ -6,14 +6,22 @@ import scala.concurrent.{ExecutionContext, Future}
 
 abstract class CliCommand (implicit val executionContext: ExecutionContext,
                            implicit val internalTimeout: Timeout) {
-  val usageString: String
-  def usage: Future[String] = Future { usageString }
-  def eval(cmds: List[String]): Future[String]
+
+  def eval(cmd: List[String]): Future[String]
+
+  val usageDefs: List[String]
+
+  lazy val usage: String = usageDefs
+    .map(usage => s"\t$usage")
+    .mkString("\n")
+
+  def usageResult: Future[String] = Future { usage }
+
   def unsupportedCommand(cmd: List[String]): Future[String] = Future {
     s"""
        Command or argument '${cmd.mkString(" ")}' not supported
-       Usage:
-       \t$usageString
+       Usage of this command:
+       $usage
      """.stripMargin
   }
 }

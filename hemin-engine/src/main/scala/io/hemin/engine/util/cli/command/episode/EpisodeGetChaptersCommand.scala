@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli.command.podcast
+package io.hemin.engine.util.cli.command.episode
 
 import akka.actor.ActorRef
 import akka.pattern.ask
@@ -9,22 +9,22 @@ import io.hemin.engine.util.cli.command.CliCommand
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PodcastGetFeedsCommand (bus: ActorRef)
-                             (override implicit val executionContext: ExecutionContext,
-                              override implicit val internalTimeout: Timeout)
+class EpisodeGetChaptersCommand (bus: ActorRef)
+                                (override implicit val executionContext: ExecutionContext,
+                                 override implicit val internalTimeout: Timeout)
   extends CliCommand {
 
   override lazy val usageDefs: List[String] = List(
-    "podcast get feeds ID",
+    "episode get chapters ID",
   )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
-    case id :: Nil => getFeedsByPodcast(id)
+    case id :: Nil => getChaptersByEpisode(id)
     case id :: _   => unsupportedCommand(cmd)
     case Nil       => usageResult
   }
 
-  private def getFeedsByPodcast(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetFeedsByPodcast(id))
+  private def getChaptersByEpisode(id: String): Future[String] =
+    CliFormatter.cliResult(bus ? CatalogStore.GetChaptersByEpisode(id))
 
 }

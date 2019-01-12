@@ -14,15 +14,15 @@ class FeedCommand (bus: ActorRef)
   private val feedProposeCommand: FeedProposeCommand = new FeedProposeCommand(bus)
   private val feedGetCommand: FeedGetCommand = new FeedGetCommand(bus)
 
-  override val usageString: String =
-    List(
-      feedGetCommand.usageString,
-      feedProposeCommand.usageString,
-    ).mkString("\n")
+  override lazy val usageDefs: List[String] = List.concat(
+    feedGetCommand.usageDefs,
+    feedProposeCommand.usageDefs,
+  )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
     case "get"     :: args => feedGetCommand.eval(args)
     case "propose" :: args => feedProposeCommand.eval(args)
     case other: Any        => unsupportedCommand(other)
   }
+
 }

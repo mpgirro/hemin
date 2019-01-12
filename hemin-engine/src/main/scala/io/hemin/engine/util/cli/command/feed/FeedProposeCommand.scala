@@ -12,11 +12,13 @@ class FeedProposeCommand (bus: ActorRef)
                           override implicit val internalTimeout: Timeout)
   extends CliCommand {
 
-  override val usageString: String = "feed propose URL"
+  override lazy val usageDefs: List[String] = List(
+    "feed propose URL [URL [...]]",
+  )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
     case urls: List[String] => proposeFeeds(urls)
-    case _                  => usage
+    case _                  => usageResult
   }
 
   private def proposeFeeds(urls: List[String]): Future[String] = Future {

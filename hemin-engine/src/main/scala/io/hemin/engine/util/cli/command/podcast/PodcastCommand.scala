@@ -14,11 +14,10 @@ class PodcastCommand (bus: ActorRef)
   private val podcastCheckCommand: PodcastCheckCommand = new PodcastCheckCommand(bus)
   private val podcastGetCommand: PodcastGetCommand = new PodcastGetCommand(bus)
 
-  override val usageString: String =
-    List(
-      podcastCheckCommand.usageString,
-      podcastGetCommand.usageString,
-    ).mkString("\n")
+  override lazy val usageDefs: List[String] = List.concat(
+    podcastCheckCommand.usageDefs,
+    podcastGetCommand.usageDefs,
+  )
 
   override def eval(cmd: List[String]): Future[String] = cmd match {
     case "check" :: args => podcastCheckCommand.eval(args)
