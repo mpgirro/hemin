@@ -52,25 +52,25 @@ class CliProcessor(bus: ActorRef,
       case "search" :: Nil          => usage("search")
       case "search" :: query :: Nil => search(query)
 
-      case "get" :: "podcast" :: Nil       => usage("get podcast")
-      case "get" :: "podcast" :: id :: Nil => getPodcast(id)
-      case "get" :: "podcast" :: id :: _   => usage("get podcast")
-
-      case "get" :: "podcast-feeds" :: Nil       => usage("get podcast")
-      case "get" :: "podcast-feeds" :: id :: Nil => getFeedsByPodcast(id)
-      case "get" :: "podcast-feeds" :: id :: _   => usage("get podcast")
-
-      case "get" :: "episode" :: Nil       => usage("get episode")
-      case "get" :: "episode" :: id :: Nil => getEpisode(id)
-      case "get" :: "episode" :: id :: _   => usage("get episode")
-
-      case "get" :: "episode-chapters" :: Nil       => usage("get chapters")
-      case "get" :: "episode-chapters" :: id :: Nil => getChaptersByEpisode(id)
-      case "get" :: "episode-chapters" :: id :: _   => usage("get chapters")
-
       case "podcast" :: "check" :: Nil       => usage("podcast check")
       case "podcast" :: "check" :: id :: Nil => checkPodcast(id)
       case "podcast" :: "check" :: id :: _   => usage("podcast check")
+
+      case "podcast" :: "get" :: "feeds" :: Nil       => usage("podcast get feeds")
+      case "podcast" :: "get" :: "feeds" :: id :: Nil => getFeedsByPodcast(id)
+      case "podcast" :: "get" :: "feeds" :: id :: _   => usage("podcast get feeds")
+
+      case "podcast" :: "get" :: Nil       => usage("podcast get")
+      case "podcast" :: "get" :: id :: Nil => getPodcast(id)
+      case "podcast" :: "get" :: id :: _   => usage("podcast get")
+
+      case "episode" :: "get" :: "chapters" :: Nil       => usage("episode get chapters")
+      case "episode" :: "get" :: "chapters" :: id :: Nil => getChaptersByEpisode(id)
+      case "episode" :: "get" :: "chapters" :: id :: _   => usage("episode get chapters")
+
+      case "episode" :: "get" :: Nil       => usage("episode get")
+      case "episode" :: "get" :: id :: Nil => getEpisode(id)
+      case "episode" :: "get" :: id :: _   => usage("episode get")
 
       case _ => help()
     }.getOrElse(emptyInput)
