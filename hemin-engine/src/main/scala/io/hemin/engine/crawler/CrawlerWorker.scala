@@ -1,8 +1,6 @@
 package io.hemin.engine.crawler
 
-import java.time.LocalDateTime
-
-import akka.actor.{Actor, ActorLogging, ActorRef, ActorSystem, Props}
+import akka.actor.{Actor, ActorRef, ActorSystem, Props}
 import akka.stream._
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._

@@ -1,6 +1,6 @@
 package io.hemin.engine.index
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.index.IndexStore._
 import io.hemin.engine.index.committer.SolrCommitter

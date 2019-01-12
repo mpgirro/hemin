@@ -1,6 +1,6 @@
 package io.hemin.engine.updater
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore.ProposeNewFeed

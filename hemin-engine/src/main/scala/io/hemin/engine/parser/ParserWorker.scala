@@ -1,9 +1,8 @@
 package io.hemin.engine.parser
 
-import java.time.{LocalDateTime, ZonedDateTime}
 import java.util.Base64
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
@@ -12,8 +11,8 @@ import io.hemin.engine.model._
 import io.hemin.engine.node.Node._
 import io.hemin.engine.parser.Parser._
 import io.hemin.engine.parser.feed.RomeFeedParser
-import io.hemin.engine.util.{HashUtil, TimeUtil}
 import io.hemin.engine.util.mapper.IndexMapper
+import io.hemin.engine.util.{HashUtil, TimeUtil}
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 

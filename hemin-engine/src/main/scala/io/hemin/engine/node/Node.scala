@@ -1,6 +1,6 @@
 package io.hemin.engine.node
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props, SupervisorStrategy, Terminated}
+import akka.actor.{Actor, ActorRef, Props, SupervisorStrategy, Terminated}
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig

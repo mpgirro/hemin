@@ -1,9 +1,9 @@
 package io.hemin.engine.searcher
 
-import akka.actor.{Actor, ActorLogging, ActorRef, Props}
+import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherStartupComplete}
 import io.hemin.engine.model.SearchResult
+import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherStartupComplete}
 import io.hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 import io.hemin.engine.searcher.retriever.{IndexRetriever, SolrRetriever}
 
