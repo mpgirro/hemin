@@ -1,7 +1,11 @@
 package io.hemin.engine.util.cli
 
 import com.typesafe.scalalogging.Logger
+import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.model._
+import io.hemin.engine.searcher.Searcher
+
+import scala.concurrent.{ExecutionContext, Future}
 
 object CliFormatter {
 
@@ -27,6 +31,17 @@ object CliFormatter {
   */
 
   private lazy val none: String = "None"
+
+  def cliResult(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
+    case CatalogStore.PodcastResult(p)            => CliFormatter.format(p)
+    case CatalogStore.EpisodeResult(e)            => CliFormatter.format(e)
+    case CatalogStore.FeedResult(f)               => CliFormatter.format(f)
+    case CatalogStore.EpisodesByPodcastResult(es) => CliFormatter.format(es)
+    case CatalogStore.FeedsByPodcastResult(fs)    => CliFormatter.format(fs)
+    case CatalogStore.ChaptersByEpisodeResult(cs) => CliFormatter.format(cs)
+    case Searcher.SearchResults(rs)               => CliFormatter.format(rs)
+    case other                                    => CliFormatter.unhandled(other)
+  }
 
   def unhandled(unknown: Any): String = {
     val msg = s"Formatter has no specific handler for type : ${unknown.getClass}"

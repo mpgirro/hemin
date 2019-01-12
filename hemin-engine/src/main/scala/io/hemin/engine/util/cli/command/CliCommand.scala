@@ -4,14 +4,14 @@ import akka.util.Timeout
 
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class CliCommand(implicit val executionContext: ExecutionContext,
-                          implicit val internalTimeout: Timeout) {
+abstract class CliCommand (implicit val executionContext: ExecutionContext,
+                           implicit val internalTimeout: Timeout) {
   val usageString: String
   def usage: Future[String] = Future { usageString }
   def eval(cmds: List[String]): Future[String]
-  def unsupportedCommand(cmds: List[String]): Future[String] = Future {
+  def unsupportedCommand(cmd: List[String]): Future[String] = Future {
     s"""
-       Command or argument '${cmds.mkString(" ")}' not supported
+       Command or argument '${cmd.mkString(" ")}' not supported
        Usage:
        \t$usageString
      """.stripMargin

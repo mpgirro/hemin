@@ -7,26 +7,10 @@ import com.typesafe.scalalogging.Logger
 import io.hemin.engine.EngineConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.searcher.Searcher
+import io.hemin.engine.util.cli.command.feed.FeedCommand
 import io.hemin.engine.util.cli.command.podcast.PodcastCommand
 
 import scala.concurrent.{ExecutionContext, Future}
-
-
-object CliProcessor {
-
-  def result(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
-    case CatalogStore.PodcastResult(p)            => CliFormatter.format(p)
-    case CatalogStore.EpisodeResult(e)            => CliFormatter.format(e)
-    case CatalogStore.FeedResult(f)               => CliFormatter.format(f)
-    case CatalogStore.EpisodesByPodcastResult(es) => CliFormatter.format(es)
-    case CatalogStore.FeedsByPodcastResult(fs)    => CliFormatter.format(fs)
-    case CatalogStore.ChaptersByEpisodeResult(cs) => CliFormatter.format(cs)
-    case Searcher.SearchResults(rs)               => CliFormatter.format(rs)
-    case other                                    => CliFormatter.unhandled(other)
-  }
-
-}
-
 
 /** Command language interpreter processor for interactive commands.
   * This is not a fully fledged REPL, since it does not print the
@@ -48,25 +32,28 @@ class CliProcessor(bus: ActorRef,
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
   private val podcastCommand: PodcastCommand = new PodcastCommand(bus)
+  private val feedCommand: FeedCommand = new FeedCommand(bus)
 
-  def eval(cmds: String): Future[String] = Option(cmds)
+  def eval(cmd: String): Future[String] = Option(cmd)
     .map(_.split(" "))
     .map(eval)
     .getOrElse(emptyInput)
 
-  def eval(cmds: Array[String]): Future[String] = Option(cmds)
+  def eval(cmd: Array[String]): Future[String] = Option(cmd)
     .map(_.toList)
     .map(eval)
     .getOrElse(emptyInput)
 
-  def eval(cmds: List[String]): Future[String] = Option(cmds)
+  def eval(cmd: List[String]): Future[String] = Option(cmd)
     .map {
       case "help" :: _   => help()
       case "ping" :: Nil => pong
       case "echo" :: txt => echo(txt)
 
+      /*
       case "propose" :: Nil   => usage("propose")
       case "propose" :: feeds => propose(feeds)
+      */
 
       case "search" :: Nil          => usage("search")
       case "search" :: query :: Nil => search(query)
@@ -78,6 +65,7 @@ class CliProcessor(bus: ActorRef,
       */
 
       case "podcast" :: args => podcastCommand.eval(args)
+      case "feed"    :: args => feedCommand.eval(args)
 
       case "episode" :: "get" :: "chapters" :: Nil       => usage("episode get chapters")
       case "episode" :: "get" :: "chapters" :: id :: Nil => getChaptersByEpisode(id)
@@ -92,8 +80,9 @@ class CliProcessor(bus: ActorRef,
 
   private val usage: String =
     List(
-      "USAGE:\n",
+      "USAGE:",
       podcastCommand.usageString,
+      feedCommand.usageString,
     ).mkString("\n")
 
   /*
@@ -133,6 +122,7 @@ class CliProcessor(bus: ActorRef,
     Future.successful(out.mkString)
   }
 
+  /*
   private def propose(feeds: List[String]): Future[String] = {
     val out = new StringBuilder
     feeds.foreach { f =>
@@ -141,21 +131,22 @@ class CliProcessor(bus: ActorRef,
     }
     Future.successful(out.mkString)
   }
+  */
 
   private def search(query: String): Future[String] =
-    CliProcessor.result(bus ? Searcher.SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
+    CliFormatter.cliResult(bus ? Searcher.SearchRequest(query, Some(config.searcher.defaultPage), Some(config.searcher.defaultSize)))
 
   //private def getPodcast(id: String): Future[String] = result(bus ? CatalogStore.GetPodcast(id))
 
-  private def getEpisode(id: String): Future[String] = CliProcessor.result(bus ? CatalogStore.GetEpisode(id))
+  private def getEpisode(id: String): Future[String] = CliFormatter.cliResult(bus ? CatalogStore.GetEpisode(id))
 
-  private def getFeed(id: String): Future[String] = CliProcessor.result(bus ? CatalogStore.GetFeed(id))
+  //private def getFeed(id: String): Future[String] = CliFormatter.cliResult(bus ? CatalogStore.GetFeed(id))
 
-  private def getEpisodesByPodcast(id: String): Future[String] = CliProcessor.result(bus ? CatalogStore.GetEpisodesByPodcast(id))
+  private def getEpisodesByPodcast(id: String): Future[String] = CliFormatter.cliResult(bus ? CatalogStore.GetEpisodesByPodcast(id))
 
   //private def getFeedsByPodcast(id: String): Future[String] = result(bus ? CatalogStore.GetFeedsByPodcast(id))
 
-  private def getChaptersByEpisode(id: String): Future[String] = CliProcessor.result(bus ? CatalogStore.GetChaptersByEpisode(id))
+  private def getChaptersByEpisode(id: String): Future[String] = CliFormatter.cliResult(bus ? CatalogStore.GetChaptersByEpisode(id))
 
   /*
   private def checkPodcast(id: String): Future[String] = Future {

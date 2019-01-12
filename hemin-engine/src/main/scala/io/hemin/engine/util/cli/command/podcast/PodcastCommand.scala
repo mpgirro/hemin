@@ -20,7 +20,7 @@ class PodcastCommand (bus: ActorRef)
       podcastGetCommand.usageString,
     ).mkString("\n")
 
-  override def eval(cmds: List[String]): Future[String] = cmds match {
+  override def eval(cmd: List[String]): Future[String] = cmd match {
     case "check" :: args => podcastCheckCommand.eval(args)
     case "get"   :: args => podcastGetCommand.eval(args)
     case other: Any      => unsupportedCommand(other)

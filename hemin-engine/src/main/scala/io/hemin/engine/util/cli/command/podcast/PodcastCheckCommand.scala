@@ -15,9 +15,9 @@ class PodcastCheckCommand (bus: ActorRef)
 
   override val usageString: String = "podcast check ID"
 
-  override def eval(args: List[String]): Future[String] = args match {
+  override def eval(cmd: List[String]): Future[String] = cmd match {
     case id :: Nil => checkPodcast(id)
-    case id :: _   => unsupportedCommand(args)
+    case id :: _   => unsupportedCommand(cmd)
     case Nil       => usage
   }
 
