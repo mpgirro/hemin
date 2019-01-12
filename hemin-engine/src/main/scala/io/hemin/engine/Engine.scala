@@ -227,7 +227,6 @@ class Engine private (engineConfig: EngineConfig,
       .map(_.feeds)
   }
 
-  // TODO unused and deprecated, since Chapters are embedded directly into Episode's
   /** Finds all [[io.hemin.engine.model.Chapter]] by their belonging Episode's ID */
   def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
     (bus ? CatalogStore.GetChaptersByEpisode(id))

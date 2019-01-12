@@ -11,7 +11,8 @@ import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
+class EpisodeRepository(db: Future[DefaultDB],
+                        ec: ExecutionContext)
   extends MongoRepository[Episode] {
 
   override protected[this] val log: Logger = Logger(getClass)
@@ -47,19 +48,20 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Episode]] = {
     log.debug("Request to get Episode (ID) : {}", id)
-    findOne("id" -> toBsonS(id))
+    findOne(Query("id" -> toBsonS(id)))
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Episode (ID) : {}", podcastId)
-    findAll("podcastId" -> toBsonS(podcastId))
+    findAll(Query("podcastId" -> toBsonS(podcastId)))
   }
 
   def findAllByPodcastAndGuid(podcastId: String, guid: String): Future[List[Episode]] = {
     log.debug("Request to get all Episodes by Podcast (ID) : {} and GUID : {}", podcastId, guid)
-    findAll(
+    findAll(Query(
       "podcastId" -> toBsonS(podcastId),
-      "guid"      -> toBsonS(guid))
+      "guid"      -> toBsonS(guid)
+    ))
   }
 
   def findOneByEnclosure(enclosureUrl: String, enclosureLength: Long, enclosureType: String): Future[List[Episode]] =
@@ -67,11 +69,11 @@ class EpisodeRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   def findOneByEnclosure(enclosureUrl: Option[String], enclosureLength: Option[Long], enclosureType: Option[String]): Future[List[Episode]] = {
     log.debug("Request to get Episode by enclosure.url : '{}' and enclosure.length : {} and enclosure.typ : {}", enclosureUrl, enclosureLength, enclosureType)
-    findAll(
+    findAll(Query(
       "enclosure.url"    -> toBsonS(enclosureUrl),
       "enclosure.length" -> toBsonL(enclosureLength),
-      "enclosure.typ"   -> toBsonS(enclosureType)
-    )
+      "enclosure.typ"    -> toBsonS(enclosureType)
+    ))
   }
 
   /** Finds all Episodes by the reference they currently hold to an image. Depending

@@ -11,7 +11,8 @@ import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
+class ImageRepository (db: Future[DefaultDB],
+                       ec: ExecutionContext)
   extends MongoRepository[Image] {
 
   override protected[this] val log: Logger = Logger(getClass)
@@ -24,7 +25,7 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] val defaultSort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
 
-  override protected[this] def querySafeguard: BSONDocument = BSONDocument()
+  override protected[this] val querySafeguard: BSONDocument = BSONDocument()
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 
@@ -47,7 +48,7 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    findOne("id" -> toBsonS(id))
+    findOne(Query("id" -> toBsonS(id)))
   }
 
   /*
@@ -59,7 +60,7 @@ class ImageRepository (db: Future[DefaultDB], ec: ExecutionContext)
 
   def findOneByUrl(url: String): Future[Option[Image]] = {
     log.debug("Request to get Image by URL : {}", url)
-    findOne("url" -> toBsonS(url))
+    findOne(Query("url" -> toBsonS(url)))
   }
 
 }

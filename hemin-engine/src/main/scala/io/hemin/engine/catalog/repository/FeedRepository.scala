@@ -10,7 +10,8 @@ import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
+class FeedRepository(db: Future[DefaultDB],
+                     ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
   override protected[this] val log: Logger = Logger(getClass)
@@ -23,7 +24,7 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
-  override protected[this] def querySafeguard: BSONDocument = BSONDocument()
+  override protected[this] val querySafeguard: BSONDocument = BSONDocument()
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
@@ -46,7 +47,7 @@ class FeedRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Feed]] = {
     log.debug("Request to get Feed (ID) : {}", id)
-    findOne("id" -> toBsonS(id))
+    findOne(Query("id" -> toBsonS(id)))
   }
 
   def findOneByUrlAndPodcastId(url: String, podcastId: String): Future[Option[Feed]] = {

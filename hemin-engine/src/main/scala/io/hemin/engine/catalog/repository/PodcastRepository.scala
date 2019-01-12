@@ -11,7 +11,8 @@ import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
+class PodcastRepository(db: Future[DefaultDB],
+                        ec: ExecutionContext)
   extends MongoRepository[Podcast] {
 
   override protected[this] val log: Logger = Logger(getClass)
@@ -46,7 +47,7 @@ class PodcastRepository(db: Future[DefaultDB], ec: ExecutionContext)
 
   override def findOne(id: String): Future[Option[Podcast]] = {
     log.debug("Request to get Podcast (ID) : {}", id)
-    findOne("id" -> toBsonS(id))
+    findOne(Query("id" -> toBsonS(id)))
   }
 
   def findAllRegistrationCompleteAsTeaser(pageNumber: Int, pageSize: Int): Future[List[Podcast]] = {

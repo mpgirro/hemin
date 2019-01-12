@@ -754,8 +754,8 @@ class CatalogStore(config: CatalogConfig)
     } yield DatabaseStats(
       podcastCount = pc,
       episodeCount = ec,
-      feedCount = fc,
-      imageCount = ic,
+      feedCount    = fc,
+      imageCount   = ic,
     )).map(theSender ! DatabaseStatsResult(_))
   }
 
