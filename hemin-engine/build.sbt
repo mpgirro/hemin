@@ -72,6 +72,7 @@ libraryDependencies ++= Seq(
     "com.sksamuel.scrimage"      %% "scrimage-core"           % scrimageVersion, // https://github.com/sksamuel/scrimage
     "com.sksamuel.scrimage"      %% "scrimage-filters"        % scrimageVersion,
     "com.sksamuel.scrimage"      %% "scrimage-io-extra"       % scrimageVersion,
+    "org.rogach"                 %% "scallop"                 % "3.1.5",         // https://github.com/scallop/scallop
     "org.scalatest"              %% "scalatest"               % "3.0.5" % Test,  // https://github.com/scalatest/scalatest
     "junit"                      %  "junit"                   % "4.12" % Test,   // not sure why I would need this
     "org.pegdown"                %  "pegdown"                 % "1.6.0" % Test,  // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
