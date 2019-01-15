@@ -1,5 +1,7 @@
 package io.hemin.engine.util.cli
 
+import java.io.ByteArrayOutputStream
+
 import akka.actor.ActorRef
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
@@ -8,6 +10,8 @@ import io.hemin.engine.util.cli.command.episode.EpisodeCommand
 import io.hemin.engine.util.cli.command.feed.FeedCommand
 import io.hemin.engine.util.cli.command.podcast.PodcastCommand
 import io.hemin.engine.util.cli.command.search.SearchCommand
+import io.hemin.engine.util.cli.new2.CliParams
+import org.rogach.scallop.Subcommand
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,16 +50,51 @@ class CliProcessor(bus: ActorRef,
     .getOrElse(emptyInput)
 
   def eval(cmd: List[String]): Future[String] = Option(cmd)
-    .map {
-      case "echo"    :: txt  => echo(txt)
-      case "episode" :: args => episodeCommand.eval(args)
-      case "feed"    :: args => feedCommand.eval(args)
-      case "help"    :: _    => help()
-      case "ping"    :: Nil  => pong
-      case "podcast" :: args => podcastCommand.eval(args)
-      case "search"  :: args => searchCommand.eval(args)
-      case _                 => help()
+    .map { args =>
+
+      def runPodcastCommand(params: CliParams): Unit =
+        println("CALLED: podcast")
+
+      def runCheckPodcastCommand(params: CliParams): Unit =
+        println(s"CALLED: podcast check ${params.podcast.check.id}")
+
+      def runGetPodcastCommand(params: CliParams): Unit =
+        println(s"CALLED: podcast get ${params.podcast.get.id}")
+
+      def runHelpCommand(params: CliParams): Unit =
+        params.printHelp()
+
+      val params = new CliParams(args)
+
+      type CommandAction = (CliParams) => Unit
+
+      def onContains[T](subcommands: Seq[T], actionMappings: (Subcommand, CommandAction)*): Option[CommandAction] = {
+        actionMappings collectFirst {
+          case (command, behavior) if subcommands contains command => behavior
+        }
+      }
+
+      onContains(params.subcommands,
+        params.help          -> runHelpCommand,
+        params.podcast.check -> runCheckPodcastCommand,
+        params.podcast.get   -> runGetPodcastCommand,
+        params.podcast       -> runPodcastCommand,
+      ) match {
+        case Some(action) => Future {
+          val out = new ByteArrayOutputStream
+          Console.withOut(out) {
+            Console.withErr(out) {
+              //println(s"CLI parser results : ${params.summary}")
+              action(params)
+            }
+          }
+          out.toString
+        }
+        case None => Future.successful("Unknown command")
+      }
+
     }.getOrElse(emptyInput)
+
 
   private lazy val commandDescriptions: String = List
     .concat(
