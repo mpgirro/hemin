@@ -65,7 +65,38 @@ class CliParams(args: List[String])
   }
   addSubcommand(podcast)
 
+  val episode = new Subcommand("episode") {
+
+    val get = new Subcommand("get") {
+      val id: ScallopOption[String] = trailArg[String](
+        name = "ID",
+        descr = "Get Episode by ID",
+        required = true)
+    }
+    addSubcommand(get)
+
+    val chapters = new Subcommand("chapters") {
+      val get = new Subcommand("get") {
+        val id: ScallopOption[String] = trailArg[String](
+          name = "ID",
+          descr = "Get Chapters of Episode by ID",
+          required = true)
+      }
+      addSubcommand(get)
+    }
+    addSubcommand(chapters)
+  }
+  addSubcommand(episode)
+
   val feed = new Subcommand("feed") {
+    val get = new Subcommand("get") {
+      val id: ScallopOption[String] = trailArg[String](
+        name = "ID",
+        descr = "Get Feed by ID",
+        required = true)
+    }
+    addSubcommand(get)
+
     val propose = new Subcommand("propose") {
       val url: ScallopOption[List[String]] = trailArg[List[String]](
         name = "URL [URL [...]]",

@@ -13,6 +13,7 @@ import org.rogach.scallop.Subcommand
 
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 /** Command language interpreter processor for interactive commands.
   * This is not a fully fledged REPL, since it does not print the
@@ -43,13 +44,16 @@ class CliProcessor(bus: ActorRef,
 
   private def determineAction(params: CliParams): Option[CommandAction] = {
     onContains(params.subcommands,
-      params.feed.propose         -> runFeedProposeCommand,
+      params.episode.get          -> retrieveEpisode,
+      params.episode.chapters.get -> retrieveEpisodeChapters,
+      params.feed.get             -> retrieveFeed,
+      params.feed.propose         -> proposeFeed,
       params.feed                 -> runFeedCommand,
-      params.help                 -> runHelpCommand,
-      params.podcast.check        -> runCheckPodcastCommand,
-      params.podcast.episodes.get -> runGetPodcastCommand,
-      params.podcast.feeds.get    -> runGetPodcastCommand,
-      params.podcast.get          -> runGetPodcastCommand,
+      params.help                 -> help,
+      params.podcast.check        -> checkPodcast,
+      params.podcast.episodes.get -> retrievePodcastEpisodes,
+      params.podcast.feeds.get    -> retrievePodcastFeeds,
+      params.podcast.get          -> retrievePodcast,
       params.podcast              -> runPodcastCommand,
     )
   }
@@ -83,87 +87,103 @@ class CliProcessor(bus: ActorRef,
 
   private lazy val emptyInput: Future[String] = Future.successful("Input command was empty")
 
-  private def awaitAndPrint(future: Future[String]): Unit = {
+  private def awaitAndPrint(action: Future[String]): Unit = {
+    val future = action.map { result =>
+      println(result)
+    }
     val duration: Duration = config.node.internalTimeout.duration
-    val result = Await.ready(future, duration)
-    println(result)
+    Await.ready(future, duration)
   }
 
   private def runPodcastCommand(params: CliParams): Unit =
-    println("CALLED: podcast")
-
-  private def runCheckPodcastCommand(params: CliParams): Unit =
-    println(s"CALLED: podcast check ${params.podcast.check.id}")
+    println("This command is not yet implemented")
 
   private def runFeedCommand(params: CliParams): Unit = {
-    println("CALLED: feed")
+    println("This command is not yet implemented")
   }
 
-  private def runFeedProposeCommand(params: CliParams): Unit = {
+  private def checkPodcast(params: CliParams): Unit = {
+    def action(id: String): Future[String] = Future {
+      bus ? CatalogStore.CheckPodcast(id)
+      "Attempting to check podcast" // we need this result type
+    }
+    params.podcast.check.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
+      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
+    }
+  }
+
+  private def proposeFeed(params: CliParams): Unit = {
+    def action(urls: List[String]): Future[String] = Future {
+      val out = new StringBuilder
+      urls.foreach { f =>
+        out ++= "proposing " + f
+        bus ! CatalogStore.ProposeNewFeed(f)
+      }
+      out.mkString
+    }
     params.feed.propose.url.toOption match {
-      case Some(url) => awaitAndPrint(proposeFeeds(url))
-      case None     => println("No URL provided") // TODO this should not be necessary since ID is makred as required
+      case Some(urls) => awaitAndPrint(action(urls))
+      case None       => println("No URL provided") // TODO this should not be necessary since ID is makred as required
     }
   }
 
-  private def runGetPodcastCommand(params: CliParams): Unit = {
-    //println(s"CALLED: podcast get ${params.podcast.get.id}")
+  private def retrievePodcast(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetPodcast(id))
     params.podcast.get.id.toOption match {
-      case Some(id) => awaitAndPrint(getPodcast(id))
+      case Some(id) => awaitAndPrint(action(id))
       case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
     }
   }
 
-  private def runGetPodcastEpisodesCommand(params: CliParams): Unit = {
-    //println(s"CALLED: podcast get episodes ${params.podcast.get.episodes.id}")
-    params.podcast.get.id.toOption match {
-      case Some(id) => awaitAndPrint(getEpisodesByPodcast(id))
+  private def retrievePodcastEpisodes(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetEpisodesByPodcast(id))
+    params.podcast.episodes.get.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
       case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
     }
   }
 
-  private def runGetPodcastFeedsCommand(params: CliParams): Unit = {
-    //println(s"CALLED: podcast get feeds ${params.podcast.get.feeds.id}")
-    params.podcast.get.id.toOption match {
-      case Some(id) => awaitAndPrint(getFeedsByPodcast(id))
+  private def retrievePodcastFeeds(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetFeedsByPodcast(id))
+    params.podcast.feeds.get.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
       case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
     }
   }
 
-  private def runHelpCommand(params: CliParams): Unit =
+  private def retrieveEpisode(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetEpisode(id))
+    params.episode.get.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
+      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
+    }
+  }
+
+  private def retrieveEpisodeChapters(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetChaptersByEpisode(id))
+    params.episode.chapters.get.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
+      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
+    }
+  }
+
+  private def retrieveFeed(params: CliParams): Unit = {
+    def action(id: String): Future[String] =
+      CliFormatter.cliResult(bus ? CatalogStore.GetFeed(id))
+    params.feed.get.id.toOption match {
+      case Some(id) => awaitAndPrint(action(id))
+      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
+    }
+  }
+
+  private def help(params: CliParams): Unit =
     params.printHelp()
-
-  private def getFeed(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetFeed(id))
-
-  private def getEpisode(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetEpisode(id))
-
-  private def getChaptersByEpisode(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetChaptersByEpisode(id))
-
-  private def proposeFeeds(urls: List[String]): Future[String] = Future {
-    val out = new StringBuilder
-    urls.foreach { f =>
-      out ++= "proposing " + f
-      bus ! CatalogStore.ProposeNewFeed(f)
-    }
-    out.mkString
-  }
-
-  private def checkPodcast(id: String): Future[String] = Future {
-    bus ? CatalogStore.CheckPodcast(id)
-    "Attempting to check podcast" // we need this result type
-  }
-
-  private def getPodcast(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetPodcast(id))
-
-  private def getEpisodesByPodcast(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetEpisodesByPodcast(id))
-
-  private def getFeedsByPodcast(id: String): Future[String] =
-    CliFormatter.cliResult(bus ? CatalogStore.GetFeedsByPodcast(id))
 
   private def getSearchResult(words: List[String]): Future[String] = {
     val query: String = words.mkString(" ")
