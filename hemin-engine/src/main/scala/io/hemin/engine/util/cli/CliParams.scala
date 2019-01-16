@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli.new2
+package io.hemin.engine.util.cli
 
 import org.rogach.scallop.exceptions._
 import org.rogach.scallop.{ScallopConf, ScallopOption, Subcommand}
@@ -7,14 +7,12 @@ class CliParams(args: List[String])
   extends ScallopConf(args) {
 
   version("test 1.2.3 (c) 2012 Mr Placeholder")
-
   banner("""Usage: test [OPTION]... [tree|palm] [OPTION]... [tree-name]
            |test is an awesome program, which does something funny
            |Options:
            |""".stripMargin)
-
   footer("\nFor all other tricks, consult the documentation!")
-
+  shortSubcommandsHelp(true)
   val properties: Map[String, String] = props[String](descr = "some key-value pairs")
   val verbose: ScallopOption[Boolean] = opt[Boolean](descr = "use more verbose output")
   val amount: ScallopOption[Int] = opt[Int](
@@ -29,7 +27,7 @@ class CliParams(args: List[String])
 
     val check = new Subcommand("check") {
       val id: ScallopOption[String] = trailArg[String](
-        name = "podcast check",
+        name = "ID",
         descr = "Check Podcast by ID",
         required = true)
     }
@@ -37,15 +35,46 @@ class CliParams(args: List[String])
 
     val get = new Subcommand("get") {
       val id: ScallopOption[String] = trailArg[String](
-        name = "podcast get",
+        name = "ID",
         descr = "Get Podcast by ID",
         required = true)
     }
     addSubcommand(get)
+
+    val episodes = new Subcommand("episodes") {
+      val get = new Subcommand("get") {
+        val id: ScallopOption[String] = trailArg[String](
+          name = "ID",
+          descr = "Get Episodes of Podcast by ID",
+          required = true)
+      }
+      addSubcommand(get)
+    }
+    addSubcommand(episodes)
+
+    val feeds = new Subcommand("feeds") {
+      val get = new Subcommand("get") {
+        val id: ScallopOption[String] = trailArg[String](
+          name = "ID",
+          descr = "Get Feeds of Podcast by ID",
+          required = true)
+      }
+      addSubcommand(get)
+    }
+    addSubcommand(feeds)
   }
   addSubcommand(podcast)
 
-  //addSubcommand(CliInputConf1.podcast)
+  val feed = new Subcommand("feed") {
+    val propose = new Subcommand("propose") {
+      val url: ScallopOption[List[String]] = trailArg[List[String]](
+        name = "URL [URL [...]]",
+        descr = "Propose a new Feed by an URL",
+        required = true)
+    }
+    addSubcommand(propose)
+  }
+  addSubcommand(feed)
 
   val tree = new Subcommand("tree") {
     val height: ScallopOption[Double] = opt[Double](
