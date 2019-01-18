@@ -24,6 +24,8 @@ object Engine {
     * and Solr index name. */
   final val name: String = "hemin"
 
+  final val version: String = "0.10.0"
+
   /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
     * configuration map. The configuration property map will be the
     * foundation of the internal [[io.hemin.engine.EngineConfig]]. Not

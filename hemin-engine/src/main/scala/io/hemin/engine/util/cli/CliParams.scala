@@ -1,13 +1,14 @@
 package io.hemin.engine.util.cli
 
+import io.hemin.engine.Engine
 import org.rogach.scallop.exceptions._
 import org.rogach.scallop.{ScallopConf, ScallopOption, Subcommand}
 
 class CliParams(args: List[String])
   extends ScallopConf(args) {
 
-  version("test 1.2.3 (c) 2012 Mr Placeholder")
-  banner("""Usage: test [OPTION]... [tree|palm] [OPTION]... [tree-name]
+  version(s"Hemin Engine CLI v${Engine.version} (c) 2018 Maximilian Irro")
+  banner("""Usage: [OPTION]... [tree|palm] [OPTION]... [tree-name]
            |test is an awesome program, which does something funny
            |Options:
            |""".stripMargin)
@@ -19,45 +20,45 @@ class CliParams(args: List[String])
     name = "amount",
     descr = "how many objects do you need?")
 
-  val help = new Subcommand("help")
+  val help = new Subcommand("help") {
+    descr("Show help information")
+  }
   addSubcommand(help)
 
+  trait ID { _: ScallopConf => // <<< NB: otherwise we will get Option identifier 'trailArg' is not unique (calls `opt` on the parent class `Conf` twice)
+    val id: ScallopOption[String] = trailArg[String](
+      name = "ID",
+      required = true)
+  }
 
   val podcast = new Subcommand("podcast") {
-
-    val check = new Subcommand("check") {
-      val id: ScallopOption[String] = trailArg[String](
-        name = "ID",
-        descr = "Check Podcast by ID",
-        required = true)
+    descr("Operations on Podcasts")
+    shortSubcommandsHelp(true)
+    val check = new Subcommand("check") with ID {
+      descr("Check Podcast by ID")
     }
     addSubcommand(check)
 
-    val get = new Subcommand("get") {
-      val id: ScallopOption[String] = trailArg[String](
-        name = "ID",
-        descr = "Get Podcast by ID",
-        required = true)
+    val get = new Subcommand("get") with ID {
+      descr("Get Podcast by ID")
     }
     addSubcommand(get)
 
     val episodes = new Subcommand("episodes") {
-      val get = new Subcommand("get") {
-        val id: ScallopOption[String] = trailArg[String](
-          name = "ID",
-          descr = "Get Episodes of Podcast by ID",
-          required = true)
+      descr("Operations on a Podcast's Episodes")
+      shortSubcommandsHelp(true)
+      val get = new Subcommand("get") with ID {
+        descr("Get Episodes of Podcast by ID")
       }
       addSubcommand(get)
     }
     addSubcommand(episodes)
 
     val feeds = new Subcommand("feeds") {
-      val get = new Subcommand("get") {
-        val id: ScallopOption[String] = trailArg[String](
-          name = "ID",
-          descr = "Get Feeds of Podcast by ID",
-          required = true)
+      descr("Operations on a Podcast's Feeds")
+      shortSubcommandsHelp(true)
+      val get = new Subcommand("get") with ID {
+        descr("Get Feeds of Podcast by ID")
       }
       addSubcommand(get)
     }
@@ -66,21 +67,19 @@ class CliParams(args: List[String])
   addSubcommand(podcast)
 
   val episode = new Subcommand("episode") {
-
-    val get = new Subcommand("get") {
-      val id: ScallopOption[String] = trailArg[String](
-        name = "ID",
-        descr = "Get Episode by ID",
-        required = true)
+    descr("Operations on Episodes")
+    shortSubcommandsHelp(true)
+    val get = new Subcommand("get") with ID {
+      descr("Get Episode by ID")
     }
     addSubcommand(get)
 
     val chapters = new Subcommand("chapters") {
-      val get = new Subcommand("get") {
-        val id: ScallopOption[String] = trailArg[String](
-          name = "ID",
-          descr = "Get Chapters of Episode by ID",
-          required = true)
+      descr("Operations on anEpisode's Chapters")
+      shortSubcommandsHelp(true)
+      requireSubcommand()
+      val get = new Subcommand("get") with ID {
+        descr("Get Chapters of Episode by ID")
       }
       addSubcommand(get)
     }
@@ -89,11 +88,10 @@ class CliParams(args: List[String])
   addSubcommand(episode)
 
   val feed = new Subcommand("feed") {
-    val get = new Subcommand("get") {
-      val id: ScallopOption[String] = trailArg[String](
-        name = "ID",
-        descr = "Get Feed by ID",
-        required = true)
+    descr("Operations on Feeds")
+    shortSubcommandsHelp(true)
+    val get = new Subcommand("get") with ID {
+      descr("Get Feed by ID")
     }
     addSubcommand(get)
 
@@ -106,29 +104,6 @@ class CliParams(args: List[String])
     addSubcommand(propose)
   }
   addSubcommand(feed)
-
-  val tree = new Subcommand("tree") {
-    val height: ScallopOption[Double] = opt[Double](
-      name = "height",
-      descr = "how tall should the tree be?")
-    val name: ScallopOption[String] = trailArg[String](
-      name = "tree name",
-      descr = "tree name")
-  }
-  addSubcommand(tree)
-
-  val palm = new Subcommand("palm") {
-    val height: ScallopOption[Double] = opt[Double](
-      name = "height",
-      descr = "how tall should the palm be?"
-    )
-    val name: ScallopOption[String] = trailArg[String](
-      name = "palm name",
-      descr = "palm name",
-      required = true,
-    )
-  }
-  addSubcommand(palm)
 
   verify()
 

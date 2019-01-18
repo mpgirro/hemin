@@ -107,10 +107,7 @@ class CliProcessor(bus: ActorRef,
       bus ? CatalogStore.CheckPodcast(id)
       "Attempting to check podcast" // we need this result type
     }
-    params.podcast.check.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def proposeFeed(params: CliParams): Unit = {
@@ -122,64 +119,43 @@ class CliProcessor(bus: ActorRef,
       }
       out.mkString
     }
-    params.feed.propose.url.toOption match {
-      case Some(urls) => awaitAndPrint(action(urls))
-      case None       => println("No URL provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(action(urls)))
   }
 
   private def retrievePodcast(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetPodcast(id))
-    params.podcast.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.podcast.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def retrievePodcastEpisodes(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetEpisodesByPodcast(id))
-    params.podcast.episodes.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def retrievePodcastFeeds(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetFeedsByPodcast(id))
-    params.podcast.feeds.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def retrieveEpisode(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetEpisode(id))
-    params.episode.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.episode.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def retrieveEpisodeChapters(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetChaptersByEpisode(id))
-    params.episode.chapters.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def retrieveFeed(params: CliParams): Unit = {
     def action(id: String): Future[String] =
       CliFormatter.cliResult(bus ? CatalogStore.GetFeed(id))
-    params.feed.get.id.toOption match {
-      case Some(id) => awaitAndPrint(action(id))
-      case None     => println("No ID provided") // TODO this should not be necessary since ID is makred as required
-    }
+    params.feed.get.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def help(params: CliParams): Unit =
