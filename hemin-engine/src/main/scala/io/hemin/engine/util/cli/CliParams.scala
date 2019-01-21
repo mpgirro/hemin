@@ -1,13 +1,13 @@
 package io.hemin.engine.util.cli
 
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import org.rogach.scallop.exceptions._
 import org.rogach.scallop.{ScallopConf, ScallopOption, Subcommand}
 
 class CliParams(args: List[String])
   extends ScallopConf(args) {
 
-  version(s"Hemin Engine CLI v${Engine.version} (c) 2018 Maximilian Irro")
+  version(s"Hemin Engine CLI v${HeminEngine.version} (c) 2018 Maximilian Irro")
   banner("""Usage: [OPTION]... [tree|palm] [OPTION]... [tree-name]
            |test is an awesome program, which does something funny
            |Options:

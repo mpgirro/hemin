@@ -9,8 +9,8 @@ import scala.concurrent.{ExecutionContext, blocking}
 import scala.io.StdIn
 import scala.util.{Failure, Success}
 
-/** Main entry point to use a [[io.hemin.engine.Engine]] in standalone mode */
-object EngineApp extends App {
+/** Main entry point to use a [[io.hemin.engine.HeminEngine]] in standalone mode */
+object HeminApp extends App {
 
   private val log = Logger(getClass)
 
@@ -20,7 +20,7 @@ object EngineApp extends App {
 
   // load the configuration and startup the engine
   private lazy val config: Config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
-  private lazy val engine: Engine = Engine.boot(config) match {
+  private lazy val engine: HeminEngine = HeminEngine.boot(config) match {
     case Success(e)  => e
     case Failure(ex) =>
       shutdown(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")

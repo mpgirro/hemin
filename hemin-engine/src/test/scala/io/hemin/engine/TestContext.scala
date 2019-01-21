@@ -31,7 +31,7 @@ class TestContext(mongoProps: MongodProps) {
     .map(_.getPort)
     .getOrElse(12345)
 
-  val mongoUri: String = s"mongodb://$mongoHost:$mongoPort/${Engine.name}"
+  val mongoUri: String = s"mongodb://$mongoHost:$mongoPort/${HeminEngine.name}"
 
   private val runtimeConfig: IRuntimeConfig = new RuntimeConfigBuilder()
     .defaults(Command.MongoD)
@@ -42,9 +42,9 @@ class TestContext(mongoProps: MongodProps) {
     .parseMap(Map(
       "hemin.catalog.mongo-uri" -> mongoUri,
     ).asJava)
-    .withFallback(EngineConfig.defaultConfig)
+    .withFallback(HeminConfig.defaultConfig)
 
-  val engineConfig: EngineConfig = EngineConfig.load(config)
+  val engineConfig: HeminConfig = HeminConfig.load(config)
 
   val repositoryFactory: RepositoryFactory = new RepositoryFactory(engineConfig.catalog, executionContext)
 

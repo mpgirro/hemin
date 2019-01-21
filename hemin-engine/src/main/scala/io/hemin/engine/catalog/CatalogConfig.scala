@@ -2,7 +2,7 @@ package io.hemin.engine.catalog
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -23,7 +23,7 @@ object CatalogConfig
   extends ConfigDefaults[CatalogConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${CatalogStore.name}"
+  override val namespace: String = s"${HeminEngine.name}.${CatalogStore.name}"
 
   override def fromConfig(config: Config): CatalogConfig =
     CatalogConfig(

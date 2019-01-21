@@ -17,7 +17,7 @@ import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
 import scala.util.{Failure, Success, Try}
 
-object Engine {
+object HeminEngine {
 
   /** The name of the Engine. This value is used for configuration
     * namespace(s), as well as the default Mongo database name,
@@ -26,60 +26,60 @@ object Engine {
 
   final val version: String = "0.10.0"
 
-  /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
+  /** Try to boot an [[io.hemin.engine.HeminEngine]] instance for the given
     * configuration map. The configuration property map will be the
-    * foundation of the internal [[io.hemin.engine.EngineConfig]]. Not
+    * foundation of the internal [[io.hemin.engine.HeminConfig]]. Not
     * specified parameters will have default values. The configuration
     * map will be also tried for the internal Akka system configuration,
-    * with fallbacks from [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    * with fallbacks from [[io.hemin.engine.HeminConfig.defaultAkkaConfig]].
     *
     * @param config The configuration map that is the base for the Engine's
     *               configuration and the internal Akka system.
     */
-  def boot(config: Config): Try[Engine] = Try(new Engine(config))
+  def boot(config: Config): Try[HeminEngine] = Try(new HeminEngine(config))
 
-  /** Try to boot an [[io.hemin.engine.Engine]] instance for the given
+  /** Try to boot an [[io.hemin.engine.HeminEngine]] instance for the given
     * configuration. The internal Akka system will use the default configuration
-    * as it is defined in [[io.hemin.engine.EngineConfig.defaultAkkaConfig]].
+    * as it is defined in [[io.hemin.engine.HeminConfig.defaultAkkaConfig]].
     *
     * @param config The Engine's configuration. The Akka system will use defaults.
     */
-  def boot(config: EngineConfig): Try[Engine] = Try(new Engine(config))
+  def boot(config: HeminConfig): Try[HeminEngine] = Try(new HeminEngine(config))
 
   private lazy val engineShutdownFailureNotRunning: Try[Unit] =
-    Failure(new EngineException("Engine shutdown failed; reason: not running"))
+    Failure(new HeminException("Engine shutdown failed; reason: not running"))
 
-  private lazy val engineGuardErrorNotRunning: EngineException =
-    new EngineException("Guard prevented call; reason: Engine not running")
+  private lazy val engineGuardErrorNotRunning: HeminException =
+    new HeminException("Guard prevented call; reason: Engine not running")
 
   private def engineGuardFailureNotRunning[A]: Try[A] = Failure(engineGuardErrorNotRunning)
 
   private def engineShutdownFailure(ex: Throwable): Try[Unit] = Failure(engineShutdownError(ex))
 
-  private def engineShutdownError(ex: Throwable): EngineException =
-    new EngineException(s"Engine shutdown failed; reason: ${ex.getMessage}", ex)
+  private def engineShutdownError(ex: Throwable): HeminException =
+    new HeminException(s"Engine shutdown failed; reason: ${ex.getMessage}", ex)
 
 }
 
-class Engine private (engineConfig: EngineConfig,
-                      akkaConfig: Config) {
+class HeminEngine private(engineConfig: HeminConfig,
+                          akkaConfig: Config) {
 
-  import io.hemin.engine.Engine._ // import the failures
+  import io.hemin.engine.HeminEngine._ // import the failures
 
   private def this(config: Config) = this(
-    engineConfig = EngineConfig.load(config),
+    engineConfig = HeminConfig.load(config),
     akkaConfig   = Option(config)
       .getOrElse(ConfigFactory.empty())
-      .withFallback(EngineConfig.defaultAkkaConfig),
+      .withFallback(HeminConfig.defaultAkkaConfig),
   )
 
-  private def this(config: EngineConfig) = this(
-    engineConfig = Option(config).getOrElse(EngineConfig.defaultEngineConfig),
-    akkaConfig   = EngineConfig.defaultAkkaConfig,
+  private def this(config: HeminConfig) = this(
+    engineConfig = Option(config).getOrElse(HeminConfig.defaultEngineConfig),
+    akkaConfig   = HeminConfig.defaultAkkaConfig,
   )
 
   /** Configuration of the Engine instance. */
-  val config: EngineConfig = engineConfig
+  val config: HeminConfig = engineConfig
 
   private val log = Logger(getClass)
 
@@ -88,7 +88,7 @@ class Engine private (engineConfig: EngineConfig,
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
   private implicit val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(4)) //  TODO set parameters from config
 
-  private val system: ActorSystem = ActorSystem(Engine.name, akkaConfig)
+  private val system: ActorSystem = ActorSystem(HeminEngine.name, akkaConfig)
   private val node: ActorRef = system.actorOf(Node.props(config), Node.name)
 
   private lazy val circuitBreaker: CircuitBreaker =

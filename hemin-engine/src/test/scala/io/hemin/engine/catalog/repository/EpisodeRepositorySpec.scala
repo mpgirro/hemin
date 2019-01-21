@@ -45,10 +45,7 @@ class EpisodeRepositorySpec
       pubDate = Some(tomorrow)
     )
 
-    assert(true) // TODO
-
-    /*
-    // Note: we are aware of the sequencing that happens here, and we want it!
+    // Note: we are aware of the sequencing that happens here, and we embrace it
     val results = for {
       e1 <- episodeRepository.save(episode1)
       e2 <- episodeRepository.save(episode2)
@@ -59,7 +56,6 @@ class EpisodeRepositorySpec
         assert(r.exists(_.id.contains("id1")), "An episode with a valid pubDate was not retrieved")
         assert(!r.exists(_.id.contains("id2")), "An episode with an invalid pubDate (in the future) was retrieved")
       }
-    */
 
   }
 

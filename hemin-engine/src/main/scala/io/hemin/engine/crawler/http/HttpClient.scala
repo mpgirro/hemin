@@ -5,7 +5,7 @@ import java.nio.file.{Path, Paths}
 
 import com.softwaremill.sttp.{Response, _}
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineException
+import io.hemin.engine.HeminException
 
 import scala.concurrent.duration._
 import scala.io.Source
@@ -173,7 +173,7 @@ class HttpClient (timeout: Long,
         lastModified    = None,
       )
     } else {
-      throw new EngineException(s"check failed on MIME : '$mimeType'")
+      throw new HeminException(s"check failed on MIME : '$mimeType'")
     }
   }
 
@@ -279,32 +279,32 @@ object HttpClient {
   }
 
   private def headFailureUrlNull: Try[Nothing] =
-    Failure(new EngineException("Cannot run HEAD check; reason: URL was NULL"))
+    Failure(new HeminException("Cannot run HEAD check; reason: URL was NULL"))
 
   private def headFailureInvalidUrl(url: String): Try[Nothing] =
-    Failure(new EngineException(s"Cannot run HEAD check; reason: no valid URL provided : '$url'"))
+    Failure(new HeminException(s"Cannot run HEAD check; reason: no valid URL provided : '$url'"))
 
   private def headFailureInvalidLocation(url: String): Try[Nothing] =
-    Failure(new EngineException(s"Cannot run HEAD check; reason: URL points neither to local nor remote resource : '$url'"))
+    Failure(new HeminException(s"Cannot run HEAD check; reason: URL points neither to local nor remote resource : '$url'"))
 
   private def headFailureInvalidStatus(code: Int, text: String): Try[Nothing] =
-    Failure(new EngineException(s"HEAD check reported status $code : '$text'"))
+    Failure(new HeminException(s"HEAD check reported status $code : '$text'"))
 
   private def headFailureUnexpectedMime(mime: String, url: String): Try[Nothing] =
-    Failure(new EngineException(s"HEAD check received unexpected MIME-type '$mime' of '$url'"))
+    Failure(new HeminException(s"HEAD check received unexpected MIME-type '$mime' of '$url'"))
 
   private def fetchFailureInvalidLocation(url: String): Try[Nothing] =
-    Failure(new EngineException(s"Cannot GET content; reason: URL points neither to local nor remote resource : '$url'"))
+    Failure(new HeminException(s"Cannot GET content; reason: URL points neither to local nor remote resource : '$url'"))
 
   private def fetchFailureWithError(error: String): Try[Nothing] =
-    Failure(new EngineException(s"Error collecting download body; message: $error"))
+    Failure(new HeminException(s"Error collecting download body; message: $error"))
 
   private def fetchFailureNonSuccessResponse(code: Int): Try[Nothing] =
-    Failure(new EngineException(s"Download resulted in a non-success response code : $code"))
+    Failure(new HeminException(s"Download resulted in a non-success response code : $code"))
 
   private def fetchFailureInvalidMime(mime: String): Try[Nothing] =
-    Failure(new EngineException(s"Aborted before downloading a file with invalid MIME-type : '$mime'"))
+    Failure(new HeminException(s"Aborted before downloading a file with invalid MIME-type : '$mime'"))
 
   private def fetchFailureExceedingLength(length: Long): Try[Nothing] =
-    Failure(new EngineException(s"Refusing to download resource because content length is too much: $length"))
+    Failure(new HeminException(s"Refusing to download resource because content length is too much: $length"))
 }

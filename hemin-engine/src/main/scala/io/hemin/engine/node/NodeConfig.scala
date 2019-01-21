@@ -4,13 +4,13 @@ import akka.util.Timeout
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
-import io.hemin.engine.{Engine, node}
+import io.hemin.engine.{HeminEngine, node}
 
 import scala.collection.JavaConverters._
 import scala.concurrent.duration._
 
 /** Configuration for [[node.Node]], which extends
-  * to [[io.hemin.engine.EngineApp]] when in standalone mode
+  * to [[io.hemin.engine.HeminApp]] when in standalone mode
   */
 final case class NodeConfig(
   repl: Boolean,
@@ -26,7 +26,7 @@ object NodeConfig
   extends ConfigDefaults[NodeConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${Node.name}"
+  override val namespace: String = s"${HeminEngine.name}.${Node.name}"
 
   override def fromConfig(config: Config): NodeConfig =
     NodeConfig(

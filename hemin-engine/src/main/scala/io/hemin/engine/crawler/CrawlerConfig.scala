@@ -2,7 +2,7 @@ package io.hemin.engine.crawler
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -21,7 +21,7 @@ object CrawlerConfig
   extends ConfigDefaults[CrawlerConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${Crawler.name}"
+  override val namespace: String = s"${HeminEngine.name}.${Crawler.name}"
 
   override def fromConfig(config: Config): CrawlerConfig =
     CrawlerConfig(

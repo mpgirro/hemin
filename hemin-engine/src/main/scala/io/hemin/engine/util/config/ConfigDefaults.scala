@@ -14,9 +14,9 @@ trait ConfigDefaults[T] {
   protected[this] val defaultMailbox: Config
 
   /** Default configuration as a `com.typesafe.config.Config` object.
-    * Every key that the [[io.hemin.engine.EngineConfig]] tries to load has
+    * Every key that the [[io.hemin.engine.HeminConfig]] tries to load has
     * a value defined in this defaults. Use these defaults as the fallback
-    * config instance when initializing an [[io.hemin.engine.Engine]] to
+    * config instance when initializing an [[io.hemin.engine.HeminEngine]] to
     * avoid errors from parsing partial configuration files.
     */
   final lazy val defaultConfig: Config = defaultValues

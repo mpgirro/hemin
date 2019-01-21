@@ -11,14 +11,14 @@ import scala.util.{Failure, Success}
 // TODO this spec relies on a complete engine setup present (mongo, solr); there should be in memory dummies present
 
 @Ignore // TODO this test is ignored at the moment, because it is slow, spams the output and is not really useful
-class EngineSpec
+class HeminEngineSpec
   extends FlatSpec
     with Matchers
     with ScalaFutures
     with MongoEmbedDatabase
     with BeforeAndAfter {
 
-  def newEngine(): Engine = Engine.boot(testContext.engineConfig) match {
+  def newEngine(): HeminEngine = HeminEngine.boot(testContext.engineConfig) match {
     case Success(engine) => engine
     case Failure(ex) =>
       assert(false, s"Failed to startup engine; reason : ${ex.getMessage}")
@@ -45,7 +45,7 @@ class EngineSpec
 
     val f: Future[String] = engine.cli("ping")
     ScalaFutures.whenReady(f.failed) { ex =>
-      ex shouldBe a [EngineException]
+      ex shouldBe a [HeminException]
     }
   }
 

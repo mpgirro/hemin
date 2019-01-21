@@ -6,7 +6,7 @@ import akka.actor.ActorRef
 import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineConfig
+import io.hemin.engine.HeminConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.searcher.Searcher
 import org.rogach.scallop.Subcommand
@@ -26,7 +26,7 @@ import scala.util.{Failure, Success}
   * @param ec
   */
 class CliProcessor(bus: ActorRef,
-                   config: EngineConfig,
+                   config: HeminConfig,
                    ec: ExecutionContext) {
 
   private val log = Logger(getClass)
@@ -41,7 +41,7 @@ class CliProcessor(bus: ActorRef,
       case (command, behavior) if subcommands contains command => behavior
     }
   }
-
+  
   private def determineAction(params: CliParams): Option[CommandAction] = {
     onContains(params.subcommands,
       params.episode.get          -> retrieveEpisode,

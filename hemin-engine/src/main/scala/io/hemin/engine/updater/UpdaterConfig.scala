@@ -2,7 +2,7 @@ package io.hemin.engine.updater
 
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -18,7 +18,7 @@ object UpdaterConfig
   extends ConfigDefaults[UpdaterConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${Updater.name}"
+  override val namespace: String = s"${HeminEngine.name}.${Updater.name}"
 
   override def fromConfig(config: Config): UpdaterConfig = UpdaterConfig()
 

@@ -1,7 +1,7 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineException
+import io.hemin.engine.HeminException
 import io.hemin.engine.catalog.repository.BsonConversion._
 import io.hemin.engine.model.Episode
 import io.hemin.engine.util.TimeUtil
@@ -29,8 +29,8 @@ class EpisodeRepository(db: Future[DefaultDB],
 
   override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("episodes"))
 
-  override protected[this] def saveError(value: Episode): EngineException =
-    new EngineException(s"Saving Episode to database was unsuccessful : $value")
+  override protected[this] def saveError(value: Episode): HeminException =
+    new HeminException(s"Saving Episode to database was unsuccessful : $value")
 
   override def save(episode: Episode): Future[Episode] = {
     val query = BSONDocument("id" -> episode.id)

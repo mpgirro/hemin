@@ -2,7 +2,7 @@ package io.hemin.engine
 
 /** This package provides the domain model classes
   * that the Hemin Engine uses in it's internal subsystems. The external
-  * API [[io.hemin.engine.Engine]] also produces results with these model
+  * API [[io.hemin.engine.HeminEngine]] also produces results with these model
   * classes.
   *
   * All Engine models are immutable Scala case classes with default falues.

@@ -2,7 +2,7 @@ package io.hemin.engine.parser
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -18,7 +18,7 @@ object ParserConfig
   extends ConfigDefaults[ParserConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${Parser.name}"
+  override val namespace: String = s"${HeminEngine.name}.${Parser.name}"
 
   override def fromConfig(config: Config): ParserConfig =
     ParserConfig(

@@ -10,7 +10,7 @@ import io.hemin.engine.parser.ParserConfig
 import io.hemin.engine.searcher.SearcherConfig
 import io.hemin.engine.updater.UpdaterConfig
 
-/** Configuration for [[io.hemin.engine.Engine]].
+/** Configuration for [[io.hemin.engine.HeminEngine]].
   *
   * @param catalog  Configuration for [[io.hemin.engine.catalog.CatalogStore]] subsystem
   * @param crawler  Configuration for [[io.hemin.engine.crawler.Crawler]] subsystem
@@ -20,7 +20,7 @@ import io.hemin.engine.updater.UpdaterConfig
   * @param searcher Configuration for [[io.hemin.engine.searcher.Searcher]] subsystem
   * @param updater  Configuration for [[io.hemin.engine.updater.Updater]] subsystem
   */
-final case class EngineConfig(
+final case class HeminConfig(
   catalog: CatalogConfig,
   crawler: CrawlerConfig,
   index: IndexConfig,
@@ -30,28 +30,28 @@ final case class EngineConfig(
   updater: UpdaterConfig,
 )
 
-object EngineConfig {
+object HeminConfig {
 
   /** Load from a given `com.typesafe.config.Config` object.  To ensure
-    * a fully initialized [[io.hemin.engine.EngineConfig]], the given
+    * a fully initialized [[io.hemin.engine.HeminConfig]], the given
     * Typesafe Config is interpolated with the results of
-    * [[io.hemin.engine.EngineConfig.defaultConfig]] as the fallback
+    * [[io.hemin.engine.HeminConfig.defaultConfig]] as the fallback
     * values for all keys that are not set in the argument config.
     */
-  def load(config: Config): EngineConfig = Option(config)
+  def load(config: Config): HeminConfig = Option(config)
     .map(_.withFallback(defaultConfig))
     .map(loadFromSafeConfig)
     .getOrElse(defaultEngineConfig)
 
   /** Loads the config file `application.conf` and initializes a
     * structure-fixed configuration instance. To be used from `main()`
-    * or equivalent. The resulting [[io.hemin.engine.EngineConfig]]
+    * or equivalent. The resulting [[io.hemin.engine.HeminConfig]]
     * will have default values for all fields that were not specified
     * in the config file. */
-  def loadFromEnvironment(): EngineConfig =
+  def loadFromEnvironment(): HeminConfig =
     load(ConfigFactory.load(System.getProperty("config.resource", "application.conf")))
 
-  /** The default configuration of an [[io.hemin.engine.Engine]], as a
+  /** The default configuration of an [[io.hemin.engine.HeminEngine]], as a
     * `com.typesafe.config.Config` object. This configuration includes
     * configuration properties for the internal Akka system and
     * dispatcher and mailbox configuration for every Akka actor. */
@@ -66,10 +66,10 @@ object EngineConfig {
     .withFallback(SearcherConfig.defaultConfig)
     .withFallback(UpdaterConfig.defaultConfig)
 
-  /** The default configuration of an [[io.hemin.engine.Engine]]
+  /** The default configuration of an [[io.hemin.engine.HeminEngine]]
     * as a structure-fixed configuration instance. Equivalent to
-    * [[io.hemin.engine.EngineConfig.defaultConfig]]. */
-  lazy val defaultEngineConfig: EngineConfig = loadFromSafeConfig(defaultConfig)
+    * [[io.hemin.engine.HeminConfig.defaultConfig]]. */
+  lazy val defaultEngineConfig: HeminConfig = loadFromSafeConfig(defaultConfig)
 
   /** The default configuration for the interal Akka system. */
   lazy val defaultAkkaConfig: Config = ConfigFactory.load(parseString(
@@ -93,11 +93,11 @@ object EngineConfig {
     }"""))
 
   /** All keys are expected and must be present in the config map.
-    * Use [[io.hemin.engine.EngineConfig.defaultConfig()]] for the
+    * Use [[io.hemin.engine.HeminConfig.defaultConfig()]] for the
     * fallback values to the TypeSafe Config object before calling
     * this method. */
-  private def loadFromSafeConfig(config: Config): EngineConfig =
-    EngineConfig(
+  private def loadFromSafeConfig(config: Config): HeminConfig =
+    HeminConfig(
       catalog  = CatalogConfig.fromConfig(config),
       crawler  = CrawlerConfig.fromConfig(config),
       index    = IndexConfig.fromConfig(config),

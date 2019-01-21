@@ -3,7 +3,7 @@ package io.hemin.engine.node
 import akka.actor.{Actor, ActorRef, Props, SupervisorStrategy, Terminated}
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.EngineConfig
+import io.hemin.engine.HeminConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.catalog.CatalogStore.CatalogMessage
 import io.hemin.engine.crawler.Crawler
@@ -25,7 +25,7 @@ import scala.language.postfixOps
 
 object Node {
   final val name = "node"
-  def props(config: EngineConfig): Props =
+  def props(config: HeminConfig): Props =
     Props(new Node(config))
       .withDispatcher(config.node.dispatcher)
       //.withMailbox(config.node.mailbox) // TODO why is this causing chaos and madness on App startup?!
@@ -71,7 +71,7 @@ object Node {
   final case class ShutdownSystem()
 }
 
-class Node(config: EngineConfig)
+class Node(config: HeminConfig)
   extends Actor {
 
   private val log: Logger = Logger(getClass)

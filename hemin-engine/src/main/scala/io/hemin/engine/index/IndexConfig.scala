@@ -2,7 +2,7 @@ package io.hemin.engine.index
 
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.config.ConfigFactory.{load, parseString}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import io.hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -25,7 +25,7 @@ object IndexConfig
   extends ConfigDefaults[IndexConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${Engine.name}.${IndexStore.name}"
+  override val namespace: String = s"${HeminEngine.name}.${IndexStore.name}"
 
   override def fromConfig(config: Config): IndexConfig =
     IndexConfig(
@@ -40,7 +40,7 @@ object IndexConfig
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$namespace.lucene-index-path" -> "./data/index",
-    s"$namespace.solr-uri"          -> s"http://localhost:8983/solr/${Engine.name}",
+    s"$namespace.solr-uri"          -> s"http://localhost:8983/solr/${HeminEngine.name}",
     s"$namespace.solr-queue-size"   -> 20,
     s"$namespace.solr-thread-count" -> 4,
     s"$namespace.create-index"      -> false,
