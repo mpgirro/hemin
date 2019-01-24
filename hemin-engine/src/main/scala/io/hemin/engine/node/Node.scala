@@ -18,7 +18,7 @@ import io.hemin.engine.searcher.Searcher.SearcherMessage
 import io.hemin.engine.updater.Updater
 import io.hemin.engine.updater.Updater.UpdaterMessage
 import io.hemin.engine.util.InitializationProgress
-import io.hemin.engine.util.cli.CliProcessor
+import io.hemin.engine.util.cli.CommandLineInterpreter
 
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps
@@ -86,7 +86,7 @@ class Node(config: HeminConfig)
 
   //private val cluster = Cluster(context.system)
 
-  private val processor = new CliProcessor(self, config, executionContext)
+  private val cli = new CommandLineInterpreter(self, config, executionContext)
 
   private val initializationProgress =
     new InitializationProgress(Seq(CatalogStore.name, Crawler.name, IndexStore.name, Parser.name, Searcher.name, Updater.name))
@@ -182,10 +182,10 @@ class Node(config: HeminConfig)
     log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
-  private def onCliInput(input: String, theSender: ActorRef): Unit = processor
-    .eval(input)
-    .mapTo[String]
-    .foreach(output => theSender ! CliOutput(output))
+  private def onCliInput(input: String, theSender: ActorRef): Unit = {
+    val output: String = cli.execute(input)
+    theSender ! CliOutput(output)
+  }
 
   private def onTerminated(corpse: ActorRef): Unit = {
     log.error("Oh noh! A critical subsystem died : {}", corpse.path)
