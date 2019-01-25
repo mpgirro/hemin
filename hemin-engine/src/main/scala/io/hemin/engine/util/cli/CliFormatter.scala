@@ -33,14 +33,14 @@ object CliFormatter {
   private lazy val none: String = "None"
 
   def cliResult(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
-    case CatalogStore.PodcastResult(p)            => CliFormatter.format(p)
-    case CatalogStore.EpisodeResult(e)            => CliFormatter.format(e)
-    case CatalogStore.FeedResult(f)               => CliFormatter.format(f)
-    case CatalogStore.EpisodesByPodcastResult(es) => CliFormatter.format(es)
-    case CatalogStore.FeedsByPodcastResult(fs)    => CliFormatter.format(fs)
-    case CatalogStore.ChaptersByEpisodeResult(cs) => CliFormatter.format(cs)
-    case Searcher.SearchResults(rs)               => CliFormatter.format(rs)
-    case other                                    => CliFormatter.unhandled(other)
+    case CatalogStore.PodcastResult(p)            => format(p)
+    case CatalogStore.EpisodeResult(e)            => format(e)
+    case CatalogStore.FeedResult(f)               => format(f)
+    case CatalogStore.EpisodesByPodcastResult(es) => format(es)
+    case CatalogStore.FeedsByPodcastResult(fs)    => format(fs)
+    case CatalogStore.ChaptersByEpisodeResult(cs) => format(cs)
+    case Searcher.SearchResults(rs)               => format(rs)
+    case other                                    => unhandled(other)
   }
 
   def unhandled(unknown: Any): String = {

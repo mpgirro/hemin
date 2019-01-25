@@ -19,7 +19,7 @@ class CliProcessor(bus: ActorRef,
   private implicit val executionContext: ExecutionContext = ec
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
-  private val operation: InternalOperation = new InternalOperation(bus, config, ec)
+  private val process: InternalProcess = new InternalProcess(bus, config, ec)
 
   def eval(params: CliParams): Option[CliAction] = {
     onContains(params.subcommands,
@@ -43,8 +43,6 @@ class CliProcessor(bus: ActorRef,
     }
   }
 
-  private lazy val emptyInput: Future[String] = Future.successful("Input command was empty")
-
   private def awaitAndPrint(action: Future[String]): Unit = {
     val future = action.map { result =>
       println(result)
@@ -61,35 +59,35 @@ class CliProcessor(bus: ActorRef,
   }
 
   private def checkPodcast(params: CliParams): Unit = {
-    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(operation.checkPodcast(id)))
+    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(process.checkPodcast(id)))
   }
 
   private def proposeFeed(params: CliParams): Unit = {
-    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(operation.proposeFeed(urls)))
+    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(process.proposeFeed(urls)))
   }
 
   private def retrievePodcast(params: CliParams): Unit = {
-    params.podcast.get.id.toOption.foreach(id => awaitAndPrint(operation.getPodcast(id)))
+    params.podcast.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcast(id)))
   }
 
   private def retrievePodcastEpisodes(params: CliParams): Unit = {
-    params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(operation.getPodcastEpisodes(id)))
+    params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcastEpisodes(id)))
   }
 
   private def retrievePodcastFeeds(params: CliParams): Unit = {
-    params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(operation.getPodcastFeeds(id)))
+    params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcastFeeds(id)))
   }
 
   private def retrieveEpisode(params: CliParams): Unit = {
-    params.episode.get.id.toOption.foreach(id => awaitAndPrint(operation.getEpisode(id)))
+    params.episode.get.id.toOption.foreach(id => awaitAndPrint(process.getEpisode(id)))
   }
 
   private def retrieveEpisodeChapters(params: CliParams): Unit = {
-    params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(operation.getEpisodeChapters(id)))
+    params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(process.getEpisodeChapters(id)))
   }
 
   private def retrieveFeed(params: CliParams): Unit = {
-    params.feed.get.id.toOption.foreach(id => awaitAndPrint(operation.getFeeds(id)))
+    params.feed.get.id.toOption.foreach(id => awaitAndPrint(process.getFeeds(id)))
   }
 
   private def help(params: CliParams): Unit =

@@ -10,9 +10,9 @@ import io.hemin.engine.searcher.Searcher
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class InternalOperation (bus: ActorRef,
-                         config: HeminConfig,
-                         ec: ExecutionContext) {
+class InternalProcess(bus: ActorRef,
+                      config: HeminConfig,
+                      ec: ExecutionContext) {
 
   private implicit val executionContext: ExecutionContext = ec
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
