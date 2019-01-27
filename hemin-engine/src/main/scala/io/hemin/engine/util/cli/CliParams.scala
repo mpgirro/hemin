@@ -31,6 +31,21 @@ class CliParams(args: List[String])
       required = true)
   }
 
+  val search = new Subcommand("search") {
+    descr("Run search")
+    shortSubcommandsHelp(true)
+    val query: ScallopOption[List[String]] = trailArg[List[String]](
+      name = "QUERY [QUERY [...]]",
+      required = true)
+    val pageNumber = opt[Int](
+      name = "page",
+      descr = "Page number of search result")
+    val pageSize = opt[Int](
+      name = "size",
+      descr = "Page size of search result")
+  }
+  addSubcommand(search)
+
   val podcast = new Subcommand("podcast") {
     descr("Operations on Podcasts")
     shortSubcommandsHelp(true)

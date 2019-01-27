@@ -2,27 +2,78 @@ package io.hemin.engine.util.cli
 
 import java.io.ByteArrayOutputStream
 
-import akka.actor.ActorRef
+import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
-import io.hemin.engine.util.cli.CommandLineInterpreter.CliAction
+import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportCliStartupComplete}
+import io.hemin.engine.util.cli.CommandLineInterpreter.{CliAction, InterpreterInput, InterpreterOutput}
 
 import scala.concurrent.ExecutionContext
 
 object CommandLineInterpreter {
   type CliAction = (CliParams) => Unit
+
+  final val name = "cli"
+
+  def props(config: HeminConfig): Props =
+    Props(new CommandLineInterpreter(config))
+      //.withDispatcher(config.dispatcher)
+      //.withMailbox(config.mailbox)
+
+  trait CliMessage
+
+
+  trait CliQuery extends CliMessage
+  trait CliQueryResult extends CliMessage
+
+  // CliQuery
+  final case class InterpreterInput(input: String) extends CliQuery
+
+  // CliQueryResult
+  final case class InterpreterOutput(output: String) extends CliQueryResult
 }
 
-class CommandLineInterpreter (bus: ActorRef,
-                              config: HeminConfig,
-                              ec: ExecutionContext) {
+class CommandLineInterpreter (config: HeminConfig)
+  extends Actor {
 
   private val log = Logger(getClass)
 
-  private val parser: CliParser = new CliParser
-  private val processor: CliProcessor = new CliProcessor(bus, config, ec)
+  private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  def execute(input: String): String = {
+  private val parser: CliParser = new CliParser
+
+  private var supervisor: ActorRef = _
+  private var bus: ActorRef = _
+  private var processor: CliProcessor = _
+
+  override def postRestart(cause: Throwable): Unit = {
+    log.warn("{} has been restarted or resumed", self.path.name)
+    super.postRestart(cause)
+  }
+
+  override def postStop(): Unit = {
+    log.info("{} subsystem shutting down", CommandLineInterpreter.name.toUpperCase)
+  }
+
+  override def receive: Receive = {
+
+    case ActorRefSupervisor(ref) =>
+      log.debug("Received ActorRefSupervisor(_)")
+      supervisor = ref
+      bus = ref
+      processor = new CliProcessor(bus, context.system, config, executionContext)
+      supervisor ! ReportCliStartupComplete
+
+    case InterpreterInput(input) => onInterpreterInput(input)
+  }
+
+  private def onInterpreterInput(input: String): Unit = {
+    log.info("Received InterpreterInput('{}')", input)
+    val output = execute(input)
+    sender ! InterpreterOutput(output)
+  }
+
+  private def execute(input: String): String = {
     val params: Option[CliParams] = parser.parse(input)
     val action: Option[CliAction] = params.flatMap(p => processor.eval(p))
     (params, action) match {
@@ -35,7 +86,7 @@ class CommandLineInterpreter (bus: ActorRef,
           }
         }
         out.toString
-      case (None, _) => "Unknown command"
+      case (_, _) => "Unknown command"
     }
   }
 

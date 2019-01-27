@@ -10,8 +10,9 @@ import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.model._
-import io.hemin.engine.node.Node
+import io.hemin.engine.node.{InternalOperationDispatcher, Node}
 import io.hemin.engine.searcher.Searcher
+import io.hemin.engine.util.cli.CommandLineInterpreter
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -61,8 +62,8 @@ object HeminEngine {
 
 }
 
-class HeminEngine private(engineConfig: HeminConfig,
-                          akkaConfig: Config) {
+class HeminEngine private (engineConfig: HeminConfig,
+                           akkaConfig: Config) {
 
   import io.hemin.engine.HeminEngine._ // import the failures
 
@@ -90,6 +91,7 @@ class HeminEngine private(engineConfig: HeminConfig,
 
   private val system: ActorSystem = ActorSystem(HeminEngine.name, akkaConfig)
   private val node: ActorRef = system.actorOf(Node.props(config), Node.name)
+  private val internal: InternalOperationDispatcher = new InternalOperationDispatcher(bus, system, config, executionContext)
 
   private lazy val circuitBreaker: CircuitBreaker =
     (for {
@@ -130,15 +132,14 @@ class HeminEngine private(engineConfig: HeminConfig,
   /** Proposes a feed's URL to the system, which will
     * process it if the URL is yet unknown to the database. */
   def propose(url: String): Try[Unit] = guarded {
-    bus ! CatalogStore.ProposeNewFeed(url)
+    //bus ! CatalogStore.ProposeNewFeed(url)
+    internal.proposeFeed(List(url))
   }
 
   /** Eventually returns the data resulting from processing the
     * arguments by the Command Language Interpreter as text */
-  def cli(args: String): Future[String] = guarded {
-    (bus ? Node.CliInput(args))
-      .mapTo[Node.CliOutput]
-      .map(_.output)
+  def cli(input: String): Future[String] = guarded {
+    internal.cli(input)
   }
 
   /** Search the index for the given query parameter. Returns a
@@ -155,30 +156,22 @@ class HeminEngine private(engineConfig: HeminConfig,
     * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
   def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = guarded {
-    (bus ? Searcher.SearchRequest(query, pageNumber, pageSize))
-      .mapTo[Searcher.SearchResults]
-      .map(_.results)
+    internal.getSearchResult(query, pageNumber, pageSize)
   }
 
   /** Finds a [[io.hemin.engine.model.Podcast]] by ID */
   def findPodcast(id: String): Future[Option[Podcast]] = guarded {
-    (bus ? CatalogStore.GetPodcast(id))
-      .mapTo[CatalogStore.PodcastResult]
-      .map(_.podcast)
+    internal.getPodcast(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Episode]] by ID */
   def findEpisode(id: String): Future[Option[Episode]] = guarded {
-    (bus ? CatalogStore.GetEpisode(id))
-      .mapTo[CatalogStore.EpisodeResult]
-      .map(_.episode)
+    internal.getEpisode(id)
   }
 
   /** Finds a [[io.hemin.engine.model.Feed]] by ID */
   def findFeed(id: String): Future[Option[Feed]] = guarded {
-    (bus ? CatalogStore.GetFeed(id))
-      .mapTo[CatalogStore.FeedResult]
-      .map(_.feed)
+    internal.getFeeds(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Image]] by ID */
@@ -217,23 +210,17 @@ class HeminEngine private(engineConfig: HeminConfig,
 
   /** Finds an [[io.hemin.engine.model.Episode]] by its belonging Podcast's ID */
   def findEpisodesByPodcast(id: String): Future[List[Episode]] = guarded {
-    (bus ? CatalogStore.GetEpisodesByPodcast(id))
-      .mapTo[CatalogStore.EpisodesByPodcastResult]
-      .map(_.episodes)
+    internal.getPodcastEpisodes(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Feed]] by its belonging Podcast's ID */
   def findFeedsByPodcast(id: String): Future[List[Feed]] = guarded {
-    (bus ? CatalogStore.GetFeedsByPodcast(id))
-      .mapTo[CatalogStore.FeedsByPodcastResult]
-      .map(_.feeds)
+    internal.getPodcastFeeds(id)
   }
 
   /** Finds all [[io.hemin.engine.model.Chapter]] by their belonging Episode's ID */
   def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
-    (bus ? CatalogStore.GetChaptersByEpisode(id))
-      .mapTo[CatalogStore.ChaptersByEpisodeResult]
-      .map(_.chapters)
+    internal.getEpisodeChapters(id)
   }
 
   def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {

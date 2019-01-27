@@ -32,6 +32,7 @@ object CliFormatter {
 
   private lazy val none: String = "None"
 
+  @Deprecated
   def cliResult(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
     case CatalogStore.PodcastResult(p)            => format(p)
     case CatalogStore.EpisodeResult(e)            => format(e)
@@ -49,6 +50,12 @@ object CliFormatter {
     msg
   }
 
+  def format(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
+    case option: Option[Any] => format(option)
+    case list: List[Any]     => format(list)
+    case other               => unhandled(other)
+  }
+
   def format(option: Option[Any]): String = option match {
     case Some(p: Podcast) => format(p)
     case Some(e: Episode) => format(e)
@@ -57,7 +64,10 @@ object CliFormatter {
     case Some(i: Image)   => format(i)
     case Some(other)      => unhandled(other)
     case None             => none
+    case other            => unhandled(other)
   }
+
+  def format(xs: List[Any]): String = prettyPrint(xs)
 
   def format(podcast: Podcast): String =
     prettyPrint(podcast.copy(
@@ -85,9 +95,7 @@ object CliFormatter {
       websiteData    = doc.websiteData.map(truncat),
     ))
 
-  def format(results: SearchResult): String = prettyPrint(results)
-
-  def format(xs: List[Any]): String = prettyPrint(xs)
+  def format(result: SearchResult): String = prettyPrint(result)
 
   private def truncat(value: String): String = value.substring(0, Math.min(value.length, 40)) ++ " ..."
 

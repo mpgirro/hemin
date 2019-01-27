@@ -1,9 +1,10 @@
 package io.hemin.engine.util.cli
 
-import akka.actor.ActorRef
+import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
+import io.hemin.engine.node.InternalOperationDispatcher
 import io.hemin.engine.util.cli.CommandLineInterpreter.CliAction
 import org.rogach.scallop.Subcommand
 
@@ -11,6 +12,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, ExecutionContext, Future}
 
 class CliProcessor(bus: ActorRef,
+                   system: ActorSystem,
                    config: HeminConfig,
                    ec: ExecutionContext) {
 
@@ -19,7 +21,7 @@ class CliProcessor(bus: ActorRef,
   private implicit val executionContext: ExecutionContext = ec
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
-  private val process: InternalProcess = new InternalProcess(bus, config, ec)
+  private val internal: InternalOperationDispatcher = new InternalOperationDispatcher(bus, system, config, ec)
 
   def eval(params: CliParams): Option[CliAction] = {
     onContains(params.subcommands,
@@ -59,38 +61,46 @@ class CliProcessor(bus: ActorRef,
   }
 
   private def checkPodcast(params: CliParams): Unit = {
-    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(process.checkPodcast(id)))
+    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(internal.checkPodcast(id)))
   }
 
   private def proposeFeed(params: CliParams): Unit = {
-    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(process.proposeFeed(urls)))
+    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(internal.proposeFeed(urls)))
   }
 
-  private def retrievePodcast(params: CliParams): Unit = {
-    params.podcast.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcast(id)))
-  }
+  private def retrievePodcast(params: CliParams): Unit =
+    params.podcast.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getPodcast(id))
+    ))
 
-  private def retrievePodcastEpisodes(params: CliParams): Unit = {
-    params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcastEpisodes(id)))
-  }
+  private def retrievePodcastEpisodes(params: CliParams): Unit =
+    params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getPodcastEpisodes(id))))
 
   private def retrievePodcastFeeds(params: CliParams): Unit = {
-    params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(process.getPodcastFeeds(id)))
+    params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getPodcastFeeds(id))
+    ))
   }
 
   private def retrieveEpisode(params: CliParams): Unit = {
-    params.episode.get.id.toOption.foreach(id => awaitAndPrint(process.getEpisode(id)))
+    params.episode.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getEpisode(id))
+    ))
   }
 
   private def retrieveEpisodeChapters(params: CliParams): Unit = {
-    params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(process.getEpisodeChapters(id)))
+    params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getEpisodeChapters(id))
+    ))
   }
 
   private def retrieveFeed(params: CliParams): Unit = {
-    params.feed.get.id.toOption.foreach(id => awaitAndPrint(process.getFeeds(id)))
+    params.feed.get.id.toOption.foreach(id => awaitAndPrint(
+      CliFormatter.format(internal.getFeeds(id))
+    ))
   }
 
-  private def help(params: CliParams): Unit =
-    params.printHelp()
+  private def help(params: CliParams): Unit = params.printHelp()
 
 }
