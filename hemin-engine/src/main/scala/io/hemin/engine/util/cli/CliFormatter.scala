@@ -50,13 +50,13 @@ object CliFormatter {
     msg
   }
 
-  def format(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
-    case option: Option[Any] => format(option)
-    case list: List[Any]     => format(list)
-    case other               => unhandled(other)
+  def format(future: Future[_])(implicit ec: ExecutionContext): Future[String] = future.map {
+    case option: Option[_] => format(option)
+    case seq: Seq[_]       => format(seq)
+    case other             => unhandled(other)
   }
 
-  def format(option: Option[Any]): String = option match {
+  def format(option: Option[_]): String = option match {
     case Some(p: Podcast) => format(p)
     case Some(e: Episode) => format(e)
     case Some(f: Feed)    => format(f)
@@ -67,7 +67,13 @@ object CliFormatter {
     case other            => unhandled(other)
   }
 
-  def format(xs: List[Any]): String = prettyPrint(xs)
+  def format(xs: Seq[_]): String = xs.map {
+    case p: Podcast => condense(p)
+    case e: Episode => condense(e)
+    case f: Feed    => condense(f)
+    case c: Chapter => condense(c)
+    case other      => prettyPrint(other)
+  }.mkString("\n")
 
   def format(podcast: Podcast): String =
     prettyPrint(podcast.copy(
@@ -96,6 +102,24 @@ object CliFormatter {
     ))
 
   def format(result: SearchResult): String = prettyPrint(result)
+
+  private def condense(p: Podcast): String = condense(p.title, p.id)
+
+  private def condense(e: Episode): String = condense(e.title, e.id)
+
+  private def condense(f: Feed): String = condense(f.url, f.id)
+
+  private def condense(c: Chapter): String = {
+    val start = c.start.getOrElse("")
+    val title = c.title.getOrElse("--")
+    s"* $start$title"
+  }
+
+  private def condense(itemTitle: Option[String], itemId: Option[String]): String = {
+    val title = itemTitle.getOrElse("--")
+    val id = itemId.getOrElse("missing")
+    s"* $title [id:$id]"
+  }
 
   private def truncat(value: String): String = value.substring(0, Math.min(value.length, 40)) ++ " ..."
 

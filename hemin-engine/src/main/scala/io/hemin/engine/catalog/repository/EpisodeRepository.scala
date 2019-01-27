@@ -52,7 +52,7 @@ class EpisodeRepository(db: Future[DefaultDB],
   }
 
   def findAllByPodcast(podcastId: String): Future[List[Episode]] = {
-    log.debug("Request to get all Episodes by Episode (ID) : {}", podcastId)
+    log.debug("Request to get all Episodes by Podcast (ID) : {}", podcastId)
     findAll(Query("podcastId" -> toBsonS(podcastId)))
   }
 
