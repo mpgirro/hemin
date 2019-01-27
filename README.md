@@ -23,7 +23,7 @@ HEMIN is a podcast catalog & search engine infrastructure. It's engine is writte
 ### ⚠️ Early development status warning
 
 
-The HEMIN infrastructure is still in the early development phase and not yet ready for full productive use.
+The Hemin infrastructure is still in the early development phase and not yet ready for full productive use.
 
 The system currently supports the following standards:
 
@@ -43,12 +43,12 @@ Further roadmap information for the subprojects is documented in their respectiv
 ## WebApp ([hemin.io](https://hemin.io))
 
 
-The WebApp is available at [hemin.io](https://hemin.io)
+A WebApp is available at [hemin.io](https://hemin.io)
 
-There are several different frontend variant implementations for the HEMIN system. These exist primarily for experimental and educational reasons. The webapps are named after the letters in the greek alphabet. Currently there are these:
+There are several different frontend variant implementations for the Hemin system. The webapps are named after the letters in the greek alphabet. Currently there are these:
 
-* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). An early proof-of-concept UI back from when Hemin was called something else and it's engine served as a scientifc guinea pig (more about those days [here](https://github.com/mpgirro/dipl)). Alpha is now deprecated.
-* [Beta](hemin-web/beta) &ndash; written in [Elm](https://elm-lang.org). It is still work in progress and quite *beta* (phun intended), but will become the production implementation.
+* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). An early proof-of-concept UI back from when Hemin was called something else and it's engine served as a scientific guinea pig (more about those days [here](https://github.com/mpgirro/dipl)). Alpha is now deprecated.
+* [Beta](hemin-web/beta) &ndash; written in [Elm](https://elm-lang.org). It is still work in progress and quite *beta* (pun intended), but will become the production implementation.
 <!--
 * [Gamma](hemin-web/gamma) &ndash; proposition of a [React](https://reactjs.org) based implementation.  
 * [Delta](hemin-web/delta) &ndash; proposition of a [VueJS](https://vuejs.org) based implementation. 
@@ -64,4 +64,4 @@ The REST endpoint to the API is [api.hemin.io](https://api.hemin.io)
 ## Engine 
 
 
-The HEMIN engine can be started as a standalone command line application that feature a REPL. Alternatively, it can be used embedded within another Scala/Java (or other compatible JVM language) application. This second way is how the API server integrates the engine.
+The Hemin engine can be started as a standalone command line application that feature a REPL. Alternatively, it can be used embedded within another Scala/Java (or other compatible JVM language) application. This second way is how the API server integrates the engine.
