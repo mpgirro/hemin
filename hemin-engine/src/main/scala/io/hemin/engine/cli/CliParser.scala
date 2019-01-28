@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli
+package io.hemin.engine.cli
 
 import com.typesafe.scalalogging.Logger
 

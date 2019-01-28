@@ -4,15 +4,12 @@ import java.util.concurrent.ForkJoinPool
 import java.util.concurrent.atomic.AtomicBoolean
 
 import akka.actor.{ActorRef, ActorSystem}
-import akka.pattern.{CircuitBreaker, ask}
+import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.model._
-import io.hemin.engine.node.{InternalOperationDispatcher, Node}
-import io.hemin.engine.searcher.Searcher
-import io.hemin.engine.util.cli.CommandLineInterpreter
+import io.hemin.engine.node.{GuardedOperationDispatcher, Node}
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
@@ -91,19 +88,7 @@ class HeminEngine private (engineConfig: HeminConfig,
 
   private val system: ActorSystem = ActorSystem(HeminEngine.name, akkaConfig)
   private val node: ActorRef = system.actorOf(Node.props(config), Node.name)
-  private val internal: InternalOperationDispatcher = new InternalOperationDispatcher(bus, system, config, executionContext)
-
-  private lazy val circuitBreaker: CircuitBreaker =
-    (for {
-      scheduler    <- Option(system).map(_.scheduler)
-      maxFailures  <- Option(config).map(_.node.breakerMaxFailures)
-      callTimeout  <- Option(config).map(_.node.breakerCallTimeout.duration)
-      resetTimeout <- Option(config).map(_.node.breakerResetTimeout.duration)
-    } yield CircuitBreaker(scheduler, maxFailures, callTimeout, resetTimeout)
-      .onOpen(breakerOpen())
-      .onClose(breakerClose())
-      .onHalfOpen(breakerHalfOpen())).get
-
+  private val guarded: GuardedOperationDispatcher = new GuardedOperationDispatcher(bus, system, config, executionContext)
 
   // Run the boot sequence. This will throw an exception in case a Failure occurred
   bootSequence() match {
@@ -131,15 +116,15 @@ class HeminEngine private (engineConfig: HeminConfig,
 
   /** Proposes a feed's URL to the system, which will
     * process it if the URL is yet unknown to the database. */
-  def propose(url: String): Try[Unit] = guarded {
+  def propose(url: String): Try[Unit] = valid {
     //bus ! CatalogStore.ProposeNewFeed(url)
-    internal.proposeFeed(List(url))
+    guarded.proposeFeed(url)
   }
 
   /** Eventually returns the data resulting from processing the
     * arguments by the Command Language Interpreter as text */
-  def cli(input: String): Future[String] = guarded {
-    internal.cli(input)
+  def cli(input: String): Future[String] = valid {
+    guarded.cli(input)
   }
 
   /** Search the index for the given query parameter. Returns a
@@ -155,30 +140,28 @@ class HeminEngine private (engineConfig: HeminConfig,
     *                 [[io.hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
     * @return The [[io.hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
-  def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = guarded {
-    internal.getSearchResult(query, pageNumber, pageSize)
+  def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = valid {
+    guarded.getSearchResult(query, pageNumber, pageSize)
   }
 
   /** Finds a [[io.hemin.engine.model.Podcast]] by ID */
-  def findPodcast(id: String): Future[Option[Podcast]] = guarded {
-    internal.getPodcast(id)
+  def findPodcast(id: String): Future[Option[Podcast]] = valid {
+    guarded.getPodcast(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Episode]] by ID */
-  def findEpisode(id: String): Future[Option[Episode]] = guarded {
-    internal.getEpisode(id)
+  def findEpisode(id: String): Future[Option[Episode]] = valid {
+    guarded.getEpisode(id)
   }
 
   /** Finds a [[io.hemin.engine.model.Feed]] by ID */
-  def findFeed(id: String): Future[Option[Feed]] = guarded {
-    internal.getFeeds(id)
+  def findFeed(id: String): Future[Option[Feed]] = valid {
+    guarded.getFeeds(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Image]] by ID */
-  def findImage(id: String): Future[Option[Image]] = guarded {
-    (bus ? CatalogStore.GetImage(id))
-      .mapTo[CatalogStore.ImageResult]
-      .map(_.image)
+  def findImage(id: String): Future[Option[Image]] = valid {
+    guarded.getImage(id)
   }
 
   /*
@@ -202,49 +185,39 @@ class HeminEngine private (engineConfig: HeminConfig,
     * @param pageSize
     * @return
     */
-  def findAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
-    (bus ? CatalogStore.GetAllPodcastsRegistrationComplete(pageNumber, pageSize))
-      .mapTo[CatalogStore.AllPodcastsResult]
-      .map(_.podcasts)
+  def findAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = valid {
+    guarded.getAllPodcasts(pageNumber, pageSize)
   }
 
   /** Finds an [[io.hemin.engine.model.Episode]] by its belonging Podcast's ID */
-  def findEpisodesByPodcast(id: String): Future[List[Episode]] = guarded {
-    internal.getPodcastEpisodes(id)
+  def findEpisodesByPodcast(id: String): Future[List[Episode]] = valid {
+    guarded.getPodcastEpisodes(id)
   }
 
   /** Finds an [[io.hemin.engine.model.Feed]] by its belonging Podcast's ID */
-  def findFeedsByPodcast(id: String): Future[List[Feed]] = guarded {
-    internal.getPodcastFeeds(id)
+  def findFeedsByPodcast(id: String): Future[List[Feed]] = valid {
+    guarded.getPodcastFeeds(id)
   }
 
   /** Finds all [[io.hemin.engine.model.Chapter]] by their belonging Episode's ID */
-  def findChaptersByEpisode(id: String): Future[List[Chapter]] = guarded {
-    internal.getEpisodeChapters(id)
+  def findChaptersByEpisode(id: String): Future[List[Chapter]] = valid {
+    guarded.getEpisodeChapters(id)
   }
 
-  def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
-    (bus ? CatalogStore.GetNewestPodcasts(pageNumber, pageSize))
-      .mapTo[CatalogStore.NewestPodcastsResult]
-      .map(_.podcasts)
+  def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = valid {
+    guarded.getAllPodcastsByNewest(pageNumber, pageSize)
   }
 
-  def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = guarded {
-    (bus ? CatalogStore.GetLatestEpisodes(pageNumber, pageSize))
-      .mapTo[CatalogStore.LatestEpisodesResult]
-      .map(_.episodes)
+  def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = valid {
+    guarded.getAllEpisodesByLatest(pageNumber, pageSize)
   }
 
-  def getDatabaseStats: Future[DatabaseStats] = guarded {
-    (bus ? CatalogStore.GetDatabaseStats())
-      .mapTo[CatalogStore.DatabaseStatsResult]
-      .map(_.stats)
+  def getDatabaseStats: Future[DatabaseStats] = valid {
+    guarded.getDatabaseStats
   }
 
-  def getDistinctCategories: Future[Set[String]] = guarded {
-    (bus ? CatalogStore.GetCategories())
-      .mapTo[CatalogStore.CategoriesResult]
-      .map(_.categories)
+  def getDistinctCategories: Future[Set[String]] = valid {
+    guarded.getDistinctCategories
   }
 
   // The call to warmup() will tap the lazy values, and wait until all
@@ -269,24 +242,18 @@ class HeminEngine private (engineConfig: HeminConfig,
   // TODO at some point I want to change this to something that distributes a message to the cluster
   private def bus: ActorRef = node
 
-  private def guarded[T](body: => Future[T]): Future[T] =
+  private def valid[T](body: => Future[T]): Future[T] =
     if (running.get) {
-      circuitBreaker.withCircuitBreaker(body)
+      body
     } else {
       Future.failed(engineGuardErrorNotRunning)
     }
 
-  private def guarded[T](body: => T): Try[T] =
+  private def valid[T](body: => T): Try[T] =
     if (running.get) {
-      Try(circuitBreaker.withSyncCircuitBreaker(body))
+      Try(body)
     } else {
       engineGuardFailureNotRunning[T]
     }
-
-  private def breakerOpen(): Unit = log.info("Circuit Breaker is open")
-
-  private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
-
-  private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
 
 }

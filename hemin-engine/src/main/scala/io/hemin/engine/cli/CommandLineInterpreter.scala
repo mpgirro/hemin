@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli
+package io.hemin.engine.cli
 
 import java.io.ByteArrayOutputStream
 
@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
 import io.hemin.engine.node.Node.{ActorRefSupervisor, ReportCliStartupComplete}
-import io.hemin.engine.util.cli.CommandLineInterpreter.{CliAction, InterpreterInput, InterpreterOutput}
+import io.hemin.engine.cli.CommandLineInterpreter.{CliAction, InterpreterInput, InterpreterOutput}
 
 import scala.concurrent.ExecutionContext
 
@@ -21,8 +21,6 @@ object CommandLineInterpreter {
       //.withMailbox(config.mailbox)
 
   trait CliMessage
-
-
   trait CliQuery extends CliMessage
   trait CliQueryResult extends CliMessage
 
@@ -68,7 +66,7 @@ class CommandLineInterpreter (config: HeminConfig)
   }
 
   private def onInterpreterInput(input: String): Unit = {
-    log.info("Received InterpreterInput('{}')", input)
+    log.debug("Received InterpreterInput('{}')", input)
     val output = execute(input)
     sender ! InterpreterOutput(output)
   }

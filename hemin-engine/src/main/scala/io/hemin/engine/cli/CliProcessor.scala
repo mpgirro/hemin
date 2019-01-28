@@ -1,11 +1,11 @@
-package io.hemin.engine.util.cli
+package io.hemin.engine.cli
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
-import io.hemin.engine.node.InternalOperationDispatcher
-import io.hemin.engine.util.cli.CommandLineInterpreter.CliAction
+import io.hemin.engine.node.GuardedOperationDispatcher
+import io.hemin.engine.cli.CommandLineInterpreter.CliAction
 import org.rogach.scallop.Subcommand
 
 import scala.concurrent.duration.Duration
@@ -21,7 +21,7 @@ class CliProcessor(bus: ActorRef,
   private implicit val executionContext: ExecutionContext = ec
   private implicit val internalTimeout: Timeout = config.node.internalTimeout
 
-  private val internal: InternalOperationDispatcher = new InternalOperationDispatcher(bus, system, config, ec)
+  private val guarded: GuardedOperationDispatcher = new GuardedOperationDispatcher(bus, system, config, ec)
 
   def eval(params: CliParams): Option[CliAction] = {
     onContains(params.subcommands,
@@ -36,6 +36,7 @@ class CliProcessor(bus: ActorRef,
       params.podcast.feeds.get    -> retrievePodcastFeeds,
       params.podcast.get          -> retrievePodcast,
       params.podcast              -> runPodcastCommand,
+      params.search               -> runSearch
     )
   }
 
@@ -61,46 +62,67 @@ class CliProcessor(bus: ActorRef,
   }
 
   private def checkPodcast(params: CliParams): Unit = {
-    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(internal.checkPodcast(id)))
+    def action(id: String): Future[String] = Future {
+      guarded.checkPodcast(id)
+      "Attempting to check podcast" // we need this result type
+    }
+    params.podcast.check.id.toOption.foreach(id => awaitAndPrint(action(id)))
   }
 
   private def proposeFeed(params: CliParams): Unit = {
-    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(internal.proposeFeed(urls)))
+    def action(urls: List[String]): Future[String] = Future {
+      val out = new StringBuilder
+      urls.foreach { f =>
+        out ++= "proposing " + f
+        guarded.proposeFeed(f)
+      }
+      out.mkString
+    }
+    params.feed.propose.url.toOption.foreach(urls => awaitAndPrint(action(urls)))
   }
 
   private def retrievePodcast(params: CliParams): Unit =
     params.podcast.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getPodcast(id))
+      CliFormatter.format(guarded.getPodcast(id))
     ))
 
   private def retrievePodcastEpisodes(params: CliParams): Unit =
     params.podcast.episodes.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getPodcastEpisodes(id))))
+      CliFormatter.format(guarded.getPodcastEpisodes(id))))
 
   private def retrievePodcastFeeds(params: CliParams): Unit = {
     params.podcast.feeds.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getPodcastFeeds(id))
+      CliFormatter.format(guarded.getPodcastFeeds(id))
     ))
   }
 
   private def retrieveEpisode(params: CliParams): Unit = {
     params.episode.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getEpisode(id))
+      CliFormatter.format(guarded.getEpisode(id))
     ))
   }
 
   private def retrieveEpisodeChapters(params: CliParams): Unit = {
     params.episode.chapters.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getEpisodeChapters(id))
+      CliFormatter.format(guarded.getEpisodeChapters(id))
     ))
   }
 
   private def retrieveFeed(params: CliParams): Unit = {
     params.feed.get.id.toOption.foreach(id => awaitAndPrint(
-      CliFormatter.format(internal.getFeeds(id))
+      CliFormatter.format(guarded.getFeeds(id))
     ))
   }
 
   private def help(params: CliParams): Unit = params.printHelp()
+
+  private def runSearch(params: CliParams): Unit = {
+    val query      = params.search.query.getOrElse(Nil).mkString(" ")
+    val pageNumber = params.search.pageNumber.toOption
+    val pageSize   = params.search.pageSize.toOption
+    awaitAndPrint(
+      CliFormatter.format(guarded.getSearchResult(query, pageNumber, pageSize))
+    )
+  }
 
 }

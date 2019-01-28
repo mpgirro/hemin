@@ -18,8 +18,8 @@ import io.hemin.engine.searcher.Searcher.SearcherMessage
 import io.hemin.engine.updater.Updater
 import io.hemin.engine.updater.Updater.UpdaterMessage
 import io.hemin.engine.util.InitializationProgress
-import io.hemin.engine.util.cli.CommandLineInterpreter
-import io.hemin.engine.util.cli.CommandLineInterpreter.CliMessage
+import io.hemin.engine.cli.CommandLineInterpreter
+import io.hemin.engine.cli.CommandLineInterpreter.CliMessage
 
 import scala.concurrent.ExecutionContext
 import scala.language.postfixOps

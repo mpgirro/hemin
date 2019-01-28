@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli
+package io.hemin.engine.cli
 
 import io.hemin.engine.HeminEngine
 import org.rogach.scallop.exceptions._
@@ -37,11 +37,15 @@ class CliParams(args: List[String])
     val query: ScallopOption[List[String]] = trailArg[List[String]](
       name = "QUERY [QUERY [...]]",
       required = true)
-    val pageNumber = opt[Int](
-      name = "page",
+    val pageNumber: ScallopOption[Int] = opt[Int](
+      name = "pageNumber",
+      short = 'p',
+      argName = "NUM",
       descr = "Page number of search result")
-    val pageSize = opt[Int](
-      name = "size",
+    val pageSize: ScallopOption[Int] = opt[Int](
+      name = "pageSize",
+      short = 's',
+      argName = "NUM",
       descr = "Page size of search result")
   }
   addSubcommand(search)

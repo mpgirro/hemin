@@ -1,4 +1,4 @@
-package io.hemin.engine.util.cli
+package io.hemin.engine.cli
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore
@@ -32,18 +32,6 @@ object CliFormatter {
 
   private lazy val none: String = "None"
 
-  @Deprecated
-  def cliResult(future: Future[Any])(implicit ec: ExecutionContext): Future[String] = future.map {
-    case CatalogStore.PodcastResult(p)            => format(p)
-    case CatalogStore.EpisodeResult(e)            => format(e)
-    case CatalogStore.FeedResult(f)               => format(f)
-    case CatalogStore.EpisodesByPodcastResult(es) => format(es)
-    case CatalogStore.FeedsByPodcastResult(fs)    => format(fs)
-    case CatalogStore.ChaptersByEpisodeResult(cs) => format(cs)
-    case Searcher.SearchResults(rs)               => format(rs)
-    case other                                    => unhandled(other)
-  }
-
   def unhandled(unknown: Any): String = {
     val msg = s"Formatter has no specific handler for type : ${unknown.getClass}"
     log.error(msg)
@@ -53,6 +41,7 @@ object CliFormatter {
   def format(future: Future[_])(implicit ec: ExecutionContext): Future[String] = future.map {
     case option: Option[_] => format(option)
     case seq: Seq[_]       => format(seq)
+    case res: SearchResult => format(res)
     case other             => unhandled(other)
   }
 

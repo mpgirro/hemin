@@ -8,16 +8,16 @@ import io.hemin.engine.HeminConfig
 import io.hemin.engine.catalog.CatalogStore
 import io.hemin.engine.model._
 import io.hemin.engine.searcher.Searcher
-import io.hemin.engine.util.cli.CommandLineInterpreter
+import io.hemin.engine.cli.CommandLineInterpreter
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try
 
 
-class InternalOperationDispatcher(bus: ActorRef,
-                                  system: ActorSystem,
-                                  config: HeminConfig,
-                                  ec: ExecutionContext) {
+class GuardedOperationDispatcher(bus: ActorRef,
+                                 system: ActorSystem,
+                                 config: HeminConfig,
+                                 ec: ExecutionContext) {
 
   private val log = Logger(getClass)
 
@@ -31,29 +31,53 @@ class InternalOperationDispatcher(bus: ActorRef,
       callTimeout  <- Option(config).map(_.node.breakerCallTimeout.duration)
       resetTimeout <- Option(config).map(_.node.breakerResetTimeout.duration)
     } yield CircuitBreaker(scheduler, maxFailures, callTimeout, resetTimeout)
-      .onOpen(breakerOpen())
-      .onClose(breakerClose())
-      .onHalfOpen(breakerHalfOpen())).get
-
-  private def breakerOpen(): Unit = log.info("Circuit Breaker is open")
-
-  private def breakerClose(): Unit = log.warn("Circuit Breaker is closed")
-
-  private def breakerHalfOpen(): Unit = log.info("Circuit Breaker is half-open, next message goes through")
+      .onOpen(log.info("Circuit Breaker is open"))
+      .onClose(log.warn("Circuit Breaker is closed"))
+      .onHalfOpen(log.info("Circuit Breaker is half-open, next message goes through")))
+      .get
 
   private def guarded[T](body: => Future[T]): Future[T] = circuitBreaker.withCircuitBreaker(body)
 
   private def guarded[T](body: => T): Try[T] = Try(circuitBreaker.withSyncCircuitBreaker(body))
 
-  def checkPodcast(id: String): Future[String] = Future {
+  def checkPodcast(id: String): Unit = guarded {
     bus ? CatalogStore.CheckPodcast(id)
-    "Attempting to check podcast" // we need this result type
   }
 
   def cli(input: String): Future[String] = guarded {
     (bus ? CommandLineInterpreter.InterpreterInput(input))
       .mapTo[CommandLineInterpreter.InterpreterOutput]
       .map(_.output)
+  }
+
+  def getAllEpisodesByLatest(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = guarded {
+    (bus ? CatalogStore.GetLatestEpisodes(pageNumber, pageSize))
+      .mapTo[CatalogStore.LatestEpisodesResult]
+      .map(_.episodes)
+  }
+
+  def getAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
+    (bus ? CatalogStore.GetAllPodcastsRegistrationComplete(pageNumber, pageSize))
+      .mapTo[CatalogStore.AllPodcastsResult]
+      .map(_.podcasts)
+  }
+
+  def getAllPodcastsByNewest(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = guarded {
+    (bus ? CatalogStore.GetNewestPodcasts(pageNumber, pageSize))
+      .mapTo[CatalogStore.NewestPodcastsResult]
+      .map(_.podcasts)
+  }
+
+  def getDatabaseStats: Future[DatabaseStats] = guarded {
+    (bus ? CatalogStore.GetDatabaseStats())
+      .mapTo[CatalogStore.DatabaseStatsResult]
+      .map(_.stats)
+  }
+
+  def getDistinctCategories: Future[Set[String]] = guarded {
+    (bus ? CatalogStore.GetCategories())
+      .mapTo[CatalogStore.CategoriesResult]
+      .map(_.categories)
   }
 
   def getEpisode(id: String): Future[Option[Episode]] = guarded {
@@ -74,7 +98,13 @@ class InternalOperationDispatcher(bus: ActorRef,
       .map(_.feed)
   }
 
-  def getPodcast(id: String): Future[Option[Podcast]] = {
+  def getImage(id: String): Future[Option[Image]] = guarded {
+    (bus ? CatalogStore.GetImage(id))
+      .mapTo[CatalogStore.ImageResult]
+      .map(_.image)
+  }
+
+  def getPodcast(id: String): Future[Option[Podcast]] = guarded {
     (bus ? CatalogStore.GetPodcast(id))
       .mapTo[CatalogStore.PodcastResult]
       .map(_.podcast)
@@ -98,13 +128,8 @@ class InternalOperationDispatcher(bus: ActorRef,
       .map(_.results)
   }
 
-  def proposeFeed(urls: List[String]): Future[String] = Future {
-    val out = new StringBuilder
-    urls.foreach { f =>
-      out ++= "proposing " + f
-      bus ! CatalogStore.ProposeNewFeed(f)
-    }
-    out.mkString
+  def proposeFeed(url: String): Unit = guarded {
+    bus ! CatalogStore.ProposeNewFeed(url)
   }
 
 }
