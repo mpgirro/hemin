@@ -4,8 +4,8 @@ import akka.actor.{ActorRef, ActorSystem}
 import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
-import io.hemin.engine.node.GuardedOperationDispatcher
 import io.hemin.engine.cli.CommandLineInterpreter.CliAction
+import io.hemin.engine.util.GuardedOperationDispatcher
 import org.rogach.scallop.Subcommand
 
 import scala.concurrent.duration.Duration

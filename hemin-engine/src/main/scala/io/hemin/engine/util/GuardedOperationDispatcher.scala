@@ -1,4 +1,4 @@
-package io.hemin.engine.node
+package io.hemin.engine.util
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.{CircuitBreaker, ask}
@@ -6,9 +6,9 @@ import akka.util.Timeout
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminConfig
 import io.hemin.engine.catalog.CatalogStore
+import io.hemin.engine.cli.CommandLineInterpreter
 import io.hemin.engine.model._
 import io.hemin.engine.searcher.Searcher
-import io.hemin.engine.cli.CommandLineInterpreter
 
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Try

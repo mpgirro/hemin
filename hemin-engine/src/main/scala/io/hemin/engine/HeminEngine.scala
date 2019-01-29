@@ -9,7 +9,8 @@ import akka.util.Timeout
 import com.typesafe.config.{Config, ConfigFactory}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.model._
-import io.hemin.engine.node.{GuardedOperationDispatcher, Node}
+import io.hemin.engine.node.Node
+import io.hemin.engine.util.GuardedOperationDispatcher
 
 import scala.concurrent.{Await, ExecutionContext, Future}
 import scala.language.postfixOps
