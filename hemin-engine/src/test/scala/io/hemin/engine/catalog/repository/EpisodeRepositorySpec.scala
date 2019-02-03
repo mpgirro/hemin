@@ -24,7 +24,6 @@ class EpisodeRepositorySpec
   }
 
   after {
-    //mongoStop(mongoProps)
     testContext.stop() // stops the embedded MongoDB
   }
 

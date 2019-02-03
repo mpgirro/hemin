@@ -51,6 +51,7 @@ class MongoTestContext {
     MongodProps(mongodExe.start(), mongodExe)
   }
 
+  /** Stops the mongod process */
   def stop(): Unit = {
     Option(mongoProps).foreach( _.mongodProcess.stop() )
     Option(mongoProps).foreach( _.mongodExe.stop() )
@@ -72,13 +73,15 @@ class MongoTestContext {
     .getOrElse(MongoTestContext.defaultMongoPort)
 
   lazy val mongoUri: String = s"mongodb://$mongoHost:$mongoPort/${HeminEngine.name}"
-  
+
+  /** The Config object from which the database connection parameters are taken */
   lazy val config: Config = ConfigFactory
     .parseMap(Map(
       "hemin.catalog.mongo-uri" -> mongoUri,
     ).asJava)
     .withFallback(HeminConfig.defaultConfig)
 
+  /** The typesafe engine config variant from which the database connection parameters are taken */
   lazy val engineConfig: HeminConfig = HeminConfig.load(config)
 
   lazy val repositoryFactory: RepositoryFactory = new RepositoryFactory(engineConfig.catalog, executionContext)
