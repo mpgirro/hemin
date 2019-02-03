@@ -15,7 +15,7 @@ import scala.concurrent.ExecutionContext
 import scala.concurrent.forkjoin.ForkJoinPool
 
 
-object TestContext {
+object MongoTestContext {
   lazy val defaultMongoHost: String = "localhost"
   lazy val defaultMongoPort: Int = 12345
 }
@@ -27,7 +27,7 @@ object TestContext {
   * ReactiveMongo).
   *
   */
-class TestContext {
+class MongoTestContext {
 
   private val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(8))
 
@@ -42,7 +42,7 @@ class TestContext {
     val mongodExe: MongodExecutable = runtime(runtimeConfig).prepare(
       new MongodConfigBuilder()
         .version(Version.V3_5_1) // TODO: in production we use Mongo v4.x
-        .net(new Net(TestContext.defaultMongoPort, Network.localhostIsIPv6()))
+        .net(new Net(MongoTestContext.defaultMongoPort, Network.localhostIsIPv6()))
         .cmdOptions(new MongoCmdOptionsBuilder()
           .useNoJournal(false)
           .build())
@@ -62,17 +62,17 @@ class TestContext {
     .map(_.net)
     .map(_.getServerAddress)
     .map(_.getCanonicalHostName)
-    .getOrElse(TestContext.defaultMongoHost)
+    .getOrElse(MongoTestContext.defaultMongoHost)
 
   lazy val mongoPort: Int = Option(mongoProps)
     .map(_.mongodProcess)
     .map(_.getConfig)
     .map(_.net)
     .map(_.getPort)
-    .getOrElse(TestContext.defaultMongoPort)
+    .getOrElse(MongoTestContext.defaultMongoPort)
 
   lazy val mongoUri: String = s"mongodb://$mongoHost:$mongoPort/${HeminEngine.name}"
-
+  
   lazy val config: Config = ConfigFactory
     .parseMap(Map(
       "hemin.catalog.mongo-uri" -> mongoUri,

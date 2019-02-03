@@ -1,7 +1,7 @@
 package io.hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import io.hemin.engine.TestContext
+import io.hemin.engine.MongoTestContext
 import io.hemin.engine.model.Episode
 import io.hemin.engine.util.TimeUtil
 import org.scalatest.concurrent.ScalaFutures
@@ -15,11 +15,11 @@ class EpisodeRepositorySpec
 
   private val log = Logger(getClass)
 
-  var testContext: TestContext = _
+  var testContext: MongoTestContext = _
   var episodeRepository: EpisodeRepository = _
 
   before {
-    testContext = new TestContext // also starts the embedded MongoDB
+    testContext = new MongoTestContext // also starts the embedded MongoDB
     episodeRepository = testContext.repositoryFactory.getEpisodeRepository
   }
 

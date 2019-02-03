@@ -24,10 +24,10 @@ class HeminEngineSpec
       null // TODO can I return a better result value (just to please the compiler?)
   }
 
-  var testContext: TestContext = _
+  var testContext: MongoTestContext = _
 
   before {
-    testContext = new TestContext // also starts the embedded MongoDB
+    testContext = new MongoTestContext // also starts the embedded MongoDB
   }
 
   after {
