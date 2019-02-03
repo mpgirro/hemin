@@ -15,7 +15,6 @@ class HeminEngineSpec
   extends FlatSpec
     with Matchers
     with ScalaFutures
-    with MongoEmbedDatabase
     with BeforeAndAfter {
 
   def newEngine(): HeminEngine = HeminEngine.boot(testContext.engineConfig) match {
@@ -25,16 +24,14 @@ class HeminEngineSpec
       null // TODO can I return a better result value (just to please the compiler?)
   }
 
-  var mongoProps: MongodProps = _
   var testContext: TestContext = _
 
   before {
-    mongoProps = mongoStart()
-    testContext = new TestContext(mongoProps)
+    testContext = new TestContext // also starts the embedded MongoDB
   }
 
   after {
-    mongoStop(mongoProps)
+    testContext.stop() // stops the embedded MongoDB
   }
 
   "The Engine" should "fail on API calls when it is already started" taggedAs Slow in {

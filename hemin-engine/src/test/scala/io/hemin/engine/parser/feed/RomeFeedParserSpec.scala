@@ -65,7 +65,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "extract 2 Episodes" in {
+  it should "extract all Episodes from the feed" in {
     val expected = 2
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
@@ -112,7 +112,7 @@ class RomeFeedParserSpec extends FlatSpec with Matchers {
     }
   }
 
-  it should "extract 3 Chapters" in {
+  it should "extract all Chapters from an Episode" in {
     val expected = 3
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
