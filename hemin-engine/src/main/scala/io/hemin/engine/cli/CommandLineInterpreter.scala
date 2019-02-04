@@ -73,7 +73,7 @@ class CommandLineInterpreter (config: HeminConfig)
 
   private def execute(input: String): String = {
     val params: Option[CliParams] = parser.parse(input)
-    val action: Option[CliAction] = params.flatMap(p => processor.eval(p))
+    val action: Option[CliAction] = params.flatMap(processor.eval)
     (params, action) match {
       case (Some(p), Some(a)) =>
         val out = new ByteArrayOutputStream
