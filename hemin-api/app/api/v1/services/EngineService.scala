@@ -1,7 +1,7 @@
 package api.v1.services
 
 import com.typesafe.config.{Config, ConfigFactory}
-import io.hemin.engine.Engine
+import io.hemin.engine.HeminEngine
 import javax.inject._
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle
@@ -16,7 +16,7 @@ class EngineService @Inject() (lifecycle: ApplicationLifecycle) {
 
   private val config: Config = ConfigFactory.load(System.getProperty("config.resource", "application.conf"))
 
-  val engine: Engine = Engine.boot(config) match {
+  val engine: HeminEngine = HeminEngine.boot(config) match {
     case Success(e)  => e
     case Failure(ex) =>
       log.error(s"Terminating due failed Engine initialization; reason : ${ex.getMessage}")
