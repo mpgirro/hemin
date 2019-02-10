@@ -1,6 +1,5 @@
 package io.hemin.engine
 
-import com.github.simplyscala.{MongoEmbedDatabase, MongodProps}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.tagobjects.Slow
 import org.scalatest.{BeforeAndAfter, FlatSpec, Ignore, Matchers}

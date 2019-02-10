@@ -1,15 +1,15 @@
 package io.hemin.engine.parser.feed
 
 import java.nio.file.{Files, Paths}
-import java.time.LocalDateTime
 import java.util.stream.Collectors
 
-import io.hemin.engine.util.mapper.DateMapper
 import org.scalatest.{FlatSpec, Matchers}
 
 import scala.util.{Failure, Success}
 
-class RomeFeedParserSpec extends FlatSpec with Matchers {
+class RomeFeedParserSpec
+  extends FlatSpec
+    with Matchers {
 
   private val SUCCEED: Boolean = true
   private val FAILURE: Boolean = false
