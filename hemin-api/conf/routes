@@ -1,5 +1,5 @@
 # Misc Non-API routes that serve dashboards, etc
-GET   /                               api.v1.controllers.HomeController.index
+GET   /                               hemin.api.v1.rest.HomeController.index
 
 # Swagger API docs
 GET   /swagger.json                   controllers.ApiHelpController.getResources
@@ -13,21 +13,21 @@ GET   /docs/*file                     controllers.Assets.at(path="/public/swagge
 GET   /json-examples/*file            controllers.Assets.at(path="/public/json-examples",file)
 
 # API resources
-GET   /api/v1/search                  api.v1.controllers.SearchController.search(q: String, p: Option[Int], s: Option[Int])
-GET   /api/v1/podcast                 api.v1.controllers.PodcastController.all(p: Option[Int], s: Option[Int])
-GET   /api/v1/podcast/teaser          api.v1.controllers.PodcastController.allAsTeaser(p: Option[Int], s: Option[Int])
-GET   /api/v1/podcast/newest          api.v1.controllers.PodcastController.newest(pageNumber: Option[Int], pageSize: Option[Int])
-GET   /api/v1/podcast/:id             api.v1.controllers.PodcastController.find(id: String)
-GET   /api/v1/podcast/:id/episodes    api.v1.controllers.PodcastController.episodes(id: String)
-GET   /api/v1/podcast/:id/feeds       api.v1.controllers.PodcastController.feeds(id: String)
-GET   /api/v1/episode/latest          api.v1.controllers.EpisodeController.latest(pageNumber: Option[Int], pageSize: Option[Int])
-GET   /api/v1/episode/:id             api.v1.controllers.EpisodeController.find(id: String)
-GET   /api/v1/episode/:id/chapters    api.v1.controllers.EpisodeController.chapters(id: String)
-GET   /api/v1/feed/:id                api.v1.controllers.FeedController.find(id: String)
-POST  /api/v1/feed/propose            api.v1.controllers.FeedController.propose
-GET   /api/v1/image/:id               api.v1.controllers.ImageController.find(id: String)
-POST  /api/v1/cli                     api.v1.controllers.CliController.eval
-GET   /api/v1/stats/database          api.v1.controllers.StatsController.database
-GET   /api/v1/category/distinct       api.v1.controllers.CategoryController.distinct
+GET   /api/v1/search                  hemin.api.v1.rest.SearchController.search(q: String, p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast                 hemin.api.v1.rest.PodcastController.all(p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast/teaser          hemin.api.v1.rest.PodcastController.allAsTeaser(p: Option[Int], s: Option[Int])
+GET   /api/v1/podcast/newest          hemin.api.v1.rest.PodcastController.newest(pageNumber: Option[Int], pageSize: Option[Int])
+GET   /api/v1/podcast/:id             hemin.api.v1.rest.PodcastController.find(id: String)
+GET   /api/v1/podcast/:id/episodes    hemin.api.v1.rest.PodcastController.episodes(id: String)
+GET   /api/v1/podcast/:id/feeds       hemin.api.v1.rest.PodcastController.feeds(id: String)
+GET   /api/v1/episode/latest          hemin.api.v1.rest.EpisodeController.latest(pageNumber: Option[Int], pageSize: Option[Int])
+GET   /api/v1/episode/:id             hemin.api.v1.rest.EpisodeController.find(id: String)
+GET   /api/v1/episode/:id/chapters    hemin.api.v1.rest.EpisodeController.chapters(id: String)
+GET   /api/v1/feed/:id                hemin.api.v1.rest.FeedController.find(id: String)
+POST  /api/v1/feed/propose            hemin.api.v1.rest.FeedController.propose
+GET   /api/v1/image/:id               hemin.api.v1.rest.ImageController.find(id: String)
+POST  /api/v1/cli                     hemin.api.v1.rest.CliController.eval
+GET   /api/v1/stats/database          hemin.api.v1.rest.StatsController.database
+GET   /api/v1/category/distinct       hemin.api.v1.rest.CategoryController.distinct
 ->    /api/v1/posts                   example.post.PostRouter
 

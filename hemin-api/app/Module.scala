@@ -3,7 +3,7 @@ import com.google.inject.AbstractModule
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Configuration, Environment}
 import example.post._
-import api.v1.services.EngineService
+import hemin.api.v1.service.EngineService
 
 /**
   * Sets up custom components for Play.

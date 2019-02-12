@@ -56,9 +56,11 @@
     <logger name="application" level="DEBUG" />
     <logger name="controllers" level="TRACE" />
     <logger name="services" level="INFO" />
-    <logger name="api.v1" level="TRACE" />
 
-    <logger name="io.hemin" level="INFO" />
+    <logger name="hemin.api.v1" level="TRACE" />
+    <logger name="hemin.engine" level="INFO" />
+    <logger name="io.hemin" level="INFO" /> <!-- TODO: obsolete? -->
+
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/> <!-- TODO: obsolete? -->
