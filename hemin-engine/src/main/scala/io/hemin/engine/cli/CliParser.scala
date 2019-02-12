@@ -16,15 +16,13 @@ class CliParser {
     .map(_.toList)
     .flatMap(parse)
 
-  def parse(args: List[String]): Option[CliParams] = {
-    Try(new CliParams(args)) match {
-      case Success(params) => Some(params)
-      case Failure(reason) =>
-        val msg = s"Error converting command to CliParams; reason: ${reason.getMessage}"
-        log.error(msg)
-        println(msg)
-        None
-    }
+  def parse(args: List[String]): Option[CliParams] = Try(new CliParams(args)) match {
+    case Success(params) => Some(params)
+    case Failure(reason) =>
+      val msg = s"Error converting command to CliParams; reason: ${reason.getMessage}"
+      log.error(msg)
+      println(msg)
+      None
   }
 
 }
