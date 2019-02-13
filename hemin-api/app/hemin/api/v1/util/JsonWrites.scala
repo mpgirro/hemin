@@ -1,6 +1,6 @@
 package hemin.api.v1.util
 
-import io.hemin.engine.model._
+import hemin.engine.model._
 import play.api.libs.json._
 
 object JsonWrites {

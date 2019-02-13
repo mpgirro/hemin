@@ -4,7 +4,7 @@ import hemin.api.v1.action.SearchActionBuilder
 import hemin.api.v1.rest.component.SearchControllerComponents
 import hemin.api.v1.service.SearchService
 import hemin.api.v1.util.{JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.SearchResult
+import hemin.engine.model.SearchResult
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}

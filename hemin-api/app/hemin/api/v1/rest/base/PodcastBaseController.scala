@@ -4,7 +4,7 @@ import hemin.api.v1.action.PodcastActionBuilder
 import hemin.api.v1.rest.component.PodcastControllerComponents
 import hemin.api.v1.service.PodcastService
 import hemin.api.v1.util.{ArrayWrapper, JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.{Episode, Feed, Image, Podcast}
+import hemin.engine.model.{Episode, Feed, Image, Podcast}
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}

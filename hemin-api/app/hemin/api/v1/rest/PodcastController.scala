@@ -3,7 +3,7 @@ package hemin.api.v1.rest
 import hemin.api.v1.rest.base.PodcastBaseController
 import hemin.api.v1.rest.component.PodcastControllerComponents
 import hemin.api.v1.util.ArrayWrapper
-import io.hemin.engine.util.mapper.{EpisodeMapper, PodcastMapper}
+import hemin.engine.util.mapper.{EpisodeMapper, PodcastMapper}
 import io.swagger.annotations.Api
 import javax.inject.Inject
 import play.api.Logger

@@ -4,7 +4,7 @@ import hemin.api.v1.action.ImageActionBuilder
 import hemin.api.v1.rest.component.ImageControllerComponents
 import hemin.api.v1.service.ImageService
 import hemin.api.v1.util.{JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.Image
+import hemin.engine.model.Image
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}

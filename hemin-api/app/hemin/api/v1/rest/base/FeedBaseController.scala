@@ -4,7 +4,7 @@ import hemin.api.v1.action.FeedActionBuilder
 import hemin.api.v1.rest.component.FeedControllerComponents
 import hemin.api.v1.service.FeedService
 import hemin.api.v1.util.{ArrayWrapper, JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.Feed
+import hemin.engine.model.Feed
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}

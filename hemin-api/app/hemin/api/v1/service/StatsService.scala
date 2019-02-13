@@ -1,6 +1,6 @@
 package hemin.api.v1.service
 
-import io.hemin.engine.model.DatabaseStats
+import hemin.engine.model.DatabaseStats
 import javax.inject.Inject
 import play.api.MarkerContext
 

@@ -4,7 +4,7 @@ import hemin.api.v1.action.EpisodeActionBuilder
 import hemin.api.v1.rest.component.EpisodeControllerComponents
 import hemin.api.v1.service.EpisodeService
 import hemin.api.v1.util.{ArrayWrapper, JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.{Chapter, Episode, Image}
+import hemin.engine.model.{Chapter, Episode, Image}
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}

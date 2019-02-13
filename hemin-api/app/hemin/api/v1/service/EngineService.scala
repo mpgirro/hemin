@@ -1,7 +1,7 @@
 package hemin.api.v1.service
 
 import com.typesafe.config.{Config, ConfigFactory}
-import io.hemin.engine.HeminEngine
+import hemin.engine.HeminEngine
 import javax.inject._
 import play.api.Logger
 import play.api.inject.ApplicationLifecycle

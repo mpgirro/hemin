@@ -4,7 +4,7 @@ import hemin.api.v1.action.StatsActionBuilder
 import hemin.api.v1.rest.component.StatsControllerComponents
 import hemin.api.v1.service.StatsService
 import hemin.api.v1.util.{JsonWrites, RequestMarkerContext}
-import io.hemin.engine.model.DatabaseStats
+import hemin.engine.model.DatabaseStats
 import javax.inject.Inject
 import play.api.libs.json.Writes
 import play.api.mvc.{BaseController, ControllerComponents}
