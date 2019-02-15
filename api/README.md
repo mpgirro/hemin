@@ -1,4 +1,4 @@
-# hemin:api
+# Hemin API
 
 [![Build Status](https://travis-ci.org/playframework/play-scala-rest-api-example.svg?branch=2.6.x)](https://travis-ci.org/playframework/play-scala-rest-api-example)
 
