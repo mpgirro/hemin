@@ -10,20 +10,20 @@ jdk:
 
 sudo: false
 
-install: cd hemin-engine && sbt clean compile publishM2
+install: cd engine && sbt clean compile publishM2
 
 cache:
   directories:
     - $HOME/.m2
 
 env: 
-  - PROJECT=hemin-engine
-  - PROJECT=hemin-api
+  - PROJECT=engine
+  - PROJECT=api
 
 #matrix:
 #    include:
-#        - env: PROJECT=hemin-engine
-#        - env: PROJECT=hemin-api
+#        - env: PROJECT=engine
+#        - env: PROJECT=api
 
 script: 
 #  - cd $PROJECT 

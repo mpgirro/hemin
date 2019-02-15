@@ -4,19 +4,19 @@ sudo: false
 matrix:
   include:
     - language: scala
-      env: PROJECT=hemin-engine
+      env: PROJECT=engine
       scala:
         - 2.12.6
       jdk:
         - oraclejdk8
         - openjdk8
       before_script:
-        - cd hemin-engine  
+        - cd engine  
       script:
         - sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - language: scala
-      env: PROJECT=hemin-api
+      env: PROJECT=api
       scala:
         - 2.12.6
       jdk:
@@ -26,16 +26,16 @@ matrix:
         directories:
           - $HOME/.m2
       install: 
-        - cd hemin-engine
+        - cd engine
         - sbt clean compile publishM2  
         - cd ..
       before_script:
-        - cd hemin-api
+        - cd api
       script:
         - sbt ++$TRAVIS_SCALA_VERSION clean test
 
     - language: elm
-      env: PROJECT=hemin-web/beta
+      env: PROJECT=web/beta
       cache:
         directories:
           - tests/elm-stuff/build-artifacts
@@ -61,7 +61,7 @@ matrix:
         - npm install
         - cd ..
       before_script:
-        - cd hemin-web/beta
+        - cd web/beta
       script:
         - elm-format --validate src/
         - elm-app test
