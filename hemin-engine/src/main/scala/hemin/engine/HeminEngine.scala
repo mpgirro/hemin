@@ -116,14 +116,14 @@ class HeminEngine private (engineConfig: HeminConfig,
 
   /** Proposes a feed's URL to the system, which will
     * process it if the URL is yet unknown to the database. */
-  def propose(url: String): Try[Unit] = valid {
+  def propose(url: String): Try[Unit] = ifRunning {
     //bus ! CatalogStore.ProposeNewFeed(url)
     guarded.proposeFeed(url)
   }
 
   /** Eventually returns the data resulting from processing the
     * arguments by the Command Language Interpreter as text */
-  def cli(input: String): Future[String] = valid {
+  def cli(input: String): Future[String] = ifRunning {
     guarded.cli(input)
   }
 
@@ -140,27 +140,27 @@ class HeminEngine private (engineConfig: HeminConfig,
     *                   [[hemin.engine.searcher.SearcherConfig.defaultSize]] is used.
     * @return The [[hemin.engine.model.SearchResult]] matching the query/page/size parameters.
     */
-  def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = valid {
+  def search(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = ifRunning {
     guarded.getSearchResult(query, pageNumber, pageSize)
   }
 
   /** Finds a [[hemin.engine.model.Podcast]] by ID */
-  def findPodcast(id: String): Future[Option[Podcast]] = valid {
+  def findPodcast(id: String): Future[Option[Podcast]] = ifRunning {
     guarded.getPodcast(id)
   }
 
   /** Finds an [[hemin.engine.model.Episode]] by ID */
-  def findEpisode(id: String): Future[Option[Episode]] = valid {
+  def findEpisode(id: String): Future[Option[Episode]] = ifRunning {
     guarded.getEpisode(id)
   }
 
   /** Finds a [[hemin.engine.model.Feed]] by ID */
-  def findFeed(id: String): Future[Option[Feed]] = valid {
+  def findFeed(id: String): Future[Option[Feed]] = ifRunning {
     guarded.getFeeds(id)
   }
 
   /** Finds an [[hemin.engine.model.Image]] by ID */
-  def findImage(id: String): Future[Option[Image]] = valid {
+  def findImage(id: String): Future[Option[Image]] = ifRunning {
     guarded.getImage(id)
   }
 
@@ -185,38 +185,38 @@ class HeminEngine private (engineConfig: HeminConfig,
     * @param pageSize
     * @return
     */
-  def findAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = valid {
+  def findAllPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = ifRunning {
     guarded.getAllPodcasts(pageNumber, pageSize)
   }
 
   /** Finds an [[hemin.engine.model.Episode]] by its belonging Podcast's ID */
-  def findEpisodesByPodcast(id: String): Future[List[Episode]] = valid {
+  def findEpisodesByPodcast(id: String): Future[List[Episode]] = ifRunning {
     guarded.getPodcastEpisodes(id)
   }
 
   /** Finds an [[hemin.engine.model.Feed]] by its belonging Podcast's ID */
-  def findFeedsByPodcast(id: String): Future[List[Feed]] = valid {
+  def findFeedsByPodcast(id: String): Future[List[Feed]] = ifRunning {
     guarded.getPodcastFeeds(id)
   }
 
   /** Finds all [[hemin.engine.model.Chapter]] by their belonging Episode's ID */
-  def findChaptersByEpisode(id: String): Future[List[Chapter]] = valid {
+  def findChaptersByEpisode(id: String): Future[List[Chapter]] = ifRunning {
     guarded.getEpisodeChapters(id)
   }
 
-  def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = valid {
+  def findNewestPodcasts(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Podcast]] = ifRunning {
     guarded.getAllPodcastsByNewest(pageNumber, pageSize)
   }
 
-  def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = valid {
+  def findLatestEpisodes(pageNumber: Option[Int], pageSize: Option[Int]): Future[List[Episode]] = ifRunning {
     guarded.getAllEpisodesByLatest(pageNumber, pageSize)
   }
 
-  def getDatabaseStats: Future[DatabaseStats] = valid {
+  def getDatabaseStats: Future[DatabaseStats] = ifRunning {
     guarded.getDatabaseStats
   }
 
-  def getDistinctCategories: Future[Set[String]] = valid {
+  def getDistinctCategories: Future[Set[String]] = ifRunning {
     guarded.getDistinctCategories
   }
 
@@ -242,14 +242,14 @@ class HeminEngine private (engineConfig: HeminConfig,
   // TODO at some point I want to change this to something that distributes a message to the cluster
   private def bus: ActorRef = node
 
-  private def valid[T](body: => Future[T]): Future[T] =
+  private def ifRunning[T](body: => Future[T]): Future[T] =
     if (running.get) {
       body
     } else {
       Future.failed(engineGuardErrorNotRunning)
     }
 
-  private def valid[T](body: => T): Try[T] =
+  private def ifRunning[T](body: => T): Try[T] =
     if (running.get) {
       Try(body)
     } else {
