@@ -20,6 +20,8 @@ http://viertausendhertz.de/feed/podcast/elementarfragen
 http://mythpodcast.libsyn.com/rss
 http://criticalrolepodcast.geekandsundry.com/feed/
 http://adventurezone.libsyn.com/rss
+https://compendion.net/minutenweisematrix/feed/m4a/
+https://www.akte-aurora.de/feed/mp3/
 https://www.wrint.de/feed/podcast
 https://daringfireball.net/thetalkshow/rss
 https://www.hoaxilla.de/podcast/hoaxilla.xml

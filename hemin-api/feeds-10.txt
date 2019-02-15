@@ -1,0 +1,10 @@
+http://feeds.stownpodcast.org/stownpodcast
+https://feeds.metaebene.me/freakshow/m4a
+http://www.fanboys.fm/episodes.mp3.rss
+http://atp.fm/episodes?format=rss
+https://www.kuechenstud.io/lagedernation/feed/aac/
+http://static.orf.at/podcast/oe3/oe3_fruehstueck.xml
+http://feeds.metaebene.me/lnp/m4a
+http://minkorrekt.de/feed/m4a/
+http://feeds.soundcloud.com/users/soundcloud:users:325487962/sounds.rss
+https://www.zeitsprung.fm/feed/mp3/

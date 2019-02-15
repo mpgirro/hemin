@@ -7,6 +7,7 @@ scalaVersion in ThisBuild := "2.12.6"
 crossScalaVersions := Seq("2.11.12", "2.12.6")
 
 resolvers += Resolver.mavenLocal
+resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
 
 def gatlingVersion(scalaBinVer: String): String = scalaBinVer match {
   case "2.11" => "2.2.5"
@@ -28,6 +29,7 @@ libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % g
 libraryDependencies += "io.gatling" % "gatling-test-framework" % gatlingVersion(scalaBinaryVersion.value) % Test
 
 libraryDependencies += "io.swagger" %% "swagger-play2" % "1.6.0"
+//libraryDependencies += "org.zalando" %% "scala-jsonapi" % "0.6.2" // TODO currently only supports Scala 2.11
 
 // The Play project itself
 lazy val root = (project in file("."))
