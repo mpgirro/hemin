@@ -19,7 +19,7 @@ initialize := {
         "Java 8 or above required")
 }
 
-mainClass in run := Some("io.hemin.engine.EngineApp")
+mainClass in run := Some("hemin.engine.HeminApp")
 
 //fork in run := true
 
