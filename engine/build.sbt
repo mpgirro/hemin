@@ -57,12 +57,13 @@ libraryDependencies ++= Seq(
     "org.reactivemongo"          %% "reactivemongo"           % "0.16.0",        // https://github.com/ReactiveMongo/ReactiveMongo
     "org.apache.lucene"          %  "lucene-core"             % luceneVersion,   // https://github.com/apache/lucene-solr
     "org.apache.lucene"          %  "lucene-queryparser"      % luceneVersion,
-    "org.apache.lucene"          %  "lucene-analyzers-common" % luceneVersion,
+    "org.apache.lucene"          %  "lucene-analyzers-common" % luceneVersion,   // TODO do I still need Lucene packages?
     "org.apache.solr"            %  "solr-solrj"              % luceneVersion,
     "org.jsoup"                  %  "jsoup"                   % "1.11.3",        // https://github.com/jhy/jsoup
     "com.google.code.gson"       %  "gson"                    % "2.8.5",         // https://github.com/google/gson
     "com.google.guava"           %  "guava"                   % "27.0-jre",      // https://github.com/google/guava
     "com.rometools"              %  "rome"                    % romeVersion,     // https://github.com/rometools/rome
+    "com.rometools"              %  "rome-opml"               % romeVersion,
     "com.rometools"              %  "rome-modules"            % romeVersion,
     "org.hashids"                %  "hashids"                 % "1.0.3",         // https://github.com/10cella/hashids-java
     "com.softwaremill.sttp"      %% "core"                    % sttpVersion,     // https://github.com/softwaremill/sttp
@@ -74,7 +75,7 @@ libraryDependencies ++= Seq(
     "com.sksamuel.scrimage"      %% "scrimage-io-extra"       % scrimageVersion,
     "org.rogach"                 %% "scallop"                 % "3.1.5",         // https://github.com/scallop/scallop
     "org.scalatest"              %% "scalatest"               % "3.0.5" % Test,  // https://github.com/scalatest/scalatest
-    "junit"                      %  "junit"                   % "4.12" % Test,   // not sure why I would need this
+    "junit"                      %  "junit"                   % "4.12"  % Test,  // TODO not sure why I would need this
     "org.pegdown"                %  "pegdown"                 % "1.6.0" % Test,  // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
     "com.github.simplyscala"     %% "scalatest-embedmongo"    % "0.2.4" % Test,  // https://github.com/SimplyScala/scalatest-embedmongo
 )

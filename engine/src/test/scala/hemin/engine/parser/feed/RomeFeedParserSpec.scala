@@ -14,14 +14,18 @@ class RomeFeedParserSpec
   private val SUCCEED: Boolean = true
   private val FAILURE: Boolean = false
 
-  private val feedData: String = Files.lines(Paths.get("src", "test", "resources", "testfeed.xml")).collect(Collectors.joining("\n"))
+  private val feedData: String = Files
+    .lines(Paths.get("src", "test", "resources", "testfeed.xml"))
+    .collect(Collectors.joining("\n"))
 
   private val testDate: Option[Long] = Some(1521240548000L) // = 2018-03-16T23:49:08
 
-  "The Parser" should "parse the Feed" in {
+  private val parseFailureMsg = "A RomeFeedParser for the test feed data could not be instantiated"
+
+  "The RomeFeedParser" should "parse the Feed" in {
     RomeFeedParser.parse(feedData) match {
       case Success(_)  => assert(SUCCEED) // all is well
-      case Failure(ex) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(ex) => assert(FAILURE, parseFailureMsg)
     }
   }
 
@@ -61,7 +65,7 @@ class RomeFeedParserSpec
             assert(FAILURE, "The Parser produced NULL for the Podcast")
             None
           })
-      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(_) => assert(FAILURE, parseFailureMsg)
     }
   }
 
@@ -72,7 +76,7 @@ class RomeFeedParserSpec
         val es = parser.episodes
         es should not be empty
         assert(es.size == expected, s"The Parser extracted ${es.size} Episodes instead of $expected")
-      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(_) => assert(FAILURE, parseFailureMsg)
     }
   }
 
@@ -108,7 +112,7 @@ class RomeFeedParserSpec
             e.enclosure.typ shouldBe Some("audio/mp4")
             e.registration.timestamp shouldBe empty
         }
-      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(_) => assert(FAILURE, parseFailureMsg)
     }
   }
 
@@ -124,7 +128,7 @@ class RomeFeedParserSpec
             cs should not be empty
             assert(cs.size == expected, s"The Parser extracted ${cs.size} Chapters instead of $expected")
         }
-      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(_) => assert(FAILURE, parseFailureMsg)
     }
   }
 
@@ -148,7 +152,7 @@ class RomeFeedParserSpec
                 c.image shouldBe Some("http://example.org/cover") // TODO this is None for some reason
             }
         }
-      case Failure(_) => assert(FAILURE, "A Parser for the test feed data could not be instantiated")
+      case Failure(_) => assert(FAILURE, parseFailureMsg)
     }
   }
 
