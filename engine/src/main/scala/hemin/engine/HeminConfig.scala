@@ -21,16 +21,18 @@ import hemin.engine.updater.UpdaterConfig
   * @param updater  Configuration for [[hemin.engine.updater.Updater]] subsystem
   */
 final case class HeminConfig(
-  catalog: CatalogConfig,
-  crawler: CrawlerConfig,
-  index: IndexConfig,
-  node: NodeConfig,
-  parser: ParserConfig,
+  catalog:  CatalogConfig,
+  crawler:  CrawlerConfig,
+  index:    IndexConfig,
+  node:     NodeConfig,
+  parser:   ParserConfig,
   searcher: SearcherConfig,
-  updater: UpdaterConfig,
+  updater:  UpdaterConfig,
 )
 
 object HeminConfig {
+
+  final val namespace: String = "hemin.engine"
 
   /** Load from a given `com.typesafe.config.Config` object.  To ensure
     * a fully initialized [[hemin.engine.HeminConfig]], the given

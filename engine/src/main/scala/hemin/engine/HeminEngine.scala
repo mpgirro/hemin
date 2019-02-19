@@ -22,7 +22,7 @@ object HeminEngine {
   /** The name of the Engine. This value is used for configuration
     * namespace(s), as well as the default Mongo database name,
     * and Solr index name. */
-  final val name: String = "hemin.engine"
+  final val name: String = "hemin"
 
   final val version: String = "0.10.0"
 

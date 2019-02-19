@@ -2,7 +2,7 @@ package hemin.engine.searcher
 
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
-import hemin.engine.HeminEngine
+import hemin.engine.{HeminConfig, HeminEngine}
 import hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
@@ -20,7 +20,7 @@ object SearcherConfig
   extends ConfigDefaults[SearcherConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${HeminEngine.name}.${Searcher.name}"
+  override val namespace: String = s"${HeminConfig.namespace}.${Searcher.name}"
 
   override def fromConfig(config: Config): SearcherConfig =
     SearcherConfig(
