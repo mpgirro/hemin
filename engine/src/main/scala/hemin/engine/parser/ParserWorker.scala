@@ -12,6 +12,7 @@ import hemin.engine.model._
 import hemin.engine.node.Node._
 import hemin.engine.parser.Parser._
 import hemin.engine.parser.feed.RomeFeedParser
+import hemin.engine.parser.opml.RomeOpmlParser
 import hemin.engine.util.mapper.IndexMapper
 import hemin.engine.util.TimeUtil
 import org.jsoup.Jsoup
@@ -84,6 +85,8 @@ class ParserWorker (config: ParserConfig)
     case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
 
     case ParseImage(url, mime, encoding, bytes) => onParseImage(url, mime, encoding, bytes)
+
+    case ParseOpml(xmlData) => onParseOpml(xmlData)
 
   }
 
@@ -204,9 +207,7 @@ class ParserWorker (config: ParserConfig)
         catalog ! catalogEvent
 
         // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
-        for (e <- parser.episodes) {
-          registerEpisode(podcastId, e)
-        }
+        parser.episodes.foreach(e => registerEpisode(podcastId, e))
 
       case Failure(ex) =>
         log.error("Error creating a parser for the feed '{}' ; reason : {}", feedUrl, ex.getMessage)
@@ -216,6 +217,17 @@ class ParserWorker (config: ParserConfig)
         val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, TimeUtil.now, FeedStatus.ParserError)
         //emitCatalogEvent(catalogEvent)
         catalog ! catalogEvent
+    }
+  }
+
+  private def onParseOpml(xmlData: String): Unit = {
+    log.debug("Received ParseOpml(_)")
+    RomeOpmlParser.parse(xmlData) match {
+      case Success(parser) =>
+        parser.feeUrls.foreach(f => catalog ! ProposeNewFeed(f))
+      case Failure(ex) =>
+        log.error("Error creating a parser for the OPML file ; reason : {}", ex.getMessage)
+        ex.printStackTrace()
     }
   }
 

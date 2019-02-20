@@ -22,6 +22,7 @@ object Parser {
   final case class ParseWebsiteData(id: String, html: String) extends ParserMessage
   final case class ParseFyydEpisodes(podcastId: String, episodesData: String) extends ParserMessage
   final case class ParseImage(url: String, mime: Option[String], encoding: String, bytes: Array[Byte]) extends ParserMessage
+  final case class ParseOpml(xmlData: String) extends ParserMessage
 }
 
 class Parser (config: ParserConfig)

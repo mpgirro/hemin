@@ -8,6 +8,7 @@ import hemin.engine.HeminConfig
 import hemin.engine.catalog.CatalogStore
 import hemin.engine.cli.CommandLineInterpreter
 import hemin.engine.model._
+import hemin.engine.parser.Parser
 import hemin.engine.searcher.Searcher
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -130,6 +131,10 @@ class GuardedOperationDispatcher(bus: ActorRef,
 
   def proposeFeed(url: String): Unit = guarded {
     bus ! CatalogStore.ProposeNewFeed(url)
+  }
+
+  def importOpml(xmlData: String): Unit = guarded {
+    bus ! Parser.ParseOpml(xmlData)
   }
 
 }

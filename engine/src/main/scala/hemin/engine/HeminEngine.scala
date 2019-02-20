@@ -220,6 +220,10 @@ class HeminEngine private (engineConfig: HeminConfig,
     guarded.getDistinctCategories
   }
 
+  def opmlImport(xmlData: String): Try[Unit] = ifRunning {
+    guarded.importOpml(xmlData)
+  }
+
   // The call to warmup() will tap the lazy values, and wait until all
   // subsystems in the actor hierarchy report that they are up and running
   private def bootSequence(): Try[Unit] = {
