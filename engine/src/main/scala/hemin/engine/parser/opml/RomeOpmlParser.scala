@@ -23,7 +23,7 @@ class RomeOpmlParser private (private val xmlData: String)
   private val feed: WireFeed = input.build(new StringReader(xmlData))
   private val outlines: List[Outline] = RomeOpmlExtractor.getOutlines(feed).asScala.toList
 
-  override val feeUrls: List[String] = xmlUrls(outlines)
+  override val feedUrls: List[String] = xmlUrls(outlines)
 
   private def xmlUrls(outlines: Seq[Outline]): List[String] = outlines match {
     case Nil     => Nil

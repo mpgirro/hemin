@@ -224,7 +224,7 @@ class ParserWorker (config: ParserConfig)
     log.debug("Received ParseOpml(_)")
     RomeOpmlParser.parse(xmlData) match {
       case Success(parser) =>
-        parser.feeUrls.foreach(f => catalog ! ProposeNewFeed(f))
+        parser.feedUrls.foreach(f => catalog ! ProposeNewFeed(f))
       case Failure(ex) =>
         log.error("Error creating a parser for the OPML file ; reason : {}", ex.getMessage)
         ex.printStackTrace()
