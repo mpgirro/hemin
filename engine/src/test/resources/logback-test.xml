@@ -41,7 +41,8 @@
 
     <logger name="hemin.engine" level="WARN"/>
     <logger name="ch.qos.logback" level="WARN"/>
-    <logger name="reactivemongo" level="ERROR"/>
+    <logger name="reactivemongo" level="WARN"/>
+    <logger name="reactivemongo.core.nodeset" level="ERROR"/>
     <logger name="com.rometools.modules.mediarss.io" level="ERROR"/>
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 

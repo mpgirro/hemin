@@ -15,6 +15,9 @@ class EpisodeRepositorySpec
 
   private val log = Logger(getClass)
 
+  val testId1 = "id1"
+  val testId2 = "id2"
+
   var testContext: MongoTestContext = _
   var episodeRepository: EpisodeRepository = _
 
@@ -33,13 +36,13 @@ class EpisodeRepositorySpec
     val tomorrow = now + 86400000L
 
     val episode1 = Episode(
-      id = Some("id1"),
+      id = Some(testId1),
       title = Some("test episode 1"),
       pubDate = Some(now)
     )
 
     val episode2 = Episode(
-      id = Some("id2"),
+      id = Some(testId2),
       title = Some("test episode 2"),
       pubDate = Some(tomorrow)
     )
@@ -52,8 +55,8 @@ class EpisodeRepositorySpec
     } yield r
 
     results.map { r =>
-        assert(r.exists(_.id.contains("id1")), "An episode with a valid pubDate was not retrieved")
-        assert(!r.exists(_.id.contains("id2")), "An episode with an invalid pubDate (in the future) was retrieved")
+        assert(r.exists(_.id.contains(testId1)), "An episode with a valid pubDate was not retrieved")
+        assert(!r.exists(_.id.contains(testId2)), "An episode with an invalid pubDate (in the future) was retrieved")
       }
 
   }

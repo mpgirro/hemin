@@ -77,7 +77,7 @@ class MongoTestContext {
   /** The Config object from which the database connection parameters are taken */
   lazy val config: Config = ConfigFactory
     .parseMap(Map(
-      "hemin.catalog.mongo-uri" -> mongoUri,
+      "hemin.engine.catalog.mongo-uri" -> mongoUri,
     ).asJava)
     .withFallback(HeminConfig.defaultConfig)
 

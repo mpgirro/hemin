@@ -38,7 +38,7 @@ object CatalogConfig
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$namespace.mongo-uri"       -> "mongodb://localhost:27017/hemin",
     s"$namespace.create-database" -> true,
-    s"$namespace.store-images"  -> false,
+    s"$namespace.store-images"    -> false,
     s"$namespace.default-page"    -> 1,
     s"$namespace.default-size"    -> 20,
     s"$namespace.max-page-size"   -> 10000,
