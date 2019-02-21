@@ -39,7 +39,7 @@ class RomeOpmlParserSpec
 
   it should "extract all expected XML feed URLs" in {
     RomeOpmlParser.parse(feedData) match {
-      case Success(parser) => parser.feeUrls should equal (expectedXmlUrls)
+      case Success(parser) => parser.feedUrls should equal (expectedXmlUrls)
       case Failure(_)      => assert(FAILURE, parseFailureMsg)
     }
   }
