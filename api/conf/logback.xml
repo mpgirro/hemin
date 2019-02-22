@@ -1,6 +1,9 @@
 <!-- https://www.playframework.com/documentation/latest/SettingsLogger -->
 <configuration>
 
+    <!-- Stop output INFO at start -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
     <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
@@ -59,13 +62,9 @@
 
     <logger name="hemin.api.v1" level="TRACE" />
     <logger name="hemin.engine" level="INFO" />
-    <logger name="io.hemin" level="INFO" /> <!-- TODO: obsolete? -->
 
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
-    <logger name="org.hibernate" level="WARN"/> <!-- TODO: obsolete? -->
-    <logger name="org.springframework.jdbc" level="WARN"/> <!-- TODO: obsolete? -->
-    <logger name="org.springframework.orm" level="WARN"/> <!-- TODO: obsolete? -->
     <logger name="com.rometools.modules.mediarss.io" level="ERROR"/>
     <logger name="org.apache.http.client.protocol.ResponseProcessCookies" level="ERROR"/>
 
