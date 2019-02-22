@@ -18,4 +18,6 @@ class FeedService @Inject()(engineService: EngineService)
 
   def propose(url: String)(implicit mc: MarkerContext): Unit = engine.propose(url)
 
+  def opmlImport(xmlData: String)(implicit mc: MarkerContext): Unit = engine.opmlImport(xmlData)
+
 }

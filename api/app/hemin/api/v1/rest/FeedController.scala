@@ -40,8 +40,21 @@ class FeedController @Inject() (cc: FeedControllerComponents)
             BadRequest
         }
       }
+    }
 
-
+  def opmlImport: Action[AnyContent] =
+    FeedAction.async { implicit request =>
+      Future {
+        request.body.asText match {
+          case Some(xmlData) =>
+            log.trace(s"OPML IMPORT")
+            feedService.opmlImport(xmlData)
+            Ok
+          case None =>
+            log.warn(s"OPML IMPORT: No URL in body [BadRequest]")
+            BadRequest
+        }
+      }
     }
 
 }

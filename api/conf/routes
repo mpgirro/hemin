@@ -25,6 +25,7 @@ GET   /api/v1/episode/:id             hemin.api.v1.rest.EpisodeController.find(i
 GET   /api/v1/episode/:id/chapters    hemin.api.v1.rest.EpisodeController.chapters(id: String)
 GET   /api/v1/feed/:id                hemin.api.v1.rest.FeedController.find(id: String)
 POST  /api/v1/feed/propose            hemin.api.v1.rest.FeedController.propose
+POST  /api/v1/feed/opml               hemin.api.v1.rest.FeedController.opmlImport
 GET   /api/v1/image/:id               hemin.api.v1.rest.ImageController.find(id: String)
 POST  /api/v1/cli                     hemin.api.v1.rest.CliController.eval
 GET   /api/v1/stats/database          hemin.api.v1.rest.StatsController.database
