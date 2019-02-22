@@ -53,8 +53,8 @@ class MongoTestContext {
 
   /** Stops the mongod process */
   def stop(): Unit = {
-    Option(mongoProps).foreach( _.mongodProcess.stop() )
-    Option(mongoProps).foreach( _.mongodExe.stop() )
+    Option(mongoProps).foreach(_.mongodProcess.stop())
+    Option(mongoProps).foreach(_.mongodExe.stop())
   }
 
   lazy val mongoHost: String = Option(mongoProps)

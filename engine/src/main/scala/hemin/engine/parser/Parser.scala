@@ -1,13 +1,24 @@
 package hemin.engine.parser
 
-import akka.actor.SupervisorStrategy.Escalate
-import akka.actor.{Actor, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy}
-import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
-import com.typesafe.scalalogging.Logger
-import hemin.engine.node.Node._
+import java.util.Base64
 
-import scala.concurrent.ExecutionContext
-import scala.concurrent.duration._
+import akka.actor.{Actor, ActorRef, Props}
+import com.typesafe.scalalogging.Logger
+import hemin.engine.catalog.CatalogStore._
+import hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, WebsiteFetchJob}
+import hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataIndexEvent}
+import hemin.engine.model.{Episode, FeedStatus, Image, Podcast}
+import hemin.engine.node.Node._
+import hemin.engine.parser.Parser._
+import hemin.engine.parser.feed.RomeFeedParser
+import hemin.engine.parser.opml.RomeOpmlParser
+import hemin.engine.util.mapper.IndexMapper
+import hemin.engine.util.{HashUtil, TimeUtil}
+import org.jsoup.Jsoup
+import org.jsoup.safety.Whitelist
+
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 object Parser {
   final val name = "parser"
@@ -35,65 +46,55 @@ class Parser (config: ParserConfig)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private var workerIndex = 0
-
   private var catalog: ActorRef = _
   private var index: ActorRef = _
   private var crawler: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private var workerReportedStartupFinished = 0
-  private var router: Router = {
-    val routees = Vector.fill(config.workerCount) {
-      val parser = createWorker()
-      context watch parser
-      ActorRefRoutee(parser)
+  override def postRestart(cause: Throwable): Unit = {
+    log.warn("{} has been restarted or resumed", self.path.name)
+    cause match {
+      case e: Exception =>
+        log.error("Unhandled Exception : {}", e.getMessage, e)
     }
-    Router(RoundRobinRoutingLogic(), routees)
+    super.postRestart(cause)
   }
 
-  override val supervisorStrategy: SupervisorStrategy =
-    OneForOneStrategy(maxNrOfRetries = 10, withinTimeRange = 1.minute) {
-      case _: Exception            => Escalate
-    }
-
   override def postStop: Unit = {
-    log.info("{} subsystem shutting down", Parser.name.toUpperCase)
+    log.debug("shutting down")
   }
 
   override def receive: Receive = {
 
-    case msg @ ActorRefCatalogStoreActor(ref) =>
+    case ActorRefCatalogStoreActor(ref) =>
       log.debug("Received ActorRefCatalogStoreActor(_)")
       catalog = ref
-      router.routees.foreach(r => r.send(msg, sender()))
 
-    case msg @ ActorRefIndexStoreActor(ref) =>
+    case ActorRefIndexStoreActor(ref) =>
       log.debug("Received ActorRefIndexStoreActor(_)")
       index = ref
-      router.routees.foreach(r => r.send(msg, sender()))
 
-    case msg @ ActorRefCrawlerActor(ref) =>
+    case ActorRefCrawlerActor(ref) =>
       log.debug("Received ActorRefCrawlerActor(_)")
       crawler = ref
-      router.routees.foreach(r => r.send(msg, sender()))
 
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      reportStartupCompleteIfViable()
+      supervisor ! ReportParserStartupComplete
 
-    case ReportWorkerStartupComplete =>
-      workerReportedStartupFinished += 1
-      reportStartupCompleteIfViable()
+    case ParseNewPodcastData(feedUrl, podcastId, feedData) => onParseNewPodcastData(feedUrl, podcastId, feedData)
 
-    case PoisonPill =>
-      log.debug("Received a PosionPill -> forwarding it to all routees")
-      router.routees.foreach(r => r.send(PoisonPill, sender()))
+    case ParseUpdateEpisodeData(feedUrl, podcastId, episodeFeedData) => onParseUpdateEpisodeData(feedUrl, podcastId, episodeFeedData)
 
-    case work =>
-      log.debug("Routing work of kind : {}", work.getClass)
-      router.route(work, sender())
+    case ParseWebsiteData(id, html) => onParseWebsiteData(id, html)
+
+    case ParseFyydEpisodes(podcastId, json) => onParseFyydEpisodes(podcastId, json)
+
+    case ParseImage(url, mime, encoding, bytes) => onParseImage(url, mime, encoding, bytes)
+
+    case ParseOpml(xmlData) => onParseOpml(xmlData)
+
   }
 
   override def unhandled(msg: Any): Unit = {
@@ -101,22 +102,155 @@ class Parser (config: ParserConfig)
     log.error("Received unhandled message of type : {}", msg.getClass)
   }
 
-  private def reportStartupCompleteIfViable(): Unit = {
-    if (workerReportedStartupFinished == config.workerCount && supervisor != null) {
-      supervisor ! ReportParserStartupComplete
+  private def onParseNewPodcastData(feedUrl: String, podcastId: String, feedData: String): Unit = {
+    log.debug("Received ParseNewPodcastData for feed: " + feedUrl)
+    parseFeedData(podcastId, feedUrl, feedData, isNewPodcast = true)
+  }
+
+  private def onParseUpdateEpisodeData(feedUrl: String, podcastId: String, episodeFeedData: String): Unit = {
+    log.debug("Received ParseEpisodeData({},{},_)", feedUrl, podcastId)
+    parseFeedData(podcastId, feedUrl, episodeFeedData, isNewPodcast = false)
+  }
+
+  private def parseFeedData(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = Future {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val p: Podcast = parser.podcast.copy(
+          id = Some(podcastId),
+          title = parser.podcast.title.map(_.trim),
+          description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
+        )
+
+        if (isNewPodcast) {
+
+          IndexMapper.toIndexDoc(p) match {
+            case Success(doc) =>
+              val indexEvent = AddDocIndexEvent(doc)
+              //emitIndexEvent(indexEvent)
+              index ! indexEvent
+            case Failure(ex) =>
+              log.error("Failed to map Podcast to IndexDoc; reason : {}", ex.getMessage)
+              ex.printStackTrace()
+          }
+
+          // request that the podcasts website will get added to the index as well, if possible
+          p.link match {
+            case Some(link) => crawler ! DownloadWithHeadCheck(p.id.get, link, WebsiteFetchJob())
+            case None => log.debug("No link set for podcast {} --> no website data will be added to the index", p.id.get)
+          }
+        }
+
+        // we always update a podcasts metadata, this likely may have changed (new descriptions, etc)
+        val catalogEvent = UpdatePodcast(podcastId, feedUrl, p)
+        //emitCatalogEvent(catalogEvent)
+        catalog ! catalogEvent
+
+        // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
+        parser.episodes.foreach(e => registerEpisode(podcastId, e))
+
+      case Failure(ex) =>
+        log.error("Error creating a parser for the feed '{}' ; reason : {}", feedUrl, ex.getMessage)
+        ex.printStackTrace()
+
+        // we update the status of the feed, to persist the information that this feed stinks
+        val catalogEvent = FeedStatusUpdate(podcastId, feedUrl, TimeUtil.now, FeedStatus.ParserError)
+        //emitCatalogEvent(catalogEvent)
+        catalog ! catalogEvent
     }
   }
 
-  private def createWorker(): ActorRef = {
-    workerIndex += 1
-    val worker = context.actorOf(ParserWorker.props(config), ParserWorker.name(workerIndex))
+  private def registerEpisode(podcastId: String, e: Episode): Unit = {
 
-    // forward the actor refs to the worker, but only if those references haven't died
-    Option(catalog).foreach(d => worker ! ActorRefCatalogStoreActor(d))
-    Option(crawler).foreach(c => worker ! ActorRefCrawlerActor(c))
-    worker ! ActorRefSupervisor(self)
+    // cleanup some potentially markuped texts
+    val episode = e.copy(
+      title = e.title.map(_.trim),
+      description = e.description.map(Jsoup.clean(_, Whitelist.basic())),
+      contentEncoded = e.contentEncoded.map(Jsoup.clean(_, Whitelist.basic())),
+    )
 
-    worker
+    val catalogCommand = RegisterEpisodeIfNew(podcastId, episode)
+    //sendCatalogCommand(catalogCommand)
+    catalog ! catalogCommand
+  }
+
+  private def onParseWebsiteData(id: String, html: String): Unit = {
+    log.debug("Received ParseWebsiteData({},_)", id)
+
+    val readableText = Jsoup.parse(html).text()
+
+    val indexEvent = UpdateDocWebsiteDataIndexEvent(id, readableText)
+    //mediator ! Publish(indexEventStream, indexEvent)
+    index ! indexEvent
+  }
+
+  private def onParseFyydEpisodes(podcastId: String, json: String): Unit = {
+    log.debug("Received ParseFyydEpisodes({},_)", podcastId)
+
+    /*
+    val episodes: List[OldEpisode] = fyydAPI.getEpisodes(json).asScala.toList
+    log.info("Loaded {} episodes from fyyd for podcast : {}", episodes.size, podcastId)
+    for(episode <- episodes){
+      registerEpisode(podcastId, episode)
+    }
+    */
+
+    throw new UnsupportedOperationException("currently not implemented")
+  }
+
+  private def onParseImage(url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Unit = {
+    log.debug("Received ParseImage({})", url)
+    imageFromBytes(url, mime, encoding, bytes)
+      .foreach { image =>
+        catalog ! UpdateImage(image)
+      }
+  }
+
+  private def imageFromBytes(url: String, mime: Option[String], encoding: String, bytes: Array[Byte]): Future[Image] = Future {
+    val image = com.sksamuel.scrimage.Image.apply(bytes)
+    val data = transform(image)
+
+    // TODO set more fields of following instance!
+    Image(
+      url  = Some(url),
+      data = Some(base64(data, mime, encoding)),
+      hash = Some(HashUtil.sha1(data)),
+    )
+  }
+
+  private def transform(image: com.sksamuel.scrimage.Image): Array[Byte] = image
+    .cover(500, 500)
+    .bound(500, 500)
+    .bytes
+
+  private def base64(bytes: Array[Byte], mimeType: Option[String], encoding: String): String = {
+    val mime: String = mimeType.map(_ + ";").getOrElse("")
+    val base64: String = Base64.getEncoder.encodeToString(bytes)
+    s"data:${mime}charset=$encoding;base64,$base64"
+  }
+
+  /*
+  private def sendCatalogCommand(command: CatalogCommand): Unit = {
+      mediator ! Send("/user/node/"+CatalogStore.name, command, localAffinity = true)
+  }
+
+  private def emitCatalogEvent(event: CatalogEvent): Unit = {
+      mediator ! Publish(catalogEventStream, event)
+  }
+
+  private def emitIndexEvent(event: IndexEvent): Unit = {
+      mediator ! Publish(indexEventStream, event)
+  }
+  */
+
+  private def onParseOpml(xmlData: String): Unit = Future {
+    log.debug("Received ParseOpml(_)")
+    RomeOpmlParser.parse(xmlData) match {
+      case Success(parser) =>
+        parser.feedUrls.foreach(f => catalog ! ProposeNewFeed(f))
+      case Failure(ex) =>
+        log.error("Error creating a parser for the OPML file ; reason : {}", ex.getMessage)
+        ex.printStackTrace()
+    }
   }
 
 }
