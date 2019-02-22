@@ -38,6 +38,16 @@ class RepositoryFactory(config: CatalogConfig,
       case _ => log.debug(s"[$lnm] MongoDB resolved: $databaseName")
     }
 
+  /** Drop all database collections.
+    * __Very destructive__!
+    */
+  def dropAll(): Unit = {
+    getPodcastRepository.drop
+    getEpisodeRepository.drop
+    getFeedRepository.drop
+    getImageRepository.drop
+  }
+
   def getPodcastRepository: PodcastRepository = new PodcastRepository(resolveDB, ec)
 
   def getEpisodeRepository: EpisodeRepository = new EpisodeRepository(resolveDB, ec)

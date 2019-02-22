@@ -27,6 +27,8 @@ connectInput in run := true
 
 outputStrategy := Some(StdoutOutput)
 
+parallelExecution in Test := false
+
 //Defaults.itSettings
 
 resolvers ++= Seq(
@@ -53,6 +55,7 @@ libraryDependencies ++= Seq(
     "com.typesafe.akka"          %% "akka-stream"             % akkaVersion,
     "com.typesafe.akka"          %% "akka-cluster"            % akkaVersion,
     "com.typesafe.akka"          %% "akka-cluster-tools"      % akkaVersion,
+    "com.typesafe.akka"          %% "akka-testkit"            % akkaVersion % Test,
     "ch.qos.logback"             %  "logback-classic"         % "1.2.3",         // https://github.com/qos-ch/logback
     "org.reactivemongo"          %% "reactivemongo"           % "0.16.0",        // https://github.com/ReactiveMongo/ReactiveMongo
     "org.apache.lucene"          %  "lucene-core"             % luceneVersion,   // https://github.com/apache/lucene-solr

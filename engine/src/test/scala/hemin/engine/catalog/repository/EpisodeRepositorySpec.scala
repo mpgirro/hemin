@@ -5,28 +5,34 @@ import hemin.engine.MongoTestContext
 import hemin.engine.model.Episode
 import hemin.engine.util.TimeUtil
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{AsyncFlatSpec, BeforeAndAfter, Matchers}
+import org.scalatest.{AsyncFlatSpec, BeforeAndAfter, BeforeAndAfterAll, Matchers}
 
 class EpisodeRepositorySpec
   extends AsyncFlatSpec
     with Matchers
     with ScalaFutures
-    with BeforeAndAfter {
+    with BeforeAndAfter
+    with BeforeAndAfterAll {
 
   private val log = Logger(getClass)
 
   val testId1 = "id1"
   val testId2 = "id2"
 
-  var testContext: MongoTestContext = _
+  val testContext = new MongoTestContext // also starts the embedded MongoDB
+
   var episodeRepository: EpisodeRepository = _
 
   before {
-    testContext = new MongoTestContext // also starts the embedded MongoDB
+    //testContext = new MongoTestContext // also starts the embedded MongoDB
     episodeRepository = testContext.repositoryFactory.getEpisodeRepository
   }
 
   after {
+    testContext.repositoryFactory.dropAll()
+  }
+
+  override def afterAll: Unit = {
     testContext.stop() // stops the embedded MongoDB
   }
 
