@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.Logger
 import hemin.engine.index.IndexStore._
 import hemin.engine.index.committer.SolrCommitter
 import hemin.engine.model.{IndexDoc, SearchResult}
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreStartupComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreInitializationComplete}
 import hemin.engine.util.ExecutorServiceWrapper
 
 import scala.concurrent.ExecutionContext
@@ -81,7 +81,7 @@ class IndexStore (config: IndexConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportIndexStoreStartupComplete
+      supervisor ! ReportIndexStoreInitializationComplete
 
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.id)

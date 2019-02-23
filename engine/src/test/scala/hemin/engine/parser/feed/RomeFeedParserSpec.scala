@@ -22,7 +22,7 @@ class RomeFeedParserSpec
 
   private val parseFailureMsg = "A RomeFeedParser for the test feed data could not be instantiated"
 
-  "The RomeFeedParser" should "parse the Feed" in {
+  "The RomeFeedParser" should "be able to parse a valid Feed" in {
     RomeFeedParser.parse(feedData) match {
       case Success(_)  => assert(SUCCEED) // all is well
       case Failure(ex) => assert(FAILURE, parseFailureMsg)

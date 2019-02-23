@@ -81,7 +81,7 @@ class CrawlerWorker (config: CrawlerConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportWorkerStartupComplete
+      supervisor ! ReportWorkerInitializationComplete
 
     case DownloadWithHeadCheck(id, url, job) =>
       (job, config.fetchWebsites) match {

@@ -44,14 +44,14 @@ object Node {
   final case class ActorRefSupervisor(ref: ActorRef) extends ActorRefInfo
 
   // Startup sequence messages
-  final case class ReportCatalogStoreStartupComplete()
-  final case class ReportIndexStoreStartupComplete()
-  final case class ReportCliStartupComplete()
-  final case class ReportCrawlerStartupComplete()
-  final case class ReportParserStartupComplete()
-  final case class ReportSearcherStartupComplete()
-  final case class ReportUpdaterStartupComplete()
-  final case class ReportWorkerStartupComplete() // for worker/handler delegation children
+  final case object ReportCatalogStoreInitializationComplete
+  final case object ReportIndexStoreInitializationComplete
+  final case object ReportCliInitializationComplete
+  final case object ReportCrawlerInitializationComplete
+  final case object ReportParserInitializationComplete
+  final case object ReportSearcherInitializationComplete
+  final case object ReportUpdaterInitializationComplete
+  final case object ReportWorkerInitializationComplete // for worker/handler delegation children
 
   // Startup protocol messags
   final case class EngineOperational()
@@ -90,8 +90,15 @@ class Node(config: HeminConfig)
 
   //private val cli = new CommandLineInterpreter(self, config, executionContext)
 
-  private val initializationProgress =
-    new InitializationProgress(Seq(CatalogStore.name, CommandLineInterpreter.name, Crawler.name, IndexStore.name, Parser.name, Searcher.name, Updater.name))
+  private val initializationProgress = new InitializationProgress(Seq(
+    CatalogStore.name,
+    CommandLineInterpreter.name,
+    Crawler.name,
+    IndexStore.name,
+    Parser.name,
+    Searcher.name,
+    Updater.name
+  ))
 
   private var index: ActorRef = _
   private var catalog: ActorRef = _
@@ -164,13 +171,13 @@ class Node(config: HeminConfig)
     case msg: SearcherMessage => searcher.tell(msg, sender())
     case msg: UpdaterMessage  => updater.tell(msg, sender())
 
-    case ReportCatalogStoreStartupComplete => initializationProgress.complete(CatalogStore.name)
-    case ReportCliStartupComplete          => initializationProgress.complete(CommandLineInterpreter.name)
-    case ReportCrawlerStartupComplete      => initializationProgress.complete(Crawler.name)
-    case ReportIndexStoreStartupComplete   => initializationProgress.complete(IndexStore.name)
-    case ReportParserStartupComplete       => initializationProgress.complete(Parser.name)
-    case ReportSearcherStartupComplete     => initializationProgress.complete(Searcher.name)
-    case ReportUpdaterStartupComplete      => initializationProgress.complete(Updater.name)
+    case ReportCatalogStoreInitializationComplete => initializationProgress.complete(CatalogStore.name)
+    case ReportCliInitializationComplete          => initializationProgress.complete(CommandLineInterpreter.name)
+    case ReportCrawlerInitializationComplete      => initializationProgress.complete(Crawler.name)
+    case ReportIndexStoreInitializationComplete   => initializationProgress.complete(IndexStore.name)
+    case ReportParserInitializationComplete       => initializationProgress.complete(Parser.name)
+    case ReportSearcherInitializationComplete     => initializationProgress.complete(Searcher.name)
+    case ReportUpdaterInitializationComplete      => initializationProgress.complete(Updater.name)
 
     case EngineOperational =>
       if (initializationProgress.isFinished) {

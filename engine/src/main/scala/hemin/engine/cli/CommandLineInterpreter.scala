@@ -6,7 +6,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import hemin.engine.HeminConfig
 import hemin.engine.cli.CommandLineInterpreter.{CliAction, InterpreterInput, InterpreterOutput}
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportCliStartupComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportCliInitializationComplete}
 
 import scala.concurrent.ExecutionContext
 
@@ -60,7 +60,7 @@ class CommandLineInterpreter (config: HeminConfig)
       supervisor = ref
       bus = ref
       processor = new CliProcessor(bus, context.system, config, executionContext)
-      supervisor ! ReportCliStartupComplete
+      supervisor ! ReportCliInitializationComplete
 
     case InterpreterInput(input) => onInterpreterInput(input)
   }

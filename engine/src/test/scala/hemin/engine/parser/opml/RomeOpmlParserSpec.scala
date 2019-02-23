@@ -30,7 +30,7 @@ class RomeOpmlParserSpec
     "https://example.org/feed3.rss"
   )
 
-  "The RomeOpmlParser" should "parse the OPML-File" in {
+  "The RomeOpmlParser" should "be able to parse a valid OPML-File" in {
     RomeOpmlParser.parse(feedData) match {
       case Success(_)  => assert(SUCCEED) // all is well
       case Failure(ex) => assert(FAILURE, parseFailureMsg)

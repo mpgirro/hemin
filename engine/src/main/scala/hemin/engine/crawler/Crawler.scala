@@ -93,7 +93,7 @@ class Crawler (config: CrawlerConfig)
       supervisor = ref
       reportStartupCompleteIfViable()
 
-    case ReportWorkerStartupComplete =>
+    case ReportWorkerInitializationComplete =>
       workerReportedStartupFinished += 1
       reportStartupCompleteIfViable()
 
@@ -117,7 +117,7 @@ class Crawler (config: CrawlerConfig)
 
   private def reportStartupCompleteIfViable(): Unit = {
     if (workerReportedStartupFinished == config.workerCount && supervisor != null) {
-      supervisor ! ReportCrawlerStartupComplete
+      supervisor ! ReportCrawlerInitializationComplete
     }
   }
 

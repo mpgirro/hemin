@@ -3,7 +3,7 @@ package hemin.engine.searcher
 import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model.SearchResult
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherStartupComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherInitializationComplete}
 import hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
 import hemin.engine.searcher.retriever.{IndexRetriever, SolrRetriever}
 
@@ -49,7 +49,7 @@ class Searcher (config: SearcherConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportSearcherStartupComplete
+      supervisor ! ReportSearcherInitializationComplete
 
     case SearchRequest(query, page, size) =>
       log.debug("Received SearchRequest('{}',{},{}) message", query, page, size)

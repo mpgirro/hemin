@@ -5,7 +5,7 @@ import com.google.common.base.Strings.isNullOrEmpty
 import com.typesafe.scalalogging.Logger
 import hemin.engine.catalog.CatalogStore.ProposeNewFeed
 import hemin.engine.crawler.Crawler.{DownloadWithHeadCheck, FetchJob}
-import hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor, ActorRefSupervisor, ReportUpdaterStartupComplete}
+import hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor, ActorRefSupervisor, ReportUpdaterInitializationComplete}
 import hemin.engine.updater.Updater.ProcessFeed
 
 import scala.concurrent.ExecutionContext
@@ -52,7 +52,7 @@ class Updater (config: UpdaterConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportUpdaterStartupComplete
+      supervisor ! ReportUpdaterInitializationComplete
 
     case ProposeNewFeed(url) =>
       log.debug("Received ProposeNewFeed({})", url)

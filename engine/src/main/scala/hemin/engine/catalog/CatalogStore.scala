@@ -157,7 +157,7 @@ class CatalogStore(config: CatalogConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportCatalogStoreStartupComplete()
+      supervisor ! ReportCatalogStoreInitializationComplete
 
     case ProposeNewFeed(feedUrl) => proposeFeed(feedUrl)
 

@@ -81,7 +81,7 @@ class Parser (config: ParserConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportParserStartupComplete
+      supervisor ! ReportParserInitializationComplete
 
     case ParseNewPodcastData(feedUrl, podcastId, feedData) => onParseNewPodcastData(feedUrl, podcastId, feedData)
 
