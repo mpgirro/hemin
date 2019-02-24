@@ -11,9 +11,6 @@ class RomeFeedParserSpec
   extends FlatSpec
     with Matchers {
 
-  private val SUCCEED: Boolean = true
-  private val FAILURE: Boolean = false
-
   private val feedData: String = Files
     .lines(Paths.get("src", "test", "resources", "testfeed.xml"))
     .collect(Collectors.joining("\n"))
@@ -24,8 +21,8 @@ class RomeFeedParserSpec
 
   "The RomeFeedParser" should "be able to parse a valid Feed" in {
     RomeFeedParser.parse(feedData) match {
-      case Success(_)  => assert(SUCCEED) // all is well
-      case Failure(ex) => assert(FAILURE, parseFailureMsg)
+      case Success(_)  => succeed // all is well
+      case Failure(ex) => fail(parseFailureMsg)
     }
   }
 
@@ -62,10 +59,10 @@ class RomeFeedParserSpec
             p.fyyd.verify shouldEqual None // TODO should be Some("abcdefg") once we support Fyyd
           }
           .orElse({
-            assert(FAILURE, "The Parser produced NULL for the Podcast")
+            fail("The Parser produced NULL for the Podcast")
             None
           })
-      case Failure(_) => assert(FAILURE, parseFailureMsg)
+      case Failure(_) => fail(parseFailureMsg)
     }
   }
 
@@ -76,7 +73,7 @@ class RomeFeedParserSpec
         val es = parser.episodes
         es should not be empty
         assert(es.size == expected, s"The Parser extracted ${es.size} Episodes instead of $expected")
-      case Failure(_) => assert(FAILURE, parseFailureMsg)
+      case Failure(_) => fail(parseFailureMsg)
     }
   }
 
@@ -112,7 +109,7 @@ class RomeFeedParserSpec
             e.enclosure.typ shouldBe Some("audio/mp4")
             e.registration.timestamp shouldBe empty
         }
-      case Failure(_) => assert(FAILURE, parseFailureMsg)
+      case Failure(_) => fail(parseFailureMsg)
     }
   }
 
@@ -128,7 +125,7 @@ class RomeFeedParserSpec
             cs should not be empty
             assert(cs.size == expected, s"The Parser extracted ${cs.size} Chapters instead of $expected")
         }
-      case Failure(_) => assert(FAILURE, parseFailureMsg)
+      case Failure(_) => fail(parseFailureMsg)
     }
   }
 
@@ -152,7 +149,7 @@ class RomeFeedParserSpec
                 c.image shouldBe Some("http://example.org/cover") // TODO this is None for some reason
             }
         }
-      case Failure(_) => assert(FAILURE, parseFailureMsg)
+      case Failure(_) => fail(parseFailureMsg)
     }
   }
 

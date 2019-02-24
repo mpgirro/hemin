@@ -15,9 +15,6 @@ class RomeOpmlParserSpec
 
   private val log: Logger = Logger(getClass)
 
-  private val SUCCEED: Boolean = true
-  private val FAILURE: Boolean = false
-
   private val feedData: String = Files
     .lines(Paths.get("src", "test", "resources", "testopml.xml"))
     .collect(Collectors.joining("\n"))
@@ -32,15 +29,15 @@ class RomeOpmlParserSpec
 
   "The RomeOpmlParser" should "be able to parse a valid OPML-File" in {
     RomeOpmlParser.parse(feedData) match {
-      case Success(_)  => assert(SUCCEED) // all is well
-      case Failure(ex) => assert(FAILURE, parseFailureMsg)
+      case Success(_)  => succeed // all is well
+      case Failure(ex) => fail(parseFailureMsg)
     }
   }
 
   it should "extract all expected XML feed URLs" in {
     RomeOpmlParser.parse(feedData) match {
       case Success(parser) => parser.feedUrls should equal (expectedXmlUrls)
-      case Failure(_)      => assert(FAILURE, parseFailureMsg)
+      case Failure(_)      => fail(parseFailureMsg)
     }
   }
 
