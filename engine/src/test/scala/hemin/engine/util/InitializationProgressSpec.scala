@@ -1,0 +1,26 @@
+package hemin.engine.util
+
+import org.scalatest.{FlatSpec, Matchers}
+
+class InitializationProgressSpec
+  extends FlatSpec
+    with Matchers {
+
+  val subsys1: String = "subsys1"
+  val subsys2: String = "subsys2"
+  val subsys3: String = "subsys3"
+
+  "The InitializationProgress" should "not indicate finished if not all subsystems have signaled their completion" in {
+    val progress: InitializationProgress = new InitializationProgress(Seq(subsys1, subsys2, subsys3))
+
+    progress.complete(subsys1)
+    assert(!progress.isFinished, "The InitializationProgress signaled completion although 2 expected subsystems are still missing")
+
+    progress.complete(subsys2)
+    assert(!progress.isFinished, "The InitializationProgress signaled completion although 1 expected subsystem is still missing")
+
+    progress.complete(subsys3)
+    assert(progress.isFinished, "The InitializationProgress does not signal completion although all expected subsystems reported their completion")
+  }
+
+}
