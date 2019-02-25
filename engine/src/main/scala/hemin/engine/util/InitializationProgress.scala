@@ -1,22 +1,34 @@
 package hemin.engine.util
 
 import com.typesafe.scalalogging.Logger
+import hemin.engine.HeminException
 
 import scala.collection.mutable
+import scala.util.{Failure, Success, Try}
 
-class InitializationProgress (subsystems: Seq[String]) {
+class InitializationProgress (component: Set[String]) {
 
   private val log = Logger(getClass)
-  private val progress: mutable.Map[String,Boolean] = mutable.Map(subsystems.map {s => (s, false)} : _*)
+  private val statusMap: mutable.Map[String,Boolean] = mutable.Map(component.toSeq.map { s => (s, false)} : _*)
+  private val success: Try[Unit] = Success()
 
-  def complete(subsystem: String): Unit =
-    if (progress.contains(subsystem)) {
-      log.info(s"${subsystem.toUpperCase} subsystem initialized ...")
-      progress += (subsystem -> true)
-    } else {
-      log.error("Initialization does no monitor the progress of this subsystem : " + subsystem)
+  def signalCompletion(subsystem: String): Try[Unit] =
+    statusMap.get(subsystem) match {
+      case None        => fail(s"Initialization does not monitor the status of this component : '$subsystem'")
+      case Some(true)  => fail(s"Initialization status is already completed for this component : '$subsystem'")
+      case Some(false) =>
+        log.info(s"${subsystem.toUpperCase} initialization completed ...")
+        statusMap += (subsystem -> true)
+        success
     }
 
-  def isFinished: Boolean = progress.foldLeft(true) { case (a, (k,v)) => a && v }
+  def componentCount: Int = component.size
+
+  def isFinished: Boolean = statusMap.foldLeft(true) { case (a, (k,v)) => a && v }
+
+  private def fail(message: String): Failure[Unit] = {
+    log.warn(message)
+    Failure(new HeminException(message))
+  }
 
 }

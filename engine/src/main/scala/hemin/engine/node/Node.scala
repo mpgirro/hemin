@@ -90,7 +90,7 @@ class Node(config: HeminConfig)
 
   //private val cli = new CommandLineInterpreter(self, config, executionContext)
 
-  private val initializationProgress = new InitializationProgress(Seq(
+  private val initializationProgress = new InitializationProgress(Set(
     CatalogStore.name,
     CommandLineInterpreter.name,
     Crawler.name,
@@ -171,13 +171,13 @@ class Node(config: HeminConfig)
     case msg: SearcherMessage => searcher.tell(msg, sender())
     case msg: UpdaterMessage  => updater.tell(msg, sender())
 
-    case ReportCatalogStoreInitializationComplete => initializationProgress.complete(CatalogStore.name)
-    case ReportCliInitializationComplete          => initializationProgress.complete(CommandLineInterpreter.name)
-    case ReportCrawlerInitializationComplete      => initializationProgress.complete(Crawler.name)
-    case ReportIndexStoreInitializationComplete   => initializationProgress.complete(IndexStore.name)
-    case ReportParserInitializationComplete       => initializationProgress.complete(Parser.name)
-    case ReportSearcherInitializationComplete     => initializationProgress.complete(Searcher.name)
-    case ReportUpdaterInitializationComplete      => initializationProgress.complete(Updater.name)
+    case ReportCatalogStoreInitializationComplete => initializationProgress.signalCompletion(CatalogStore.name)
+    case ReportCliInitializationComplete          => initializationProgress.signalCompletion(CommandLineInterpreter.name)
+    case ReportCrawlerInitializationComplete      => initializationProgress.signalCompletion(Crawler.name)
+    case ReportIndexStoreInitializationComplete   => initializationProgress.signalCompletion(IndexStore.name)
+    case ReportParserInitializationComplete       => initializationProgress.signalCompletion(Parser.name)
+    case ReportSearcherInitializationComplete     => initializationProgress.signalCompletion(Searcher.name)
+    case ReportUpdaterInitializationComplete      => initializationProgress.signalCompletion(Updater.name)
 
     case EngineOperational =>
       if (initializationProgress.isFinished) {
