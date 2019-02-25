@@ -34,7 +34,7 @@ class SolrRetrieverSpec
     // TODO add an assertion?
   }
 
-  it should "retrieve no search results if the query is empty" in {
+  it should "retrieve empty search results if the query is empty" in {
     val retriever: IndexRetriever = new SolrRetriever(engineConfig.searcher, executionContext)
     val future: Future[SearchResult] = retriever.search(
       query = "",
@@ -48,7 +48,7 @@ class SolrRetrieverSpec
   }
 
 
-  it should "retrieve no search results if the query is null" in {
+  it should "retrieve empty search results if the query is null" in {
     val retriever: IndexRetriever = new SolrRetriever(engineConfig.searcher, executionContext)
     val future: Future[SearchResult] = retriever.search(
       query = null,
@@ -61,7 +61,7 @@ class SolrRetrieverSpec
     }
   }
 
-  it should "retrieve no search results if the page number is invalid (<1)" in {
+  it should "retrieve empty search results if the page number is invalid (<1)" in {
     val retriever: IndexRetriever = new SolrRetriever(engineConfig.searcher, executionContext)
     val future: Future[SearchResult] = retriever.search(
       query = defaultQuery,
@@ -75,7 +75,7 @@ class SolrRetrieverSpec
   }
 
 
-  it should "retrieve no search results if the page size is invalid (<1)" in {
+  it should "retrieve empty search results if the page size is invalid (<1)" in {
     val retriever: IndexRetriever = new SolrRetriever(engineConfig.searcher, executionContext)
     val future: Future[SearchResult] = retriever.search(
       query = defaultQuery,

@@ -47,7 +47,7 @@ class SearcherSpec
     expectMsgType[ReportSearcherInitializationComplete.type]
   }
 
-  it should "reply with no search results found if the query is empty" in {
+  it should "reply with empty search results if the query is empty" in {
     val searcher: ActorRef = defaultTestSearcher()
     val future = searcher ? SearchRequest("", defaultPageNumber, defaultPageSize)
     future.value.get match {
@@ -57,7 +57,7 @@ class SearcherSpec
     }
   }
 
-  it should "reply with no search results found if the query is null" in {
+  it should "reply with empty search results if the query is null" in {
     val searcher: ActorRef = defaultTestSearcher()
     val future = searcher ? SearchRequest(null, defaultPageNumber, defaultPageSize)
     future.value.get match {
@@ -67,7 +67,7 @@ class SearcherSpec
     }
   }
 
-  it should "reply with no search results found if the page number is invalid (<1)" in {
+  it should "reply with empty search results if the page number is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
     val future = searcher ? SearchRequest(defaultQuery, Some(0), defaultPageSize)
     future.value.get match {
@@ -77,9 +77,9 @@ class SearcherSpec
     }
   }
 
-  it should "reply with no search results found if the page size is invalid (<1)" in {
+  it should "reply with empty search results if the page size is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
-    val future = searcher ? Searcher.SearchRequest(defaultQuery, defaultPageNumber, Some(0))
+    val future = searcher ? SearchRequest(defaultQuery, defaultPageNumber, Some(0))
     future.value.get match {
       case Success(result: SearchResults) => assertEmptySearchResult(result.results)
       case Success(other) => fail("Expected reply was not of type : " + classOf[SearchResults])
