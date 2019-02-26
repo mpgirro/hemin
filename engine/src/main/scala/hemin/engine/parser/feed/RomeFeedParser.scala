@@ -45,14 +45,14 @@ class RomeFeedParser private (private val xmlData: String)
     copyright       = Option(feed.getCopyright),
     docs            = Option(feed.getDocs),
     managingEditor  = Option(feed.getManagingEditor),
-    atomLinks       = podcastAtomLinks,
     registration = PodcastRegistration(
       timestamp = None,
       complete  = None,
     ),
-    itunes    = podcastItunesInfo,
-    feedpress = podcastFeedpressInfo,
-    fyyd      = podcastFyydInfo,
+    atom      = podcastAtom,
+    itunes    = podcastItunes,
+    feedpress = podcastFeedpress,
+    fyyd      = podcastFyyd,
   )
 
   private def extractEpisodes(feed: SyndFeed): List[Episode] = feed
@@ -73,10 +73,10 @@ class RomeFeedParser private (private val xmlData: String)
     description     = Option(e.getDescription).map(_.getValue),
     image           = episodeImage(e),
     contentEncoded  = episodeContentEncoded(e),
-    atomLinks       = episodeAtomLinks(e),
     chapters        = episodeChapters(e),
-    itunes          = episodeItunesInfo(e),
-    enclosure       = episodeEnclosureInfo(e),
+    atom            = episodeAtom(e),
+    itunes          = episodeItunes(e),
+    enclosure       = episodeEnclosure(e),
     registration = EpisodeRegistration(
       timestamp = None,
     )
@@ -137,7 +137,7 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-  private lazy val podcastItunesInfo: PodcastItunes = feedItunesModule
+  private lazy val podcastItunes: PodcastItunes = feedItunesModule
     .map { itunes =>
       PodcastItunes(
         subtitle   = Option(itunes.getSubtitle),
@@ -159,15 +159,30 @@ class RomeFeedParser private (private val xmlData: String)
       )
     }.getOrElse(PodcastItunes())
 
-  private lazy val podcastFeedpressInfo: PodcastFeedpress = PodcastFeedpress(locale = None)
+  private lazy val podcastFeedpress: PodcastFeedpress = PodcastFeedpress(locale = None)
 
-  private lazy val podcastFyydInfo: PodcastFyyd = PodcastFyyd(verify = None)
+  private lazy val podcastFyyd: PodcastFyyd = PodcastFyyd(verify = None)
+
+  private lazy val podcastAtom: Atom = Atom(
+    contributors = podcastAtomContributors,
+    links        = podcastAtomLinks,
+  )
+
+  private lazy val podcastAtomContributors: List[AtomContributor] = Nil
 
   private lazy val podcastAtomLinks: List[AtomLink] = RomeFeedExtractor
     .getAtomLinks(feed)
     .asScala
     .map(AtomLink.fromRome)
     .toList
+
+  private def episodeAtom(e: SyndEntry): Atom = Atom(
+    contributors = episodeAtomContributors(e),
+    links        = episodeAtomLinks(e),
+  )
+
+  // TODO implement!
+  private def episodeAtomContributors(e: SyndEntry): List[AtomContributor] = Nil
 
   private def episodeAtomLinks(e: SyndEntry): List[AtomLink] = RomeFeedExtractor
     .getAtomLinks(e)
@@ -183,7 +198,7 @@ class RomeFeedParser private (private val xmlData: String)
     .map(_.toExternalForm)
     .orElse(podcast.image) // fallback is the podcast's image
 
-  private def episodeItunesInfo(e: SyndEntry): EpisodeItunes = RomeFeedExtractor
+  private def episodeItunes(e: SyndEntry): EpisodeItunes = RomeFeedExtractor
     .getItunesEntryInformation(e)
     .asScala
     .map { itunes =>
@@ -198,7 +213,7 @@ class RomeFeedParser private (private val xmlData: String)
       )
     }.getOrElse(EpisodeItunes())
 
-  private def episodeEnclosureInfo(entry: SyndEntry): EpisodeEnclosure = Option(entry.getEnclosures)
+  private def episodeEnclosure(entry: SyndEntry): EpisodeEnclosure = Option(entry.getEnclosures)
     .map { es =>
       if (es.size > 1) log.warn("Encountered multiple <enclosure> elements in <item> element")
       if (es.size > 0) {

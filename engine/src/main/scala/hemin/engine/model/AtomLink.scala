@@ -33,7 +33,7 @@ object AtomLink {
 
 }
 
-case class AtomLink (
+case class AtomLink(
   title: Option[String],
   href: Option[String],
   hrefResolved: Option[String],
