@@ -10,6 +10,8 @@ import hemin.engine.cli.CommandLineInterpreter
 import hemin.engine.cli.CommandLineInterpreter.CliMessage
 import hemin.engine.crawler.Crawler
 import hemin.engine.crawler.Crawler.CrawlerMessage
+import hemin.engine.graph.GraphStore
+import hemin.engine.graph.GraphStore.GraphStoreMessage
 import hemin.engine.index.IndexStore
 import hemin.engine.index.IndexStore.IndexMessage
 import hemin.engine.node.Node._
@@ -48,6 +50,7 @@ object Node {
   final case object ReportIndexStoreInitializationComplete
   final case object ReportCliInitializationComplete
   final case object ReportCrawlerInitializationComplete
+  final case object ReportGraphStoreInitializationComplete
   final case object ReportParserInitializationComplete
   final case object ReportSearcherInitializationComplete
   final case object ReportUpdaterInitializationComplete
@@ -94,6 +97,7 @@ class Node(config: HeminConfig)
     CatalogStore.name,
     CommandLineInterpreter.name,
     Crawler.name,
+    GraphStore.name,
     IndexStore.name,
     Parser.name,
     Searcher.name,
@@ -107,6 +111,7 @@ class Node(config: HeminConfig)
   private var parser: ActorRef = _
   private var searcher: ActorRef = _
   private var updater: ActorRef = _
+  private var graph: ActorRef = _
 
   override def postRestart(cause: Throwable): Unit = {
     log.warn("{} has been restarted or resumed", self.path.name)
@@ -128,6 +133,7 @@ class Node(config: HeminConfig)
     searcher = context.watch(context.actorOf(Searcher.props(config.searcher),      Searcher.name))
     updater  = context.watch(context.actorOf(Updater.props(config.updater),        Updater.name))
     cli      = context.watch(context.actorOf(CommandLineInterpreter.props(config), CommandLineInterpreter.name))
+    graph    = context.watch(context.actorOf(GraphStore.props(config.graph),       GraphStore.name))
 
 
     // pass around references not provided by constructors due to circular dependencies
@@ -155,6 +161,8 @@ class Node(config: HeminConfig)
     updater ! ActorRefCatalogStoreActor(catalog)
     updater ! ActorRefCrawlerActor(crawler)
     updater ! ActorRefSupervisor(self)
+
+    graph ! ActorRefSupervisor(self)
   }
 
   override def postStop: Unit = {
@@ -163,17 +171,19 @@ class Node(config: HeminConfig)
 
   override def receive: Receive = {
 
-    case msg: CatalogMessage  => catalog.tell(msg, sender())
-    case msg: CliMessage      => cli.tell(msg, sender())
-    case msg: CrawlerMessage  => crawler.tell(msg, sender())
-    case msg: IndexMessage    => index.tell(msg, sender())
-    case msg: ParserMessage   => parser.tell(msg, sender())
-    case msg: SearcherMessage => searcher.tell(msg, sender())
-    case msg: UpdaterMessage  => updater.tell(msg, sender())
+    case msg: CatalogMessage    => catalog.tell(msg, sender())
+    case msg: CliMessage        => cli.tell(msg, sender())
+    case msg: CrawlerMessage    => crawler.tell(msg, sender())
+    case msg: GraphStoreMessage => graph.tell(msg, sender())
+    case msg: IndexMessage      => index.tell(msg, sender())
+    case msg: ParserMessage     => parser.tell(msg, sender())
+    case msg: SearcherMessage   => searcher.tell(msg, sender())
+    case msg: UpdaterMessage    => updater.tell(msg, sender())
 
     case ReportCatalogStoreInitializationComplete => initializationProgress.signalCompletion(CatalogStore.name)
     case ReportCliInitializationComplete          => initializationProgress.signalCompletion(CommandLineInterpreter.name)
     case ReportCrawlerInitializationComplete      => initializationProgress.signalCompletion(Crawler.name)
+    case ReportGraphStoreInitializationComplete   => initializationProgress.signalCompletion(GraphStore.name)
     case ReportIndexStoreInitializationComplete   => initializationProgress.signalCompletion(IndexStore.name)
     case ReportParserInitializationComplete       => initializationProgress.signalCompletion(Parser.name)
     case ReportSearcherInitializationComplete     => initializationProgress.signalCompletion(Searcher.name)
@@ -206,6 +216,7 @@ class Node(config: HeminConfig)
     // it is important to shutdown all actor(supervisor) befor shutting down the actor system
     context.system.stop(crawler)    // these have a too full inbox usually to let them finish processing
     context.system.stop(catalog)
+    context.system.stop(graph)
     context.system.stop(cli)
     context.system.stop(parser)
     context.system.stop(index)

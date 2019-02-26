@@ -76,6 +76,7 @@ libraryDependencies ++= Seq(
     "com.sksamuel.scrimage"      %% "scrimage-core"           % scrimageVersion, // https://github.com/sksamuel/scrimage
     "com.sksamuel.scrimage"      %% "scrimage-filters"        % scrimageVersion,
     "com.sksamuel.scrimage"      %% "scrimage-io-extra"       % scrimageVersion,
+    "org.neo4j.driver"           % "neo4j-java-driver"        % "1.7.2",
     "org.rogach"                 %% "scallop"                 % "3.1.5",         // https://github.com/scallop/scallop
     "org.scalatest"              %% "scalatest"               % "3.0.5" % Test,  // https://github.com/scalatest/scalatest
     "junit"                      %  "junit"                   % "4.12"  % Test,  // TODO not sure why I would need this
