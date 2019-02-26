@@ -163,7 +163,7 @@ class RomeFeedParser private (private val xmlData: String)
 
   private lazy val podcastFyyd: PodcastFyyd = PodcastFyyd(verify = None)
 
-  private lazy val podcastAtom: Atom = Atom(
+  private lazy val podcastAtom: PodcastAtom = PodcastAtom(
     contributors = podcastAtomContributors,
     links        = podcastAtomLinks,
   )
@@ -176,7 +176,7 @@ class RomeFeedParser private (private val xmlData: String)
     .map(AtomLink.fromRome)
     .toList
 
-  private def episodeAtom(e: SyndEntry): Atom = Atom(
+  private def episodeAtom(e: SyndEntry): EpisodeAtom = EpisodeAtom(
     contributors = episodeAtomContributors(e),
     links        = episodeAtomLinks(e),
   )

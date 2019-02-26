@@ -91,8 +91,11 @@ object BsonConversion {
   implicit val atomLinkWriter: BSONDocumentWriter[AtomLink] = Macros.writer[AtomLink]
   implicit val atomLinkReader: BSONDocumentReader[AtomLink] = Macros.reader[AtomLink]
 
-  implicit val atomWriter: BSONDocumentWriter[Atom] = Macros.writer[Atom]
-  implicit val atomReader: BSONDocumentReader[Atom] = Macros.reader[Atom]
+  implicit val podcastAtomWriter: BSONDocumentWriter[PodcastAtom] = Macros.writer[PodcastAtom]
+  implicit val podcastAtomReader: BSONDocumentReader[PodcastAtom] = Macros.reader[PodcastAtom]
+
+  implicit val episodeAtomWriter: BSONDocumentWriter[EpisodeAtom] = Macros.writer[EpisodeAtom]
+  implicit val episodeAtomReader: BSONDocumentReader[EpisodeAtom] = Macros.reader[EpisodeAtom]
 
   val podcastWriter: BSONDocumentWriter[Podcast] = Macros.writer[Podcast]
   val podcastReader: BSONDocumentReader[Podcast] = Macros.reader[Podcast]

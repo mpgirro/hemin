@@ -43,7 +43,6 @@ class RomeFeedParserSpec
             p.copyright shouldBe Some("Lorem Ipsum")
             p.docs shouldBe Some("Lorem Ipsum")
             p.managingEditor shouldBe empty // TODO add to testfeed.xml
-            // TODO test the values from p.atomLinks
             p.registration.timestamp shouldBe empty
             p.registration.complete shouldEqual None
             p.itunes.summary shouldBe Some("Lorem Ipsum")
@@ -55,6 +54,7 @@ class RomeFeedParserSpec
             p.itunes.typ shouldBe Some("episodic")
             p.itunes.ownerName shouldBe Some("Lorem Ipsum")
             p.itunes.ownerEmail shouldBe Some("test@example.org")
+            p.atom.links.size shouldBe 8
             p.feedpress.locale shouldEqual None // TODO why not Some("en") ?!
             p.fyyd.verify shouldEqual None // TODO should be Some("abcdefg") once we support Fyyd
           }
@@ -95,8 +95,7 @@ class RomeFeedParserSpec
             e.description shouldBe Some("Lorem Ipsum")
             e.image shouldBe Some("http://example.org/cover.jpg")
             e.contentEncoded shouldBe Some("Lorem Ipsum")
-            // TODO test the values from e.atomLinks
-            //e.chapters should not be empty // TODO test chapter fields as well
+            e.chapters should not be empty
             e.itunes.duration shouldBe Some("03:24:27")
             e.itunes.subtitle shouldBe Some("Lorem Ipsum")
             e.itunes.author shouldBe Some("Lorem Ipsum")
@@ -107,6 +106,7 @@ class RomeFeedParserSpec
             e.enclosure.url shouldBe Some("http://example.org/episode1.m4a")
             e.enclosure.length shouldBe Some(78589133)
             e.enclosure.typ shouldBe Some("audio/mp4")
+            e.atom.links.size shouldBe 1
             e.registration.timestamp shouldBe empty
         }
       case Failure(_) => fail(parseFailureMsg)

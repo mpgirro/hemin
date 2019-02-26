@@ -13,7 +13,7 @@ final case class Podcast(
   docs: Option[String]              = None,
   managingEditor: Option[String]    = None,
   image: Option[String]             = None,
-  atom: Atom                        = Atom(),
+  atom: PodcastAtom                 = PodcastAtom(),
   registration: PodcastRegistration = PodcastRegistration(),
   itunes: PodcastItunes             = PodcastItunes(),
   feedpress: PodcastFeedpress       = PodcastFeedpress(),
