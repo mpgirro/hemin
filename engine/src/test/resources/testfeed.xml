@@ -32,6 +32,7 @@
         <atom:link rel="hub" href="http://test.superfeedr.com"/>
         <atom:contributor>
             <atom:name>Lorem Ipsum</atom:name>
+            <atom:email>test@example.org</atom:email>
             <atom:uri>http://example.org</atom:uri>
         </atom:contributor>
         <generator>Lorem Ipsum</generator>
@@ -80,6 +81,7 @@
             <itunes:season>1</itunes:season>
             <atom:contributor>
                 <atom:name>Lorem Ipsum</atom:name>
+                <atom:email>test@example.org</atom:email>
                 <atom:uri>http://example.org</atom:uri>
             </atom:contributor>
         </item>
@@ -107,6 +109,7 @@
             <itunes:season>2</itunes:season>
             <atom:contributor>
                 <atom:name>Lorem Ipsum</atom:name>
+                <atom:email>test@example.org</atom:email>
                 <atom:uri>http://example.org</atom:uri>
             </atom:contributor>
         </item>

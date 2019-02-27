@@ -20,7 +20,7 @@ atomLink.getRel == "prev-archive"
 
 object AtomLink {
 
-  /** Instantiates an AtomLink from a ROME Link object */
+  /** Instantiates an [[hemin.engine.model.AtomLink]] from a ROME Link object */
   def fromRome(link: Link): AtomLink = AtomLink(
     title        = Option(link.getTitle),
     href         = Option(link.getHref),
