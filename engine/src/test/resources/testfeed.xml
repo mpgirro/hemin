@@ -10,7 +10,6 @@
      xmlns:feedpress="https://feed.press/xmlns"
      version="2.0">
     <channel>
-        <feedpress:locale>en</feedpress:locale>
         <title>Lorem Ipsum</title>
         <link>http://example.org</link>
         <description>Lorem Ipsum</description>
@@ -20,6 +19,10 @@
             <title>Lorem Ipsum</title>
             <link>Lorem Ipsum</link>
         </image>
+        <language>de-DE</language>
+        <generator>Lorem Ipsum</generator>
+        <copyright>Lorem Ipsum</copyright>
+        <docs>Lorem Ipsum</docs>
         <atom:link rel="self" type="application/rss+xml" title="Lorem Ipsum (MPEG-4 AAC Audio)" href="http://example.org/feed/m4a"/>
         <atom:link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (MP3 Audio)" href="http://example.org/feed/mp3"/>
         <atom:link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (Ogg Vorbis Audio)" href="http://example.org/feed/oga"/>
@@ -27,17 +30,12 @@
         <atom:link rel="next" href="http://example.org/feed/m4a?paged=2"/>
         <atom:link rel="first" href="http://example.org/feed/m4a"/>
         <atom:link rel="last" href="http://example.org/feed/m4a?paged=8"/>
-        <language>de-DE</language>
-        <fyyd:verify xmlns:fyyd="https://fyyd.de/fyyd-ns/">abcdefg</fyyd:verify>
         <atom:link rel="hub" href="http://test.superfeedr.com"/>
         <atom:contributor>
             <atom:name>Lorem Ipsum</atom:name>
             <atom:email>test@example.org</atom:email>
             <atom:uri>http://example.org</atom:uri>
         </atom:contributor>
-        <generator>Lorem Ipsum</generator>
-        <copyright>Lorem Ipsum</copyright>
-        <docs>Lorem Ipsum</docs>
         <itunes:keywords>Lorem Ipsum</itunes:keywords>
         <itunes:author>Lorem Ipsum</itunes:author>
         <itunes:type>episodic</itunes:type>
@@ -57,14 +55,22 @@
         <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
         <itunes:block>no</itunes:block>
         <itunes:explicit>no</itunes:explicit>
+        <fyyd:verify xmlns:fyyd="https://fyyd.de/fyyd-ns/">abcdefg</fyyd:verify>
+        <feedpress:locale>en</feedpress:locale>
         <item>
             <title>Lorem Ipsum</title>
             <link>http://example.org/episode1</link>
             <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
             <guid isPermaLink="false">1fa609024fdf097</guid>
             <description><![CDATA[Lorem Ipsum]]></description>
-            <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode1"/>
             <enclosure url="http://example.org/episode1.m4a" length="78589133" type="audio/mp4" />
+            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+            <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode1"/>
+            <atom:contributor>
+                <atom:name>Lorem Ipsum</atom:name>
+                <atom:email>test@example.org</atom:email>
+                <atom:uri>http://example.org</atom:uri>
+            </atom:contributor>
             <itunes:duration>03:24:27</itunes:duration>
             <itunes:author>Lorem Ipsum</itunes:author>
             <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
@@ -72,18 +78,12 @@
             <itunes:episode>1</itunes:episode>
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
-            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+            <itunes:season>1</itunes:season>
             <psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
             </psc:chapters>
-            <itunes:season>1</itunes:season>
-            <atom:contributor>
-                <atom:name>Lorem Ipsum</atom:name>
-                <atom:email>test@example.org</atom:email>
-                <atom:uri>http://example.org</atom:uri>
-            </atom:contributor>
         </item>
         <item>
             <title>Lorem Ipsum</title>
@@ -91,8 +91,14 @@
             <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
             <guid isPermaLink="false">kdgfg237402kjh</guid>
             <description><![CDATA[Lorem Ipsum]]></description>
-            <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode2"/>
             <enclosure url="http://example.org/episode2.m4a" length="78589133" type="audio/mp4" />
+            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+            <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode2"/>
+            <atom:contributor>
+                <atom:name>Lorem Ipsum</atom:name>
+                <atom:email>test@example.org</atom:email>
+                <atom:uri>http://example.org</atom:uri>
+            </atom:contributor>
             <itunes:duration>03:24:27</itunes:duration>
             <itunes:author>Lorem Ipsum</itunes:author>
             <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
@@ -100,18 +106,12 @@
             <itunes:episode>3</itunes:episode>
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
-            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+            <itunes:season>2</itunes:season>
             <psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
             </psc:chapters>
-            <itunes:season>2</itunes:season>
-            <atom:contributor>
-                <atom:name>Lorem Ipsum</atom:name>
-                <atom:email>test@example.org</atom:email>
-                <atom:uri>http://example.org</atom:uri>
-            </atom:contributor>
         </item>
     </channel>
 </rss>

@@ -17,23 +17,29 @@ class RomeFeedParserSpec
 
   val testDate: Option[Long] = Some(1521240548000L) // = 2018-03-16T23:49:08
 
-  val expectedEpisodes: Int = 2
-  val expectedChapters: Int = 3
+  val expectedPodcastAtomLinks = 8
+  val expectedPodcastPersonaAuthors = 0
+  val expectedPodcastPersonaContributors = 0
+  val expectedEpisodes = 2
+  val expectedEpisodeAtomLinks = 1
+  val expectedEpisodePersonaAuthors = 0
+  val expectedEpisodePersonaContributors = 0
+  val expectedChapters = 3
 
-  val parseFailureMsg = "A RomeFeedParser for the test feed data could not be instantiated"
+  val parseFailureMsg = "The RomeFeedParser failed to instantiate from the XML feed data"
 
-  "The RomeFeedParser" should "be able to parse a valid Feed" in {
+  "The RomeFeedParser" should "instantiate from a valid XML feed" in {
     RomeFeedParser.parse(feedData) match {
       case Success(_)  => succeed // all is well
       case Failure(ex) => fail(parseFailureMsg)
     }
   }
 
-  it should "extract all Podcast metadata fields correctly" in {
+  it should "extract all Podcast metadata fields" in {
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
         Option(parser.podcast)
-          .map {p =>
+          .map { p =>
             p.id shouldBe empty
             p.title shouldBe Some("Lorem Ipsum")
             p.link shouldBe Some("http://example.org")
@@ -57,9 +63,9 @@ class RomeFeedParserSpec
             p.itunes.typ shouldBe Some("episodic")
             p.itunes.ownerName shouldBe Some("Lorem Ipsum")
             p.itunes.ownerEmail shouldBe Some("test@example.org")
-            p.atom.links.size shouldBe 8
-            p.persona.authors.size shouldBe 0      // TODO
-            p.persona.contributors.size shouldBe 0 // TODO
+            p.atom.links.size shouldBe expectedPodcastAtomLinks
+            p.persona.authors.size shouldBe expectedPodcastPersonaAuthors      // TODO
+            p.persona.contributors.size shouldBe expectedPodcastPersonaContributors
             p.feedpress.locale shouldEqual None // TODO why not Some("en") ?!
             p.fyyd.verify shouldEqual None // TODO should be Some("abcdefg") once we support Fyyd
           }
@@ -71,16 +77,81 @@ class RomeFeedParserSpec
     }
   }
 
-  it should "extract all Episodes from the feed" in {
+  it should "extract AtomLink metadata fields for a Podcast" in {
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
-        val es = parser.episodes
-        assert(es.size == expectedEpisodes, s"The Parser extracted ${es.size} Episodes instead of $expectedEpisodes")
+        val als = parser.podcast.atom.links
+        als.headOption match {
+          case None => fail("Parser failed to extract an AtomLink for a Podcast")
+          case Some(al) =>
+            al.rel shouldBe oneElementOf(Set(
+              "self",
+              "alternate",
+              "next",
+              "first",
+              "last",
+              "hub",
+            ))
+            al.href shouldBe oneElementOf(Set(
+              "http://example.org/feed/m4a",
+              "http://example.org/feed/mp3",
+              "http://example.org/feed/oga",
+              "http://example.org/feed/opus",
+              "http://example.org/feed/m4a?paged=2",
+              "http://example.org/feed/m4a?paged=8",
+              "http://test.superfeedr.com",
+            ))
+            al.title shouldBe oneElementOf(Set(
+              "Lorem Ipsum (MPEG-4 AAC Audio)",
+              "Lorem Ipsum (MP3 Audio)",
+              "Lorem Ipsum (Ogg Vorbis Audio)",
+              "Lorem Ipsum (Ogg Opus Audio)",
+            ))
+            al.typ shouldBe oneElementOf(Set(
+              "application/rss+xml",
+            ))
+            // TODO set this fields in feed, and test for correct extraction
+            al.hrefLang shouldBe None
+            al.hrefResolved shouldBe None
+            al.length shouldBe None
+        }
       case Failure(_) => fail(parseFailureMsg)
     }
   }
 
-  it should "extract all Episode metadata fields correctly" in {
+  it should "extract Author (Person) metadata fields for a Podcast" in {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val as = parser.podcast.persona.authors
+        as.headOption match {
+          case None => fail("Parser failed to extract an Author (Person) for a Podcast")
+          case Some(author) =>
+            // TODO add these fields to the testfeed --> never seen such in real life feed before
+            author.name shouldBe None
+            author.email shouldBe None
+            author.uri shouldBe None
+        }
+      case Failure(_) => fail(parseFailureMsg)
+    }
+  }
+
+  it should "extract Contributor (Persons) metadata fields for a Podcast" in {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        val cs = parser.podcast.persona.contributors
+        cs.headOption match {
+          case None => fail("Parser failed to extract a Contributor (Person) for a Podcast")
+          case Some(c) =>
+            // TODO add these fields to the testfeed --> never seen such in real life feed before
+            c.name shouldBe None
+            c.email shouldBe None
+            c.uri shouldBe None
+        }
+      case Failure(_) => fail(parseFailureMsg)
+    }
+  }
+
+  it should "extract all Episode metadata fields" in {
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
         parser.episodes.headOption match {
@@ -97,7 +168,6 @@ class RomeFeedParserSpec
             e.description shouldBe Some("Lorem Ipsum")
             e.image shouldBe Some("http://example.org/cover.jpg")
             e.contentEncoded shouldBe Some("Lorem Ipsum")
-            e.chapters should not be empty
             e.itunes.duration shouldBe Some("03:24:27")
             e.itunes.subtitle shouldBe Some("Lorem Ipsum")
             e.itunes.author shouldBe Some("Lorem Ipsum")
@@ -108,30 +178,17 @@ class RomeFeedParserSpec
             e.enclosure.url shouldBe Some("http://example.org/episode1.m4a")
             e.enclosure.length shouldBe Some(78589133)
             e.enclosure.typ shouldBe Some("audio/mp4")
-            e.atom.links.size shouldBe 0           // TODO
-            e.persona.authors.size shouldBe 0      // TODO
-            e.persona.contributors.size shouldBe 0 // TODO
+            e.chapters shouldBe expectedChapters
+            e.atom.links.size shouldBe expectedEpisodeAtomLinks
+            e.persona.authors.size shouldBe expectedEpisodePersonaAuthors
+            e.persona.contributors.size shouldBe expectedEpisodePersonaContributors
             e.registration.timestamp shouldBe empty
         }
       case Failure(_) => fail(parseFailureMsg)
     }
   }
 
-  it should "extract all Chapters from an Episode" in {
-    RomeFeedParser.parse(feedData) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
-          case None => fail("Parser failed to extract an Episode")
-          case Some(e) =>
-            val cs = e.chapters
-            assert(cs.size == expectedChapters, s"The Parser extracted ${cs.size} Chapters instead of $expectedChapters")
-        }
-      case Failure(_) => fail(parseFailureMsg)
-    }
-  }
-
-
-  it should "extract all Chapter metadata fields correctly" in {
+  it should "extract all Chapter metadata fields" in {
     RomeFeedParser.parse(feedData) match {
       case Success(parser) =>
         parser.episodes.headOption match {
@@ -151,8 +208,71 @@ class RomeFeedParserSpec
     }
   }
 
-  // TODO test atom links extraction like chapters
+  it should "extract all AtomLinks metadata fields for an Episode" in {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        parser.episodes.headOption match {
+          case None => fail("Parser failed to extract an Episode")
+          case Some(e) =>
+            val als = e.atom.links
+            als.headOption match {
+              case None => fail("Parser failed to extract an AtomLink for an Episode")
+              case Some(al) =>
+                al.rel shouldBe Some("http://podlove.org/deep-link")
+                al.href shouldBe oneElementOf(Set(
+                  "http://example.org/episode1",
+                  "http://example.org/episode2",
+                ))
+                // TODO set this fields in feed, and test for correct extraction
+                al.hrefLang shouldBe None
+                al.hrefResolved shouldBe None
+                al.length shouldBe None
+                al.title shouldBe None
+                al.typ shouldBe None
+            }
+        }
+      case Failure(_) => fail(parseFailureMsg)
+    }
+  }
 
-  // TODO test persona extraction like chapters
+  it should "extract Author (Person) metadata fields for an Episode" in {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        parser.episodes.headOption match {
+          case None => fail("Parser failed to extract an Episode")
+          case Some(e) =>
+            val as = e.persona.authors
+            as.headOption match {
+              case None => fail("Parser failed to extract an Author (Person) for a Podcast")
+              case Some(author) =>
+                // TODO add these fields to the testfeed --> never seen such in real life feed before
+                author.name shouldBe None
+                author.email shouldBe None
+                author.uri shouldBe None
+            }
+        }
+      case Failure(_) => fail(parseFailureMsg)
+    }
+  }
+
+  it should "extract Contributor (Persons) metadata fields for an Episode" in {
+    RomeFeedParser.parse(feedData) match {
+      case Success(parser) =>
+        parser.episodes.headOption match {
+          case None => fail("Parser failed to extract an Episode")
+          case Some(e) =>
+            val cs = e.persona.contributors
+            cs.headOption match {
+              case None => fail("Parser failed to extract a Contributor (Person) for a Podcast")
+              case Some(c) =>
+                // TODO add these fields to the testfeed --> never seen such in real life feed before
+                c.name shouldBe None
+                c.email shouldBe None
+                c.uri shouldBe None
+            }
+        }
+      case Failure(_) => fail(parseFailureMsg)
+    }
+  }
 
 }
