@@ -10,7 +10,16 @@ class InitializationProgressSpec
   val subsys2: String = "subsys2"
   val subsys3: String = "subsys3"
 
-  "The InitializationProgress" should "not indicate finished if not all subsystems have signaled their completion" in {
+  "The InitializationProgress" should "signal completion once all subsystems reported in" in {
+    val progress: InitializationProgress = new InitializationProgress(Set(subsys1, subsys2, subsys3))
+
+    progress.signalCompletion(subsys1)
+    progress.signalCompletion(subsys2)
+    progress.signalCompletion(subsys3)
+    progress.isFinished shouldBe true
+  }
+
+  "The InitializationProgress" should "not signal completion until all subsystems reported in" in {
     val progress: InitializationProgress = new InitializationProgress(Set(subsys1, subsys2, subsys3))
 
     progress.signalCompletion(subsys1)
