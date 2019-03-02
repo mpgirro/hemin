@@ -12,7 +12,7 @@ class RomeFeedParserSpec
     with Matchers {
 
   val feedData: String = Files
-    .lines(Paths.get("src", "test", "resources", "testfeed.xml"))
+    .lines(Paths.get("src", "test", "resources", "rss.xml"))
     .collect(Collectors.joining("\n"))
 
   val testDate: Option[Long] = Some(1521240548000L) // = 2018-03-16T23:49:08
@@ -51,7 +51,7 @@ class RomeFeedParserSpec
             p.generator shouldBe Some("Lorem Ipsum")
             p.copyright shouldBe Some("Lorem Ipsum")
             p.docs shouldBe Some("Lorem Ipsum")
-            p.managingEditor shouldBe empty // TODO add to testfeed.xml
+            p.managingEditor shouldBe empty // TODO add to rss.xml
             p.registration.timestamp shouldBe empty
             p.registration.complete shouldEqual None
             p.itunes.summary shouldBe Some("Lorem Ipsum")

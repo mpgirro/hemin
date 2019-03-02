@@ -16,7 +16,7 @@ class RomeOpmlParserSpec
   private val log: Logger = Logger(getClass)
 
   private val feedData: String = Files
-    .lines(Paths.get("src", "test", "resources", "testopml.xml"))
+    .lines(Paths.get("src", "test", "resources", "opml.xml"))
     .collect(Collectors.joining("\n"))
 
   private val parseFailureMsg = "A RomeOpmlParser for the test feed data could not be instantiated"
