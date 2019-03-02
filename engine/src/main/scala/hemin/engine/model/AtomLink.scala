@@ -34,13 +34,13 @@ object AtomLink {
 }
 
 case class AtomLink(
-  title: Option[String],
-  href: Option[String],
-  hrefResolved: Option[String],
-  hrefLang: Option[String],
-  rel: Option[String],
-  typ: Option[String],
-  length: Option[Long],
+  title: Option[String]        = None,
+  href: Option[String]         = None,
+  hrefResolved: Option[String] = None,
+  hrefLang: Option[String]     = None,
+  rel: Option[String]          = None,
+  typ: Option[String]          = None,
+  length: Option[Long]         = None,
 )
 
 

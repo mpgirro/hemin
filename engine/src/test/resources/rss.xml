@@ -8,6 +8,7 @@
      xmlns:content="http://purl.org/rss/1.0/modules/content/"
      xmlns:fh="http://purl.org/syndication/history/1.0"
      xmlns:feedpress="https://feed.press/xmlns"
+     xmlns:fyyd="https://fyyd.de/fyyd-ns/"
      version="2.0">
     <channel>
         <title>Lorem Ipsum</title>
@@ -27,8 +28,8 @@
         <atom:link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (MP3 Audio)" href="http://example.org/feed/mp3"/>
         <atom:link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (Ogg Vorbis Audio)" href="http://example.org/feed/oga"/>
         <atom:link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (Ogg Opus Audio)" href="http://example.org/feed/opus"/>
-        <atom:link rel="next" href="http://example.org/feed/m4a?paged=2"/>
         <atom:link rel="first" href="http://example.org/feed/m4a"/>
+        <atom:link rel="next" href="http://example.org/feed/m4a?paged=2"/>
         <atom:link rel="last" href="http://example.org/feed/m4a?paged=8"/>
         <atom:link rel="hub" href="http://test.superfeedr.com"/>
         <atom:contributor>
@@ -55,7 +56,7 @@
         <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
         <itunes:block>no</itunes:block>
         <itunes:explicit>no</itunes:explicit>
-        <fyyd:verify xmlns:fyyd="https://fyyd.de/fyyd-ns/">abcdefg</fyyd:verify>
+        <fyyd:verify>abcdefg</fyyd:verify>
         <feedpress:locale>en</feedpress:locale>
         <item>
             <title>Lorem Ipsum</title>
@@ -79,7 +80,7 @@
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
             <itunes:season>1</itunes:season>
-            <psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+            <psc:chapters version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
@@ -107,7 +108,7 @@
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
             <itunes:season>2</itunes:season>
-            <psc:chapters xmlns:psc="http://podlove.org/simple-chapters" version="1.2">
+            <psc:chapters version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
