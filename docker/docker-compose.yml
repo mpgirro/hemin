@@ -1,0 +1,14 @@
+version: '2'
+services:
+  mongo:
+    extends:
+      file: mongo.yml
+      service: mongodb
+  solr:
+    extends:
+      file: solr.yml
+      service: solr
+  neo4j:
+    extends:
+      file: neo4j.yml
+      service: neo4j
