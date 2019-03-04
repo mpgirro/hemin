@@ -8,9 +8,17 @@ jdk:
   - oraclejdk8
   - openjdk8
 
+services:
+  -  docker
+
 sudo: false
 
-install: cd engine && sbt clean compile publishM2
+before_install:
+  - docker-compose -f docker/docker-compose.yml up -d
+
+install: 
+  - cd engine
+  - sbt clean compile publishM2
 
 cache:
   directories:

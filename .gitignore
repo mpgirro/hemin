@@ -1,3 +1,4 @@
 # Ignore data directories of docker containers
 /docker/data/mongo
+/docker/data/neo4j
 /docker/data/solr
