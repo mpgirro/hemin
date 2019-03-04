@@ -9,8 +9,8 @@ final case class PodcastItunes(
   explicit: Option[Boolean]  = None,
   block: Option[Boolean]     = None,
   typ: Option[String]        = None,
-  ownerName: Option[String]  = None,
-  ownerEmail: Option[String] = None,
+  owner: Person              = Person()
+
 ) extends Patchable[PodcastItunes] {
 
   override def patchLeft(diff: PodcastItunes): PodcastItunes = Option(diff) match {
@@ -24,8 +24,7 @@ final case class PodcastItunes(
       explicit   = reduceLeft(this.explicit, that.explicit),
       block      = reduceLeft(this.block, that.block),
       typ        = reduceLeft(this.typ, that.typ),
-      ownerName  = reduceLeft(this.ownerName, that.ownerName),
-      ownerEmail = reduceLeft(this.ownerEmail, that.ownerEmail),
+      owner      = this.owner.patchLeft(that.owner),
     )
   }
 
@@ -40,8 +39,7 @@ final case class PodcastItunes(
       explicit   = reduceRight(this.explicit, that.explicit),
       block      = reduceRight(this.block, that.block),
       typ        = reduceRight(this.typ, that.typ),
-      ownerName  = reduceRight(this.ownerName, that.ownerName),
-      ownerEmail = reduceRight(this.ownerEmail, that.ownerEmail),
+      owner      = this.owner.patchRight(that.owner),
     )
   }
 }

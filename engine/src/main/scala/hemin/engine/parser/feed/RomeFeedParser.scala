@@ -44,6 +44,7 @@ class RomeFeedParser private (private val xmlData: String)
     copyright      = Option(feed.getCopyright),
     docs           = Option(feed.getDocs),
     managingEditor = Option(feed.getManagingEditor),
+    webMaster      = Option(feed.getWebMaster),
     registration = PodcastRegistration(
       timestamp = None,
       complete  = None,
@@ -138,6 +139,8 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
+
+
   private lazy val podcastItunes: PodcastItunes = feedItunesModule
     .map { itunes =>
       PodcastItunes(
@@ -155,10 +158,14 @@ class RomeFeedParser private (private val xmlData: String)
         explicit   = Option(itunes.getExplicit),
         block      = Option(itunes.getBlock),
         typ        = Option(itunes.getType),
-        ownerName  = Option(itunes.getOwnerName),
-        ownerEmail = Option(itunes.getOwnerEmailAddress),
+        owner      = podcastItunesOwner(itunes),
       )
     }.getOrElse(PodcastItunes())
+
+  private def podcastItunesOwner(itunes: FeedInformation): Person = Person(
+    name  = Option(itunes.getOwnerName),
+    email = Option(itunes.getOwnerEmailAddress),
+  )
 
   private lazy val podcastFeedpress: PodcastFeedpress = PodcastFeedpress(locale = None)
 
