@@ -13,6 +13,12 @@ object JsonWrites {
 
   implicit val atomLinkWrites: Writes[AtomLink] = Json.writes[AtomLink]
 
+  implicit val atomWrites: Writes[Atom] = Json.writes[Atom]
+
+  implicit val personWrites: Writes[Person] = Json.writes[Person]
+
+  implicit val personaWrites: Writes[Persona] = Json.writes[Persona]
+
   implicit val podcastRegistrationWrites: Writes[PodcastRegistration] = Json.writes[PodcastRegistration]
 
   implicit val podcastItunesWrites: Writes[PodcastItunes] = Json.writes[PodcastItunes]
