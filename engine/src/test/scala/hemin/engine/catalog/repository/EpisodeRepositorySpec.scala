@@ -1,7 +1,8 @@
 package hemin.engine.catalog.repository
 
 import com.typesafe.scalalogging.Logger
-import hemin.engine.MongoTestContext
+import hemin.engine.TestConstants
+import hemin.engine.catalog.CatalogConfig
 import hemin.engine.model.Episode
 import hemin.engine.util.TimeUtil
 import org.scalatest.concurrent.ScalaFutures
@@ -19,6 +20,7 @@ class EpisodeRepositorySpec
   val testId1 = "id1"
   val testId2 = "id2"
 
+  /*
   val testContext = new MongoTestContext // also starts the embedded MongoDB
 
   var episodeRepository: EpisodeRepository = _
@@ -35,6 +37,11 @@ class EpisodeRepositorySpec
   override def afterAll: Unit = {
     testContext.stop() // stops the embedded MongoDB
   }
+  */
+
+  val catalogConfig: CatalogConfig = TestConstants.engineConfig.catalog
+  val repositoryFactory: RepositoryFactory = new RepositoryFactory(catalogConfig, executionContext)
+  val episodeRepository: EpisodeRepository = repositoryFactory.getEpisodeRepository
 
   "The EpisodeRepository" should "not eventually retrieve an episode with a future pubDate" in {
 

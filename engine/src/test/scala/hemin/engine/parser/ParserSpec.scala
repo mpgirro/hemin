@@ -3,7 +3,7 @@ package hemin.engine.parser
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportParserInitializationComplete}
-import hemin.engine.{HeminConfig, HeminEngine}
+import hemin.engine.{HeminEngine, TestConstants}
 import org.scalatest.{FlatSpecLike, Matchers}
 
 class ParserSpec
@@ -12,10 +12,10 @@ class ParserSpec
     with FlatSpecLike
     with Matchers {
 
-  val engineConfig: HeminConfig = HeminConfig.defaultEngineConfig
+  val parserConfig: ParserConfig = TestConstants.engineConfig.parser
 
   "The Parser" should "report its completed initialization" in {
-    val parser: ActorRef = system.actorOf(Parser.props(engineConfig.parser))
+    val parser: ActorRef = system.actorOf(Parser.props(parserConfig))
     parser ! ActorRefSupervisor(testActor)
     expectMsgType[ReportParserInitializationComplete.type]
   }

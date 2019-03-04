@@ -19,7 +19,7 @@ class InitializationProgressSpec
     progress.isFinished shouldBe true
   }
 
-  "The InitializationProgress" should "not signal completion until all subsystems reported in" in {
+  it should "not signal completion until all subsystems reported in" in {
     val progress: InitializationProgress = new InitializationProgress(Set(subsys1, subsys2, subsys3))
 
     progress.signalCompletion(subsys1)

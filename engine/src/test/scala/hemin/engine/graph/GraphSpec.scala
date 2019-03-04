@@ -3,7 +3,7 @@ package hemin.engine.graph
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportGraphStoreInitializationComplete}
-import hemin.engine.{HeminConfig, HeminEngine}
+import hemin.engine.{HeminEngine, TestConstants}
 import org.scalatest.{FlatSpecLike, Matchers}
 
 class GraphSpec
@@ -12,10 +12,10 @@ class GraphSpec
     with FlatSpecLike
     with Matchers {
 
-  val engineConfig: HeminConfig = HeminConfig.defaultEngineConfig
+  val graphConfig: GraphConfig = TestConstants.engineConfig.graph
 
   "The GraphStore" should "report its completed initialization" in {
-    val graph: ActorRef = system.actorOf(GraphStore.props(engineConfig.graph))
+    val graph: ActorRef = system.actorOf(GraphStore.props(graphConfig))
     graph ! ActorRefSupervisor(testActor)
     expectMsgType[ReportGraphStoreInitializationComplete.type]
   }

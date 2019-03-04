@@ -14,7 +14,7 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.concurrent.forkjoin.ForkJoinPool
 
-
+@Deprecated
 object MongoTestContext {
   lazy val defaultMongoHost: String = "localhost"
   lazy val defaultMongoPort: Int = 12345
@@ -27,6 +27,7 @@ object MongoTestContext {
   * ReactiveMongo).
   *
   */
+@Deprecated
 class MongoTestContext {
 
   private val executionContext: ExecutionContext = ExecutionContext.fromExecutor(new ForkJoinPool(8))

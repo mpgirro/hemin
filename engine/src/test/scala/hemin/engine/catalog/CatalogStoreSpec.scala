@@ -3,7 +3,7 @@ package hemin.engine.catalog
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit, TestProbe}
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportCatalogStoreInitializationComplete}
-import hemin.engine.{HeminEngine, MongoTestContext}
+import hemin.engine.{HeminConfig, HeminEngine, TestConstants}
 import org.scalatest._
 
 class CatalogStoreSpec
@@ -14,27 +14,15 @@ class CatalogStoreSpec
     //with BeforeAndAfter
     with BeforeAndAfterAll {
 
+  val engineConfig: HeminConfig = TestConstants.engineConfig
   val supervisorMock: ActorRef = TestProbe.apply().ref
-
-  val testContext: MongoTestContext = new MongoTestContext // also starts the embedded MongoDB
-
-  /*
-  before {
-    testContext = new MongoTestContext // also starts the embedded MongoDB
-  }
-
-  after {
-    testContext.stop() // stops the embedded MongoDB
-  }
-  */
 
   override def afterAll: Unit = {
     TestKit.shutdownActorSystem(system)
-    testContext.stop() // stops the embedded MongoDB
   }
 
   "The CatalogStore" should "report its completed initialization" in {
-    val catalog: ActorRef = system.actorOf(CatalogStore.props(testContext.engineConfig.catalog))
+    val catalog: ActorRef = system.actorOf(CatalogStore.props(engineConfig.catalog))
     catalog ! ActorRefSupervisor(testActor)
     expectMsgType[ReportCatalogStoreInitializationComplete.type]
   }

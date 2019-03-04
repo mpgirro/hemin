@@ -2,26 +2,28 @@ package hemin.engine.searcher
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.pattern.ask
-import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
+import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import hemin.engine.model.SearchResult
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherInitializationComplete}
 import hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
-import hemin.engine.{HeminConfig, HeminEngine}
-import org.scalatest.{FlatSpecLike, Ignore, Matchers}
+import hemin.engine.{HeminEngine, TestConstants}
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.{FlatSpecLike, Matchers}
 
-import scala.util.{Failure, Success}
+import scala.concurrent.ExecutionContext
 
-@Ignore
 class SearcherSpec
   extends TestKit(ActorSystem(HeminEngine.name))
     with ImplicitSender
     with FlatSpecLike
-    with Matchers {
+    with Matchers
+    with ScalaFutures {
 
-  val engineConfig: HeminConfig = HeminConfig.defaultEngineConfig
+  val searcherConfig: SearcherConfig = TestConstants.engineConfig.searcher
 
-  implicit val timeout: Timeout = engineConfig.node.internalTimeout
+  implicit val executionContext: ExecutionContext = TestConstants.executionContext
+  implicit val timeout: Timeout = TestConstants.timeout
 
   val defaultQuery: String = "foo"
   val defaultPageNumber: Option[Int] = Some(1)
@@ -34,57 +36,49 @@ class SearcherSpec
     result.results shouldBe Nil
   }
 
-  def defaultTestSearcher(): TestActorRef[Searcher] = {
-    val searcher: TestActorRef[Searcher] = TestActorRef(system.actorOf(Searcher.props(engineConfig.searcher)))
+  def defaultTestSearcher(): ActorRef = {
+    val searcher: ActorRef = system.actorOf(Searcher.props(searcherConfig))
     searcher ! ActorRefSupervisor(testActor)
     expectMsgType[ReportSearcherInitializationComplete.type]
     searcher
   }
 
   "The Searcher" should "report its completed initialization" in {
-    val searcher: ActorRef = system.actorOf(Searcher.props(engineConfig.searcher))
+    val searcher: ActorRef = system.actorOf(Searcher.props(searcherConfig))
     searcher ! ActorRefSupervisor(testActor)
     expectMsgType[ReportSearcherInitializationComplete.type]
   }
 
   it should "reply with empty search results if the query is empty" in {
     val searcher: ActorRef = defaultTestSearcher()
-    val future = searcher ? SearchRequest("", defaultPageNumber, defaultPageSize)
-    future.value.get match {
-      case Success(result: SearchResults) => assertEmptySearchResult(result.results)
-      case Success(other) => fail("Expected reply was not of type : " + classOf[SearchResults])
-      case Failure(ex) => throw ex
-    }
+    (searcher ? SearchRequest("", defaultPageNumber, defaultPageSize))
+      .mapTo[SearchResults]
+      .map(_.results)
+      .map(assertEmptySearchResult)
   }
 
   it should "reply with empty search results if the query is null" in {
     val searcher: ActorRef = defaultTestSearcher()
-    val future = searcher ? SearchRequest(null, defaultPageNumber, defaultPageSize)
-    future.value.get match {
-      case Success(result: SearchResults) => assertEmptySearchResult(result.results)
-      case Success(other) => fail("Expected reply was not of type : " + classOf[SearchResults])
-      case Failure(ex) => throw ex
-    }
+    (searcher ? SearchRequest(null, defaultPageNumber, defaultPageSize))
+      .mapTo[SearchResults]
+      .map(_.results)
+      .map(assertEmptySearchResult)
   }
 
   it should "reply with empty search results if the page number is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
-    val future = searcher ? SearchRequest(defaultQuery, Some(0), defaultPageSize)
-    future.value.get match {
-      case Success(result: SearchResults) => assertEmptySearchResult(result.results)
-      case Success(other) => fail("Expected reply was not of type : " + classOf[SearchResults])
-      case Failure(ex) => throw ex
-    }
+    (searcher ? SearchRequest(defaultQuery, Some(0), defaultPageSize))
+      .mapTo[SearchResults]
+      .map(_.results)
+      .map(assertEmptySearchResult)
   }
 
   it should "reply with empty search results if the page size is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
-    val future = searcher ? SearchRequest(defaultQuery, defaultPageNumber, Some(0))
-    future.value.get match {
-      case Success(result: SearchResults) => assertEmptySearchResult(result.results)
-      case Success(other) => fail("Expected reply was not of type : " + classOf[SearchResults])
-      case Failure(ex) => throw ex
-    }
+    (searcher ? SearchRequest(defaultQuery, defaultPageNumber, Some(0)))
+      .mapTo[SearchResults]
+      .map(_.results)
+      .map(assertEmptySearchResult)
   }
 
 }
