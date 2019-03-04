@@ -31,12 +31,13 @@ class RomeFeedParserSpec
     description = Some("Lorem Ipsum"),
     pubDate = testDate,
     image = testImage,
-    lastBuildDate = None,
+    lastBuildDate = None, // TODO why None? Its set in the feed
     language = Some("de-DE"),
     generator = Some("Lorem Ipsum"),
     copyright = Some("Lorem Ipsum"),
     docs = Some("Lorem Ipsum"),
-    managingEditor = None, // TODO add to rss.xml/atom.xml
+    managingEditor = Some("editor@example.com"),
+    webMaster = Some("webmaster@example.com"),
     registration = PodcastRegistration(
       timestamp = None,
       complete = None,
@@ -52,8 +53,10 @@ class RomeFeedParserSpec
       explicit = Some(false),
       block = Some(false),
       typ = Some("episodic"),
-      ownerName = Some("Lorem Ipsum"),
-      ownerEmail = Some("test@example.org"),
+      owner = Person(
+        name = Some("Lorem Ipsum"),
+        email = Some("test@example.org"),
+      ),
     ),
     atom = Atom(
       links = List(
@@ -154,6 +157,7 @@ class RomeFeedParserSpec
             p.copyright shouldBe expectedPodcast.copyright
             p.docs shouldBe expectedPodcast.docs
             p.managingEditor shouldBe expectedPodcast.managingEditor
+            p.webMaster shouldBe expectedPodcast.webMaster
             p.registration.timestamp shouldBe expectedPodcast.registration.timestamp
             p.registration.complete shouldEqual expectedPodcast.registration.complete
             p.itunes.summary shouldBe expectedPodcast.itunes.summary
@@ -163,8 +167,8 @@ class RomeFeedParserSpec
             p.itunes.explicit shouldBe expectedPodcast.itunes.explicit
             p.itunes.block shouldBe expectedPodcast.itunes.block
             p.itunes.typ shouldBe expectedPodcast.itunes.typ
-            p.itunes.ownerName shouldBe expectedPodcast.itunes.ownerName
-            p.itunes.ownerEmail shouldBe expectedPodcast.itunes.ownerEmail
+            p.itunes.owner.name shouldBe expectedPodcast.itunes.owner.name
+            p.itunes.owner.email shouldBe expectedPodcast.itunes.owner.email
             p.atom.links.size shouldBe expectedPodcast.atom.links.size
             p.persona.authors.size shouldBe expectedPodcast.persona.authors.size
             p.persona.contributors.size shouldBe expectedPodcast.persona.contributors.size
