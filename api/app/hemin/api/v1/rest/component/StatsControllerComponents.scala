@@ -2,7 +2,7 @@ package hemin.api.v1.rest.component
 
 import hemin.api.v1.action.StatsActionBuilder
 import hemin.api.v1.service.StatsService
-import hemin.api.v1.util.concurrent.StatsExecutionContext
+import hemin.api.v1.util.concurrent.ApiV1ExecutionContext
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
@@ -20,5 +20,5 @@ case class StatsControllerComponents @Inject()(actionBuilder: StatsActionBuilder
                                                messagesApi: MessagesApi,
                                                langs: Langs,
                                                fileMimeTypes: FileMimeTypes,
-                                               executionContext: StatsExecutionContext)
+                                               executionContext: ApiV1ExecutionContext)
   extends ControllerComponents

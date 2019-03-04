@@ -4,6 +4,5 @@ import akka.actor.ActorSystem
 import javax.inject.Inject
 import play.api.libs.concurrent.CustomExecutionContext
 
-@Deprecated
-class CliExecutionContext @Inject()(actorSystem: ActorSystem)
-  extends CustomExecutionContext(actorSystem, "hemin.api.v1.cli.dispatcher")
+class ApiV1ExecutionContext @Inject()(actorSystem: ActorSystem)
+  extends CustomExecutionContext(actorSystem, "hemin.api.v1.dispatcher")

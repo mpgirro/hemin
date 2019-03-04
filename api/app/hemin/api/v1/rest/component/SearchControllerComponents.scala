@@ -2,7 +2,7 @@ package hemin.api.v1.rest.component
 
 import hemin.api.v1.action.SearchActionBuilder
 import hemin.api.v1.service.SearchService
-import hemin.api.v1.util.concurrent.SearchExecutionContext
+import hemin.api.v1.util.concurrent.ApiV1ExecutionContext
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
@@ -20,5 +20,5 @@ case class SearchControllerComponents @Inject()(actionBuilder: SearchActionBuild
                                                 messagesApi: MessagesApi,
                                                 langs: Langs,
                                                 fileMimeTypes: FileMimeTypes,
-                                                executionContext: SearchExecutionContext)
+                                                executionContext: ApiV1ExecutionContext)
   extends ControllerComponents

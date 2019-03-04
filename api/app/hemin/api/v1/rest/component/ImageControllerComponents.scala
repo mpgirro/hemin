@@ -2,7 +2,7 @@ package hemin.api.v1.rest.component
 
 import hemin.api.v1.action.ImageActionBuilder
 import hemin.api.v1.service.ImageService
-import hemin.api.v1.util.concurrent.ImageExecutionContext
+import hemin.api.v1.util.concurrent.ApiV1ExecutionContext
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
@@ -20,5 +20,5 @@ case class ImageControllerComponents @Inject()(actionBuilder: ImageActionBuilder
                                                messagesApi: MessagesApi,
                                                langs: Langs,
                                                fileMimeTypes: FileMimeTypes,
-                                               executionContext: ImageExecutionContext)
+                                               executionContext: ApiV1ExecutionContext)
   extends ControllerComponents

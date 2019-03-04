@@ -4,5 +4,6 @@ import akka.actor.ActorSystem
 import javax.inject.Inject
 import play.api.libs.concurrent.CustomExecutionContext
 
+@Deprecated
 class StatsExecutionContext @Inject()(actorSystem: ActorSystem)
   extends CustomExecutionContext(actorSystem, "hemin.api.v1.stats.dispatcher")
