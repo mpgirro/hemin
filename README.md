@@ -47,11 +47,11 @@ A WebApp is available at [hemin.io](https://hemin.io)
 
 There are several different frontend variant implementations for the Hemin system. The webapps are named after the letters in the greek alphabet. Currently there are these:
 
-* [Alpha](hemin-web/alpha) &ndash; based on [Angular](https://angular.io). An early proof-of-concept UI back from when Hemin was called something else and it's engine served as a scientific guinea pig (more about those days [here](https://github.com/mpgirro/dipl)). Alpha is now deprecated.
-* [Beta](hemin-web/beta) &ndash; written in [Elm](https://elm-lang.org). It is still work in progress and quite *beta* (pun intended), but will become the production implementation.
+* _Alpha_ &ndash; based on [Angular](https://angular.io). An early proof-of-concept UI back from when Hemin was called something else and it's engine served as a scientific guinea pig (more about those days [here](https://github.com/mpgirro/dipl)). Development on Alpha is discontinued. <!--The API compatibility is outdated. -->
+* [Beta](web/beta) &ndash; written in [Elm](https://elm-lang.org). It is still work in progress and quite *beta* (pun intended), but will become the production implementation.
 <!--
-* [Gamma](hemin-web/gamma) &ndash; proposition of a [React](https://reactjs.org) based implementation.  
-* [Delta](hemin-web/delta) &ndash; proposition of a [VueJS](https://vuejs.org) based implementation. 
+* [Gamma](web/gamma) &ndash; proposition of a [React](https://reactjs.org) based implementation.  
+* [Delta](web/delta) &ndash; proposition of a [VueJS](https://vuejs.org) based implementation. 
 -->
 
 
