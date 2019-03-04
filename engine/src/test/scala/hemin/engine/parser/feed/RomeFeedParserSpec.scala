@@ -131,12 +131,13 @@ class RomeFeedParserSpec
   val expectedEpisodePersonaContributors = 0
   val expectedChapters = 3
 
-  val parseFailureMsg = "The RomeFeedParser failed to instantiate from the XML feed data"
+  def parseFailureMsg(ex: Throwable) =
+    s"The RomeFeedParser failed to instantiate from the XML feed data : ${ex.getMessage}"
 
   "The RomeFeedParser" should "instantiate from a valid XML feed" in {
     RomeFeedParser.parse(rssXml) match {
       case Success(_)  => succeed // all is well
-      case Failure(ex) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -182,7 +183,7 @@ class RomeFeedParserSpec
             fail("The Parser produced NULL for the Podcast")
             None
           })
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -225,7 +226,7 @@ class RomeFeedParserSpec
             // TODO set this fields in feed, and test for correct extraction
             al.hrefLang shouldBe None
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -241,7 +242,7 @@ class RomeFeedParserSpec
             author.email shouldBe None
             author.uri shouldBe None
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -257,7 +258,7 @@ class RomeFeedParserSpec
             c.email shouldBe None
             c.uri shouldBe None
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -294,7 +295,7 @@ class RomeFeedParserSpec
             e.persona.contributors.size shouldBe expectedEpisodePersonaContributors
             e.registration.timestamp shouldBe empty
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -314,7 +315,7 @@ class RomeFeedParserSpec
                 c.image shouldBe Some("http://example.org/cover") // TODO this is None for some reason
             }
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -341,7 +342,7 @@ class RomeFeedParserSpec
                 al.typ shouldBe None
             }
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -361,7 +362,7 @@ class RomeFeedParserSpec
                 author.uri shouldBe None
             }
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
@@ -381,7 +382,7 @@ class RomeFeedParserSpec
                 c.uri shouldBe None
             }
         }
-      case Failure(_) => fail(parseFailureMsg)
+      case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 

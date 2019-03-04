@@ -10,7 +10,7 @@ import scala.util.{Failure, Success}
 
 // TODO this spec relies on a complete engine setup present (mongo, solr); there should be in memory dummies present
 
-//@Ignore // TODO this test is ignored at the moment, because it is slow, spams the output and is not really useful
+@Ignore // TODO this test is ignored at the moment, because it is slow, spams the output and is not really useful
 class HeminEngineSpec
   extends FlatSpec
     with Matchers
