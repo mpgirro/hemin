@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"
+      xmlns:bitlove="http://bitlove.org"
+      xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+      xmlns:psc="http://podlove.org/simple-chapters"
+      xmlns:content="http://purl.org/rss/1.0/modules/content/"
+      xmlns:feedpress="https://feed.press/xmlns"
+      xmlns:fyyd="https://fyyd.de/fyyd-ns/">
+    <title>Lorem Ipsum</title>
+    <link href="http://example.org"/>
+    <subtitle>Lorem Ipsum</subtitle>
+    <lastBuildDate>Fri, 16 Mar 2018 22:49:08 +0000</lastBuildDate>
+    <image>
+        <url>http://example.org/cover.jpg</url>
+        <title>Lorem Ipsum</title>
+        <link>Lorem Ipsum</link>
+    </image>
+    <language>de-DE</language>
+    <generator>Lorem Ipsum</generator>
+    <copyright>Lorem Ipsum</copyright>
+    <docs>Lorem Ipsum</docs>
+    <managingEditor>editor@example.com</managingEditor>
+    <webMaster>webmaster@example.com</webMaster>
+    <link rel="self" type="application/rss+xml" title="Lorem Ipsum (MPEG-4 AAC Audio)" href="http://example.org/feed/m4a"/>
+    <link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (MP3 Audio)" href="http://example.org/feed/mp3"/>
+    <link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (Ogg Vorbis Audio)" href="http://example.org/feed/oga"/>
+    <link rel="alternate" type="application/rss+xml" title="Lorem Ipsum (Ogg Opus Audio)" href="http://example.org/feed/opus"/>
+    <link rel="first" href="http://example.org/feed/m4a"/>
+    <link rel="next" href="http://example.org/feed/m4a?paged=2"/>
+    <link rel="last" href="http://example.org/feed/m4a?paged=8"/>
+    <link rel="hub" href="http://test.superfeedr.com"/>
+    <contributor>
+        <name>Lorem Ipsum</name>
+        <email>test@example.org</email>
+        <uri>http://example.org</uri>
+    </contributor>
+    <itunes:keywords>Lorem Ipsum</itunes:keywords>
+    <itunes:author>Lorem Ipsum</itunes:author>
+    <itunes:type>episodic</itunes:type>
+    <itunes:summary>Lorem Ipsum</itunes:summary>
+    <itunes:category text="Technology">
+        <itunes:category text="Tech News"/>
+    </itunes:category>
+    <itunes:category text="Society &amp; Culture"/>
+    <itunes:category text="Technology">
+        <itunes:category text="Gadgets"/>
+    </itunes:category>
+    <itunes:owner>
+        <itunes:name>Lorem Ipsum</itunes:name>
+        <itunes:email>test@example.org</itunes:email>
+    </itunes:owner>
+    <itunes:image href="http://example.org/cover.jpg"/>
+    <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
+    <itunes:block>no</itunes:block>
+    <itunes:explicit>no</itunes:explicit>
+    <fyyd:verify>abcdefg</fyyd:verify>
+    <feedpress:newsletterId>abc123</feedpress:newsletterId>
+    <feedpress:locale>en</feedpress:locale>
+    <feedpress:podcastId>xyz123</feedpress:podcastId>
+    <feedpress:cssFile>http://example.org/style.css</feedpress:cssFile>
+    <entry>
+        <title>Lorem Ipsum</title>
+        <id>1fa609024fdf097</id>
+        <summary><![CDATA[Lorem Ipsum]]></summary>
+        <published>Fri, 16 Mar 2018 22:49:08 +0000</published>
+        <link href="http://example.org/episode1"/>
+        <link rel="enclosure"
+              href="http://example.org/episode1.m4a"
+              length="78589133"
+              type="audio/mp4"/>
+        <link rel="http://podlove.org/deep-link" href="http://example.org/episode1"/>
+        <contributor>
+            <name>Lorem Ipsum</name>
+            <email>test@example.org</email>
+            <uri>http://example.org</uri>
+        </contributor>
+        <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+        <itunes:duration>03:24:27</itunes:duration>
+        <itunes:author>Lorem Ipsum</itunes:author>
+        <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
+        <itunes:title>Lorem Ipsum</itunes:title>
+        <itunes:episode>1</itunes:episode>
+        <itunes:episodeType>full</itunes:episodeType>
+        <itunes:summary>Lorem Ipsum</itunes:summary>
+        <itunes:season>1</itunes:season>
+        <psc:chapters version="1.2">
+            <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+            <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+            <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+        </psc:chapters>
+    </entry>
+    <entry>
+        <title>Lorem Ipsum</title>
+        <id>kdgfg237402kjh</id>
+        <summary><![CDATA[Lorem Ipsum]]></summary>
+        <published>Fri, 16 Mar 2018 22:49:08 +0000</published>
+        <link href="http://example.org/episode2"/>
+        <link rel="enclosure"
+              href="http://example.org/episode2.m4a"
+              length="78589133"
+              type="audio/mp4"/>
+        <link rel="http://podlove.org/deep-link" href="http://example.org/episode1"/>
+        <contributor>
+            <name>Lorem Ipsum</name>
+            <email>test@example.org</email>
+            <uri>http://example.org</uri>
+        </contributor>
+        <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
+        <itunes:duration>03:24:27</itunes:duration>
+        <itunes:author>Lorem Ipsum</itunes:author>
+        <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
+        <itunes:title>Lorem Ipsum</itunes:title>
+        <itunes:episode>3</itunes:episode>
+        <itunes:episodeType>full</itunes:episodeType>
+        <itunes:summary>Lorem Ipsum</itunes:summary>
+        <itunes:season>2</itunes:season>
+        <psc:chapters version="1.2">
+            <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+            <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+            <psc:chapter start="00:02:12.641" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
+        </psc:chapters>
+    </entry>
+</feed>

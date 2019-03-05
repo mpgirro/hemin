@@ -76,15 +76,14 @@ libraryDependencies ++= Seq(
     "com.sksamuel.scrimage"      %% "scrimage-core"           % scrimageVersion, // https://github.com/sksamuel/scrimage
     "com.sksamuel.scrimage"      %% "scrimage-filters"        % scrimageVersion,
     "com.sksamuel.scrimage"      %% "scrimage-io-extra"       % scrimageVersion,
-    "org.neo4j.driver"           % "neo4j-java-driver"        % "1.7.2",
+    "org.neo4j.driver"           %  "neo4j-java-driver"       % "1.7.2",
     "org.rogach"                 %% "scallop"                 % "3.1.5",         // https://github.com/scallop/scallop
     "org.scalatest"              %% "scalatest"               % "3.0.5" % Test,  // https://github.com/scalatest/scalatest
     "junit"                      %  "junit"                   % "4.12"  % Test,  // TODO not sure why I would need this
     "org.pegdown"                %  "pegdown"                 % "1.6.0" % Test,  // In addition to your testCompile dependency on scalatest, you also require a testRuntime dependency on pegdown in order to create the HTML report.
-    "com.github.simplyscala"     %% "scalatest-embedmongo"    % "0.2.4" % Test,  // https://github.com/SimplyScala/scalatest-embedmongo
 )
 
 // Initial commands to be run in your REPL.  I like to import various project-specific things here.
 initialCommands := """
-    import io.hemin.engine._;
+    import hemin.engine._;
   """

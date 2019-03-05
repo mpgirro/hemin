@@ -59,21 +59,24 @@
         <itunes:block>no</itunes:block>
         <itunes:explicit>no</itunes:explicit>
         <fyyd:verify>abcdefg</fyyd:verify>
+        <feedpress:newsletterId>abc123</feedpress:newsletterId>
         <feedpress:locale>en</feedpress:locale>
+        <feedpress:podcastId>xyz123</feedpress:podcastId>
+        <feedpress:cssFile>http://example.org/style.css</feedpress:cssFile>
         <item>
             <title>Lorem Ipsum</title>
-            <link>http://example.org/episode1</link>
-            <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
             <guid isPermaLink="false">1fa609024fdf097</guid>
             <description><![CDATA[Lorem Ipsum]]></description>
+            <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
+            <link>http://example.org/episode1</link>
             <enclosure url="http://example.org/episode1.m4a" length="78589133" type="audio/mp4" />
-            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
             <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode1"/>
             <atom:contributor>
                 <atom:name>Lorem Ipsum</atom:name>
                 <atom:email>test@example.org</atom:email>
                 <atom:uri>http://example.org</atom:uri>
             </atom:contributor>
+            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
             <itunes:duration>03:24:27</itunes:duration>
             <itunes:author>Lorem Ipsum</itunes:author>
             <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
@@ -90,18 +93,18 @@
         </item>
         <item>
             <title>Lorem Ipsum</title>
-            <link>http://example.org/episode2</link>
-            <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
             <guid isPermaLink="false">kdgfg237402kjh</guid>
             <description><![CDATA[Lorem Ipsum]]></description>
+            <pubDate>Fri, 16 Mar 2018 22:49:08 +0000</pubDate>
+            <link>http://example.org/episode2</link>
             <enclosure url="http://example.org/episode2.m4a" length="78589133" type="audio/mp4" />
-            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
             <atom:link rel="http://podlove.org/deep-link" href="http://example.org/episode2"/>
             <atom:contributor>
                 <atom:name>Lorem Ipsum</atom:name>
                 <atom:email>test@example.org</atom:email>
                 <atom:uri>http://example.org</atom:uri>
             </atom:contributor>
+            <content:encoded><![CDATA[Lorem Ipsum]]></content:encoded>
             <itunes:duration>03:24:27</itunes:duration>
             <itunes:author>Lorem Ipsum</itunes:author>
             <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
