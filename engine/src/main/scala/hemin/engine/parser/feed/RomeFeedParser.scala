@@ -4,7 +4,7 @@ import java.io.StringReader
 
 import com.google.common.base.Strings.isNullOrEmpty
 import com.rometools.modules.itunes.FeedInformation
-import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
+import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage, SyndLink}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model._
@@ -175,11 +175,20 @@ class RomeFeedParser private (private val xmlData: String)
     links = podcastAtomLinks,
   )
 
-  private lazy val podcastAtomLinks: List[AtomLink] = RomeFeedExtractor
-    .getAtomLinks(feed)
-    .asScala
-    .map(AtomLink.fromRome)
-    .toList
+  private lazy val podcastAtomLinks: List[AtomLink] =
+    if (feed.getLinks.isEmpty) {
+      RomeFeedExtractor
+        .getAtomLinks(feed)
+        .asScala
+        .map(AtomLink.fromRome)
+        .toList
+    } else {
+      feed
+        .getLinks
+        .asScala
+        .map(AtomLink.fromRome)
+        .toList
+    }
 
   private lazy val podcastPersona: Persona = Persona(
     authors      = podcastAuthors,

@@ -1,6 +1,7 @@
 package hemin.engine.model
 
 import com.rometools.rome.feed.atom.Link
+import com.rometools.rome.feed.synd.SyndLink
 
 /* these are the kinds of links I've identified so far
 
@@ -23,12 +24,23 @@ object AtomLink {
   /** Instantiates an [[hemin.engine.model.AtomLink]] from a ROME Link object */
   def fromRome(link: Link): AtomLink = AtomLink(
     title        = Option(link.getTitle),
-    href         = Option(link.getHref),
-    hrefResolved = Option(link.getHrefResolved),
-    hrefLang     = Option(link.getHreflang),
     rel          = Option(link.getRel),
     typ          = Option(link.getType),
     length       = Option(link.getLength),
+    href         = Option(link.getHref),
+    hrefLang     = Option(link.getHreflang),
+    hrefResolved = Option(link.getHrefResolved),
+  )
+
+  /** Instantiates an [[hemin.engine.model.AtomLink]] from a ROME SyndLink object */
+  def fromRome(link: SyndLink): AtomLink = AtomLink(
+    title        = Option(link.getTitle),
+    rel          = Option(link.getRel),
+    typ          = Option(link.getType),
+    length       = Option(link.getLength),
+    href         = Option(link.getHref),
+    hrefLang     = Option(link.getHreflang),
+    hrefResolved = None,
   )
 
 }
