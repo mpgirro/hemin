@@ -16,7 +16,7 @@
         <description>Lorem Ipsum</description>
         <lastBuildDate>Fri, 16 Mar 2018 22:49:08 +0000</lastBuildDate>
         <image>
-            <url>http://example.org/cover.jpg</url>
+            <url>http://example.org/podcast-cover.jpg</url>
             <title>Lorem Ipsum</title>
             <link>Lorem Ipsum</link>
         </image>
@@ -54,7 +54,7 @@
             <itunes:name>Lorem Ipsum</itunes:name>
             <itunes:email>test@example.org</itunes:email>
         </itunes:owner>
-        <itunes:image href="http://example.org/cover.jpg"/>
+        <itunes:image href="http://example.org/podcast-cover.jpg"/>
         <itunes:subtitle>Lorem Ipsum</itunes:subtitle>
         <itunes:block>no</itunes:block>
         <itunes:explicit>no</itunes:explicit>
@@ -85,6 +85,7 @@
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
             <itunes:season>1</itunes:season>
+            <itunes:image href="http://example.org/episode-cover.jpg"/>
             <psc:chapters version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
@@ -113,6 +114,7 @@
             <itunes:episodeType>full</itunes:episodeType>
             <itunes:summary>Lorem Ipsum</itunes:summary>
             <itunes:season>2</itunes:season>
+            <itunes:image href="http://example.org/episode-cover.jpg"/>
             <psc:chapters version="1.2">
                 <psc:chapter start="00:00:00.000" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
                 <psc:chapter start="00:01:03.856" title="Lorem Ipsum" href="http://example.org" image="http://example.org/cover"/>
