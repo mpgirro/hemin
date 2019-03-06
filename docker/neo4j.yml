@@ -3,6 +3,8 @@ services:
   neo4j:
     image: neo4j:3.5.3
     container_name: "hemin-neo4j"
+    environment:
+      - NEO4J_AUTH=hemin/hemin
     ports:
       - 7474:7474
       - 7473:7473
