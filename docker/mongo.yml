@@ -1,8 +1,8 @@
 version: '2'
 services:
-    mongodb:
+    mongo:
         image: mongo:4.1
-        container_name: "mongodb"
+        container_name: "hemin-mongo"
         environment:
             - MONGO_DATA_DIR=/data/db
             - MONGO_LOG_DIR=/dev/null

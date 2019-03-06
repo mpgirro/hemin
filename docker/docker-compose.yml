@@ -3,7 +3,7 @@ services:
   mongo:
     extends:
       file: mongo.yml
-      service: mongodb
+      service: mongo
   solr:
     extends:
       file: solr.yml

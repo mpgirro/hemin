@@ -2,7 +2,7 @@ version: '2'
 services:
   solr:
     image: solr:7.5.0
-    container_name: "solr"
+    container_name: "hemin-solr"
     ports:
       - 8983:8983
     volumes:
