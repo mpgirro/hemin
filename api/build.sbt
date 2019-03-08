@@ -1,5 +1,9 @@
 import sbt.Keys._
 
+organization := "io.hemin"
+name := "hemin-api"
+version := "1.0-SNAPSHOT"
+
 lazy val GatlingTest = config("gatling") extend Test
 
 scalaVersion in ThisBuild := "2.12.6"
