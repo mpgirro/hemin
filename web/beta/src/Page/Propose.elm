@@ -7,14 +7,17 @@ module Page.Propose exposing
     )
 
 import Const
-import Html exposing (Html, button, div, form, input, p, span, text)
-import Html.Attributes exposing (autocomplete, class, placeholder, spellcheck, type_, value)
+import File exposing (File)
+import File.Select as Select
+import Html exposing (Html, button, div, form, hr, input, p, span, text)
+import Html.Attributes exposing (autocomplete, class, multiple, placeholder, spellcheck, type_, value)
 import Html.Attributes.Aria exposing (ariaLabel)
-import Html.Events exposing (onClick, onInput, onSubmit)
+import Html.Events exposing (on, onClick, onInput, onSubmit)
 import Http
 import Page.Error as ErrorPage
 import RestApi
 import Skeleton exposing (Page)
+import Task
 
 
 
@@ -39,18 +42,23 @@ init =
 
 
 type Msg
-    = Propose
-    | Proposed (Result Http.Error ())
-    | NewUrl String
+    = FeedUrlPropose
+    | FeedUrlProposed (Result Http.Error ())
+    | FeedUrlUpdated String
+    | OpmlRequested
+    | OpmlSelected File
+    | OpmlTransformed String
+      --    | OpmlUploadProgress Http.Progress
+    | OpmlUploaded (Result Http.Error ())
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        NewUrl feed ->
+        FeedUrlUpdated feed ->
             ( FeedUrl feed, Cmd.none )
 
-        Propose ->
+        FeedUrlPropose ->
             case model of
                 FeedUrl feed ->
                     ( Proposing feed, proposeFeed feed )
@@ -59,13 +67,29 @@ update msg model =
                     -- TODO is this the error handling I want?
                     ( FeedUrl "", Cmd.none )
 
-        Proposed response ->
+        FeedUrlProposed response ->
             case response of
                 Ok _ ->
                     ( Success "", Cmd.none )
 
                 Err cause ->
                     ( Failure cause, Cmd.none )
+
+        OpmlRequested ->
+            ( model, Select.file [ "application/xml", "text/xml", "text/x-opml" ] OpmlSelected )
+
+        OpmlSelected file ->
+            ( model, Task.perform OpmlTransformed (File.toString file) )
+
+        -- TODO from here, we want to produce a message that uploads the XML! (POST request)
+        OpmlTransformed xml ->
+            --    ( model, Cmd.none )
+            ( model, RestApi.uploadOpml OpmlUploaded xml )
+
+        --OpmlUploadProgress progress ->
+        --    ( model, Cmd.none )
+        OpmlUploaded response ->
+            ( model, Cmd.none )
 
 
 view : Model -> ( String, Html Msg )
@@ -78,23 +102,29 @@ view model =
         body =
             case model of
                 FeedUrl url ->
-                    viewForm url
+                    div []
+                        [ viewFeedUrlForm url
+                        , hr [] []
+                        , viewOpmlSelectInput
+                        ]
 
                 Proposing feed ->
                     div []
-                        [ viewForm feed
+                        [ viewFeedUrlForm feed
                         , div [ class "Box", class "mt-3" ]
                             [ div
                                 [ class "flash", class "flash-full", class "flash-warn" ]
                                 [ text "Proposing..." ]
                             ]
+                        , hr [] []
+                        , viewOpmlSelectInput
 
                         --, p [ class "mt-2" ] [ text "Proposing..." ]
                         ]
 
                 Success feed ->
                     div []
-                        [ viewForm feed
+                        [ viewFeedUrlForm feed
                         , div [ class "Box", class "mt-3" ]
                             [ div
                                 [ class "flash", class "flash-full", class "flash-success" ]
@@ -104,6 +134,8 @@ view model =
                                 , text " If the feed is valid and not yet in our database, the podcast and episodes will be available soon."
                                 ]
                             ]
+                        , hr [] []
+                        , viewOpmlSelectInput
 
                         --, p [ class "mt-2" ] [ text "Feed successfully proposed. HEMIN will process it shortly." ]
                         ]
@@ -114,8 +146,8 @@ view model =
     ( title, body )
 
 
-viewForm : String -> Html Msg
-viewForm url =
+viewFeedUrlForm : String -> Html Msg
+viewFeedUrlForm url =
     div []
         [ p []
             [ text "Please submit the URL to the feed of the podcast that you want to add to "
@@ -123,17 +155,17 @@ viewForm url =
             , text ":"
             ]
         , Html.form
-            [ onSubmit Propose ]
+            [ onSubmit FeedUrlPropose ]
             [ div [ class "input-group" ]
-                [ viewInput url
-                , viewSubmitButton
+                [ viewFeedUrlInput url
+                , viewFeedUrlSubmitButton
                 ]
             ]
         ]
 
 
-viewInput : String -> Html Msg
-viewInput url =
+viewFeedUrlInput : String -> Html Msg
+viewFeedUrlInput url =
     let
         placeholderValue =
             "Enter the feed to propose here"
@@ -147,13 +179,13 @@ viewInput url =
         , autocomplete False
         , spellcheck False
         , ariaLabel placeholderValue
-        , onInput NewUrl
+        , onInput FeedUrlUpdated
         ]
         []
 
 
-viewSubmitButton : Html Msg
-viewSubmitButton =
+viewFeedUrlSubmitButton : Html Msg
+viewFeedUrlSubmitButton =
     span [ class "input-group-button" ]
         [ button
             [ class "btn"
@@ -162,9 +194,18 @@ viewSubmitButton =
             --, attribute "style" "padding: 0"
             , type_ "button"
             , ariaLabel "Submit"
-            , onClick Propose
+            , onClick FeedUrlPropose
             ]
             [ text "Submit" ]
+        ]
+
+
+viewOpmlSelectInput : Html Msg
+viewOpmlSelectInput =
+    div []
+        [ button
+            [ onClick OpmlRequested ]
+            [ text "Select" ]
         ]
 
 
@@ -174,4 +215,4 @@ viewSubmitButton =
 
 proposeFeed : String -> Cmd Msg
 proposeFeed feed =
-    RestApi.proposeFeed Proposed feed
+    RestApi.proposeFeed FeedUrlProposed feed

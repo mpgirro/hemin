@@ -10,6 +10,7 @@ module RestApi exposing
     , getPodcast
     , getSearchResult
     , proposeFeed
+    , uploadOpml
     )
 
 import Data.DatabaseStats exposing (DatabaseStats, databaseStatsDecoder)
@@ -151,9 +152,18 @@ proposeFeed resultWrapper feed =
         }
 
 
+uploadOpml : (Result Http.Error () -> msg) -> String -> Cmd msg
+uploadOpml resultWrapper xml =
+    Http.post
+        { url = apiBase ++ "/feed/opml"
+        , body = Http.stringBody "text/x-opml" xml
+        , expect = Http.expectWhatever resultWrapper
+        }
+
+
 getDatabaseStats : (Result Http.Error DatabaseStats -> msg) -> Cmd msg
 getDatabaseStats resultWrapper =
     Http.get
-            { url = apiBase ++ "/stats/database"
-            , expect = Http.expectJson resultWrapper databaseStatsDecoder
-            }
+        { url = apiBase ++ "/stats/database"
+        , expect = Http.expectJson resultWrapper databaseStatsDecoder
+        }
