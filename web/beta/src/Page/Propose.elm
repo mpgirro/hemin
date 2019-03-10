@@ -10,7 +10,7 @@ import Const
 import File exposing (File)
 import File.Select as Select
 import Html exposing (Html, button, div, form, hr, input, p, span, text)
-import Html.Attributes exposing (autocomplete, class, multiple, placeholder, spellcheck, type_, value)
+import Html.Attributes exposing (autocomplete, class, disabled, multiple, placeholder, spellcheck, type_, value)
 import Html.Attributes.Aria exposing (ariaLabel)
 import Html.Events exposing (on, onClick, onInput, onSubmit)
 import Http
@@ -29,6 +29,7 @@ type Model
     | FeedUrl String
     | Proposing String
     | Success String
+    | OpmlFile File
 
 
 init : ( Model, Cmd Msg )
@@ -45,8 +46,9 @@ type Msg
     = FeedUrlPropose
     | FeedUrlProposed (Result Http.Error ())
     | FeedUrlUpdated String
-    | OpmlRequested
+    | OpmlSelectRequested
     | OpmlSelected File
+    | OpmlUploadRequested
     | OpmlTransformed String
       --    | OpmlUploadProgress Http.Progress
     | OpmlUploaded (Result Http.Error ())
@@ -75,11 +77,19 @@ update msg model =
                 Err cause ->
                     ( Failure cause, Cmd.none )
 
-        OpmlRequested ->
+        OpmlSelectRequested ->
             ( model, Select.file [ "application/xml", "text/xml", "text/x-opml" ] OpmlSelected )
 
         OpmlSelected file ->
-            ( model, Task.perform OpmlTransformed (File.toString file) )
+            ( OpmlFile file, Cmd.none )
+
+        OpmlUploadRequested ->
+            case model of
+                OpmlFile file ->
+                    ( model, Task.perform OpmlTransformed (File.toString file) )
+
+                _ ->
+                    ( model, Cmd.none )
 
         -- TODO from here, we want to produce a message that uploads the XML! (POST request)
         OpmlTransformed xml ->
@@ -89,14 +99,19 @@ update msg model =
         --OpmlUploadProgress progress ->
         --    ( model, Cmd.none )
         OpmlUploaded response ->
-            ( model, Cmd.none )
+            case response of
+                Ok _ ->
+                    ( Success "", Cmd.none )
+
+                Err cause ->
+                    ( Failure cause, Cmd.none )
 
 
 view : Model -> ( String, Html Msg )
 view model =
     let
         title =
-            "Search"
+            "Add Feeds"
 
         body : Html Msg
         body =
@@ -105,7 +120,7 @@ view model =
                     div []
                         [ viewFeedUrlForm url
                         , hr [] []
-                        , viewOpmlSelectInput
+                        , viewOpmlFileForm ""
                         ]
 
                 Proposing feed ->
@@ -117,9 +132,16 @@ view model =
                                 [ text "Proposing..." ]
                             ]
                         , hr [] []
-                        , viewOpmlSelectInput
+                        , viewOpmlFileForm ""
 
                         --, p [ class "mt-2" ] [ text "Proposing..." ]
+                        ]
+
+                OpmlFile file ->
+                    div []
+                        [ viewFeedUrlForm ""
+                        , hr [] []
+                        , viewOpmlFileForm (File.name file)
                         ]
 
                 Success feed ->
@@ -135,7 +157,7 @@ view model =
                                 ]
                             ]
                         , hr [] []
-                        , viewOpmlSelectInput
+                        , viewOpmlFileForm ""
 
                         --, p [ class "mt-2" ] [ text "Feed successfully proposed. HEMIN will process it shortly." ]
                         ]
@@ -190,8 +212,6 @@ viewFeedUrlSubmitButton =
         [ button
             [ class "btn"
             , class "text-normal"
-
-            --, attribute "style" "padding: 0"
             , type_ "button"
             , ariaLabel "Submit"
             , onClick FeedUrlPropose
@@ -200,12 +220,62 @@ viewFeedUrlSubmitButton =
         ]
 
 
-viewOpmlSelectInput : Html Msg
-viewOpmlSelectInput =
+viewOpmlFileForm : String -> Html Msg
+viewOpmlFileForm fileName =
     div []
+        [ p []
+            [ text "Upload an OPML file to add podcasts"
+            ]
+        , Html.form
+            []
+            [ div [ class "input-group" ]
+                [ viewOpmlFileInput fileName
+                , viewOpmlSelectButton
+                , viewOpmlUploadButton
+                ]
+            ]
+        ]
+
+
+viewOpmlFileInput : String -> Html Msg
+viewOpmlFileInput fileName =
+    input
+        [ class "form-control"
+        , class "input-block"
+        , type_ "text"
+        , value fileName
+        , autocomplete False
+        , spellcheck False
+        , disabled True
+        ]
+        []
+
+
+viewOpmlSelectButton : Html Msg
+viewOpmlSelectButton =
+    span [ class "input-group-button" ]
         [ button
-            [ onClick OpmlRequested ]
+            [ class "btn"
+            , class "text-normal"
+            , type_ "button"
+            , ariaLabel "Select"
+            , onClick OpmlSelectRequested
+            ]
             [ text "Select" ]
+        ]
+
+
+viewOpmlUploadButton : Html Msg
+viewOpmlUploadButton =
+    span [ class "input-group-button" ]
+        [ button
+            [ class "btn"
+            , class "text-normal"
+            , type_ "button"
+            , ariaLabel "Upload"
+            , onClick OpmlUploadRequested
+            ]
+            [ text "Upload" ]
         ]
 
 
