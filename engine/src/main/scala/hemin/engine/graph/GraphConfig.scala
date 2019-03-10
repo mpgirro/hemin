@@ -30,8 +30,8 @@ object GraphConfig
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
     s"$namespace.neo4j-uri" -> "bolt://localhost/7687",
-    s"$namespace.username"  -> "hemin",
-    s"$namespace.password"  -> "hemin",
+    s"$namespace.username"  -> "",
+    s"$namespace.password"  -> "",
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

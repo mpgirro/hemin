@@ -51,7 +51,7 @@ class FeedController @Inject() (cc: FeedControllerComponents)
             feedService.opmlImport(xmlData)
             Ok
           case None =>
-            log.warn(s"OPML IMPORT: No URL in body [BadRequest]")
+            log.warn(s"OPML IMPORT: XML in body missing [BadRequest]")
             BadRequest
         }
       }
