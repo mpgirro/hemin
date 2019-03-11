@@ -5,6 +5,7 @@ import com.typesafe.scalalogging.Logger
 import hemin.engine.catalog.CatalogStore._
 import hemin.engine.catalog.repository._
 import hemin.engine.crawler.Crawler._
+import hemin.engine.graph.GraphStore._
 import hemin.engine.index.IndexStore.AddDocIndexEvent
 import hemin.engine.model._
 import hemin.engine.node.Node._
@@ -95,6 +96,7 @@ class CatalogStore(config: CatalogConfig)
 
   private var catalogStore: ActorRef = _
   private var indexStore: ActorRef = _
+  private var graphStore: ActorRef = _
   private var crawler: ActorRef = _
   private var updater: ActorRef = _
   private var supervisor: ActorRef = _
@@ -125,10 +127,7 @@ class CatalogStore(config: CatalogConfig)
 
   override def postRestart(cause: Throwable): Unit = {
     log.warn("{} has been restarted or resumed", self.path.name)
-
-    //log.info(s"[$lnm] Stopping the MongoDriver...")
-    //Future(mongoDriver.close())
-
+    //repositoryFactory.close()
     super.postRestart(cause)
   }
 
@@ -145,6 +144,10 @@ class CatalogStore(config: CatalogConfig)
     case ActorRefIndexStoreActor(ref) =>
       log.debug("Received ActorRefIndexStoreActor(_)")
       indexStore = ref
+
+    case ActorRefGraphStoreActor(ref) =>
+      log.debug("Received ActorRefGraphStoreActor(_)")
+      graphStore = ref
 
     case ActorRefCrawlerActor(ref) =>
       log.debug("Received ActorRefCrawlerActor(_)")
@@ -342,6 +345,11 @@ class CatalogStore(config: CatalogConfig)
         // ensure that values that may have changed are propagated to the podcast
         updateEpisodeFieldsRelatedToPodcast(p)
         // TODO I must also update the same fields in the index
+
+        // Send semantic data to graph database
+        graphStore ! GeneratePodcastNode(p)
+        graphStore ! GenerateWebsiteNode(p.link)
+        graphStore ! GeneratePodcastWebsiteRelationship(p.id, p.link)
       })
   }
 
@@ -872,6 +880,11 @@ class CatalogStore(config: CatalogConfig)
                   .onComplete {
                     case Success(_) =>
                       log.info("episode registered : '{}' [p:{},e:{}]", e.title.get, podcastId, e.id.get)
+
+                      graphStore ! GenerateEpisodetNode(e)
+                      graphStore ! GenerateWebsiteNode(e.link)
+                      graphStore ! GenerateEpisodeWebsiteRelationship(e.id, e.link)
+                      graphStore ! GeneratePodcastEpisodeRelationship(e.podcastId, e.id)
 
                       IndexMapper.toIndexDoc(e) match {
                         case Success(doc) =>

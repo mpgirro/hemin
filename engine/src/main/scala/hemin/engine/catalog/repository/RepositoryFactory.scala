@@ -14,7 +14,7 @@ class RepositoryFactory(config: CatalogConfig,
 
   private val log: Logger = Logger(getClass)
 
-  private lazy val (connection, databaseName) = {
+  private lazy val (driver, connection, databaseName) = {
     val driver = MongoDriver()
 
     //registerDriverShutdownHook(driver)
@@ -28,7 +28,7 @@ class RepositoryFactory(config: CatalogConfig,
           s"cannot resolve connection from URI: $parsedUri"
         ))
       }
-    } yield con -> db).get
+    } yield (driver, con, db)).get
   }
 
   private lazy val lnm = s"${connection.supervisor}/${connection.name}"
@@ -37,6 +37,11 @@ class RepositoryFactory(config: CatalogConfig,
     connection.database(databaseName).andThen {
       case _ => log.debug(s"[$lnm] MongoDB resolved: $databaseName")
     }
+
+  def close(): Unit = {
+    log.debug("Stopping the MongoDriver...")
+    driver.close()
+  }
 
   /** Drop all database collections.
     * __Very destructive__!

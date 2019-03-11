@@ -40,6 +40,7 @@ object Node {
   trait ActorRefInfo
   final case class ActorRefCatalogStoreActor(ref: ActorRef) extends ActorRefInfo
   final case class ActorRefCrawlerActor(ref: ActorRef) extends ActorRefInfo
+  final case class ActorRefGraphStoreActor(ref: ActorRef) extends ActorRefInfo
   final case class ActorRefParserActor(ref: ActorRef) extends ActorRefInfo
   final case class ActorRefIndexStoreActor(ref: ActorRef) extends ActorRefInfo
   final case class ActorRefUpdaterActor(ref: ActorRef) extends ActorRefInfo
@@ -152,6 +153,7 @@ class Node(config: HeminConfig)
 
     catalog ! ActorRefCatalogStoreActor(catalog)
     catalog ! ActorRefIndexStoreActor(index)
+    catalog ! ActorRefGraphStoreActor(graph)
     catalog ! ActorRefCrawlerActor(crawler)
     catalog ! ActorRefUpdaterActor(updater)
     catalog ! ActorRefSupervisor(self)
