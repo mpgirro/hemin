@@ -40,6 +40,12 @@ class GraphStore (config: GraphConfig)
 
   private var supervisor: ActorRef = _
 
+  // wipe all data if it pleases and sparkles
+  if (config.createGraph) {
+    log.info("Dropping graph database on startup")
+    repository.dropAll()
+  }
+
   override def postStop: Unit = {
     log.info("{} subsystem shutting down", GraphStore.name.toUpperCase)
   }

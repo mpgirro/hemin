@@ -11,6 +11,7 @@ final case class GraphConfig (
   neo4jUri: String,
   username: String,
   password: String,
+  createGraph: Boolean,
 ) extends ConfigStandardValues {
   override val namespace: String = GraphConfig.namespace
 }
@@ -23,15 +24,17 @@ object GraphConfig
 
   override def fromConfig(config: Config): GraphConfig =
     GraphConfig(
-      neo4jUri = config.getString(s"$namespace.neo4j-uri"),
-      username = config.getString(s"$namespace.username"),
-      password = config.getString(s"$namespace.password"),
+      neo4jUri    = config.getString(s"$namespace.neo4j-uri"),
+      username    = config.getString(s"$namespace.username"),
+      password    = config.getString(s"$namespace.password"),
+      createGraph = config.getBoolean(s"$namespace.create-graph"),
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$namespace.neo4j-uri" -> "bolt://localhost/7687",
-    s"$namespace.username"  -> "",
-    s"$namespace.password"  -> "",
+    s"$namespace.neo4j-uri"    -> "bolt://localhost/7687",
+    s"$namespace.username"     -> "",
+    s"$namespace.password"     -> "",
+    s"$namespace.create-graph" -> true,
   ).asJava)
 
   override protected[this] val defaultDispatcher: Config = load(parseString(

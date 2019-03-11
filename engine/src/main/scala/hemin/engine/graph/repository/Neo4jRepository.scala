@@ -37,84 +37,58 @@ class Neo4jRepository(config: GraphConfig,
     driver.close()
   }
 
-  override def createPodcast(podcast: Podcast): Future[Unit] = Future {
-    val script = (podcast.id, podcast.title) match {
-      case (Some(id), Some(title)) =>
-        s"CREATE (podcast:$podcastLabel {title:'$title',id:'$id'})"
-      case (Some(id), _) =>
-        s"CREATE (podcast:$podcastLabel {id:'$id'})"
-      case (_,_) =>
-        log.warn("Unable to create Podcast node since we have neither ID nor title")
-        ""
-    }
-    //val script = s"CREATE (podcast:Podcasts {title:'${podcast.title}',id:'${podcast.id}'})"
-    /*
+  override def dropAll(): Unit = {
     val script =
-      s"""MERGE (p:Podcast{ id: { map }.id, title: { map }.title }
-         |ON CREATE SET n = { map }
-         |ON MATCH  SET n += { map }
+    s"""MATCH (n)
+       |DETACH DELETE n
        """.stripMargin
-       */
+    runScript(script)
+  }
+
+  override def createPodcast(podcast: Podcast): Future[Unit] = Future {
+    val id = podcast.id.getOrElse("")
+    val title = podcast.title.getOrElse("")
+    val properties = s"id: '$id', title: '$title'"
+    val script =
+    s"""MERGE (p:$podcastLabel{ id: '$id' })
+       |ON CREATE SET n = { $properties }
+       |ON MATCH  SET n += { $properties }
+       """.stripMargin
     runScript(script)
   }
 
   override def createEpisode(episode: Episode): Future[Unit] = Future {
-    val script = (episode.id, episode.title) match {
-      case (Some(id), Some(title)) =>
-        s"CREATE (episode:$episodeLabel {title:'$title',id:'$id'})"
-      case (Some(id), _) =>
-        s"CREATE (episode:$episodeLabel {id:'$id'})"
-      case (_,_) =>
-        log.warn("Unable to create Episode node since we have neither ID nor title")
-        ""
-    }
-    //val script = s"CREATE (episode:Episodes {title:'${episode.title}',id:'${episode.id}'})"
-    /*
+    val id = episode.id.getOrElse("")
+    val title = episode.title.getOrElse("")
+    val properties = s"id: '$id', title: '$title'"
     val script =
-      s"""MERGE (e:Episode{ id: { map }.id, title: { map }.title }
-         |ON CREATE SET n = { map }
-         |ON MATCH  SET n += { map }
+      s"""MERGE (e:$episodeLabel{ id: '$id' })
+         |ON CREATE SET n = { $properties }
+         |ON MATCH  SET n += { $properties }
        """.stripMargin
-       */
     runScript(script)
   }
 
   override def createWebsite(url: String): Future[Unit] = Future {
-    val script = s"CREATE (website:$websiteLabel {url:'$url'})"
-    /*
+    val properties = s"url: '$url'"
     val script =
-      s"""MERGE (w:Website{ url: { map }.url }
-         |ON CREATE SET n = { map }
-         |ON MATCH  SET n += { map }
+      s"""MERGE (w:$websiteLabel{ url: '$url' })
+         |ON CREATE SET n = { $properties }
+         |ON MATCH  SET n += { $properties }
        """.stripMargin
-       */
     runScript(script)
   }
 
   override def createPerson(person: Person): Future[Unit] = Future {
-    val script = (person.name, person.email, person.uri) match {
-      case (Some(name), Some(email), Some(uri)) =>
-        s"CREATE (person:$personLabel {name:'$name',email:'$email',uri:'$uri'})"
-      case (Some(name), None, Some(uri)) =>
-        s"CREATE (person:$personLabel {name:'$name',uri:'$uri'})"
-      case (Some(name), Some(email), None) =>
-        s"CREATE (person:$personLabel {name:'$name',email:'$email'})"
-      case (None, Some(email), Some(uri)) =>
-        s"CREATE (person:$personLabel email:'$email',uri:'$uri'})"
-      case (Some(name), _, _) =>
-        s"CREATE (person:$personLabel {name:'$name')"
-      case (_,_,_) =>
-        log.warn("Unable to create Person node since we have neither name, email nor uri")
-        ""
-    }
-    //val script = s"CREATE (person:Persons {name:'${person.name}',email:'${person.email}', uri:'${person.uri}'})"
-    /*
+    val name = person.name.getOrElse("")
+    val email = person.email.getOrElse("")
+    val uri = person.uri.getOrElse("")
+    val properties = s"name: '$name', email: '$email', uri: '$uri'"
     val script =
-      s"""MERGE (p:Person{ name: { map }.name, email: { map }.email, uri: { map }.uri }
-         |ON CREATE SET n = { map }
-         |ON MATCH  SET n += { map }
+      s"""MERGE (p:$personLabel{ name: { $properties }.name, email: { $properties }.email, uri: { $properties }.uri })
+         |ON CREATE SET n = { $properties }
+         |ON MATCH  SET n += { $properties }
        """.stripMargin
-       */
     runScript(script)
   }
 

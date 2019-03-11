@@ -13,6 +13,8 @@ trait GraphRepository {
 
   def close(): Unit
 
+  def dropAll(): Unit
+
   def createPodcast(podcast: Podcast): Future[Unit]
 
   def createEpisode(episode: Episode): Future[Unit]
