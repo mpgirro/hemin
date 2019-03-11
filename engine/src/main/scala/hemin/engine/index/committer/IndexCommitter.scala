@@ -7,4 +7,6 @@ trait IndexCommitter {
 
   def save(doc: IndexDoc): Unit
 
+  def deleteAll(): Unit
+
 }

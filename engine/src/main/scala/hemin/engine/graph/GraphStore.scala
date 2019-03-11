@@ -42,7 +42,7 @@ class GraphStore (config: GraphConfig)
 
   // wipe all data if it pleases and sparkles
   if (config.createGraph) {
-    log.info("Dropping graph database on startup")
+    log.info("Deleting Graph database on startup")
     repository.dropAll()
   }
 

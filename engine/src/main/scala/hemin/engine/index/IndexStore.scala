@@ -58,6 +58,11 @@ class IndexStore (config: IndexConfig)
 
   private var supervisor: ActorRef = _
 
+  if (config.createIndex) {
+    log.info("Deleting all Index documents on startup")
+    solrCommiter.deleteAll()
+  }
+
   override def postRestart(cause: Throwable): Unit = {
     log.warn("{} has been restarted or resumed", self.path.name)
     cause match {

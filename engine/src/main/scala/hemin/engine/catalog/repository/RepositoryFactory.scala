@@ -47,10 +47,10 @@ class RepositoryFactory(config: CatalogConfig,
     * __Very destructive__!
     */
   def dropAll(): Unit = {
-    getPodcastRepository.drop
-    getEpisodeRepository.drop
-    getFeedRepository.drop
-    getImageRepository.drop
+    getPodcastRepository.deleteAll()
+    getEpisodeRepository.deleteAll()
+    getFeedRepository.deleteAll()
+    getImageRepository.deleteAll()
   }
 
   def getPodcastRepository: PodcastRepository = new PodcastRepository(resolveDB, ec)

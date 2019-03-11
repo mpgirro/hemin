@@ -110,11 +110,11 @@ class CatalogStore(config: CatalogConfig)
 
   // wipe all data if it pleases and sparkles
   if (config.createDatabase) {
-    log.info("Dropping database collections on startup")
-    podcasts.drop
-    episodes.drop
-    feeds.drop
-    images.drop
+    log.info("Deleting Catalog database on startup")
+    podcasts.deleteAll()
+    episodes.deleteAll()
+    feeds.deleteAll()
+    images.deleteAll()
   }
 
   /* TODO

@@ -25,8 +25,16 @@ class SolrCommitter(config: IndexConfig,
     .withExecutorService(executorService)
     .build()
 
-  if (config.createIndex) try {
-    log.info("Deleting all Solr documents on startup")
+  override def save(doc: IndexDoc): Unit = SolrMapper.toSolr(doc) match {
+    case Success(d) =>
+      solr.add(d)
+      solr.commit()
+    case Failure(ex) =>
+      log.error("Failed to map IndexDoc to Solr; reason : {}", ex.getMessage)
+      ex.printStackTrace()
+  }
+
+  override def deleteAll(): Unit = try {
     solr.deleteByQuery("*:*")
     solr.commit()
   } catch {
@@ -35,14 +43,4 @@ class SolrCommitter(config: IndexConfig,
       ex.printStackTrace()
   }
 
-  override def save(doc: IndexDoc): Unit = {
-    SolrMapper.toSolr(doc) match {
-      case Success(d) =>
-        solr.add(d)
-        solr.commit()
-      case Failure(ex) =>
-        log.error("Failed to map IndexDoc to Solr; reason : {}", ex.getMessage)
-        ex.printStackTrace()
-    }
-  }
 }

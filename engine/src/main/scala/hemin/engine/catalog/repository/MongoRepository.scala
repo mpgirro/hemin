@@ -54,10 +54,11 @@ trait MongoRepository[T] {
     *
     * @return true if drop was successful
     */
-  def drop: Future[Boolean] = {
+  def deleteAll(): Future[Boolean] = {
     collection.flatMap { c =>
       log.info("Dropping database collection : {}", c.name)
-      c.drop(failIfNotFound = true) }
+      c.drop(failIfNotFound = true)
+    }
   }
 
   def countDocuments: Future[Int] = collection.flatMap(_.count(None))
