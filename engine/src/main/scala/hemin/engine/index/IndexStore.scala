@@ -46,21 +46,13 @@ class IndexStore (config: IndexConfig)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private val solrCommiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
-
-  /*
-  private var indexChanged = false
-  private val cache: mutable.Queue[IndexDoc] = new mutable.Queue
-  private val updateWebsiteQueue: mutable.Queue[(String,String)] = new mutable.Queue
-  private val updateImageQueue: mutable.Queue[(String,String)] = new mutable.Queue
-  private val updateLinkQueue: mutable.Queue[(String,String)] = new mutable.Queue
-  */
+  private val commiter: SolrCommitter = new SolrCommitter(config, new ExecutorServiceWrapper())
 
   private var supervisor: ActorRef = _
 
   if (config.createIndex) {
     log.info("Deleting all Index documents on startup")
-    solrCommiter.deleteAll()
+    commiter.deleteAll()
   }
 
   override def postRestart(cause: Throwable): Unit = {
@@ -75,9 +67,6 @@ class IndexStore (config: IndexConfig)
   }
 
   override def postStop: Unit = {
-    //Option(luceneCommitter).foreach(_.destroy())
-    //Option(luceneSearcher).foreach(_.destroy())
-
     log.info("{} subsystem shutting down", IndexStore.name.toUpperCase)
   }
 
@@ -90,23 +79,7 @@ class IndexStore (config: IndexConfig)
 
     case AddDocIndexEvent(doc) =>
       log.debug("Received IndexStoreAddDoc({})", doc.id)
-      //cache.enqueue(doc)
-      solrCommiter.save(doc)
-
-      /*
-    case UpdateDocWebsiteDataIndexEvent(id, html) =>
-      log.debug("Received IndexStoreUpdateDocWebsiteData({},_)", id)
-      updateWebsiteQueue.enqueue((id,html))
-
-    // TODO this fix is not done in the Directory and only correct data gets send to the index anyway...
-    case UpdateDocImageIndexEvent(id, image) =>
-      log.debug("Received IndexStoreUpdateDocImage({},{})", id, image)
-      updateImageQueue.enqueue((id, image))
-
-    case UpdateDocLinkIndexEvent(id, link) =>
-      log.debug("Received IndexStoreUpdateDocLink({},'{}')", id, link)
-      updateLinkQueue.enqueue((id, link))
-      */
+      commiter.save(doc)
 
   }
 

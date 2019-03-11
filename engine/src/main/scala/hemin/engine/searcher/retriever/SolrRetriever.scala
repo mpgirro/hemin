@@ -13,7 +13,6 @@ import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext
 import scala.util.{Failure, Success}
 
-
 class SolrRetriever (config: SearcherConfig,
                      ec: ExecutionContext)
   extends IndexRetriever {

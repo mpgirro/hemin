@@ -5,7 +5,9 @@ import hemin.engine.searcher.SearcherConfig
 
 import scala.concurrent.ExecutionContext
 
-
+/** This Retriever is currently unimplemented. For a future version,
+  * it is intended to fetch data from an ElasticSearch index.
+  */
 class ElasticRetriever (config: SearcherConfig,
                         ec: ExecutionContext)
   extends IndexRetriever {
