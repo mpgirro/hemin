@@ -67,8 +67,8 @@ class ExecutorServiceWrapper(implicit ec: ExecutionContext) extends ExecutorServ
   private[this] def executeWithPromise[T](callback: => T): Promise[TaskState[T]] = {
     val promise = Promise[TaskState[T]]()
 
-    ec.execute(() => {
-      if (!promise.isCompleted)
+    ec.execute(() =>
+      if (!promise.isCompleted) {
         try {
           val result = callback
           promise.tryComplete(Success(Finished(result)))
