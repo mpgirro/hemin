@@ -6,9 +6,9 @@ class UrlMapperSpec
   extends FlatSpec
     with Matchers {
 
-  private val mapper = UrlMapper
+  val mapper = UrlMapper
 
-  private val expectedResult = "ab cd"
+  val expectedResult = "ab cd"
 
   "The UrlMapper" should "remove the protocol" in {
     mapper.keywords("http://") shouldBe ""

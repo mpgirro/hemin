@@ -15,8 +15,6 @@ class EpisodeRepositorySpec
     with BeforeAndAfter
     with BeforeAndAfterAll {
 
-  private val log = Logger(getClass)
-
   val testId1 = "id1"
   val testId2 = "id2"
 
