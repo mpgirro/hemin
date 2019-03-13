@@ -9,7 +9,7 @@ final case class PodcastItunes(
   explicit: Option[Boolean]  = None,
   block: Option[Boolean]     = None,
   typ: Option[String]        = None,
-  owner: Person              = Person()
+  owner: Option[Person]      = None
 
 ) extends Patchable[PodcastItunes] {
 
@@ -24,7 +24,7 @@ final case class PodcastItunes(
       explicit   = reduceLeft(this.explicit, that.explicit),
       block      = reduceLeft(this.block, that.block),
       typ        = reduceLeft(this.typ, that.typ),
-      owner      = this.owner.patchLeft(that.owner),
+      owner      = reduceLeft(this.owner, that.owner)
     )
   }
 
@@ -39,7 +39,7 @@ final case class PodcastItunes(
       explicit   = reduceRight(this.explicit, that.explicit),
       block      = reduceRight(this.block, that.block),
       typ        = reduceRight(this.typ, that.typ),
-      owner      = this.owner.patchRight(that.owner),
+      owner      = reduceRight(this.owner, that.owner)
     )
   }
 }

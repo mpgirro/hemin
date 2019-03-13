@@ -162,10 +162,18 @@ class RomeFeedParser private (private val xmlData: String)
       )
     }.getOrElse(PodcastItunes())
 
-  private def podcastItunesOwner(itunes: FeedInformation): Person = Person(
-    name  = Option(itunes.getOwnerName),
-    email = Option(itunes.getOwnerEmailAddress),
-  )
+  private def podcastItunesOwner(itunes: FeedInformation): Option[Person] = {
+    val name = Option(itunes.getOwnerName)
+    val email = Option(itunes.getOwnerEmailAddress)
+    (name, email) match {
+      case (None, None) => None
+      case (_, _) => Some(Person(
+        name  = name,
+        email = email,
+        uri   = None,
+      ))
+    }
+  }
 
   private lazy val podcastFeedpress: PodcastFeedpress = PodcastFeedpress(locale = None)
 

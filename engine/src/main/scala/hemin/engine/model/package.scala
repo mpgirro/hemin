@@ -1,6 +1,4 @@
-package io.hemin.engine
-
-import hemin.engine.HeminEngine
+package hemin.engine
 
 /** This package provides the domain model classes
   * that the Hemin Engine uses in it's internal subsystems. The external
