@@ -56,7 +56,7 @@ trait MongoRepository[T] {
     */
   def deleteAll(): Future[Boolean] = {
     collection.flatMap { c =>
-      log.info("Dropping database collection : {}", c.name)
+      log.debug("Dropping database collection : {}", c.name)
       c.drop(failIfNotFound = true)
     }
   }

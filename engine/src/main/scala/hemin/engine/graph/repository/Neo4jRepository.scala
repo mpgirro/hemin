@@ -2,6 +2,7 @@ package hemin.engine.graph.repository
 
 import com.typesafe.scalalogging.Logger
 import hemin.engine.graph.GraphConfig
+import hemin.engine.graph.repository.GraphRepository._
 import hemin.engine.model.{Episode, Person, Podcast}
 import org.neo4j.driver.v1._
 
@@ -15,18 +16,13 @@ class Neo4jRepository(config: GraphConfig,
 
   override protected[this] implicit val executionContext: ExecutionContext = ec
 
-  private val podcastLabel: String = "Podcast"
-  private val episodeLabel: String = "Episode"
-  private val websiteLabel: String = "Website"
-  private val personLabel: String = "Person"
-
   private val driver: Driver = GraphDatabase.driver(config.neo4jUri, AuthTokens.basic(config.username, config.password))
   private val session: Session = driver.session
 
-  runScript(s"CREATE INDEX ON :$podcastLabel(id)")
-  runScript(s"CREATE INDEX ON :$episodeLabel(id)")
-  runScript(s"CREATE INDEX ON :$websiteLabel(url)")
-  runScript(s"CREATE INDEX ON :$personLabel(name, email, url)")
+  runScript(s"CREATE INDEX ON :$PODCAST_LABEL(id)")
+  runScript(s"CREATE INDEX ON :$EPISODE_LABEL(id)")
+  runScript(s"CREATE INDEX ON :$WEBSITE_LABEL(url)")
+  runScript(s"CREATE INDEX ON :$PERSON_LABEL(name, email, url)")
 
   private def runScript(script: String): StatementResult = {
     session.run(script)
@@ -50,9 +46,9 @@ class Neo4jRepository(config: GraphConfig,
     val title = podcast.title.getOrElse("")
     val properties = s"id: '$id', title: '$title'"
     val script =
-    s"""MERGE (p:$podcastLabel{ id: '$id' })
-       |ON CREATE SET n = { $properties }
-       |ON MATCH  SET n += { $properties }
+    s"""MERGE (podcast:$PODCAST_LABEL{ id: '$id' })
+       |ON CREATE SET podcast = { $properties }
+       |ON MATCH  SET podcast += { $properties }
        """.stripMargin
     runScript(script)
   }
@@ -62,9 +58,9 @@ class Neo4jRepository(config: GraphConfig,
     val title = episode.title.getOrElse("")
     val properties = s"id: '$id', title: '$title'"
     val script =
-      s"""MERGE (e:$episodeLabel{ id: '$id' })
-         |ON CREATE SET n = { $properties }
-         |ON MATCH  SET n += { $properties }
+      s"""MERGE (episode:$EPISODE_LABEL{ id: '$id' })
+         |ON CREATE SET episode = { $properties }
+         |ON MATCH  SET episode += { $properties }
        """.stripMargin
     runScript(script)
   }
@@ -72,9 +68,9 @@ class Neo4jRepository(config: GraphConfig,
   override def createWebsite(url: String): Future[Unit] = Future {
     val properties = s"url: '$url'"
     val script =
-      s"""MERGE (w:$websiteLabel{ url: '$url' })
-         |ON CREATE SET n = { $properties }
-         |ON MATCH  SET n += { $properties }
+      s"""MERGE (website:$WEBSITE_LABEL{ url: '$url' })
+         |ON CREATE SET website = { $properties }
+         |ON MATCH  SET website += { $properties }
        """.stripMargin
     runScript(script)
   }
@@ -85,36 +81,79 @@ class Neo4jRepository(config: GraphConfig,
     val uri = person.uri.getOrElse("")
     val properties = s"name: '$name', email: '$email', uri: '$uri'"
     val script =
-      s"""MERGE (p:$personLabel{ name: { $properties }.name, email: { $properties }.email, uri: { $properties }.uri })
-         |ON CREATE SET n = { $properties }
-         |ON MATCH  SET n += { $properties }
+      s"""MERGE (person:$PERSON_LABEL{ name: { $properties }.name, email: { $properties }.email, uri: { $properties }.uri })
+         |ON CREATE SET person = { $properties }
+         |ON MATCH  SET person += { $properties }
        """.stripMargin
     runScript(script)
   }
 
-  def linkPodcastEpisode(podcastId: String, episodeId: String): Future[Unit] = Future {
+  override def createPerson(name: String): Future[Unit] = Future {
+    val properties = s"name: '$name'"
     val script =
-      s"""MATCH (p:$podcastLabel),(e:$episodeLabel)
-         |WHERE p.id = '$podcastId' AND e.id = '$episodeId'
-         |CREATE (p)-[r:PUBLISHED]->(e)
+      s"""MERGE (person:$PERSON_LABEL{ name: { $properties }.name })
+         |ON CREATE SET person = { $properties }
+         |ON MATCH  SET person += { $properties }
        """.stripMargin
     runScript(script)
   }
 
-  def linkPodcastWebsite(podcastId: String, url: String): Future[Unit] = Future {
+  override def linkPodcastEpisode(podcastId: String, episodeId: String): Future[Unit] = Future {
     val script =
-      s"""MATCH (p:$podcastLabel),(w:$websiteLabel)
-         |WHERE p.id = '$podcastId' AND w.url = '$url'
-         |CREATE (p)-[r:REFERENCES]->(w)
+      s"""MATCH (podcast:$PODCAST_LABEL),(episode:$EPISODE_LABEL)
+         |WHERE podcast.id = '$podcastId' AND episode.id = '$episodeId'
+         |CREATE (podcast)-[r:$BELONGS_TO_RELATIONSHIP]->(episode)
        """.stripMargin
     runScript(script)
   }
 
-  def linkEpisodeWebsite(episodeId: String, url: String): Future[Unit] = Future {
+  override def linkPodcastWebsite(podcastId: String, url: String): Future[Unit] = Future {
     val script =
-      s"""MATCH (e:$episodeLabel),(w:$websiteLabel)
-         |WHERE e.id = '$episodeId' AND w.url = '$url'
-         |CREATE (e)-[r:REFERENCES]->(w)
+      s"""MATCH (podcast:$PODCAST_LABEL),(website:$WEBSITE_LABEL)
+         |WHERE podcast.id = '$podcastId' AND website.url = '$url'
+         |CREATE (podcast)-[r:$LINKS_TO_RELATIONSHIP]->(website)
+       """.stripMargin
+    runScript(script)
+  }
+
+  override def linkPodcastPerson(podcastId: String, person: Person, role: String): Future[Unit] = Future {
+    val name = person.name.getOrElse("")
+    val email = person.email.getOrElse("")
+    val uri = person.uri.getOrElse("")
+    val script =
+      s"""MATCH (podcast:$PODCAST_LABEL),(person:$PERSON_LABEL)
+         |WHERE podcast.id = '$podcastId' AND person.name = '$name' AND person.email = '$email' AND person.uri = '$uri'
+         |CREATE (podcast)-[r:$role]->(person)
+       """.stripMargin
+    runScript(script)
+  }
+
+  override def linkEpisodeWebsite(episodeId: String, url: String): Future[Unit] = Future {
+    val script =
+      s"""MATCH (episode:$EPISODE_LABEL),(website:$WEBSITE_LABEL)
+         |WHERE episode.id = '$episodeId' AND website.url = '$url'
+         |CREATE (episode)-[r:$LINKS_TO_RELATIONSHIP]->(website)
+       """.stripMargin
+    runScript(script)
+  }
+
+  override def linkEpisodePerson(episodeId: String, person: Person, role: String): Future[Unit] = Future {
+    val name = person.name.getOrElse("")
+    val email = person.email.getOrElse("")
+    val uri = person.uri.getOrElse("")
+    val script =
+      s"""MATCH (episode:$EPISODE_LABEL),(person:$PERSON_LABEL)
+         |WHERE episode.id = '$episodeId' AND person.name = '$name' AND person.email = '$email' AND person.uri = '$uri'
+         |CREATE (episode)-[r:$role]->(person)
+       """.stripMargin
+    runScript(script)
+  }
+
+  override def linkEpisodePerson(episodeId: String, personName: String, role: String): Future[Unit] = Future {
+    val script =
+      s"""MATCH (episode:$EPISODE_LABEL),(person:$PERSON_LABEL)
+         |WHERE episode.id = '$episodeId' AND person.name = '$personName'
+         |CREATE (episode)-[r:$role]->(person)
        """.stripMargin
     runScript(script)
   }

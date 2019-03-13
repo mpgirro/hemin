@@ -348,8 +348,6 @@ class CatalogStore(config: CatalogConfig)
 
         // Send semantic data to graph database
         graphStore ! GeneratePodcastNode(p)
-        graphStore ! GenerateWebsiteNode(p.link)
-        graphStore ! GeneratePodcastWebsiteRelationship(p.id, p.link)
       })
   }
 
@@ -882,8 +880,6 @@ class CatalogStore(config: CatalogConfig)
                       log.info("episode registered : '{}' [p:{},e:{}]", e.title.get, podcastId, e.id.get)
 
                       graphStore ! GenerateEpisodetNode(e)
-                      graphStore ! GenerateWebsiteNode(e.link)
-                      graphStore ! GenerateEpisodeWebsiteRelationship(e.id, e.link)
                       graphStore ! GeneratePodcastEpisodeRelationship(e.podcastId, e.id)
 
                       IndexMapper.toIndexDoc(e) match {
