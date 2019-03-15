@@ -51,10 +51,10 @@ class RomeFeedParserSpec
       explicit = Some(false),
       block = Some(false),
       typ = Some("episodic"),
-      owner = Person(
+      owner = Some(Person(
         name = Some("Lorem Ipsum"),
         email = Some("test@example.org"),
-      ),
+      )),
     ),
     atom = Atom(
       links = List(
