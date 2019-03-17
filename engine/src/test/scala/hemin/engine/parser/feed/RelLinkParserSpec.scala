@@ -6,7 +6,7 @@ import java.util.stream.Collectors
 import hemin.engine.model.AtomLink
 import org.scalatest.{FlatSpec, Matchers}
 
-class LinkParserSpec
+class RelLinkParserSpec
   extends FlatSpec
     with Matchers {
 
@@ -25,15 +25,27 @@ class LinkParserSpec
 
   val links: List[AtomLink] = List(
     AtomLink(
-      rel  = Some(""),
+      rel  = None,
+      href = None,
+    ),
+    AtomLink(
+      rel  = None,
+      href = Some("http://example.org"),
+    ),
+    AtomLink(
+      rel  = Some("self"),
       href = Some(""),
     ),
     AtomLink(
-      rel  = Some(""),
-      href = Some(""),
+      rel  = Some("alternate"),
+      href = Some("http://example.org/feed/m4a"),
     ),
     AtomLink(
-      rel  = Some(""),
+      rel  = Some("alternate"),
+      href = Some("http://example.org/feed/mp3"),
+    ),
+    AtomLink(
+      rel  = Some("enclosure"),
       href = Some(""),
     ),
     AtomLink(
@@ -62,7 +74,7 @@ class LinkParserSpec
     ),
   )
 
-  val parser: LinkParser = new LinkParser(links)
+  val parser: RelLinkParser = new RelLinkParser(links)
 
   "The LinkParser" should "find alternative links" in {
     parser.alternate.size shouldBe 3
