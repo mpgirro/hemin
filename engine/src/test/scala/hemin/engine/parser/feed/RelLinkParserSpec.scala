@@ -10,20 +10,8 @@ class RelLinkParserSpec
   extends FlatSpec
     with Matchers {
 
-  /*
-  val links: List[AtomLink] = {
-    val atomXml: String = Files
-      .lines(Paths.get("src", "test", "resources", "atom.xml"))
-      .collect(Collectors.joining("\n"))
-
-    val feedParser: FeedParser = RomeFeedParser.parse(atomXml).get
-    val xs = feedParser.podcast.atom.links
-    val ys = feedParser.episodes.head.atom.links
-    xs ++ ys
-  }
-  */
-
   val links: List[AtomLink] = List(
+    // invalid entries that should not be recognized
     AtomLink(
       rel  = None,
       href = None,
@@ -33,9 +21,10 @@ class RelLinkParserSpec
       href = Some("http://example.org"),
     ),
     AtomLink(
-      rel  = Some("self"),
-      href = Some(""),
+      rel  = Some("alternate"),
+      href = None,
     ),
+    // Atom Syndication Format (RFC 4287)
     AtomLink(
       rel  = Some("alternate"),
       href = Some("http://example.org/feed/m4a"),
@@ -45,20 +34,55 @@ class RelLinkParserSpec
       href = Some("http://example.org/feed/mp3"),
     ),
     AtomLink(
+      rel  = Some("related"),
+      href = Some("http://example.org"),
+    ),
+    AtomLink(
       rel  = Some("enclosure"),
-      href = Some(""),
+      href = Some("http://example.org/episode1.m4a"),
     ),
     AtomLink(
-      rel  = Some(""),
-      href = Some(""),
+      rel  = Some("self"),
+      href = Some("http://example.org/feed/m4a?paged=3"),
     ),
     AtomLink(
-      rel  = Some(""),
-      href = Some(""),
+      rel  = Some("via"),
+      href = Some("http://example.org"),
+    ),
+    // Paged Feeds (RFC 5005)
+    AtomLink(
+      rel  = Some("first"),
+      href = Some("http://example.org/feed/m4a"),
     ),
     AtomLink(
-      rel  = Some(""),
-      href = Some(""),
+      rel  = Some("last"),
+      href = Some("http://example.org/feed/m4a?paged=8"),
+    ),
+    AtomLink(
+      rel  = Some("next"),
+      href = Some("http://example.org/feed/m4a?paged=4"),
+    ),
+    AtomLink(
+      rel  = Some("previous"),
+      href = Some("http://example.org/feed/m4a?paged=2"),
+    ),
+    // Archived Feeds (RFC 5005)
+    AtomLink(
+      rel  = Some("prev-archive"),
+      href = Some(""), // TODO what is a reasonable value here?
+    ),
+    AtomLink(
+      rel  = Some("next-archive"),
+      href = Some(""), // TODO what is a reasonable value here?
+    ),
+    AtomLink(
+      rel  = Some("current"),
+      href = Some(""), // TODO what is a reasonable value here?
+    ),
+    // Podlove Deep Link
+    AtomLink(
+      rel  = Some("http://podlove.org/deep-link"),
+      href = Some("http://example.org/episode1"),
     ),
     AtomLink(
       rel  = Some(""),
@@ -76,13 +100,77 @@ class RelLinkParserSpec
 
   val parser: RelLinkParser = new RelLinkParser(links)
 
-  "The LinkParser" should "find alternative links" in {
-    parser.alternate.size shouldBe 3
+  "The LinkParser" should "not find links when no relation is set" in {
+    val p: RelLinkParser = new RelLinkParser(List(AtomLink(
+      rel  = None,
+      href = Some("http://example.org/feed/mp3")
+    )))
+    p.self.size shouldBe 0
+    p.self shouldBe None
   }
 
-  it should "find enclosure links" in {
+  it should "not find links when no relation is set" in {
+    val p: RelLinkParser = new RelLinkParser(List(AtomLink(
+      rel  = Some("self"),
+      href = None
+    )))
+    p.self.size shouldBe 0
+    p.self shouldBe None
+  }
+
+  it should "find 'alternative' links" in {
+    parser.alternate.size shouldBe 2
+    parser.alternate shouldBe Set("http://example.org/feed/m4a","http://example.org/feed/mp3")
+  }
+
+  it should "find 'related' links" in {
+    parser.related.size shouldBe 1
+    parser.related shouldBe Set("http://example.org")
+  }
+
+  it should "find 'enclosure' links" in {
     parser.enclosure.size shouldBe 1
-    parser.enclosure.head shouldBe "http://example.org/episode1"
+    parser.enclosure shouldBe Set("http://example.org/episode1")
+  }
+
+  it should "find a 'self' link" in {
+    parser.self shouldBe Some("http://example.org/feed/m4a?paged=3")
+  }
+
+  it should "find a 'via' links" in {
+    parser.via shouldBe Set("http://example.org")
+  }
+
+  it should "find a 'first' paged feed link" in {
+    parser.pagedFeedFirst shouldBe Some("http://example.org/feed/m4a")
+  }
+
+  it should "find a 'last' paged feed link" in {
+    parser.pagedFeedLast shouldBe Some("http://example.org/feed/m4a?paged=8")
+  }
+
+  it should "find a 'next' paged feed link" in {
+    parser.pagedFeedNext shouldBe Some("http://example.org/feed/m4a?paged=4")
+  }
+
+  it should "find a 'previous' paged feed link" in {
+    parser.pagedFeedPrevious shouldBe Some("http://example.org/feed/m4a?paged=2")
+  }
+
+  it should "find a 'prev-archive' paged feed link" in {
+    parser.archivedFeedNext shouldBe None // TODO this needs a value!
+  }
+
+  it should "find a 'next-archive' paged feed link" in {
+    parser.archivedFeedPrev shouldBe None // TODO this needs a value!
+  }
+
+  it should "find a 'current' paged feed link" in {
+    parser.archivedFeedCurrent shouldBe None // TODO this needs a value!
+  }
+
+  it should "find a Podlove deep-link" in {
+    parser.deepLink shouldBe Some("http://example.org/episode1")
   }
 
 }
