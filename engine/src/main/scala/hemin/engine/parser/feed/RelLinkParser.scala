@@ -44,9 +44,11 @@ class RelLinkParser(links: List[AtomLink]) {
 
   private val pairs: List[(String, String)] = links
     .map(l => (l.rel, l.href))
-    .map {
-      case (Some(rel), Some(href)) => (rel,href)
+    .filter {
+      case (Some(_),Some(_)) => true
+      case (_,_)             => false
     }
+    .map(t => (t._1.get,t._2.get))
 
   val alternate: Set[String] = matchMore(ALTERNATE)
 
