@@ -11,6 +11,7 @@ import scala.concurrent.duration._
 import scala.io.Source
 import scala.util.{Failure, Success, Try}
 
+@deprecated("use hemin.engine.crawler.fetch.impl.Fetcher implementations instead")
 class HttpClient (timeout: Long,
                   private val downloadMaxBytes: Long) {
 

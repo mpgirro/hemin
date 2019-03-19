@@ -3,8 +3,6 @@ package hemin.engine.model
 import com.rometools.rome.feed.atom.Link
 import com.rometools.rome.feed.synd.SyndLink
 
-
-
 object AtomLink {
 
   /** Instantiates an [[hemin.engine.model.AtomLink]] from a ROME Link object */

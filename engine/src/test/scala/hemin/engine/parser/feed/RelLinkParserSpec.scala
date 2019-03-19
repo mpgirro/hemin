@@ -109,7 +109,7 @@ class RelLinkParserSpec
     p.self shouldBe None
   }
 
-  it should "not find links when no relation is set" in {
+  it should "not find links when no href is set" in {
     val p: RelLinkParser = new RelLinkParser(List(AtomLink(
       rel  = Some("self"),
       href = None

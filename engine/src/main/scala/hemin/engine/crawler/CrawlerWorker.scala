@@ -6,6 +6,8 @@ import com.typesafe.scalalogging.Logger
 import hemin.engine.catalog.CatalogStore._
 import hemin.engine.crawler.Crawler._
 import hemin.engine.crawler.api._
+import hemin.engine.crawler.fetch.Fetcher
+import hemin.engine.crawler.fetch.result.FetchResult
 import hemin.engine.crawler.http.HttpClient
 import hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import hemin.engine.model.FeedStatus
@@ -43,7 +45,8 @@ class CrawlerWorker (config: CrawlerConfig)
   private var parser: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private val httpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
+  //private val httpClient = new HttpClient(config.downloadTimeout, config.downloadMaxBytes)
+  private val fetcher: Fetcher = new Fetcher(config.downloadTimeout, config.downloadMaxBytes)
 
   // TODO implement the API's and allow them to be trigger by the CLI with respective messages
   private val fyyd = new FyydAPI()
@@ -55,7 +58,8 @@ class CrawlerWorker (config: CrawlerConfig)
   override def postStop: Unit = {
     log.debug("shutting down")
 
-    httpClient.close()
+    //httpClient.close()
+    fetcher.close()
   }
 
   override def postRestart(cause: Throwable): Unit = {
@@ -159,7 +163,8 @@ class CrawlerWorker (config: CrawlerConfig)
 
   private def headCheck(id: String, url: String, job: FetchJob): Unit = {
     blocking {
-      httpClient.headCheck(url, job.mimeCheck) match {
+      //httpClient.headCheck(url, job.mimeCheck) match {
+      fetcher.check(url, job.mimeCheck) match {
         case Success(headResult) =>
           val encoding = headResult.contentEncoding
 
@@ -226,24 +231,26 @@ class CrawlerWorker (config: CrawlerConfig)
     */
   private def fetchContent(id: String, url: String, job: FetchJob, encoding: Option[String]): Unit = {
     blocking {
-      httpClient.fetchContent(url, encoding, job.mimeCheck) match {
-        case Success((data, mime, enc)) =>
+      //httpClient.fetchContent(url, encoding, job.mimeCheck) match {
+      fetcher.fetch(url, encoding, job.mimeCheck) match {
+        //case Success((data, mime, enc)) =>
+        case Success(result) =>
           job match {
             case NewPodcastFetchJob() =>
-              parser ! ParseNewPodcastData(url, id, asString(data, enc))
+              parser ! ParseNewPodcastData(url, id, asString(result))
               val catalogEvent = FeedStatusUpdate(id, url, TimeUtil.now, FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
             case UpdateEpisodesFetchJob(etag, lastMod) =>
-              parser ! ParseUpdateEpisodeData(url, id, asString(data, enc))
+              parser ! ParseUpdateEpisodeData(url, id, asString(result))
               val catalogEvent = FeedStatusUpdate(id, url, TimeUtil.now, FeedStatus.DownloadSuccess)
               //emitCatalogEvent(catalogEvent)
               catalog ! catalogEvent
 
-            case WebsiteFetchJob() => parser ! ParseWebsiteData(id, asString(data, enc))
+            case WebsiteFetchJob() => parser ! ParseWebsiteData(id, asString(result))
 
-            case ImageFetchJob() => parser ! ParseImage(url, mime, enc, data)
+            case ImageFetchJob() => parser ! ParseImage(url, result.mime, result.encoding, result.data)
 
           }
         case Failure(ex) =>
@@ -255,6 +262,6 @@ class CrawlerWorker (config: CrawlerConfig)
     }
   }
 
-  private def asString(data: Array[Byte], encoding: String): String = new String(data, encoding)
+  private def asString(result: FetchResult): String = new String(result.data, result.encoding)
 
 }

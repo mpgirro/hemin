@@ -156,8 +156,7 @@ class RomeFeedParserSpec
       p.itunes.explicit shouldBe expectedPodcast.itunes.explicit
       p.itunes.block shouldBe expectedPodcast.itunes.block
       p.itunes.typ shouldBe expectedPodcast.itunes.typ
-      p.itunes.owner.name shouldBe expectedPodcast.itunes.owner.name
-      p.itunes.owner.email shouldBe expectedPodcast.itunes.owner.email
+      p.itunes.owner shouldBe expectedPodcast.itunes.owner
       p.atom.links.size shouldBe expectedPodcast.atom.links.size
       p.persona.authors.size shouldBe expectedPodcast.persona.authors.size
       p.persona.contributors.size shouldBe expectedPodcast.persona.contributors.size

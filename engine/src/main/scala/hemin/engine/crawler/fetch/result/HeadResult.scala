@@ -1,7 +1,6 @@
-package hemin.engine.crawler.http
+package hemin.engine.crawler.fetch.result
 
-@deprecated("replaced by hemin.engine.crawler.fetch.result classes")
-final case class HttpHeadResult(
+final case class HeadResult(
   statusCode: Int,
   location: Option[String],
   mimeType: Option[String],

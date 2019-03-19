@@ -11,7 +11,7 @@ import scala.collection.JavaConverters._
 final case class CrawlerConfig (
   workerCount: Int,
   fetchWebsites: Boolean,
-  downloadTimeout: Int,
+  downloadTimeout: Long,
   downloadMaxBytes: Long
 ) extends ConfigStandardValues {
   override val namespace: String = CrawlerConfig.namespace
