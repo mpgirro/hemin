@@ -4,7 +4,7 @@ import akka.actor.SupervisorStrategy.Escalate
 import akka.actor.{Actor, ActorRef, OneForOneStrategy, PoisonPill, Props, SupervisorStrategy, Terminated}
 import akka.routing.{ActorRefRoutee, RoundRobinRoutingLogic, Router}
 import com.typesafe.scalalogging.Logger
-import hemin.engine.crawler.http.HttpClient
+import hemin.engine.crawler.fetch.Fetcher
 import hemin.engine.node.Node._
 
 import scala.concurrent.ExecutionContext
@@ -23,16 +23,16 @@ object Crawler {
     def mimeCheck(mime: String): Boolean = validate(mime.toLowerCase)
   }
   final case class NewPodcastFetchJob() extends FetchJob {
-    override def validate(mime: String): Boolean = HttpClient.isFeedMime(mime)
+    override def validate(mime: String): Boolean = Fetcher.isFeedMime(mime)
   }
   final case class UpdateEpisodesFetchJob(etag: String, lastMod: String) extends FetchJob {
-    override def validate(mime: String): Boolean = HttpClient.isFeedMime(mime)
+    override def validate(mime: String): Boolean = Fetcher.isFeedMime(mime)
   }
   final case class WebsiteFetchJob() extends FetchJob {
-    override def validate(mime: String): Boolean = HttpClient.isHtmlMime(mime)
+    override def validate(mime: String): Boolean = Fetcher.isHtmlMime(mime)
   }
   final case class ImageFetchJob() extends FetchJob {
-    override def validate(mime: String): Boolean = HttpClient.isImageMime(mime)
+    override def validate(mime: String): Boolean = Fetcher.isImageMime(mime)
   }
 
   final case class DownloadWithHeadCheck(id: String, url: String, job: FetchJob) extends CrawlerMessage

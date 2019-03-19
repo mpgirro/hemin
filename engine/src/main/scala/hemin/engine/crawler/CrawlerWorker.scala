@@ -8,7 +8,6 @@ import hemin.engine.crawler.Crawler._
 import hemin.engine.crawler.api._
 import hemin.engine.crawler.fetch.Fetcher
 import hemin.engine.crawler.fetch.result.FetchResult
-import hemin.engine.crawler.http.HttpClient
 import hemin.engine.index.IndexStore.UpdateDocLinkIndexEvent
 import hemin.engine.model.FeedStatus
 import hemin.engine.node.Node._
