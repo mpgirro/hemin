@@ -2,13 +2,13 @@ version: '2'
 services:
   mongo:
     extends:
-      file: mongo.yml
+      file: docker/mongo.yml
       service: mongo
   solr:
     extends:
-      file: solr.yml
+      file: docker/solr.yml
       service: solr
   neo4j:
     extends:
-      file: neo4j.yml
+      file: docker/neo4j.yml
       service: neo4j
