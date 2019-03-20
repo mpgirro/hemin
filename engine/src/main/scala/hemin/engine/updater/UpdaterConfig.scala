@@ -35,7 +35,7 @@ object UpdaterConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[UpdaterPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[UpdaterMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

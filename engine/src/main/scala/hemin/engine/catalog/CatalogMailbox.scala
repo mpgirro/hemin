@@ -7,7 +7,7 @@ import hemin.engine.node.Node.{ActorRefCrawlerActor, DebugPrintAllEpisodes, Debu
 import hemin.engine.catalog.CatalogStore._
 
 /** Priority mailbox for [[hemin.engine.catalog.CatalogStore]] */
-class CatalogPriorityMailbox(settings: ActorSystem.Settings, config: Config)
+class CatalogMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {

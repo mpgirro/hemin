@@ -50,7 +50,7 @@ object GraphConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[GraphPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[GraphMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

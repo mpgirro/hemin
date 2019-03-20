@@ -48,7 +48,7 @@ object SearcherConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[SearcherPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[SearcherMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

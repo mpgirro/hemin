@@ -61,7 +61,7 @@ object IndexConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[IndexPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[IndexMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

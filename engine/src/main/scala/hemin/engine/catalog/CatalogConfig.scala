@@ -57,7 +57,7 @@ object CatalogConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[CatalogPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[CatalogMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

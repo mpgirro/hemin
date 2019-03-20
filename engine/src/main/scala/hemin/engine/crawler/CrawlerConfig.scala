@@ -51,7 +51,7 @@ object CrawlerConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[CrawlerPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[CrawlerMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

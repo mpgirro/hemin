@@ -7,7 +7,7 @@ import hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefCrawlerActor}
 import hemin.engine.parser.Parser.{ParseNewPodcastData, ParseUpdateEpisodeData, ParseWebsiteData}
 
 /** Priority mailbox for [[hemin.engine.parser.Parser]] */
-class ParserPriorityMailbox(settings: ActorSystem.Settings, config: Config)
+class ParserMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {

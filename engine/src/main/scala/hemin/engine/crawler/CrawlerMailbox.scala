@@ -7,7 +7,7 @@ import hemin.engine.node.Node.{ActorRefCatalogStoreActor, ActorRefParserActor, C
 import hemin.engine.crawler.Crawler.{DownloadContent, DownloadWithHeadCheck}
 
 /** Priority mailbox for [[hemin.engine.crawler.Crawler]] */
-class CrawlerPriorityMailbox(settings: ActorSystem.Settings, config: Config)
+class CrawlerMailbox(settings: ActorSystem.Settings, config: Config)
   extends UnboundedPriorityMailbox(
     // Create a new PriorityGenerator, lower prio means more important
     PriorityGenerator {

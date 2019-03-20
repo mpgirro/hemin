@@ -42,7 +42,7 @@ object ParserConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[ParserPriorityMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[ParserMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))
