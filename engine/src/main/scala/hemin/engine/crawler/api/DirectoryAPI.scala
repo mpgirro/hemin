@@ -11,7 +11,7 @@ import hemin.engine.util.mapper.UrlMapper
 import scala.collection.JavaConverters._
 import scala.util.{Failure, Success, Try}
 
-trait ExternalDirectoryAPI {
+trait DirectoryAPI {
 
   def baseUrl: String
 

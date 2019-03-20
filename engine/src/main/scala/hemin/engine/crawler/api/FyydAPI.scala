@@ -1,6 +1,6 @@
 package hemin.engine.crawler.api
 
-class FyydAPI extends ExternalDirectoryAPI {
+class FyydAPI extends DirectoryAPI {
 
   override def baseUrl: String = throw new UnsupportedOperationException("FyydAPI.baseUrl not yet implemented")
 

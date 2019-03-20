@@ -1,6 +1,6 @@
 package hemin.engine.crawler.api
 
-class GpodderAPI extends ExternalDirectoryAPI {
+class GpodderAPI extends DirectoryAPI {
 
   override def baseUrl: String = throw new UnsupportedOperationException("GpodderAPI.baseUrl not yet implemented")
 

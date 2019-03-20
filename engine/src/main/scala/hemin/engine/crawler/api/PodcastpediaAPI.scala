@@ -1,6 +1,6 @@
 package hemin.engine.crawler.api
 
-class PodcastpediaAPI extends ExternalDirectoryAPI {
+class PodcastpediaAPI extends DirectoryAPI {
 
   override def baseUrl: String = throw new UnsupportedOperationException("PodcastpediaAPI.baseUrl not yet implemented")
 

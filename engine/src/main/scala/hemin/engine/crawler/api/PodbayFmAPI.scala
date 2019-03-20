@@ -1,6 +1,6 @@
 package hemin.engine.crawler.api
 
-class PodbayFmAPI extends ExternalDirectoryAPI {
+class PodbayFmAPI extends DirectoryAPI {
 
   override def baseUrl: String = throw new UnsupportedOperationException("PodbayFmAPI.baseUrl not yet implemented")
 

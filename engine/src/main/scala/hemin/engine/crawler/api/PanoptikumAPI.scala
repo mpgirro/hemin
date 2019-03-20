@@ -1,6 +1,6 @@
 package hemin.engine.crawler.api
 
-class PanoptikumAPI extends ExternalDirectoryAPI {
+class PanoptikumAPI extends DirectoryAPI {
 
   override def baseUrl: String = throw new UnsupportedOperationException("PanoptikumAPI.baseUrl not yet implemented")
 
