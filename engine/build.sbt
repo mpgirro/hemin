@@ -40,7 +40,7 @@ resolvers ++= Seq(
 
 //val scalaVersion = "2.12.6" // TODO extract stuff from above
 val akkaVersion = "2.5.17"
-val luceneVersion = "7.5.0"
+val solrVersion = "7.5.0"
 val romeVersion = "1.12.0"
 val sttpVersion = "1.4.2"
 val scrimageVersion = "2.1.8"
@@ -58,10 +58,7 @@ libraryDependencies ++= Seq(
     "com.typesafe.akka"          %% "akka-testkit"            % akkaVersion % Test,
     "ch.qos.logback"             %  "logback-classic"         % "1.2.3",         // https://github.com/qos-ch/logback
     "org.reactivemongo"          %% "reactivemongo"           % "0.16.0",        // https://github.com/ReactiveMongo/ReactiveMongo
-    "org.apache.lucene"          %  "lucene-core"             % luceneVersion,   // https://github.com/apache/lucene-solr
-    "org.apache.lucene"          %  "lucene-queryparser"      % luceneVersion,
-    "org.apache.lucene"          %  "lucene-analyzers-common" % luceneVersion,   // TODO do I still need Lucene packages?
-    "org.apache.solr"            %  "solr-solrj"              % luceneVersion,
+    "org.apache.solr"            %  "solr-solrj"              % solrVersion,     // https://github.com/apache/lucene-solr
     "org.jsoup"                  %  "jsoup"                   % "1.11.3",        // https://github.com/jhy/jsoup
     "com.google.code.gson"       %  "gson"                    % "2.8.5",         // https://github.com/google/gson
     "com.google.guava"           %  "guava"                   % "27.0-jre",      // https://github.com/google/guava
