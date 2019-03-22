@@ -10,7 +10,6 @@ import scala.concurrent.duration._
 
 /** Configuration for [[hemin.engine.index.IndexStore]] */
 final case class IndexConfig (
-  luceneIndexPath: String,
   solrUri: String,
   solrQueueSize: Int,
   solrThreadCount: Int,
@@ -29,7 +28,6 @@ object IndexConfig
 
   override def fromConfig(config: Config): IndexConfig =
     IndexConfig(
-      luceneIndexPath = config.getString(s"$namespace.lucene-index-path"), // TODO add to config file
       solrUri         = config.getString(s"$namespace.solr-uri"),
       solrQueueSize   = config.getInt(s"$namespace.solr-queue-size"),
       solrThreadCount = config.getInt(s"$namespace.solr-thread-count"),
@@ -39,7 +37,6 @@ object IndexConfig
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
-    s"$namespace.lucene-index-path" -> "./data/index",
     s"$namespace.solr-uri"          -> s"http://localhost:8983/solr/${HeminEngine.name}",
     s"$namespace.solr-queue-size"   -> 20,
     s"$namespace.solr-thread-count" -> 4,

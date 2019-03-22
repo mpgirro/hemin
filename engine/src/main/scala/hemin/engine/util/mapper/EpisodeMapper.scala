@@ -27,26 +27,6 @@ object EpisodeMapper {
     .map(Success(_))
     .getOrElse(mapperFailureIndexToEpisode(src))
 
-  def toEpisode(src: org.apache.lucene.document.Document): Try[Episode] = Option(src)
-    .map { s =>
-      Episode(
-        id           = LuceneMapper.get(s, IndexField.Id.entryName),
-        title        = LuceneMapper.get(s, IndexField.Title.entryName),
-        podcastTitle = LuceneMapper.get(s, IndexField.PodcastTitle.entryName),
-        link         = LuceneMapper.get(s, IndexField.Link.entryName),
-        pubDate      = DateMapper.asMilliseconds(s.get(IndexField.PubDate.entryName)),
-        description  = LuceneMapper.get(s, IndexField.Description.entryName),
-        image        = LuceneMapper.get(s, IndexField.ItunesImage.entryName),
-        itunes = EpisodeItunes(
-          author   = LuceneMapper.get(s, IndexField.ItunesAuthor.entryName),
-          summary  = LuceneMapper.get(s, IndexField.ItunesSummary.entryName),
-          duration = LuceneMapper.get(s, IndexField.ItunesDuration.entryName),
-        )
-      )
-    }
-    .map(Success(_))
-    .getOrElse(mapperFailureLuceneToEpisode(src))
-
   def toEpisode(src: SolrDocument): Try[Episode] = Option(src)
     .map { s =>
       Episode(

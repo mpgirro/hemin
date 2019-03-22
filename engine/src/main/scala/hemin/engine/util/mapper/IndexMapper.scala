@@ -53,29 +53,6 @@ object IndexMapper {
     .map(Success(_))
     .getOrElse(mapperFailureEpisodeToIndexDoc(src))
 
-  def toIndexDoc(doc: org.apache.lucene.document.Document): Try[IndexDoc] = Option(doc)
-    .map { d =>
-      val docType = d.get(IndexField.DocType.entryName)
-      if (isNullOrEmpty(docType)) {
-        mapperFailureUnsupportedIndexDocumentType("NULL")
-      } else {
-        docType match {
-          case "podcast" =>
-            PodcastMapper.toPodcast(doc) match {
-              case Success(p)  => toIndexDoc(p)
-              case Failure(ex) => mapperFailurePodcastToIndexDoc(ex)
-            }
-          case "episode" =>
-            EpisodeMapper.toEpisode(doc) match {
-              case Success(e)  => toIndexDoc(e)
-              case Failure(ex) => mapperFailureEpisodeToIndexDoc(ex)
-            }
-          case _ => mapperFailureUnsupportedIndexDocumentType(docType)
-        }
-      }
-    }
-    .getOrElse(mapperFailureLuceneToIndexDoc(doc))
-
   def toIndexDoc(src: SolrDocument): Try[IndexDoc] = Option(src)
     .map { s =>
       val docType = SolrMapper.firstStringMatch(s, IndexField.DocType.entryName)

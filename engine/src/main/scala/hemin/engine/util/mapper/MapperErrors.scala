@@ -13,23 +13,11 @@ object MapperErrors {
   private[mapper] def mapperErrorIndexToPodcast(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Podcast : $value")
 
-  /** Returns the result of [[MapperErrors.mapperErrorLuceneToPodcast]] as a Failure */
-  private[mapper] def mapperFailureLuceneToPodcast(value: org.apache.lucene.document.Document): Try[Podcast] =
-    Failure(mapperErrorLuceneToPodcast(value))
-  private[mapper] def mapperErrorLuceneToPodcast(value: org.apache.lucene.document.Document): HeminException =
-    new HeminException(s"Error mapping Lucene Document to Podcast : $value")
-
   /** Returns the result of [[MapperErrors.mapperErrorSolrToPodcast]] as a Failure */
   private[mapper] def mapperFailureSolrToPodcast(value: org.apache.solr.common.SolrDocument): Try[Podcast] =
     Failure(mapperErrorSolrToPodcast(value))
   private[mapper] def mapperErrorSolrToPodcast(value: org.apache.solr.common.SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr Document to Podcast : $value")
-
-  /** Returns the result of [[MapperErrors.mapperErrorLuceneToIndexDoc]] as a Failure */
-  private[mapper] def mapperFailureLuceneToIndexDoc(value: org.apache.lucene.document.Document): Try[IndexDoc] =
-    Failure(mapperErrorLuceneToIndexDoc(value))
-  private[mapper] def mapperErrorLuceneToIndexDoc(value: org.apache.lucene.document.Document): HeminException =
-    new HeminException(s"Error mapping Lucene Document to IndexDoc : $value")
 
   /** Returns the result of [[MapperErrors.mapperErrorSolrToIndexDoc]] as a Failure */
   private[mapper] def mapperFailureSolrToIndexDoc(value: org.apache.solr.common.SolrDocument): Try[IndexDoc] =
@@ -65,23 +53,11 @@ object MapperErrors {
   private[mapper] def mapperErrorIndexToEpisode(value: IndexDoc): HeminException =
     new HeminException(s"Error mapping IndexDoc to Episode : $value")
 
-  /** Returns the result of [[MapperErrors.mapperErrorLuceneToEpisode]] as a Failure */
-  private[mapper] def mapperFailureLuceneToEpisode(value: org.apache.lucene.document.Document): Try[Episode] =
-    Failure(mapperErrorLuceneToEpisode(value))
-  private[mapper] def mapperErrorLuceneToEpisode(value: org.apache.lucene.document.Document): HeminException =
-    new HeminException(s"Error mapping Lucene Document to Episode : $value")
-
   /** Returns the result of [[MapperErrors.mapperErrorSolrToEpisode]] as a Failure */
   private[mapper] def mapperFailureSolrToEpisode(value: org.apache.solr.common.SolrDocument): Try[Episode] =
     Failure(mapperErrorSolrToEpisode(value))
   private[mapper] def mapperErrorSolrToEpisode(value: org.apache.solr.common.SolrDocument): HeminException =
     new HeminException(s"Error mapping Solr Document to Episode : $value")
-
-  /** Returns the result of [[MapperErrors.mapperErrorIndexToLucene]] as a Failure */
-  private[mapper] def mapperFailureIndexToLucene(value: IndexDoc): Try[org.apache.lucene.document.Document] =
-    Failure(mapperErrorIndexToLucene(value))
-  private[mapper] def mapperErrorIndexToLucene(value: IndexDoc): HeminException =
-    new HeminException(s"Error mapping IndexDoc to Lucene Document : $value")
 
   /** Returns the result of [[MapperErrors.mapperErrorIndexToSolr]] as a Failure */
   private[mapper] def mapperFailureIndexToSolr(value: IndexDoc): Try[org.apache.solr.common.SolrInputDocument] =

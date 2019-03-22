@@ -26,21 +26,6 @@ object PodcastMapper {
     .map(Success(_))
     .getOrElse(mapperFailureIndexToPodcast(doc))
 
-  def toPodcast(doc: org.apache.lucene.document.Document): Try[Podcast] = Option(doc)
-    .map { d =>
-      Podcast(
-        id          = LuceneMapper.get(d, IndexField.Id.entryName),
-        title       = LuceneMapper.get(d, IndexField.Title.entryName),
-        link        = LuceneMapper.get(d, IndexField.Link.entryName),
-        pubDate     = DateMapper.asMilliseconds(d.get(IndexField.PubDate.entryName)),
-        description = LuceneMapper.get(d, IndexField.Description.entryName),
-        image       = LuceneMapper.get(d, IndexField.ItunesImage.entryName),
-      )
-    }
-    .map(Success(_))
-    .getOrElse(mapperFailureLuceneToPodcast(doc))
-
-
   def toPodcast(doc: SolrDocument): Try[Podcast] = Option(doc)
     .map { d =>
       Podcast(
