@@ -82,7 +82,7 @@ class RelLinkParser(links: List[AtomLink]) {
 
   val archivedFeedNext: Option[String] = matchOne(NEXT_ARCHIVE)
 
-  val archivedFeedCurrent: Option[String] = matchOne(DEEP_LINK)
+  val archivedFeedCurrent: Option[String] = matchOne(CURRENT)
 
   val deepLink: Option[String] = matchOne(DEEP_LINK)
 

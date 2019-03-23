@@ -1,8 +1,5 @@
 package hemin.engine.parser.feed
 
-import java.nio.file.{Files, Paths}
-import java.util.stream.Collectors
-
 import hemin.engine.model.AtomLink
 import org.scalatest.{FlatSpec, Matchers}
 
@@ -69,15 +66,15 @@ class RelLinkParserSpec
     // Archived Feeds (RFC 5005)
     AtomLink(
       rel  = Some("prev-archive"),
-      href = Some(""), // TODO what is a reasonable value here?
+      href = Some("http://example.org/feed/m4a?archive=1"),
     ),
     AtomLink(
       rel  = Some("next-archive"),
-      href = Some(""), // TODO what is a reasonable value here?
+      href = Some("http://example.org/feed/m4a?archive=3"),
     ),
     AtomLink(
       rel  = Some("current"),
-      href = Some(""), // TODO what is a reasonable value here?
+      href = Some("http://example.org/feed/m4a?archive=2"),
     ),
     // Podlove Deep Link
     AtomLink(
@@ -100,7 +97,7 @@ class RelLinkParserSpec
 
   val parser: RelLinkParser = new RelLinkParser(links)
 
-  "The LinkParser" should "not find links when no relation is set" in {
+  "The RelLinkParser" should "not find links when no relation is set" in {
     val p: RelLinkParser = new RelLinkParser(List(AtomLink(
       rel  = None,
       href = Some("http://example.org/feed/mp3")
@@ -130,7 +127,7 @@ class RelLinkParserSpec
 
   it should "find 'enclosure' links" in {
     parser.enclosure.size shouldBe 1
-    parser.enclosure shouldBe Set("http://example.org/episode1")
+    parser.enclosure shouldBe Set("http://example.org/episode1.m4a")
   }
 
   it should "find a 'self' link" in {
@@ -158,15 +155,15 @@ class RelLinkParserSpec
   }
 
   it should "find a 'prev-archive' paged feed link" in {
-    parser.archivedFeedNext shouldBe None // TODO this needs a value!
+    parser.archivedFeedNext shouldBe Some("http://example.org/feed/m4a?archive=3")
   }
 
   it should "find a 'next-archive' paged feed link" in {
-    parser.archivedFeedPrev shouldBe None // TODO this needs a value!
+    parser.archivedFeedPrev shouldBe Some("http://example.org/feed/m4a?archive=1")
   }
 
   it should "find a 'current' paged feed link" in {
-    parser.archivedFeedCurrent shouldBe None // TODO this needs a value!
+    parser.archivedFeedCurrent shouldBe Some("http://example.org/feed/m4a?archive=2")
   }
 
   it should "find a Podlove deep-link" in {
