@@ -3,7 +3,7 @@ package hemin.engine.catalog.repository
 import com.typesafe.scalalogging.Logger
 import hemin.engine.HeminException
 import reactivemongo.api.collections.bson.BSONCollection
-import reactivemongo.api.{Cursor, ReadPreference}
+import reactivemongo.api.{Cursor, DefaultDB, ReadPreference}
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONValue}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -16,13 +16,15 @@ trait MongoRepository[T] {
 
   protected[this] implicit val bsonReader: BSONDocumentReader[T]
 
+  protected[this] val collectionName: String
+
   protected[this] val log: Logger
+
+  protected[this] val database: Future[DefaultDB]
 
   protected[this] val defaultSort: BSONDocument
 
   protected[this] def querySafeguard: BSONDocument
-
-  protected[this] def collection: Future[BSONCollection]
 
   protected[this] def saveError(value: T): HeminException
 
@@ -104,6 +106,9 @@ trait MongoRepository[T] {
       val query = BSONDocument()
       findAll(query, pageNumber, pageSize)
     }
+
+  protected[this] def collection: Future[BSONCollection] =
+    database.map(_.collection(collectionName))
 
   protected[this] def findAll(selectors: (String, Option[BSONValue])*): Future[List[T]] =
     findAll(Query(selectors.toMap))

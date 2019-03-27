@@ -139,8 +139,6 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-
-
   private lazy val podcastItunes: PodcastItunes = feedItunesModule
     .map { itunes =>
       PodcastItunes(

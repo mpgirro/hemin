@@ -15,7 +15,11 @@ class PodcastRepository(db: Future[DefaultDB],
                         ec: ExecutionContext)
   extends MongoRepository[Podcast] {
 
+  override protected[this] val collectionName: String = "podcasts"
+
   override protected[this] val log: Logger = Logger(getClass)
+
+  override protected[this] val database: Future[DefaultDB] = db
 
   override protected[this] implicit val executionContext: ExecutionContext = ec
 
@@ -26,8 +30,6 @@ class PodcastRepository(db: Future[DefaultDB],
   override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] def querySafeguard: BSONDocument = BSONDocument("pubDate" -> BSONDocument("$lt" -> TimeUtil.now))
-
-  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("podcasts"))
 
   override protected[this] def saveError(value: Podcast): HeminException =
     new HeminException(s"Saving Podcast to database was unsuccessful : $value")

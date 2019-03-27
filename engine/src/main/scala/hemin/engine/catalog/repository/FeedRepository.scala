@@ -14,7 +14,11 @@ class FeedRepository(db: Future[DefaultDB],
                      ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
+  override protected[this] val collectionName: String = "feeds"
+
   override protected[this] val log: Logger = Logger(getClass)
+
+  override protected[this] val database: Future[DefaultDB] = db
 
   override protected[this] implicit val executionContext: ExecutionContext = ec
 
@@ -25,8 +29,6 @@ class FeedRepository(db: Future[DefaultDB],
   override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
 
   override protected[this] val querySafeguard: BSONDocument = BSONDocument()
-
-  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("feeds"))
 
   override protected[this] def saveError(value: Feed): HeminException =
     new HeminException(s"Saving Feed to database was unsuccessful : $value")

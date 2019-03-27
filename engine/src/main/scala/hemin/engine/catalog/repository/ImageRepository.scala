@@ -15,7 +15,11 @@ class ImageRepository (db: Future[DefaultDB],
                        ec: ExecutionContext)
   extends MongoRepository[Image] {
 
+  override protected[this] val collectionName: String = "images"
+
   override protected[this] val log: Logger = Logger(getClass)
+
+  override protected[this] val database: Future[DefaultDB] = db
 
   override protected[this] implicit val executionContext: ExecutionContext = ec
 
@@ -26,8 +30,6 @@ class ImageRepository (db: Future[DefaultDB],
   override protected[this] val defaultSort: BSONDocument = BSONDocument("createdAt" -> 1) // sort ascending by title
 
   override protected[this] val querySafeguard: BSONDocument = BSONDocument()
-
-  override protected[this] def collection: Future[BSONCollection] = db.map(_.collection("images"))
 
   override protected[this] def saveError(value: Image): HeminException =
     new HeminException(s"Saving Image to database was unsuccessful : $value")

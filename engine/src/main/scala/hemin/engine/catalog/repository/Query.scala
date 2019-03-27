@@ -14,4 +14,5 @@ object Query {
     BSONDocument.apply(elems.collect { case (k, Some(v)) => k -> v })
 
   def apply(elems: (String, Option[BSONValue])*): BSONDocument = apply(elems.toMap)
+
 }
