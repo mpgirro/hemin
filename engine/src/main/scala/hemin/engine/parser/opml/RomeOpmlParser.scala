@@ -10,8 +10,8 @@ import com.typesafe.scalalogging.Logger
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-object RomeOpmlParser {
-  def parse(xmlData: String): Try[OpmlParser] = Try(new RomeOpmlParser(xmlData))
+object RomeOpmlParser extends OpmlParserCompanion {
+  override def parse(xmlData: String): Try[OpmlParser] = Try(new RomeOpmlParser(xmlData))
 }
 
 class RomeOpmlParser private (private val xmlData: String)

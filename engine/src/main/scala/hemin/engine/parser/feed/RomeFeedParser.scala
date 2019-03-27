@@ -15,8 +15,8 @@ import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
 import scala.util.Try
 
-object RomeFeedParser {
-  def parse(xmlData: String): Try[FeedParser] = Try(new RomeFeedParser(xmlData))
+object RomeFeedParser extends FeedParserCompanion {
+  override def parse(xmlData: String): Try[FeedParser] = Try(new RomeFeedParser(xmlData))
 }
 
 class RomeFeedParser private (private val xmlData: String)
