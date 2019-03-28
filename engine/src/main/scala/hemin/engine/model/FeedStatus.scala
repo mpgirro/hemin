@@ -9,8 +9,8 @@ sealed abstract class FeedStatus(override val entryName: String) extends EnumEnt
 object FeedStatus extends Enum[FeedStatus] {
 
   /* `findValues` is a protected method that invokes a macro to
- * find all `FeedStatus` object declarations inside an `Enum`.
- * We use it to implement the `val values` member */
+  * find all `FeedStatus` object declarations inside an `Enum`.
+  * We use it to implement the `val values` member */
   val values: immutable.IndexedSeq[FeedStatus] = findValues
 
   final case object NeverChecked    extends FeedStatus("never_checked")

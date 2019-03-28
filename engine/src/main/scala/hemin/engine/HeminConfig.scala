@@ -3,6 +3,7 @@ package hemin.engine
 import com.typesafe.config.ConfigFactory.parseString
 import com.typesafe.config.{Config, ConfigFactory}
 import hemin.engine.catalog.CatalogConfig
+import hemin.engine.cli.CliConfig
 import hemin.engine.crawler.CrawlerConfig
 import hemin.engine.graph.GraphConfig
 import hemin.engine.index.IndexConfig
@@ -14,6 +15,7 @@ import hemin.engine.updater.UpdaterConfig
 /** Configuration for [[HeminEngine]].
   *
   * @param catalog  Configuration for [[hemin.engine.catalog.CatalogStore]] subsystem
+  * @param cli      Configuration for [[hemin.engine.cli.CommandLineInterpreter]] subsystem
   * @param crawler  Configuration for [[hemin.engine.crawler.Crawler]] subsystem
   * @param graph    Configuration for [[hemin.engine.graph.GraphConfig]] subsystem
   * @param index    Configuration for [[hemin.engine.index.IndexStore]] subsystem
@@ -24,6 +26,7 @@ import hemin.engine.updater.UpdaterConfig
   */
 final case class HeminConfig(
   catalog:  CatalogConfig,
+  cli:      CliConfig,
   crawler:  CrawlerConfig,
   graph:    GraphConfig,
   index:    IndexConfig,
@@ -64,6 +67,7 @@ object HeminConfig {
     .withFallback(defaultAkkaConfig)
     .withFallback(defaultMongoConfig)
     .withFallback(CatalogConfig.defaultConfig)
+    .withFallback(CliConfig.defaultConfig)
     .withFallback(CrawlerConfig.defaultConfig)
     .withFallback(GraphConfig.defaultConfig)
     .withFallback(IndexConfig.defaultConfig)
@@ -105,6 +109,7 @@ object HeminConfig {
   private def loadFromSafeConfig(config: Config): HeminConfig =
     HeminConfig(
       catalog  = CatalogConfig.fromConfig(config),
+      cli      = CliConfig.fromConfig(config),
       crawler  = CrawlerConfig.fromConfig(config),
       graph    = GraphConfig.fromConfig(config),
       index    = IndexConfig.fromConfig(config),

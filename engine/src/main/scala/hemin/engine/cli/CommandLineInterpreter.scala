@@ -17,8 +17,8 @@ object CommandLineInterpreter {
 
   def props(config: HeminConfig): Props =
     Props(new CommandLineInterpreter(config))
-      //.withDispatcher(config.dispatcher)
-      //.withMailbox(config.mailbox)
+      .withDispatcher(config.cli.dispatcher)
+      .withMailbox(config.cli.mailbox)
 
   trait CliMessage
   trait CliQuery extends CliMessage
