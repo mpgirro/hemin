@@ -87,63 +87,38 @@ class RomeFeedParser
     )
   )
 
-  private def podcastTitleWithImageFallback(feed: SyndFeed): Option[String] = {
-    val feedTitle = Option(feed.getTitle)
-    val imgTitle = Option(feed.getImage).map(_.getTitle)
-
-    (feedTitle, imgTitle) match {
-      case (Some(_), _)    => feedTitle
-      case (None, Some(_)) => imgTitle
-      case (_, _)          => None
-    }
-  }
-
-  private def podcastLinkWithImageFallback(feed: SyndFeed): Option[String] = {
-    val feedLink = Option(feed.getLink)
-    val imgLink = Option(feed.getImage).map(_.getLink)
-
-    val link = (feedLink, imgLink) match {
-      case (Some(_), _)    => feedLink
-      case (None, Some(_)) => imgLink
-      case (_, _)          => None
-    }
-    link.flatMap(UrlMapper.sanitize)
-  }
-
-  private def podcastDescriptionWithImageFallback(feed: SyndFeed): Option[String] = {
-    val feedDescr = Option(feed.getDescription)
-    val imgDescr = Option(feed.getImage).map(_.getDescription)
-
-    (feedDescr, imgDescr) match {
-      case (Some(_), _)    => feedDescr
-      case (None, Some(_)) => imgDescr
-      case (_, _)          => None
-    }
-  }
-
-  private def podcastImageWithItunesFallback(feed: SyndFeed): Option[String] = {
-    val feedImg: Option[String] = Option(feed.getImage)
-      .flatMap { img: SyndImage =>
-        if (isNullOrEmpty(img.getUrl))
-          None
-        else
-          Some(img.getUrl)
+  private def podcastTitleWithImageFallback(feed: SyndFeed): Option[String] =
+    Option(feed.getTitle)
+      .orElse {
+        Option(feed.getImage)
+          .map(_.getTitle)
       }
 
-    val feedItunesModule: Option[FeedInformation] = RomeFeedExtractor
-      .getItunesModule(feed)
-      .asScala
-    val itunesImg: Option[String] = feedItunesModule
-      .map(_.getImage)
-      .map(_.toString)
-      .orElse(None)
+  private def podcastLinkWithImageFallback(feed: SyndFeed): Option[String] =
+    Option(feed.getLink)
+      .orElse {
+        Option(feed.getImage)
+          .map(_.getLink)
+      }
+      .flatMap(UrlMapper.sanitize)
 
-    (feedImg, itunesImg) match {
-      case (Some(_), _)    => feedImg
-      case (None, Some(_)) => itunesImg
-      case (_, _)          => None
+  private def podcastDescriptionWithImageFallback(feed: SyndFeed): Option[String] =
+    Option(feed.getDescription)
+      .orElse {
+        Option(feed.getImage)
+          .map(_.getDescription)
+      }
+
+  private def podcastImageWithItunesFallback(feed: SyndFeed): Option[String] = Option(feed.getImage)
+    .filter(img => !isNullOrEmpty(img.getUrl))
+    .map(_.getUrl)
+    .orElse {
+      RomeFeedExtractor
+        .getItunesModule(feed)
+        .asScala
+        .map(_.getImage)
+        .map(_.toString)
     }
-  }
 
   private def podcastItunes(feed: SyndFeed): PodcastItunes = RomeFeedExtractor
     .getItunesModule(feed)
