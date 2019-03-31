@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object EpisodeItunes {
+  val empty: EpisodeItunes = EpisodeItunes()
+}
+
 final case class EpisodeItunes(
   duration: Option[String]    = None,
   subtitle: Option[String]    = None,

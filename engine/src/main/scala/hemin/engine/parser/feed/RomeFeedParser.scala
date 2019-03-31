@@ -4,7 +4,7 @@ import java.io.StringReader
 
 import com.google.common.base.Strings.isNullOrEmpty
 import com.rometools.modules.itunes.FeedInformation
-import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
+import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model._
@@ -26,7 +26,6 @@ class RomeFeedParser
     val inputSource: InputSource = new InputSource(new StringReader(xmlData))
     val input: SyndFeedInput = new SyndFeedInput
     val feed: SyndFeed = input.build(inputSource)
-    val feedItunesModule: Option[FeedInformation] = RomeFeedExtractor.getItunesModule(feed).asScala
 
     val podcast: Podcast = parseFeed(feed)
     val episodes: List[Episode] = extractEpisodes(feed, podcast)
@@ -227,7 +226,7 @@ class RomeFeedParser
         episode     = Option(itunes.getEpisode),
         episodeType = Option(itunes.getEpisodeType),
       )
-    }.getOrElse(EpisodeItunes())
+    }.getOrElse(EpisodeItunes.empty)
 
   private def episodeEnclosure(entry: SyndEntry): EpisodeEnclosure = Option(entry.getEnclosures)
     .map { es =>
@@ -240,9 +239,9 @@ class RomeFeedParser
           typ    = Option(e.getType),
         )
       } else {
-        EpisodeEnclosure()
+        EpisodeEnclosure.empty
       }
-    }.getOrElse(EpisodeEnclosure())
+    }.getOrElse(EpisodeEnclosure.empty)
 
   private def episodeContentEncoded(entry: SyndEntry): Option[String] = RomeFeedExtractor
     .getContentModule(entry)

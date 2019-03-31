@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object EpisodeEnclosure {
+  val empty: EpisodeEnclosure = EpisodeEnclosure()
+}
+
 final case class EpisodeEnclosure(
   url: Option[String]  = None,
   length: Option[Long] = None,
