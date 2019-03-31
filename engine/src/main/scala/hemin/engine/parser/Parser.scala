@@ -10,8 +10,8 @@ import hemin.engine.index.IndexStore.{AddDocIndexEvent, UpdateDocWebsiteDataInde
 import hemin.engine.model.{Episode, FeedStatus, Image, Podcast}
 import hemin.engine.node.Node._
 import hemin.engine.parser.Parser._
-import hemin.engine.parser.feed.RomeFeedParser
-import hemin.engine.parser.opml.RomeOpmlParser
+import hemin.engine.parser.feed.{FeedParser, RomeFeedParser}
+import hemin.engine.parser.opml.{OpmlParser, RomeOpmlParser}
 import hemin.engine.util.mapper.IndexMapper
 import hemin.engine.util.{HashUtil, TimeUtil}
 import org.jsoup.Jsoup
@@ -36,7 +36,7 @@ object Parser {
   final case class ParseOpml(xmlData: String) extends ParserMessage
 }
 
-class Parser (config: ParserConfig)
+class   Parser (config: ParserConfig)
   extends Actor {
 
   private val log: Logger = Logger(getClass)
@@ -45,6 +45,9 @@ class Parser (config: ParserConfig)
   log.debug("{} running with mailbox : {}", self.path.name, context.system.mailboxes.lookup(context.props.mailbox))
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
+
+  private val feedParser: FeedParser = new RomeFeedParser
+  private val opmlParser: OpmlParser = new RomeOpmlParser
 
   private var catalog: ActorRef = _
   private var index: ActorRef = _
@@ -113,12 +116,12 @@ class Parser (config: ParserConfig)
   }
 
   private def parseFeedData(podcastId: String, feedUrl: String, feedData: String, isNewPodcast: Boolean): Unit = Future {
-    RomeFeedParser.parse(feedData) match {
-      case Success(parser) =>
-        val p: Podcast = parser.podcast.copy(
+    feedParser.parse(feedData) match {
+      case Success(result) =>
+        val p: Podcast = result.podcast.copy(
           id = Some(podcastId),
-          title = parser.podcast.title.map(_.trim),
-          description = parser.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
+          title = result.podcast.title.map(_.trim),
+          description = result.podcast.description.map(Jsoup.clean(_, Whitelist.basic())),
         )
 
         if (isNewPodcast) {
@@ -146,7 +149,7 @@ class Parser (config: ParserConfig)
         catalog ! catalogEvent
 
         // check for "new" episodes: because this is a new OldPodcast, all episodes will be new and registered
-        parser.episodes.foreach(e => registerEpisode(podcastId, e))
+        result.episodes.foreach(e => registerEpisode(podcastId, e))
 
       case Failure(ex) =>
         log.error("Error creating a parser for the feed '{}' ; reason : {}", feedUrl, ex.getMessage)
@@ -244,9 +247,9 @@ class Parser (config: ParserConfig)
 
   private def onParseOpml(xmlData: String): Unit = Future {
     log.debug("Received ParseOpml(_)")
-    RomeOpmlParser.parse(xmlData) match {
-      case Success(parser) =>
-        parser.feedUrls.foreach(f => catalog ! ProposeNewFeed(f))
+    opmlParser.parse(xmlData) match {
+      case Success(result) =>
+        result.feedUrls.foreach(f => catalog ! ProposeNewFeed(f))
       case Failure(ex) =>
         log.error("Error creating a parser for the OPML file ; reason : {}", ex.getMessage)
         ex.printStackTrace()

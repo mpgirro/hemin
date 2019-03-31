@@ -12,6 +12,8 @@ class RomeFeedParserSpec
   extends FlatSpec
     with Matchers {
 
+  val parser: FeedParser = new RomeFeedParser
+
   val rssXml: String = Files
     .lines(Paths.get("src", "test", "resources", "rss.xml"))
     .collect(Collectors.joining("\n"))
@@ -59,44 +61,44 @@ class RomeFeedParserSpec
     atom = Atom(
       links = List(
         AtomLink(
-          title        = Some("Lorem Ipsum (MPEG-4 AAC Audio)"),
-          href         = Some("http://example.org/feed/m4a"),
-          rel          = Some("self"),
-          typ          = Some("application/rss+xml"),
+          title = Some("Lorem Ipsum (MPEG-4 AAC Audio)"),
+          href  = Some("http://example.org/feed/m4a"),
+          rel   = Some("self"),
+          typ   = Some("application/rss+xml"),
         ),
         AtomLink(
-          title        = Some("Lorem Ipsum (MP3 Audio)"),
-          href         = Some("http://example.org/feed/mp3"),
-          rel          = Some("alternate"),
-          typ          = Some("application/rss+xml"),
+          title = Some("Lorem Ipsum (MP3 Audio)"),
+          href  = Some("http://example.org/feed/mp3"),
+          rel   = Some("alternate"),
+          typ   = Some("application/rss+xml"),
         ),
         AtomLink(
-          title        = Some("Lorem Ipsum (Ogg Vorbis Audio)"),
-          href         = Some("http://example.org/feed/oga"),
-          rel          = Some("alternate"),
-          typ          = Some("application/rss+xml"),
+          title = Some("Lorem Ipsum (Ogg Vorbis Audio)"),
+          href  = Some("http://example.org/feed/oga"),
+          rel   = Some("alternate"),
+          typ   = Some("application/rss+xml"),
         ),
         AtomLink(
-          title        = Some("Lorem Ipsum (Ogg Opus Audio)"),
-          href         = Some("http://example.org/feed/opus"),
-          rel          = Some("alternate"),
-          typ          = Some("application/rss+xml"),
+          title = Some("Lorem Ipsum (Ogg Opus Audio)"),
+          href  = Some("http://example.org/feed/opus"),
+          rel   = Some("alternate"),
+          typ   = Some("application/rss+xml"),
         ),
         AtomLink(
-          href         = Some("http://example.org/feed/m4a"),
-          rel          = Some("first"),
+          href  = Some("http://example.org/feed/m4a"),
+          rel   = Some("first"),
         ),
         AtomLink(
-          href         = Some("http://example.org/feed/m4a?paged=2"),
-          rel          = Some("next"),
+          href  = Some("http://example.org/feed/m4a?paged=2"),
+          rel   = Some("next"),
         ),
         AtomLink(
-          href         = Some("http://example.org/feed/m4a?paged=8"),
-          rel          = Some("last"),
+          href  = Some("http://example.org/feed/m4a?paged=8"),
+          rel   = Some("last"),
         ),
         AtomLink(
-          href         = Some("http://test.superfeedr.com"),
-          rel          = Some("hub"),
+          href  = Some("http://test.superfeedr.com"),
+          rel   = Some("hub"),
         ),
       ),
     ),
@@ -140,7 +142,7 @@ class RomeFeedParserSpec
       p.description shouldBe expectedPodcast.description
       p.pubDate shouldBe expectedPodcast.pubDate
       p.image shouldBe expectedPodcast.image
-      p.lastBuildDate shouldEqual expectedPodcast.lastBuildDate // TODO why is it not equal to testDate ?! --> unexpected behavior of ROME?!
+      p.lastBuildDate shouldEqual expectedPodcast.lastBuildDate
       p.language shouldBe expectedPodcast.language
       p.generator shouldBe expectedPodcast.generator
       p.copyright shouldBe expectedPodcast.copyright
@@ -282,93 +284,93 @@ class RomeFeedParserSpec
   }
 
   "The RomeFeedParser" should "instantiate from a valid RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
+    parser.parse(rssXml) match {
       case Success(_)  => succeed // all is well
       case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
   it should "instantiate from a valid Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
+    parser.parse(atomXml) match {
       case Success(_)  => succeed // all is well
       case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all Podcast metadata fields from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) => matchPodcast(parser.podcast)
+    parser.parse(rssXml) match {
+      case Success(result) => matchPodcast(result.podcast)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all Podcast metadata fields from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) => matchPodcast(parser.podcast)
+    parser.parse(atomXml) match {
+      case Success(result) => matchPodcast(result.podcast)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract AtomLink metadata fields for a Podcast from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) => matchPodcastAtomLinks(parser.podcast.atom.links)
+    parser.parse(rssXml) match {
+      case Success(result) => matchPodcastAtomLinks(result.podcast.atom.links)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract AtomLink metadata fields for a Podcast from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) => matchPodcastAtomLinks(parser.podcast.atom.links)
+    parser.parse(atomXml) match {
+      case Success(result) => matchPodcastAtomLinks(result.podcast.atom.links)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   ignore should "extract Author (Person) metadata fields for a Podcast from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) => matchAuthors(parser.podcast.persona.authors)
+    parser.parse(rssXml) match {
+      case Success(result) => matchAuthors(result.podcast.persona.authors)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   ignore should "extract Author (Person) metadata fields for a Podcast from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) => matchAuthors(parser.podcast.persona.authors)
+    parser.parse(atomXml) match {
+      case Success(result) => matchAuthors(result.podcast.persona.authors)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   ignore should "extract Contributor (Persons) metadata fields for a Podcast from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) => matchContributors(parser.podcast.persona.contributors)
+    parser.parse(rssXml) match {
+      case Success(result) => matchContributors(result.podcast.persona.contributors)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   ignore should "extract Contributor (Persons) metadata fields for a Podcast from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) => matchContributors(parser.podcast.persona.contributors)
+    parser.parse(atomXml) match {
+      case Success(result) => matchContributors(result.podcast.persona.contributors)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all Episode metadata fields from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) => matchEpisode(parser.episodes.headOption)
+    parser.parse(rssXml) match {
+      case Success(result) => matchEpisode(result.episodes.headOption)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all Episode metadata fields from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) => matchEpisode(parser.episodes.headOption)
+    parser.parse(atomXml) match {
+      case Success(result) => matchEpisode(result.episodes.headOption)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all Chapter metadata fields from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(rssXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the RSS feed")
           case Some(e) => matchChapters(e.chapters)
         }
@@ -377,9 +379,9 @@ class RomeFeedParserSpec
   }
 
   it should "extract all Chapter metadata fields from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(atomXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the Atom feed")
           case Some(e) => matchChapters(e.chapters)
         }
@@ -388,9 +390,9 @@ class RomeFeedParserSpec
   }
 
   it should "extract all AtomLinks metadata fields for an Episode from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(rssXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the RSS feed")
           case Some(e) => matchEpisodeAtomLinks(e.atom.links)
         }
@@ -399,9 +401,9 @@ class RomeFeedParserSpec
   }
 
   it should "extract all AtomLinks metadata fields for an Episode from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(atomXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the Atom feed")
           case Some(e) => matchEpisodeAtomLinks(e.atom.links)
         }
@@ -410,9 +412,9 @@ class RomeFeedParserSpec
   }
 
   ignore should "extract Author (Person) metadata fields for an Episode from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(rssXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the RSS feed")
           case Some(e) => matchAuthors(e.persona.authors)
         }
@@ -421,9 +423,9 @@ class RomeFeedParserSpec
   }
 
   ignore should "extract Author (Person) metadata fields for an Episode from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(atomXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the Atom feed")
           case Some(e) => matchAuthors(e.persona.authors)
         }
@@ -432,9 +434,9 @@ class RomeFeedParserSpec
   }
 
   ignore should "extract Contributor (Persons) metadata fields for an Episode from the RSS feed" in {
-    RomeFeedParser.parse(rssXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(rssXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the RSS feed")
           case Some(e) => matchContributors(e.persona.contributors)
         }
@@ -443,9 +445,9 @@ class RomeFeedParserSpec
   }
 
   ignore should "extract Contributor (Persons) metadata fields for an Episode from the Atom feed" in {
-    RomeFeedParser.parse(atomXml) match {
-      case Success(parser) =>
-        parser.episodes.headOption match {
+    parser.parse(atomXml) match {
+      case Success(result) =>
+        result.episodes.headOption match {
           case None    => fail("Parser failed to extract an Episode from the Atom feed")
           case Some(e) => matchContributors(e.persona.contributors)
         }

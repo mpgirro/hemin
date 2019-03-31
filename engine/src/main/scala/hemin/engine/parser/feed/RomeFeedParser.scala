@@ -4,7 +4,7 @@ import java.io.StringReader
 
 import com.google.common.base.Strings.isNullOrEmpty
 import com.rometools.modules.itunes.FeedInformation
-import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage, SyndLink}
+import com.rometools.rome.feed.synd.{SyndEntry, SyndFeed, SyndImage}
 import com.rometools.rome.io.SyndFeedInput
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model._
@@ -15,29 +15,32 @@ import scala.collection.JavaConverters._
 import scala.compat.java8.OptionConverters._
 import scala.util.Try
 
-object RomeFeedParser extends FeedParserCompanion {
-  override def parse(xmlData: String): Try[FeedParser] = Try(new RomeFeedParser(xmlData))
-}
-
-class RomeFeedParser private (private val xmlData: String)
+class RomeFeedParser
   extends FeedParser {
 
   private val log: Logger = Logger(getClass)
 
-  private val inputSource: InputSource = new InputSource(new StringReader(xmlData))
-  private val input: SyndFeedInput = new SyndFeedInput
-  private val feed: SyndFeed = input.build(inputSource)
-  private val feedItunesModule: Option[FeedInformation] = RomeFeedExtractor.getItunesModule(feed).asScala
-  override val podcast: Podcast = parseFeed(feed)
-  override val episodes: List[Episode] = extractEpisodes(feed)
+  override def parse(xmlData: String): Try[FeedParserResult] = Try {
+    log.debug("Parsing Feed XML data")
+
+    val inputSource: InputSource = new InputSource(new StringReader(xmlData))
+    val input: SyndFeedInput = new SyndFeedInput
+    val feed: SyndFeed = input.build(inputSource)
+    val feedItunesModule: Option[FeedInformation] = RomeFeedExtractor.getItunesModule(feed).asScala
+
+    val podcast: Podcast = parseFeed(feed)
+    val episodes: List[Episode] = extractEpisodes(feed, podcast)
+
+    FeedParserResult(podcast, episodes)
+  }
 
   private def parseFeed(feed: SyndFeed): Podcast = Podcast(
     id             = None,
-    title          = podcastTitleWithImageFallback,
-    link           = podcastLinkWithImageFallback,
-    description    = podcastDescriptionWithImageFallback,
+    title          = podcastTitleWithImageFallback(feed),
+    link           = podcastLinkWithImageFallback(feed),
+    description    = podcastDescriptionWithImageFallback(feed),
     pubDate        = DateMapper.asMilliseconds(feed.getPublishedDate),
-    image          = podcastImageWithItunesFallback,
+    image          = podcastImageWithItunesFallback(feed),
     lastBuildDate  = None,  // TODO the parser does not yet produce this
     language       = Option(feed.getLanguage),
     generator      = Option(feed.getGenerator),
@@ -49,42 +52,42 @@ class RomeFeedParser private (private val xmlData: String)
       timestamp = None,
       complete  = None,
     ),
-    atom         = podcastAtom,
-    persona      = podcastPersona,
-    itunes       = podcastItunes,
-    feedpress    = podcastFeedpress,
-    fyyd         = podcastFyyd,
+    atom         = podcastAtom(feed),
+    persona      = podcastPersona(feed),
+    itunes       = podcastItunes(feed),
+    feedpress    = podcastFeedpress(feed),
+    fyyd         = podcastFyyd(feed),
   )
 
-  private def extractEpisodes(feed: SyndFeed): List[Episode] = feed
+  private def extractEpisodes(feed: SyndFeed, podcast: Podcast): List[Episode] = feed
     .getEntries
     .asScala
-    .map(extractEpisode)
+    .map(e => extractEpisode(e, podcast))
     .toList
 
-  private def extractEpisode(e: SyndEntry): Episode = Episode(
+  private def extractEpisode(entry: SyndEntry, podcast: Podcast): Episode = Episode(
     id              = None,
     podcastId       = None,
     podcastTitle    = podcast.title,
-    title           = Option(e.getTitle),
-    link            = UrlMapper.sanitize(e.getLink),
-    pubDate         = DateMapper.asMilliseconds(e.getPublishedDate),
-    guid            = Option(e.getUri),
+    title           = Option(entry.getTitle),
+    link            = UrlMapper.sanitize(entry.getLink),
+    pubDate         = DateMapper.asMilliseconds(entry.getPublishedDate),
+    guid            = Option(entry.getUri),
     guidIsPermalink = None, // TODO welches feld von ROME korrespondiert zu diesem Boolean?
-    description     = Option(e.getDescription).map(_.getValue),
-    image           = episodeImage(e),
-    contentEncoded  = episodeContentEncoded(e),
-    chapters        = episodeChapters(e),
-    atom            = episodeAtom(e),
-    persona         = episodePersona(e),
-    itunes          = episodeItunes(e),
-    enclosure       = episodeEnclosure(e),
+    description     = Option(entry.getDescription).map(_.getValue),
+    image           = episodeImage(entry, podcast),
+    contentEncoded  = episodeContentEncoded(entry),
+    chapters        = episodeChapters(entry),
+    atom            = episodeAtom(entry),
+    persona         = episodePersona(entry),
+    itunes          = episodeItunes(entry),
+    enclosure       = episodeEnclosure(entry),
     registration = EpisodeRegistration(
       timestamp = None,
     )
   )
 
-  private lazy val podcastTitleWithImageFallback: Option[String] = {
+  private def podcastTitleWithImageFallback(feed: SyndFeed): Option[String] = {
     val feedTitle = Option(feed.getTitle)
     val imgTitle = Option(feed.getImage).map(_.getTitle)
 
@@ -95,7 +98,7 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-  private lazy val podcastLinkWithImageFallback: Option[String] = {
+  private def podcastLinkWithImageFallback(feed: SyndFeed): Option[String] = {
     val feedLink = Option(feed.getLink)
     val imgLink = Option(feed.getImage).map(_.getLink)
 
@@ -107,7 +110,7 @@ class RomeFeedParser private (private val xmlData: String)
     link.flatMap(UrlMapper.sanitize)
   }
 
-  private lazy val podcastDescriptionWithImageFallback: Option[String] = {
+  private def podcastDescriptionWithImageFallback(feed: SyndFeed): Option[String] = {
     val feedDescr = Option(feed.getDescription)
     val imgDescr = Option(feed.getImage).map(_.getDescription)
 
@@ -118,7 +121,7 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-  private lazy val podcastImageWithItunesFallback: Option[String] = {
+  private def podcastImageWithItunesFallback(feed: SyndFeed): Option[String] = {
     val feedImg: Option[String] = Option(feed.getImage)
       .flatMap { img: SyndImage =>
         if (isNullOrEmpty(img.getUrl))
@@ -127,6 +130,9 @@ class RomeFeedParser private (private val xmlData: String)
           Some(img.getUrl)
       }
 
+    val feedItunesModule: Option[FeedInformation] = RomeFeedExtractor
+      .getItunesModule(feed)
+      .asScala
     val itunesImg: Option[String] = feedItunesModule
       .map(_.getImage)
       .map(_.toString)
@@ -139,7 +145,9 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-  private lazy val podcastItunes: PodcastItunes = feedItunesModule
+  private def podcastItunes(feed: SyndFeed): PodcastItunes = RomeFeedExtractor
+    .getItunesModule(feed)
+    .asScala
     .map { itunes =>
       PodcastItunes(
         subtitle   = Option(itunes.getSubtitle),
@@ -173,15 +181,15 @@ class RomeFeedParser private (private val xmlData: String)
     }
   }
 
-  private lazy val podcastFeedpress: PodcastFeedpress = PodcastFeedpress(locale = None)
+  private def podcastFeedpress(feed: SyndFeed): PodcastFeedpress = PodcastFeedpress(locale = None)
 
-  private lazy val podcastFyyd: PodcastFyyd = PodcastFyyd(verify = None)
+  private def podcastFyyd(feed: SyndFeed): PodcastFyyd = PodcastFyyd(verify = None)
 
-  private lazy val podcastAtom: Atom = Atom(
-    links = podcastAtomLinks,
+  private def podcastAtom(feed: SyndFeed): Atom = Atom(
+    links = podcastAtomLinks(feed),
   )
 
-  private lazy val podcastAtomLinks: List[AtomLink] =
+  private def podcastAtomLinks(feed: SyndFeed): List[AtomLink] =
     if (feed.getLinks.isEmpty) {
       RomeFeedExtractor
         .getAtomLinks(feed)
@@ -196,43 +204,43 @@ class RomeFeedParser private (private val xmlData: String)
         .toList
     }
 
-  private lazy val podcastPersona: Persona = Persona(
-    authors      = podcastAuthors,
-    contributors = podcastContributors,
+  private def podcastPersona(feed: SyndFeed): Persona = Persona(
+    authors      = podcastAuthors(feed),
+    contributors = podcastContributors(feed),
   )
 
-  private lazy val podcastAuthors: List[Person] = feed
+  private def podcastAuthors(feed: SyndFeed): List[Person] = feed
     .getAuthors
     .asScala
     .map(Person.fromRome)
     .toList
 
-  private lazy val podcastContributors: List[Person] = feed
+  private def podcastContributors(feed: SyndFeed): List[Person] = feed
     .getContributors
     .asScala
     .map(Person.fromRome)
     .toList
 
-  private def episodeAtom(e: SyndEntry): Atom = Atom(
-    links = episodeAtomLinks(e),
+  private def episodeAtom(entry: SyndEntry): Atom = Atom(
+    links = episodeAtomLinks(entry),
   )
 
-  private def episodeAtomLinks(e: SyndEntry): List[AtomLink] = RomeFeedExtractor
-    .getAtomLinks(e)
+  private def episodeAtomLinks(entry: SyndEntry): List[AtomLink] = RomeFeedExtractor
+    .getAtomLinks(entry)
     .asScala
     .map(AtomLink.fromRome)
     .toList
 
-  private def episodeImage(e: SyndEntry): Option[String] = RomeFeedExtractor
-    .getItunesEntryInformation(e)
+  private def episodeImage(entry: SyndEntry, podcast: Podcast): Option[String] = RomeFeedExtractor
+    .getItunesEntryInformation(entry)
     .asScala
     .flatMap(itunes => Option(itunes.getImage))
     //.map(_.getImage) // TODO why is this line not working, but the above?
     .map(_.toExternalForm)
     .orElse(podcast.image) // fallback is the podcast's image
 
-  private def episodeItunes(e: SyndEntry): EpisodeItunes = RomeFeedExtractor
-    .getItunesEntryInformation(e)
+  private def episodeItunes(entry: SyndEntry): EpisodeItunes = RomeFeedExtractor
+    .getItunesEntryInformation(entry)
     .asScala
     .map { itunes =>
       EpisodeItunes(
@@ -261,8 +269,8 @@ class RomeFeedParser private (private val xmlData: String)
       }
     }.getOrElse(EpisodeEnclosure())
 
-  private def episodeContentEncoded(e: SyndEntry): Option[String] = RomeFeedExtractor
-    .getContentModule(e)
+  private def episodeContentEncoded(entry: SyndEntry): Option[String] = RomeFeedExtractor
+    .getContentModule(entry)
     .asScala
     .map { content =>
       val es = content.getEncodeds
@@ -275,25 +283,25 @@ class RomeFeedParser private (private val xmlData: String)
     }
     .flatMap(Option(_)) // re-wrap, because we produce null in the map above
 
-  private def episodePersona(e: SyndEntry): Persona = Persona(
-    authors      = episodeAuthors(e),
-    contributors = episodeContributors(e),
+  private def episodePersona(entry: SyndEntry): Persona = Persona(
+    authors      = episodeAuthors(entry),
+    contributors = episodeContributors(entry),
   )
 
-  private def episodeAuthors(e: SyndEntry): List[Person] = e
+  private def episodeAuthors(entry: SyndEntry): List[Person] = entry
     .getAuthors
     .asScala
     .map(Person.fromRome)
     .toList
 
-  private def episodeContributors(e: SyndEntry): List[Person] = e
+  private def episodeContributors(entry: SyndEntry): List[Person] = entry
     .getContributors
     .asScala
     .map(Person.fromRome)
     .toList
 
-  private def episodeChapters(e: SyndEntry): List[Chapter] = RomeFeedExtractor
-    .getPodloveSimpleChapterModule(e)
+  private def episodeChapters(entry: SyndEntry): List[Chapter] = RomeFeedExtractor
+    .getPodloveSimpleChapterModule(entry)
     .asScala
     .map(_.getChapters)
     .map { _.asScala

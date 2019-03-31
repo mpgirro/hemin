@@ -1,13 +1,15 @@
 package hemin.engine.parser.feed
 
-import hemin.engine.model.{Episode, Podcast}
+import scala.util.Try
 
 trait FeedParser {
 
-  /** The Podcast model holding the parsing result values */
-  val podcast: Podcast
-
-  /** List of all Episode models holding the parsing result values */
-  val episodes: List[Episode]
+  /** Attempts to parse an RSS 2.0 or Atom 1.0 feed.
+    *
+    * @param xmlData The XML data structure of the feed as a raw String
+    * @return The [[hemin.engine.parser.feed.FeedParserResult]] instance holding
+    *         the valuesif the parsing was successful, and a failure otherwise
+    */
+  def parse(xmlData: String): Try[FeedParserResult]
 
 }

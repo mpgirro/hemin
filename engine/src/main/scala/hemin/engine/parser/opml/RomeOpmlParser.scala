@@ -10,20 +10,21 @@ import com.typesafe.scalalogging.Logger
 import scala.collection.JavaConverters._
 import scala.util.Try
 
-object RomeOpmlParser extends OpmlParserCompanion {
-  override def parse(xmlData: String): Try[OpmlParser] = Try(new RomeOpmlParser(xmlData))
-}
-
-class RomeOpmlParser private (private val xmlData: String)
+class RomeOpmlParser
   extends OpmlParser {
 
   private val log: Logger = Logger(getClass)
 
-  private val input = new WireFeedInput
-  private val feed: WireFeed = input.build(new StringReader(xmlData))
-  private val outlines: List[Outline] = RomeOpmlExtractor.getOutlines(feed).asScala.toList
+  override def parse(xmlData: String): Try[OpmlParserResult] = Try {
+    log.debug("Parsing OPML data")
 
-  override val feedUrls: List[String] = xmlUrls(outlines)
+    val input = new WireFeedInput
+    val feed: WireFeed = input.build(new StringReader(xmlData))
+    val outlines: List[Outline] = RomeOpmlExtractor.getOutlines(feed).asScala.toList
+    val feedUrls: List[String] = xmlUrls(outlines)
+
+    OpmlParserResult(feedUrls)
+  }
 
   private def xmlUrls(outlines: Seq[Outline]): List[String] = outlines match {
     case Nil     => Nil

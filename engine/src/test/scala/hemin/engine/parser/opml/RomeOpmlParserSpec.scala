@@ -3,7 +3,6 @@ package hemin.engine.parser.opml
 import java.nio.file.{Files, Paths}
 import java.util.stream.Collectors
 
-import com.typesafe.scalalogging.Logger
 import org.scalatest.{FlatSpec, Ignore, Matchers}
 
 import scala.util.{Failure, Success}
@@ -12,6 +11,8 @@ import scala.util.{Failure, Success}
 class RomeOpmlParserSpec
   extends FlatSpec
     with Matchers {
+
+  val parser: OpmlParser = new RomeOpmlParser
 
   val opmlData: String = Files
     .lines(Paths.get("src", "test", "resources", "opml.xml"))
@@ -27,15 +28,15 @@ class RomeOpmlParserSpec
   )
 
   "The RomeOpmlParser" should "be able to parse a valid OPML-File" in {
-    RomeOpmlParser.parse(opmlData) match {
+    parser.parse(opmlData) match {
       case Success(_)  => succeed // all is well
       case Failure(ex) => fail(parseFailureMsg(ex))
     }
   }
 
   it should "extract all expected XML feed URLs" in {
-    RomeOpmlParser.parse(opmlData) match {
-      case Success(parser) => parser.feedUrls should equal (expectedXmlUrls)
+    parser.parse(opmlData) match {
+      case Success(result) => result.feedUrls should equal (expectedXmlUrls)
       case Failure(ex)     => fail(parseFailureMsg(ex))
     }
   }
