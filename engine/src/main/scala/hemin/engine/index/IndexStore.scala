@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import hemin.engine.index.IndexStore._
 import hemin.engine.index.committer.SolrCommitter
-import hemin.engine.model.{IndexDoc, SearchResult}
+import hemin.engine.model.{Document, SearchResult}
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportIndexStoreInitializationComplete}
 import hemin.engine.util.ExecutorServiceWrapper
 
@@ -24,7 +24,7 @@ object IndexStore {
   trait IndexQuery extends IndexMessage
   trait IndexQueryResult extends IndexMessage
   // IndexEvents
-  final case class AddDocIndexEvent(doc: IndexDoc) extends IndexEvent
+  final case class AddDocIndexEvent(doc: Document) extends IndexEvent
   final case class UpdateDocWebsiteDataIndexEvent(id: String, html: String) extends IndexEvent
   final case class UpdateDocImageIndexEvent(id: String, image: String) extends IndexEvent
   final case class UpdateDocLinkIndexEvent(id: String, newLink: String) extends IndexEvent

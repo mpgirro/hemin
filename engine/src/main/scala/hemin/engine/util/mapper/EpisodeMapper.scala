@@ -1,6 +1,6 @@
 package hemin.engine.util.mapper
 
-import hemin.engine.model.{Episode, EpisodeItunes, IndexDoc, IndexField}
+import hemin.engine.model.{Episode, EpisodeItunes, Document, IndexField}
 import hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -8,7 +8,7 @@ import scala.util.{Success, Try}
 
 object EpisodeMapper {
 
-  def toEpisode(src: IndexDoc): Try[Episode] = Option(src)
+  def toEpisode(src: Document): Try[Episode] = Option(src)
     .map{ s =>
       Episode(
         id          = s.id,

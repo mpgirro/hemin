@@ -1,6 +1,6 @@
 package hemin.engine.util.mapper
 
-import hemin.engine.model.{IndexDoc, IndexField, Podcast, PodcastItunes}
+import hemin.engine.model.{Document, IndexField, Podcast, PodcastItunes}
 import hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -8,7 +8,7 @@ import scala.util.{Success, Try}
 
 object PodcastMapper {
 
-  def toPodcast(doc: IndexDoc): Try[Podcast] = Option(doc)
+  def toPodcast(doc: Document): Try[Podcast] = Option(doc)
     .map{ d =>
       Podcast(
         id          = d.id,

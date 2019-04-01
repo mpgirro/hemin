@@ -1,6 +1,6 @@
 package hemin.engine.index.committer
 
-import hemin.engine.model.IndexDoc
+import hemin.engine.model.Document
 
 trait IndexCommitter {
 
@@ -10,7 +10,7 @@ trait IndexCommitter {
     *
     * @param doc The document to save.
     */
-  def save(doc: IndexDoc): Unit
+  def save(doc: Document): Unit
 
   /** Deletes all documents from the reverse index structure */
   def deleteAll(): Unit

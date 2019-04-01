@@ -1,6 +1,6 @@
 package hemin.engine.model
 
-final case class IndexDoc(
+final case class Document(
   docType: Option[String]        = None,
   id: Option[String]             = None,
   title: Option[String]          = None,
@@ -15,11 +15,11 @@ final case class IndexDoc(
   contentEncoded: Option[String] = None,
   transcript: Option[String]     = None,
   websiteData: Option[String]    = None,
-) extends Patchable[IndexDoc] {
+) extends Patchable[Document] {
 
-  override def patchLeft(diff: IndexDoc): IndexDoc = Option(diff) match {
+  override def patchLeft(diff: Document): Document = Option(diff) match {
     case None       => this
-    case Some(that) => IndexDoc(
+    case Some(that) => Document(
       docType        = reduceLeft(this.docType, that.docType),
       id             = reduceLeft(this.id, that.id),
       title          = reduceLeft(this.title, that.title),
@@ -37,9 +37,9 @@ final case class IndexDoc(
     )
   }
 
-  override def patchRight(diff: IndexDoc): IndexDoc = Option(diff) match {
+  override def patchRight(diff: Document): Document = Option(diff) match {
     case None       => this
-    case Some(that) => IndexDoc(
+    case Some(that) => Document(
       docType        = reduceRight(this.docType, that.docType),
       id             = reduceRight(this.id, that.id),
       title          = reduceRight(this.title, that.title),

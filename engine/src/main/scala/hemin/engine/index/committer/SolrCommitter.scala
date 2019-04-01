@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutorService
 
 import com.typesafe.scalalogging.Logger
 import hemin.engine.index.IndexConfig
-import hemin.engine.model.IndexDoc
+import hemin.engine.model.Document
 import hemin.engine.util.mapper.SolrMapper
 import org.apache.solr.client.solrj.impl.ConcurrentUpdateSolrClient
 import org.apache.solr.client.solrj.{SolrClient, SolrServerException}
@@ -25,7 +25,7 @@ class SolrCommitter(config: IndexConfig,
     .withExecutorService(executorService)
     .build()
 
-  override def save(doc: IndexDoc): Unit = SolrMapper.toSolr(doc) match {
+  override def save(doc: Document): Unit = SolrMapper.toSolr(doc) match {
     case Success(d) =>
       solr.add(d)
       solr.commit()

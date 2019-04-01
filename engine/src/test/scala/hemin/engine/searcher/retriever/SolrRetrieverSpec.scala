@@ -36,9 +36,9 @@ class SolrRetrieverSpec
   it should "retrieve empty search results if the query is empty" in {
     val retriever: IndexRetriever = new SolrRetriever(searcherConfig, executionContext)
     val future: Future[SearchResult] = retriever.search(
-      query = "",
-      page = defaultPageNumber,
-      size = defaultPageSize
+      query      = "",
+      pageNumber = defaultPageNumber,
+      pageSize   = defaultPageSize
     )
     future.map(assertEmptySearchResult)
   }
@@ -47,9 +47,9 @@ class SolrRetrieverSpec
   it should "retrieve empty search results if the query is null" in {
     val retriever: IndexRetriever = new SolrRetriever(searcherConfig, executionContext)
     val future: Future[SearchResult] = retriever.search(
-      query = null,
-      page = defaultPageNumber,
-      size = defaultPageSize
+      query      = null,
+      pageNumber = defaultPageNumber,
+      pageSize   = defaultPageSize
     )
     future.map(assertEmptySearchResult)
   }
@@ -57,9 +57,9 @@ class SolrRetrieverSpec
   it should "retrieve empty search results if the page number is invalid (<1)" in {
     val retriever: IndexRetriever = new SolrRetriever(searcherConfig, executionContext)
     val future: Future[SearchResult] = retriever.search(
-      query = defaultQuery,
-      page = 0,
-      size = defaultPageSize
+      query      = defaultQuery,
+      pageNumber = 0,
+      pageSize   = defaultPageSize
     )
     future.map(assertEmptySearchResult)
   }
@@ -68,9 +68,9 @@ class SolrRetrieverSpec
   it should "retrieve empty search results if the page size is invalid (<1)" in {
     val retriever: IndexRetriever = new SolrRetriever(searcherConfig, executionContext)
     val future: Future[SearchResult] = retriever.search(
-      query = defaultQuery,
-      page = defaultPageNumber,
-      size = 0
+      query      = defaultQuery,
+      pageNumber = defaultPageNumber,
+      pageSize   = 0
     )
     future.map(assertEmptySearchResult)
   }

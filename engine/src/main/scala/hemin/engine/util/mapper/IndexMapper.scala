@@ -1,7 +1,7 @@
 package hemin.engine.util.mapper
 
 import com.google.common.base.Strings.isNullOrEmpty
-import hemin.engine.model.{Episode, IndexDoc, IndexField, Podcast}
+import hemin.engine.model.{Episode, Document, IndexField, Podcast}
 import hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -9,9 +9,9 @@ import scala.util.{Failure, Success, Try}
 
 object IndexMapper {
 
-  def toIndexDoc(src: Podcast): Try[IndexDoc] = Option(src)
+  def toDocument(src: Podcast): Try[Document] = Option(src)
     .map { s =>
-      IndexDoc(
+      Document(
         docType        = Some("podcast"),
         id             = s.id,
         title          = s.title,
@@ -31,9 +31,9 @@ object IndexMapper {
     .map(Success(_))
     .getOrElse(mapperFailurePodcastToIndexDoc(src))
 
-  def toIndexDoc(src: Episode): Try[IndexDoc] = Option(src)
+  def toDocument(src: Episode): Try[Document] = Option(src)
     .map { s =>
-      IndexDoc(
+      Document(
         docType        = Some("episode"),
         id             = s.id,
         title          = s.title,
@@ -53,7 +53,7 @@ object IndexMapper {
     .map(Success(_))
     .getOrElse(mapperFailureEpisodeToIndexDoc(src))
 
-  def toIndexDoc(src: SolrDocument): Try[IndexDoc] = Option(src)
+  def toDocument(src: SolrDocument): Try[Document] = Option(src)
     .map { s =>
       val docType = SolrMapper.firstStringMatch(s, IndexField.DocType.entryName)
       docType match {
@@ -64,12 +64,12 @@ object IndexMapper {
             dt match {
               case "podcast" =>
                 PodcastMapper.toPodcast(src) match {
-                  case Success(p)  => toIndexDoc(p)
+                  case Success(p)  => toDocument(p)
                   case Failure(ex) => mapperFailurePodcastToIndexDoc(ex)
                 }
               case "episode" =>
                 EpisodeMapper.toEpisode(src) match {
-                  case Success(e)  => toIndexDoc(e): Try[IndexDoc]
+                  case Success(e)  => toDocument(e): Try[Document]
                   case Failure(ex) => mapperFailureEpisodeToIndexDoc(ex)
                 }
               case _ => mapperFailureUnsupportedIndexDocumentType(dt)

@@ -126,7 +126,7 @@ class   Parser (config: ParserConfig)
 
         if (isNewPodcast) {
 
-          IndexMapper.toIndexDoc(p) match {
+          IndexMapper.toDocument(p) match {
             case Success(doc) =>
               val indexEvent = AddDocIndexEvent(doc)
               //emitIndexEvent(indexEvent)

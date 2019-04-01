@@ -882,7 +882,7 @@ class CatalogStore(config: CatalogConfig)
                       graphStore ! GenerateEpisodetNode(e)
                       graphStore ! GeneratePodcastEpisodeRelationship(e.podcastId, e.id)
 
-                      IndexMapper.toIndexDoc(e) match {
+                      IndexMapper.toDocument(e) match {
                         case Success(doc) =>
                           val indexEvent = AddDocIndexEvent(doc)
                           //emitIndexEvent(indexEvent)

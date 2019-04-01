@@ -82,7 +82,7 @@ object CliFormatter {
 
   def format(image: Image): String = prettyPrint(image)
 
-  def format(doc: IndexDoc): String =
+  def format(doc: Document): String =
     prettyPrint(doc.copy(
       description    = doc.description.map(truncat),
       chapterMarks   = doc.chapterMarks.map(truncat),

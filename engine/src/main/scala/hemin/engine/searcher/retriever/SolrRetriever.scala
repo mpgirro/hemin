@@ -1,7 +1,7 @@
 package hemin.engine.searcher.retriever
 
 import com.typesafe.scalalogging.Logger
-import hemin.engine.model.{IndexDoc, IndexField, SearchResult}
+import hemin.engine.model.{Document, IndexField, SearchResult}
 import hemin.engine.searcher.SearcherConfig
 import hemin.engine.model.IndexField._
 import hemin.engine.util.mapper.IndexMapper
@@ -58,10 +58,10 @@ class SolrRetriever (config: SearcherConfig,
     .map(f => s"${f.entryName}:(${query.trim})")
     .mkString(" ")
 
-  private def toResults(docs: SolrDocumentList): List[IndexDoc] = {
+  private def toResults(docs: SolrDocumentList): List[Document] = {
     val (successes, failures) = docs
       .asScala
-      .map(IndexMapper.toIndexDoc)
+      .map(IndexMapper.toDocument)
       .partition(_.isSuccess)
 
     // report all failures
