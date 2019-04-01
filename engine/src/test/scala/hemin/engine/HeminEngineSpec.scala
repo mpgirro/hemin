@@ -26,8 +26,7 @@ class HeminEngineSpec
   def newEngine(): HeminEngine = HeminEngine.boot(engineConfig) match {
     case Success(engine) => engine
     case Failure(ex) =>
-      assert(false, s"Failed to startup engine; reason : ${ex.getMessage}")
-      null // TODO can I return a better result value (just to please the compiler?)
+      fail(s"Failed to startup engine; reason : ${ex.getMessage}")
   }
 
   "The Engine" should "fail gracefully on API calls when it is already shutdown" taggedAs Slow in {

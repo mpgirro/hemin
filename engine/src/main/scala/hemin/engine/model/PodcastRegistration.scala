@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object PodcastRegistration {
+  val empty: PodcastRegistration = PodcastRegistration()
+}
+
 final case class PodcastRegistration(
   timestamp: Option[Long]   = None,
   complete: Option[Boolean] = None,

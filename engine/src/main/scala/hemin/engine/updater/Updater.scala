@@ -57,8 +57,10 @@ class Updater (config: UpdaterConfig)
     case ProposeNewFeed(url) =>
       log.debug("Received ProposeNewFeed({})", url)
       log.info("Request to propose : {}", url)
-      if (!isNullOrEmpty(url))
+
+      if (!isNullOrEmpty(url)) {
         catalog ! ProposeNewFeed(url)
+      }
 
     case ProcessFeed(id, url, job: FetchJob) =>
       log.debug("Received ProcessFeed({},{},{})", id, url, job)

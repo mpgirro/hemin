@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object PodcastFyyd {
+  val empty: PodcastFyyd = PodcastFyyd()
+}
+
 final case class PodcastFyyd(
   verify: Option[String] = None,
 ) extends Patchable[PodcastFyyd] {

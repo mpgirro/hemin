@@ -1,15 +1,19 @@
 package hemin.engine.model
 
+object PodcastItunes {
+  val empty: PodcastItunes = PodcastItunes()
+}
+
 final case class PodcastItunes(
-  subtitle: Option[String]   = None,
-  summary: Option[String]    = None,
-  author: Option[String]     = None,
-  keywords: List[String]     = Nil,
-  categories: List[String]   = Nil,
-  explicit: Option[Boolean]  = None,
-  block: Option[Boolean]     = None,
-  typ: Option[String]        = None,
-  owner: Option[Person]      = None
+  subtitle: Option[String]  = None,
+  summary: Option[String]   = None,
+  author: Option[String]    = None,
+  keywords: List[String]    = Nil,
+  categories: List[String]  = Nil,
+  explicit: Option[Boolean] = None,
+  block: Option[Boolean]    = None,
+  typ: Option[String]       = None,
+  owner: Option[Person]     = None
 
 ) extends Patchable[PodcastItunes] {
 

@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object EpisodeRegistration {
+  val empty: EpisodeRegistration = EpisodeRegistration()
+}
+
 final case class EpisodeRegistration(
   timestamp: Option[Long] = None,
 ) extends Patchable[EpisodeRegistration] {

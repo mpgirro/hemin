@@ -1,5 +1,9 @@
 package hemin.engine.model
 
+object PodcastFeedpress {
+  val empty: PodcastFeedpress = PodcastFeedpress()
+}
+
 final case class PodcastFeedpress(
   newsletterId: Option[String] = None,
   locale: Option[String]       = None,

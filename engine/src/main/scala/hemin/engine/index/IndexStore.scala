@@ -60,7 +60,7 @@ class IndexStore (config: IndexConfig)
     cause match {
       case e: Exception =>
         log.error("Unhandled Exception : {}", e.getMessage, e)
-        sender ! IndexSearchResults(SearchResult()) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
+        sender ! IndexSearchResults(SearchResult.empty) // TODO besser eine neue antwortmessage a la ErrorIndexResult und entsprechend den fehler in der UI anzeigen zu können
       //currQuery = ""
     }
     super.postRestart(cause)
