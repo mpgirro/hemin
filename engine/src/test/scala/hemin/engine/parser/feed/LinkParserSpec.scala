@@ -3,7 +3,7 @@ package hemin.engine.parser.feed
 import hemin.engine.model.AtomLink
 import org.scalatest.{FlatSpec, Matchers}
 
-class RelLinkParserSpec
+class LinkParserSpec
   extends FlatSpec
     with Matchers {
 
@@ -95,10 +95,10 @@ class RelLinkParserSpec
     ),
   )
 
-  val parser: RelLinkParser = new RelLinkParser(links)
+  val parser: LinkParser = new LinkParser(links)
 
   "The RelLinkParser" should "not find links when no relation is set" in {
-    val p: RelLinkParser = new RelLinkParser(List(AtomLink(
+    val p: LinkParser = new LinkParser(List(AtomLink(
       rel  = None,
       href = Some("http://example.org/feed/mp3")
     )))
@@ -107,7 +107,7 @@ class RelLinkParserSpec
   }
 
   it should "not find links when no href is set" in {
-    val p: RelLinkParser = new RelLinkParser(List(AtomLink(
+    val p: LinkParser = new LinkParser(List(AtomLink(
       rel  = Some("self"),
       href = None
     )))

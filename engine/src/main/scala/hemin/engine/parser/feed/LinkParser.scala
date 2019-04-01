@@ -1,9 +1,9 @@
 package hemin.engine.parser.feed
 
 import hemin.engine.model.AtomLink
-import hemin.engine.parser.feed.RelLinkParser._
+import hemin.engine.parser.feed.LinkParser._
 
-object RelLinkParser {
+object LinkParser {
 
   // Described for the Atom Syndication Format (RFC 4287)
   val ALTERNATE: String = "alternate"  // alternate representation of the entry or feed
@@ -40,7 +40,7 @@ object RelLinkParser {
   *
   * @param links
   */
-class RelLinkParser(links: List[AtomLink]) {
+class LinkParser(links: List[AtomLink]) {
 
   private val pairs: List[(String, String)] = links
     .map(l => (l.rel, l.href))
