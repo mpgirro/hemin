@@ -4,7 +4,7 @@ import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model.SearchResult
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherInitializationComplete}
-import hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
+import hemin.engine.searcher.Searcher.{SearchRequest, SearchReply}
 import hemin.engine.searcher.retriever.{IndexRetriever, SolrRetriever}
 
 import scala.concurrent.ExecutionContext
@@ -23,7 +23,7 @@ object Searcher {
   // SearchQueries
   final case class SearchRequest(query: String, pageNumber: Option[Int], pageSize: Option[Int]) extends SearcherQuery
   // SearchQueryResults
-  final case class SearchResults(results: SearchResult) extends SearcherQueryResult
+  final case class SearchReply(query: String, pageNumber: Option[Int], pageSize: Option[Int], results: SearchResult) extends SearcherQueryResult
 }
 
 class Searcher (config: SearcherConfig)
@@ -51,13 +51,13 @@ class Searcher (config: SearcherConfig)
       supervisor = ref
       supervisor ! ReportSearcherInitializationComplete
 
-    case SearchRequest(query, page, size) =>
-      log.debug("Received SearchRequest('{}',{},{}) message", query, page, size)
+    case SearchRequest(query, pageNumber, pageSize) =>
+      log.debug("Received SearchRequest('{}',{},{}) message", query, pageNumber, pageSize)
 
       val theSender = sender()
-      retriever.search(query, page, size)
+      retriever.search(query, pageNumber, pageSize)
         .onComplete {
-          case Success(rs) => theSender ! SearchResults(rs)
+          case Success(results) => theSender ! SearchReply(query, pageNumber, pageSize, results)
           case Failure(ex) =>
             log.error("Error on searching Index : {}", ex)
             ex.printStackTrace()

@@ -125,7 +125,7 @@ class GuardedOperationDispatcher(bus: ActorRef,
 
   def getSearchResult(query: String, pageNumber: Option[Int], pageSize: Option[Int]): Future[SearchResult] = guarded {
     (bus ? Searcher.SearchRequest(query, pageNumber, pageSize))
-      .mapTo[Searcher.SearchResults]
+      .mapTo[Searcher.SearchReply]
       .map(_.results)
   }
 

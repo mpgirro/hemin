@@ -6,7 +6,7 @@ import akka.testkit.{ImplicitSender, TestKit}
 import akka.util.Timeout
 import hemin.engine.model.SearchResult
 import hemin.engine.node.Node.{ActorRefSupervisor, ReportSearcherInitializationComplete}
-import hemin.engine.searcher.Searcher.{SearchRequest, SearchResults}
+import hemin.engine.searcher.Searcher.{SearchRequest, SearchReply}
 import hemin.engine.{HeminEngine, TestConstants}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{FlatSpecLike, Matchers}
@@ -52,7 +52,7 @@ class SearcherSpec
   it should "reply with empty search results if the query is empty" in {
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest("", defaultPageNumber, defaultPageSize))
-      .mapTo[SearchResults]
+      .mapTo[SearchReply]
       .map(_.results)
       .map(assertEmptySearchResult)
   }
@@ -60,7 +60,7 @@ class SearcherSpec
   it should "reply with empty search results if the query is null" in {
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(null, defaultPageNumber, defaultPageSize))
-      .mapTo[SearchResults]
+      .mapTo[SearchReply]
       .map(_.results)
       .map(assertEmptySearchResult)
   }
@@ -68,7 +68,7 @@ class SearcherSpec
   it should "reply with empty search results if the page number is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(defaultQuery, Some(0), defaultPageSize))
-      .mapTo[SearchResults]
+      .mapTo[SearchReply]
       .map(_.results)
       .map(assertEmptySearchResult)
   }
@@ -76,7 +76,7 @@ class SearcherSpec
   it should "reply with empty search results if the page size is invalid (<1)" in {
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(defaultQuery, defaultPageNumber, Some(0)))
-      .mapTo[SearchResults]
+      .mapTo[SearchReply]
       .map(_.results)
       .map(assertEmptySearchResult)
   }
