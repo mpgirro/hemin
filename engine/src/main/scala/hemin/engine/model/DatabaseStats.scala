@@ -1,6 +1,6 @@
 package hemin.engine.model
 
-case class DatabaseStats (
+final case class DatabaseStats (
   podcastCount: Int,
   episodeCount: Int,
   feedCount: Int,

@@ -29,7 +29,7 @@ object AtomLink {
 
 }
 
-case class AtomLink(
+final case class AtomLink(
   title: Option[String]        = None,
   href: Option[String]         = None,
   hrefResolved: Option[String] = None,
