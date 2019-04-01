@@ -47,15 +47,12 @@ class RomeFeedParser
     docs           = Option(feed.getDocs),
     managingEditor = Option(feed.getManagingEditor),
     webMaster      = Option(feed.getWebMaster),
-    registration = PodcastRegistration(
-      timestamp = None,
-      complete  = None,
-    ),
-    atom         = podcastAtom(feed),
-    persona      = podcastPersona(feed),
-    itunes       = podcastItunes(feed),
-    feedpress    = podcastFeedpress(feed),
-    fyyd         = podcastFyyd(feed),
+    registration   = PodcastRegistration.empty,
+    atom           = podcastAtom(feed),
+    persona        = podcastPersona(feed),
+    itunes         = podcastItunes(feed),
+    feedpress      = podcastFeedpress(feed),
+    fyyd           = podcastFyyd(feed),
   )
 
   private def extractEpisodes(feed: SyndFeed, podcast: Podcast): List[Episode] = feed
@@ -81,9 +78,7 @@ class RomeFeedParser
     persona         = episodePersona(entry),
     itunes          = episodeItunes(entry),
     enclosure       = episodeEnclosure(entry),
-    registration = EpisodeRegistration(
-      timestamp = None,
-    )
+    registration    = EpisodeRegistration.empty
   )
 
   private def podcastTitleWithImageFallback(feed: SyndFeed): Option[String] =
@@ -140,7 +135,8 @@ class RomeFeedParser
         typ        = Option(itunes.getType),
         owner      = podcastItunesOwner(itunes),
       )
-    }.getOrElse(PodcastItunes())
+    }
+    .getOrElse(PodcastItunes.empty)
 
   private def podcastItunesOwner(itunes: FeedInformation): Option[Person] = {
     val name = Option(itunes.getOwnerName)
@@ -155,27 +151,31 @@ class RomeFeedParser
     }
   }
 
-  private def podcastFeedpress(feed: SyndFeed): PodcastFeedpress = PodcastFeedpress(locale = None)
+  // TODO implement once ROME supports this
+  private def podcastFeedpress(feed: SyndFeed): PodcastFeedpress = PodcastFeedpress.empty
 
-  private def podcastFyyd(feed: SyndFeed): PodcastFyyd = PodcastFyyd(verify = None)
+  // TODO implement once ROME supports this
+  private def podcastFyyd(feed: SyndFeed): PodcastFyyd = PodcastFyyd.empty
 
   private def podcastAtom(feed: SyndFeed): Atom = Atom(
     links = podcastAtomLinks(feed),
   )
 
+  private def fromAtomLink(ls: java.util.List[com.rometools.rome.feed.atom.Link]): List[AtomLink] = ls
+    .asScala
+    .map(AtomLink.fromRome)
+    .toList
+
+  private def fromSyndLink(ls: java.util.List[com.rometools.rome.feed.synd.SyndLink]): List[AtomLink] = ls
+    .asScala
+    .map(AtomLink.fromRome)
+    .toList
+
   private def podcastAtomLinks(feed: SyndFeed): List[AtomLink] =
     if (feed.getLinks.isEmpty) {
-      RomeFeedExtractor
-        .getAtomLinks(feed)
-        .asScala
-        .map(AtomLink.fromRome)
-        .toList
+      fromAtomLink( RomeFeedExtractor.getAtomLinks(feed))
     } else {
-      feed
-        .getLinks
-        .asScala
-        .map(AtomLink.fromRome)
-        .toList
+      fromSyndLink(feed.getLinks)
     }
 
   private def podcastPersona(feed: SyndFeed): Persona = Persona(
@@ -199,11 +199,13 @@ class RomeFeedParser
     links = episodeAtomLinks(entry),
   )
 
-  private def episodeAtomLinks(entry: SyndEntry): List[AtomLink] = RomeFeedExtractor
-    .getAtomLinks(entry)
-    .asScala
-    .map(AtomLink.fromRome)
-    .toList
+  private def episodeAtomLinks(entry: SyndEntry): List[AtomLink] = {
+    if (entry.getLinks.isEmpty) {
+      fromAtomLink( RomeFeedExtractor.getAtomLinks(entry))
+    } else {
+      fromSyndLink(entry.getLinks)
+    }
+  }
 
   private def episodeImage(entry: SyndEntry, podcast: Podcast): Option[String] = RomeFeedExtractor
     .getItunesEntryInformation(entry)
@@ -226,7 +228,8 @@ class RomeFeedParser
         episode     = Option(itunes.getEpisode),
         episodeType = Option(itunes.getEpisodeType),
       )
-    }.getOrElse(EpisodeItunes.empty)
+    }
+    .getOrElse(EpisodeItunes.empty)
 
   private def episodeEnclosure(entry: SyndEntry): EpisodeEnclosure = Option(entry.getEnclosures)
     .map { es =>
@@ -241,7 +244,8 @@ class RomeFeedParser
       } else {
         EpisodeEnclosure.empty
       }
-    }.getOrElse(EpisodeEnclosure.empty)
+    }
+    .getOrElse(EpisodeEnclosure.empty)
 
   private def episodeContentEncoded(entry: SyndEntry): Option[String] = RomeFeedExtractor
     .getContentModule(entry)
@@ -287,6 +291,7 @@ class RomeFeedParser
           image = Option(c.getImage),
         )
       }.toList
-    }.getOrElse(Nil)
+    }
+    .getOrElse(Nil)
 
 }
