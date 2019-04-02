@@ -1,4 +1,4 @@
-package hemin.api.v1.util.concurrent
+package hemin.api.v1.util
 
 import akka.actor.ActorSystem
 import javax.inject.Inject

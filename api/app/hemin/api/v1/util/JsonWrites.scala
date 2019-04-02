@@ -6,7 +6,7 @@ import play.api.libs.json._
 object JsonWrites {
 
   /** Mapping to write a IndexDoc out as a JSON value. */
-  implicit val indexDocWrites: Writes[IndexDoc] = Json.writes[IndexDoc]
+  implicit val documentWrites: Writes[Document] = Json.writes[Document]
 
   /** Mapping to write a ResultWrapper out as a JSON value. */
   implicit val searchResultWrites: Writes[SearchResult] = Json.writes[SearchResult]

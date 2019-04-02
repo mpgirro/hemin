@@ -2,7 +2,7 @@ package hemin.api.v1.rest.component
 
 import hemin.api.v1.action.FeedActionBuilder
 import hemin.api.v1.service.FeedService
-import hemin.api.v1.util.concurrent.ApiV1ExecutionContext
+import hemin.api.v1.util.ApiV1ExecutionContext
 import javax.inject.Inject
 import play.api.http.FileMimeTypes
 import play.api.i18n.{Langs, MessagesApi}
