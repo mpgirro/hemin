@@ -30,5 +30,3 @@ GET   /api/v1/image/:id               hemin.api.v1.rest.ImageController.find(id:
 POST  /api/v1/cli                     hemin.api.v1.rest.CliController.eval
 GET   /api/v1/stats/database          hemin.api.v1.rest.StatsController.database
 GET   /api/v1/category/distinct       hemin.api.v1.rest.CategoryController.distinct
-->    /api/v1/posts                   example.post.PostRouter
-
