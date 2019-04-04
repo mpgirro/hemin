@@ -82,7 +82,7 @@ update msg model =
                 cmd =
                     sendPodloveButtonModelToJs mod
             in
-            ( mod, Cmd.none )
+            ( mod, cmd )
 
         GotEpisodeListData episodes ->
             let

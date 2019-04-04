@@ -1,30 +1,29 @@
 
-function configurePodloveSubscribeButton(config) {
-  console.log("got from Elm:", config);
-  //window.podcastData = config;
+export default function configurePodloveSubscribeButton(oConfig) {
+  "use strict";
+  
+  // the element we append the Subscribe Button to
+  const oSubscribeButton = document.getElementById("podlove-subscribe-button");
 
-  /*
-  const child1 = document.createElement('script');
+  // the button can be null, if the Elm view has not been rendered yet
+  if (oSubscribeButton) {
 
-  const podloveSubscribeButtonJS = `window.podcastData = ${config}`;
+    window.podloveSubscribeButtonData = oConfig;
 
-  child1.append(document.createTextNode(podloveSubscribeButtonJS));
-  button.appendChild(child1);
+    // define the actual button to the wrapper
+    const oButtonScript = document.createElement("script");
+    //oButtonScript.setAttribute("class", "subscribe-button");
+    // el2.setAttribute('src', '/assets/podlove/subscribe-button/javascripts/app.js'); // TODO loading locally for some reason does not work
+    oButtonScript.setAttribute("src", "https://cdn.podlove.org/subscribe-button/javascripts/app.js");
+    oButtonScript.setAttribute("data-language", "en");
+    oButtonScript.setAttribute("data-size", "small");
+    oButtonScript.setAttribute("data-json-data", "podloveSubscribeButtonData");
+    //oButtonScript.setAttribute('data-color', this.HIGHLIGHT_COLOR);
+    oButtonScript.setAttribute("data-format", "rectangle");
+    oButtonScript.setAttribute("data-style", "outline");
 
-  const child2 = document.createElement('script');
-  child2.setAttribute('class', 'podlove-subscribe-button');
-  // el2.setAttribute('src', '/assets/podlove/subscribe-button/javascripts/app.js'); // TODO loading locally for some reason does not work
-  child2.setAttribute('src', 'https://cdn.podlove.org/subscribe-button/javascripts/app.js');
-  child2.setAttribute('data-language', 'en');
-  child2.setAttribute('data-size', 'small');
-  child2.setAttribute('data-json-data', 'podcastData');
-  //child2.setAttribute('data-color', this.HIGHLIGHT_COLOR);
-  child2.setAttribute('data-format', 'rectangle');
-  child2.setAttribute('data-style', 'outline');
-  button.appendChild(child2);
+    // add child element to render the Subscribe Button
+    oSubscribeButton.appendChild(oButtonScript);
+  }
 
-  //const child3 = document.createElement('noscript');
-  //child3.appendChild(document.createTextNode(`<a href="${this.podcast.link}">Subscribe to feed</a>`));
-  //button.appendChild(child3);
-  */
 }

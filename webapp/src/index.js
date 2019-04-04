@@ -9,7 +9,7 @@ const app = Elm.Main.init({
 });
 
 
-//app.ports.podloveSubscribeButton.subscribe(configurePodloveSubscribeButton);
+app.ports.podloveSubscribeButton.subscribe(configurePodloveSubscribeButton);
 
 
 registerServiceWorker();

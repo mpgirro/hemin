@@ -18,7 +18,7 @@ import Json.Encode exposing (encode, list, object, string)
 ---- OUTBOUND PORTS ----
 
 
-port sendPodloveSubscribeButtonModelAsJson : Json.Encode.Value -> Cmd msg
+port podloveSubscribeButton : Json.Encode.Value -> Cmd msg
 
 
 sendPodloveSubscribeButtonModel : Model -> Cmd msg
@@ -28,7 +28,7 @@ sendPodloveSubscribeButtonModel model =
         json =
             encodeConfig model
     in
-    sendPodloveSubscribeButtonModelAsJson json
+    podloveSubscribeButton json
 
 
 
@@ -76,7 +76,7 @@ init =
 
         cmd : Cmd Msg
         cmd =
-            sendPodloveSubscribeButtonModelAsJson json
+            podloveSubscribeButton json
     in
     ( model, cmd )
 
@@ -98,7 +98,7 @@ update msg model =
                 json =
                     encodeConfig model
             in
-            ( model, sendPodloveSubscribeButtonModelAsJson json )
+            ( model, podloveSubscribeButton json )
 
 
 
