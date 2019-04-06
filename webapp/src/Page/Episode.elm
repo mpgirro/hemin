@@ -12,6 +12,7 @@ import Html exposing (Html, a, div, h1, img, p, small, span, text)
 import Html.Attributes exposing (alt, class, href, src)
 import Http
 import Page.Error as ErrorPage
+import Podlove.WebPlayer as PodlovePlayer
 import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectToParent)
@@ -34,6 +35,13 @@ init id =
         model =
             { episode = RemoteData.NotAsked }
 
+        ( _, podlovePlayerCmd ) =
+            PodlovePlayer.init
+
+        initPodlovePlayer : Cmd Msg
+        initPodlovePlayer =
+            wrapPodlovePlayerMsg podlovePlayerCmd
+
         cmd : Cmd Msg
         cmd =
             getEpisode id
@@ -47,13 +55,58 @@ init id =
 
 type Msg
     = GotEpisodeData (WebData Episode)
+    | PodlovePlayerMsg PodlovePlayer.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         GotEpisodeData episode ->
-            ( { model | episode = episode }, Cmd.none )
+            let
+                mod : Model
+                mod =
+                    { model | episode = episode }
+
+                cmd : Cmd Msg
+                cmd =
+                    sendPodlovePlayerModelToJs mod
+
+            in
+            ( mod, cmd )
+
+        PodlovePlayerMsg playerMsg ->
+            updatePodlovePlayer model playerMsg
+            --( model, Cmd.none )
+
+
+updatePodlovePlayer : Model -> PodlovePlayer.Msg -> ( Model, Cmd Msg )
+updatePodlovePlayer model playerMsg =
+    let
+        playerModel : PodlovePlayer.Model
+        playerModel =
+            case model.episode of
+                RemoteData.Success episode ->
+                    episodeToPodlovePlayerModel episode
+
+                _ ->
+                    PodlovePlayer.emptyModel
+
+        -- TODO ignore the result! we just need trigger the update
+        ( _, m ) =
+            PodlovePlayer.update playerMsg playerModel
+    in
+    ( model, wrapPodlovePlayerMsg m )
+    --( model, Cmd.none )
+
+
+sendPodlovePlayerModelToJs : Model -> Cmd Msg
+sendPodlovePlayerModelToJs model =
+    let
+        buttonModel : PodlovePlayer.Model
+        buttonModel =
+            modelToPodlovePlayerModel model
+    in
+    wrapPodlovePlayerMsg (PodlovePlayer.sendPodloveWebPlayerModel buttonModel)
 
 
 
@@ -98,6 +151,7 @@ viewEpisode episode =
         , viewTitle episode
         , viewLink episode
         , viewSmallInfos episode
+        , viewPodlovePlayer episode
         , viewDecription episode
         ]
 
@@ -232,6 +286,15 @@ viewItunesDuration episode =
     span [ class "mr-2" ] [ text "duration:", value ]
 
 
+viewPodlovePlayer : Episode -> Html Msg
+viewPodlovePlayer episode =
+    let
+        playerModel : PodlovePlayer.Model
+        playerModel =
+            episodeToPodlovePlayerModel episode
+    in
+    wrapPodloveButtonHtml (PodlovePlayer.view playerModel)
+
 
 --- HTTP ---
 
@@ -262,3 +325,49 @@ toDescriptionTriple e =
                     Nothing
     in
     ( emptyToNothing e.contentEncoded, emptyToNothing e.description, e.itunes.summary )
+
+
+wrapPodlovePlayerMsg : Cmd PodlovePlayer.Msg -> Cmd Msg
+wrapPodlovePlayerMsg msg =
+    Cmd.map PodlovePlayerMsg msg
+
+
+wrapPodloveButtonHtml : Html PodlovePlayer.Msg -> Html Msg
+wrapPodloveButtonHtml msg =
+    Html.map PodlovePlayerMsg msg
+
+
+modelToPodlovePlayerModel : Model -> PodlovePlayer.Model
+modelToPodlovePlayerModel model =
+    case model.episode of
+        RemoteData.Success episode ->
+            episodeToPodlovePlayerModel episode
+
+        _ ->
+            PodlovePlayer.emptyModel
+
+episodeToPodlovePlayerModel : Episode -> PodlovePlayer.Model
+episodeToPodlovePlayerModel episode =
+    let
+        toPlayerModel : Episode -> PodlovePlayer.Model
+        toPlayerModel e =
+            -- TODO
+             { duration = Nothing
+                , audio =
+                    { url = Nothing
+                    , size = Nothing
+                    , mimeType = Nothing
+                    }
+                , chapters = []
+                , theme =
+                    { main = Nothing
+                    , highlight = Nothing
+                    }
+                , tabs =
+                    { chapters = Nothing
+                    }
+                , visibleComponents = []
+                }
+
+    in
+    toPlayerModel episode

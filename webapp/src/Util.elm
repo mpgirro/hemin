@@ -1,6 +1,8 @@
 module Util exposing
     ( decodePosix
     , emptyHtml
+    , encodeMaybeBool
+    , encodeMaybeString
     , maybeAsString
     , maybeAsText
     , maybePageNumberParam
@@ -15,8 +17,28 @@ import DateFormat
 import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, property)
 import Json.Decode exposing (Decoder, int, maybe)
-import Json.Encode
+import Json.Encode exposing (string, bool)
 import Time exposing (Month, Posix, millisToPosix, toDay, toMonth, toYear)
+
+
+encodeMaybeString : Maybe String -> Json.Encode.Value
+encodeMaybeString maybeString =
+    case maybeString of
+        Just s ->
+            string s
+
+        Nothing ->
+            Json.Encode.null
+
+
+encodeMaybeBool : Maybe Bool -> Json.Encode.Value
+encodeMaybeBool maybeBool =
+    case maybeBool of
+        Just b ->
+            bool b
+
+        Nothing ->
+            Json.Encode.null
 
 
 maybeAsText : Maybe String -> Html msg

@@ -12,7 +12,7 @@ port module Podlove.SubscribeButton exposing
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)
 import Json.Encode exposing (encode, list, object, string)
-
+import Util exposing (encodeMaybeString)
 
 
 ---- OUTBOUND PORTS ----
@@ -26,7 +26,7 @@ sendPodloveSubscribeButtonModel model =
     let
         json : Json.Encode.Value
         json =
-            encodeConfig model
+            encodeModel model
     in
     podloveSubscribeButton json
 
@@ -72,7 +72,7 @@ init =
 
         json : Json.Encode.Value
         json =
-            encodeConfig model
+            encodeModel model
 
         cmd : Cmd Msg
         cmd =
@@ -96,7 +96,7 @@ update msg model =
             let
                 json : Json.Encode.Value
                 json =
-                    encodeConfig model
+                    encodeModel model
             in
             ( model, podloveSubscribeButton json )
 
@@ -114,33 +114,23 @@ view _ =
 --- JSON ---
 
 
-encodeConfig : Model -> Json.Encode.Value
-encodeConfig config =
+encodeModel : Model -> Json.Encode.Value
+encodeModel model =
     object
-        [ ( "title", encodeMaybeString config.title )
-        , ( "subtitle", encodeMaybeString config.subtitle )
-        , ( "description", encodeMaybeString config.description )
-        , ( "cover", encodeMaybeString config.cover )
-        , ( "feeds", list encodeFeed config.feeds )
+        [ ( "title", encodeMaybeString model.title )
+        , ( "subtitle", encodeMaybeString model.subtitle )
+        , ( "description", encodeMaybeString model.description )
+        , ( "cover", encodeMaybeString model.cover )
+        , ( "feeds", list encodeFeed model.feeds )
         ]
 
 
 encodeFeed : Feed -> Json.Encode.Value
-encodeFeed config =
+encodeFeed feed =
     object
-        [ ( "type", encodeMaybeString config.type_ )
-        , ( "format", encodeMaybeString config.format )
-        , ( "url", encodeMaybeString config.url )
-        , ( "variant", encodeMaybeString config.variant )
-        , ( "directory-url-itunes", encodeMaybeString config.directoryUrlItunes )
+        [ ( "type", encodeMaybeString feed.type_ )
+        , ( "format", encodeMaybeString feed.format )
+        , ( "url", encodeMaybeString feed.url )
+        , ( "variant", encodeMaybeString feed.variant )
+        , ( "directory-url-itunes", encodeMaybeString feed.directoryUrlItunes )
         ]
-
-
-encodeMaybeString : Maybe String -> Json.Encode.Value
-encodeMaybeString maybeString =
-    case maybeString of
-        Just s ->
-            string s
-
-        Nothing ->
-            Json.Encode.null

@@ -1,12 +1,12 @@
 
 export default function configurePodloveSubscribeButton(oConfig) {
   "use strict";
-  
+
   // the element we append the Subscribe Button to
-  const oSubscribeButton = document.getElementById("podlove-subscribe-button");
+  const oSubscribeButtonContainer = document.getElementById("podlove-subscribe-button");
 
   // the button can be null, if the Elm view has not been rendered yet
-  if (oSubscribeButton) {
+  if (oSubscribeButtonContainer) {
 
     window.podloveSubscribeButtonData = oConfig;
 
@@ -23,7 +23,7 @@ export default function configurePodloveSubscribeButton(oConfig) {
     oButtonScript.setAttribute("data-style", "outline");
 
     // add child element to render the Subscribe Button
-    oSubscribeButton.appendChild(oButtonScript);
+    oSubscribeButtonContainer.appendChild(oButtonScript);
   }
 
 }

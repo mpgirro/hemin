@@ -110,8 +110,8 @@ update msg model =
             ( mod, Cmd.none )
 
         PodloveButtonMsg buttonMsg ->
-            --updatePodloveButton model buttonMsg
-            ( model, Cmd.none )
+            updatePodloveButton model buttonMsg
+            --( model, Cmd.none )
 
 
 updatePodloveButton : Model -> PodloveButton.Msg -> ( Model, Cmd Msg )
@@ -125,8 +125,8 @@ updatePodloveButton model buttonMsg =
         ( _, m ) =
             PodloveButton.update buttonMsg buttonModel
     in
-    --( model, wrapPodloveButtonMsg m )
-    ( model, Cmd.none )
+    ( model, wrapPodloveButtonMsg m )
+    --( model, Cmd.none )
 
 
 sendPodloveButtonModelToJs : Model -> Cmd Msg
