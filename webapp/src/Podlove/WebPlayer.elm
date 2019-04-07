@@ -11,7 +11,7 @@ port module Podlove.WebPlayer exposing
 import Html exposing (Html, div)
 import Html.Attributes exposing (id)
 import Json.Encode exposing (encode, list, object, string)
-import Util exposing (encodeMaybeBool, encodeMaybeString)
+import Util exposing (encodeMaybeBool, encodeMaybeInt, encodeMaybeString)
 
 
 ---- OUTBOUND PORTS ----
@@ -66,7 +66,7 @@ emptyModel =
 
 type alias Audio =
     { url : Maybe String
-    , size : Maybe String
+    , size : Maybe Int
     , mimeType : Maybe String
     }
 
@@ -149,7 +149,7 @@ encodeModel model =
         , ( "chapters", list encodeChapter model.chapters )
         , ( "theme", encodeTheme model.theme )
         , ( "tabs", encodeTabs model.tabs )
-        , ( "visibleComponents", list string [] )
+        , ( "visibleComponents", list string model.visibleComponents )
         ]
 
 
@@ -157,7 +157,7 @@ encodeAudio : Audio -> Json.Encode.Value
 encodeAudio audio =
     object
         [ ( "url", encodeMaybeString audio.url )
-        , ( "size", encodeMaybeString audio.size )
+        , ( "size", encodeMaybeInt audio.size )
         , ( "mimeType", encodeMaybeString audio.mimeType )
         ]
 
