@@ -38,9 +38,6 @@ type alias Model =
     { duration : Maybe String
     , audio : Audio
     , chapters : List Chapter
-    , theme : Theme
-    , tabs : Tabs
-    , visibleComponents : List String
     }
 
 
@@ -53,14 +50,6 @@ emptyModel =
         , mimeType = Nothing
         }
     , chapters = []
-    , theme =
-        { main = Nothing
-        , highlight = Nothing
-        }
-    , tabs =
-        { chapters = Nothing
-        }
-    , visibleComponents = []
     }
 
 
@@ -76,17 +65,6 @@ type alias Chapter =
     , title : Maybe String
     , href : Maybe String
     , image : Maybe String
-    }
-
-
-type alias Theme =
-    { main : Maybe String
-    , highlight : Maybe String
-    }
-
-
-type alias Tabs =
-    { chapters : Maybe Bool
     }
 
 
@@ -147,9 +125,6 @@ encodeModel model =
         [ ( "duration", encodeMaybeString model.duration )
         , ( "audio", encodeAudio model.audio )
         , ( "chapters", list encodeChapter model.chapters )
-        , ( "theme", encodeTheme model.theme )
-        , ( "tabs", encodeTabs model.tabs )
-        , ( "visibleComponents", list string model.visibleComponents )
         ]
 
 
@@ -169,19 +144,4 @@ encodeChapter chapter =
         , ( "title", encodeMaybeString chapter.title )
         , ( "href", encodeMaybeString chapter.href )
         , ( "image", encodeMaybeString chapter.image )
-        ]
-
-
-encodeTheme : Theme -> Json.Encode.Value
-encodeTheme theme =
-    object
-        [ ( "main", encodeMaybeString theme.main )
-        , ( "title", encodeMaybeString theme.highlight )
-        ]
-
-
-encodeTabs : Tabs -> Json.Encode.Value
-encodeTabs tabs =
-    object
-        [ ( "chapters", encodeMaybeBool tabs.chapters )
         ]

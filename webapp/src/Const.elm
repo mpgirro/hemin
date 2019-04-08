@@ -1,7 +1,5 @@
 module Const exposing
-    ( podlovePlayerThemeHighlight
-    , podlovePlayerThemeMain
-    , siteName
+    ( siteName
     , version
     )
 
@@ -14,12 +12,3 @@ siteName =
 version : String
 version =
     "0.1.0"
-
-
-podlovePlayerThemeMain : String
-podlovePlayerThemeMain =
-    "#ffffff"
-
-podlovePlayerThemeHighlight : String
-podlovePlayerThemeHighlight =
-    "#2B8AC6"

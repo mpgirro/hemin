@@ -7,7 +7,6 @@ module Page.Episode exposing
     )
 
 import Browser
-import Const exposing (podlovePlayerThemeHighlight, podlovePlayerThemeMain)
 import Data.Episode exposing (Episode)
 import Html exposing (Html, a, div, h1, img, p, small, span, text)
 import Html.Attributes exposing (alt, class, href, src)
@@ -354,28 +353,14 @@ episodeToPodlovePlayerModel episode =
         toPlayerModel e =
             -- TODO
              { duration = episode.itunes.duration
-                , audio =
-                    { url = episode.enclosure.url
-                    , size = episode.enclosure.length
-                    , mimeType = episode.enclosure.typ
-                    }
-                -- TODO set the chapters; add them to episode
-                , chapters = []
-                , theme =
-                    { main = Just podlovePlayerThemeMain
-                    , highlight = Just podlovePlayerThemeHighlight
-                    }
-                , tabs =
-                    { chapters = Just True
-                    }
-                , visibleComponents =
-                    [ "tabChapters"
-                    , "tabAudio"
-                    , "progressbar"
-                    , "controlSteppers"
-                    , "controlChapters"
-                    ]
+             , audio =
+                { url = episode.enclosure.url
+                , size = episode.enclosure.length
+                , mimeType = episode.enclosure.typ
                 }
+              -- TODO set the chapters; add them to episode
+              , chapters = []
+              }
 
     in
     toPlayerModel episode

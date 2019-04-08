@@ -107,7 +107,7 @@ update msg model =
 
 view : Model -> Html Msg
 view _ =
-    div [ id "podlove-subscribe-button" ] []
+    div [ id "podlove-subscribe-button-container" ] []
 
 
 
