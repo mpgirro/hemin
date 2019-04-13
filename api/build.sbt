@@ -18,6 +18,20 @@ def gatlingVersion(scalaBinVer: String): String = scalaBinVer match {
   case "2.12" => "2.3.1"
 }
 
+// Note: This version must exactly match the one used by the Hemin engine
+val akkaVersion = "2.5.22"
+val akkaHttpVersion = "10.1.8"
+
+// Akka dependencies used by Play
+libraryDependencies ++= Seq(
+    "com.typesafe.akka" %% "akka-actor"     % akkaVersion,
+    "com.typesafe.akka" %% "akka-stream"    % akkaVersion,
+    "com.typesafe.akka" %% "akka-slf4j"     % akkaVersion,
+    "com.typesafe.akka" %% "akka-http"      % akkaHttpVersion,
+    "com.typesafe.akka" %% "akka-http-core" % akkaHttpVersion,
+    "com.typesafe.akka" %% "akka-parsing"   % akkaHttpVersion
+)
+
 libraryDependencies += guice
 
 libraryDependencies += "io.hemin" %% "hemin-engine" % "1.0-SNAPSHOT"
