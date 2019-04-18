@@ -2,7 +2,7 @@
 GET   /                               hemin.api.v1.rest.HomeController.index
 
 # Swagger API docs
-GET   /swagger.json                   controllers.ApiHelpController.getResources
+GET   /swagger.json                   hemin.api.SwaggerSpecs.specs
 GET   /docs/                          controllers.Assets.at(path="/public/swagger",file="index.html")
 GET   /docs/*file                     controllers.Assets.at(path="/public/swagger",file)
 

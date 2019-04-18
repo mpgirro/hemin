@@ -6,13 +6,13 @@ import hemin.api.v1.util.ArrayWrapper
 import hemin.engine.model.Episode
 import io.swagger.annotations._
 import javax.inject.Inject
-import javax.ws.rs.{ GET, Path, PathParam, Produces }
+import javax.ws.rs.{GET, Path, Produces}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
-@Path("/episode")
 @Api("Episode")
+@Path("/api/v1/episode")
 class EpisodeController @Inject() (cc: EpisodeControllerComponents)
   extends EpisodeBaseController(cc) {
 
@@ -21,12 +21,11 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
   @GET
   @Path("/")
   @ApiOperation(value = "Finds an Episode by ID",
-    notes = "Multiple status values can be provided with comma seperated strings",
-    response = classOf[Episode],
-  responseContainer = "List")
+    response = classOf[Episode])
   @ApiResponses(Array(
     new ApiResponse(code = 400, message = "Invalid ID supplied"),
     new ApiResponse(code = 404, message = "Episode not found")))
+  @Produces(Array("application/json"))
   def find(
     @ApiParam(value = "ID of the Episode to fetch") id: String): Action[AnyContent] = EpisodeAction.async {
     implicit request =>

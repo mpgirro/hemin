@@ -1,0 +1,13 @@
+---
+  swagger: "2.0"
+  info:
+    title: "Hemin API"
+    description: "This the API to the backend data of Hemin. You can find out more about Hemin at [https://hemin.io](https://hemin.io)."
+    version: "1.0.0"
+  host: localhost:9000
+  schemes:
+    - "http"
+  consumes:
+    - application/json
+  produces:
+    - application/json

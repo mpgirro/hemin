@@ -10,8 +10,11 @@ scalaVersion in ThisBuild := "2.12.6"
 
 crossScalaVersions := Seq("2.11.12", "2.12.6")
 
-resolvers += Resolver.mavenLocal
-resolvers += "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots"
+resolvers ++= Seq(
+    Resolver.mavenLocal,
+    Resolver.jcenterRepo,
+    "Sonatype OSS Snapshots" at "https://oss.sonatype.org/content/repositories/snapshots",
+)
 
 def gatlingVersion(scalaBinVer: String): String = scalaBinVer match {
   case "2.11" => "2.2.5"
@@ -34,6 +37,8 @@ libraryDependencies ++= Seq(
 
 libraryDependencies += guice
 
+libraryDependencies += "com.typesafe.play" %% "play-json" % "2.7.3"  // https://github.com/playframework/play-json
+
 libraryDependencies += "io.hemin" %% "hemin-engine" % "1.0-SNAPSHOT"
 
 libraryDependencies += "org.joda" % "joda-convert" % "1.9.2"
@@ -49,8 +54,11 @@ libraryDependencies += "io.gatling" % "gatling-test-framework" % gatlingVersion(
 // JAX-RS is required by Swagger for some annotations
 libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar")) // this is a workaround for https://github.com/jax-rs/api/issues/571
 libraryDependencies += "io.swagger" %% "swagger-play2" % "1.7.0"
+libraryDependencies += "com.iheart" %% "play-swagger" % "0.7.5-PLAY2.7" // https://github.com/iheartradio/play-swagger
 
 //libraryDependencies += "org.zalando" %% "scala-jsonapi" % "0.6.2" // TODO currently only supports Scala 2.11
+
+//swaggerDomainNameSpaces := Seq("hemin.engine.model")
 
 // The Play project itself
 lazy val root = (project in file("."))
@@ -61,3 +69,5 @@ lazy val root = (project in file("."))
     name := """hemin-api""",
     scalaSource in GatlingTest := baseDirectory.value / "/gatling/simulation"
   )
+
+
