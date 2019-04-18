@@ -20,7 +20,8 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
 
   @GET
   @Path("/")
-  @ApiOperation(value = "Finds an Episode by ID",
+  @ApiOperation(
+    value    = "Finds an Episode by ID",
     response = classOf[Episode])
   @ApiResponses(Array(
     new ApiResponse(code = 400, message = "Invalid ID supplied"),
@@ -38,6 +39,16 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
         }
     }
 
+//  @GET
+//  @Path("/")
+  @ApiOperation(
+    value    = "Finds Chapters of an Episode by ID",
+    response = classOf[Episode],
+    responseContainer = "List")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Invalid ID supplied"),
+    new ApiResponse(code = 404, message = "Episode not found")))
+  @Produces(Array("application/json"))
   def chapters(id: String): Action[AnyContent] =
     EpisodeAction.async { implicit request =>
       log.trace(s"GET chapters by episode: id = $id")

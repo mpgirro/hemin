@@ -21,8 +21,9 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
 
   @GET
   @Path("/")
-  @ApiOperation(value = "Finds an Podcast by ID",
-    notes = "Multiple status values can be provided with comma seperated strings",
+  @ApiOperation(
+    value    = "Finds an Podcast by ID",
+    notes    = "Multiple status values can be provided with comma seperated strings",
     response = classOf[Podcast])
   @ApiResponses(Array(
     new ApiResponse(code = 400, message = "Invalid ID supplied"),
@@ -41,8 +42,9 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
 
   @GET
   @Path("/")
-  @ApiOperation(value = "Finds Podcasts by Page-Number and Page-Size",
-    response = classOf[Podcast],
+  @ApiOperation(
+    value             = "Finds Podcasts by Page-Number and Page-Size",
+    response          = classOf[Podcast],
     responseContainer = "List")
   def all(p: Option[Int], s: Option[Int]): Action[AnyContent] =
     PodcastAction.async { implicit request =>
