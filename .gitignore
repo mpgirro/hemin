@@ -2,3 +2,4 @@
 /docker/data/mongo
 /docker/data/neo4j
 /docker/data/solr
+/docker/data/fuseki

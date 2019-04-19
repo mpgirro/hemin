@@ -12,3 +12,7 @@ services:
     extends:
       file: docker/neo4j.yml
       service: neo4j
+  fuseki:
+    extends:
+      file: docker/fuseki.yml
+      service: fuseki

@@ -1,0 +1,13 @@
+version: '2'
+services:
+  fuseki:
+    image: stain/jena-fuseki
+    container_name: "hemin-fuseki"
+    environment:
+      - ADMIN_PASSWORD=hemin
+    ports:
+      - 3030:3030
+    volumes:
+      - ./data/fuseki:/fuseki
+
+
