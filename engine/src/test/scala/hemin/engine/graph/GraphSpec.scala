@@ -1,23 +1,23 @@
-package hemin.engine.semantic
+package hemin.engine.graph
 
 import akka.actor.{ActorRef, ActorSystem}
 import akka.testkit.{ImplicitSender, TestKit}
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportSemanticStoreInitializationComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportGraphStoreInitializationComplete}
 import hemin.engine.{HeminEngine, TestConstants}
 import org.scalatest.{FlatSpecLike, Matchers}
 
-class SemanticSpec
+class GraphSpec
   extends TestKit(ActorSystem(HeminEngine.name))
     with ImplicitSender
     with FlatSpecLike
     with Matchers {
 
-  val semanticConfig: SemanticConfig = TestConstants.engineConfig.semantic
+  val semanticConfig: GraphConfig = TestConstants.engineConfig.graph
 
   "The SemanticStore" should "report its completed initialization" in {
-    val semantic: ActorRef = system.actorOf(SemanticStore.props(semanticConfig))
+    val semantic: ActorRef = system.actorOf(GraphStore.props(semanticConfig))
     semantic ! ActorRefSupervisor(testActor)
-    expectMsgType[ReportSemanticStoreInitializationComplete.type]
+    expectMsgType[ReportGraphStoreInitializationComplete.type]
   }
 
 }

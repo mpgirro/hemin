@@ -1,19 +1,19 @@
-package hemin.engine.semantic
+package hemin.engine.graph
 
 import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
-import hemin.engine.semantic.SemanticStore._
-import hemin.engine.semantic.repository.graph.{GraphRepository, Neo4jRepository}
+import hemin.engine.graph.GraphStore._
 import hemin.engine.model.{Episode, Podcast}
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportSemanticStoreInitializationComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportGraphStoreInitializationComplete}
+import hemin.engine.graph.repository.{GraphRepository, Neo4jRepository}
 
 import scala.concurrent.ExecutionContext
 
-object SemanticStore {
-  final val name = "semantic"
+object GraphStore {
+  final val name = "graph"
 
-  def props(config: SemanticConfig): Props =
-    Props(new SemanticStore(config))
+  def props(config: GraphConfig): Props =
+    Props(new GraphStore(config))
       .withDispatcher(config.dispatcher)
       .withMailbox(config.mailbox)
 
@@ -23,7 +23,7 @@ object SemanticStore {
   final case class GeneratePodcastEpisodeRelationship(podcastId: Option[String], episodeId: Option[String]) extends GraphStoreMessage
 }
 
-class SemanticStore(config: SemanticConfig)
+class GraphStore(config: GraphConfig)
   extends Actor {
 
   private val log: Logger = Logger(getClass)
@@ -39,12 +39,12 @@ class SemanticStore(config: SemanticConfig)
 
   // wipe all data if it pleases and sparkles
   if (config.createStore) {
-    log.info("Deleting Semantic database(s) on startup")
+    log.info("Deleting Graph database(s) on startup")
     graphRepository.dropAll()
   }
 
   override def postStop: Unit = {
-    log.info("{} subsystem shutting down", SemanticStore.name.toUpperCase)
+    log.info("{} subsystem shutting down", GraphStore.name.toUpperCase)
   }
 
   override def receive: Receive = {
@@ -52,7 +52,7 @@ class SemanticStore(config: SemanticConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportSemanticStoreInitializationComplete
+      supervisor ! ReportGraphStoreInitializationComplete
 
     case GeneratePodcastNode(podcast) =>
       onGeneratePodcastNode(podcast)
@@ -80,15 +80,15 @@ class SemanticStore(config: SemanticConfig)
       }
       podcast.persona.authors.foreach { person =>
         graphRepository.createPerson(person)
-        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.AUTHOR_RELATIONSHIP)
+        graphRepository.linkPodcastPerson(podcastId, person, Neo4jRepository.AUTHOR_RELATIONSHIP)
       }
       podcast.persona.contributors.foreach { person =>
         graphRepository.createPerson(person)
-        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
+        graphRepository.linkPodcastPerson(podcastId, person, Neo4jRepository.CONTRIBUTOR_RELATIONSHIP)
       }
       podcast.itunes.owner.foreach { person =>
         graphRepository.createPerson(person)
-        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.ITUNES_OWNER_RELATIONSHIP)
+        graphRepository.linkPodcastPerson(podcastId, person, Neo4jRepository.ITUNES_OWNER_RELATIONSHIP)
       }
     }
   }
@@ -103,15 +103,15 @@ class SemanticStore(config: SemanticConfig)
       }
       episode.persona.authors.foreach { person =>
         graphRepository.createPerson(person)
-        graphRepository.linkEpisodePerson(episodeId, person, GraphRepository.AUTHOR_RELATIONSHIP)
+        graphRepository.linkEpisodePerson(episodeId, person, Neo4jRepository.AUTHOR_RELATIONSHIP)
       }
       episode.persona.contributors.foreach { person =>
         graphRepository.createPerson(person)
-        graphRepository.linkEpisodePerson(episodeId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
+        graphRepository.linkEpisodePerson(episodeId, person, Neo4jRepository.CONTRIBUTOR_RELATIONSHIP)
       }
       episode.itunes.author.foreach { itunesAuthor =>
         graphRepository.createPerson(itunesAuthor)
-        graphRepository.linkEpisodePerson(episodeId, itunesAuthor, GraphRepository.ITUNES_AUTHOR_RELATIONSHIP)
+        graphRepository.linkEpisodePerson(episodeId, itunesAuthor, Neo4jRepository.ITUNES_AUTHOR_RELATIONSHIP)
       }
     }
   }

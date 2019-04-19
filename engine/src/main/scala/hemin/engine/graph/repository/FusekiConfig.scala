@@ -1,4 +1,4 @@
-package hemin.engine.semantic.repository.triple
+package hemin.engine.graph.repository
 
 case class FusekiConfig(
   uri: String,

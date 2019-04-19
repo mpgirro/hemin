@@ -1,34 +1,11 @@
-package hemin.engine.semantic.repository.graph
+package hemin.engine.graph.repository
 
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model.{Episode, Person, Podcast}
-import hemin.engine.semantic.repository.SemanticRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-object GraphRepository {
-  /** The Label of Podcast nodes */
-  val PODCAST_LABEL: String = "Podcast"
-
-  /** The Label of Episode nodes */
-  val EPISODE_LABEL: String = "Episode"
-
-  /** The Label of Website nodes */
-  val WEBSITE_LABEL: String = "Website"
-
-  /** The Label of Person nodes */
-  val PERSON_LABEL: String = "Person"
-
-  val AUTHOR_RELATIONSHIP: String = "AUTHOR"
-  val BELONGS_TO_RELATIONSHIP: String = "BELONGS_TO"
-  val CONTRIBUTOR_RELATIONSHIP: String = "CONTRIBUTOR"
-  val ITUNES_AUTHOR_RELATIONSHIP: String = "ITUNES_AUTHOR"
-  val ITUNES_OWNER_RELATIONSHIP: String = "ITUNES_OWNER"
-  val LINKS_TO_RELATIONSHIP: String = "LINKS_TO"
-}
-
-trait GraphRepository extends SemanticRepository {
+trait GraphRepository {
 
   protected[this] implicit val executionContext: ExecutionContext
 
