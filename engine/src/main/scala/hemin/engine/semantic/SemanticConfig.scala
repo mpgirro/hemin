@@ -1,4 +1,4 @@
-package hemin.engine.graph
+package hemin.engine.semantic
 
 import com.typesafe.config.ConfigFactory.{load, parseString}
 import com.typesafe.config.{Config, ConfigFactory}
@@ -7,27 +7,27 @@ import hemin.engine.util.config.{ConfigDefaults, ConfigStandardValues}
 
 import scala.collection.JavaConverters._
 
-final case class GraphConfig (
+final case class SemanticConfig(
   neo4jUri: String,
   username: String,
   password: String,
-  createGraph: Boolean,
+  createStore: Boolean,
 ) extends ConfigStandardValues {
-  override val namespace: String = GraphConfig.namespace
+  override val namespace: String = SemanticConfig.namespace
 }
 
-object GraphConfig
-  extends ConfigDefaults[GraphConfig]
+object SemanticConfig
+  extends ConfigDefaults[SemanticConfig]
     with ConfigStandardValues {
 
-  override val namespace: String = s"${HeminConfig.namespace}.${GraphStore.name}"
+  override val namespace: String = s"${HeminConfig.namespace}.${SemanticStore.name}"
 
-  override def fromConfig(config: Config): GraphConfig =
-    GraphConfig(
+  override def fromConfig(config: Config): SemanticConfig =
+    SemanticConfig(
       neo4jUri    = config.getString(s"$namespace.neo4j-uri"),
       username    = config.getString(s"$namespace.username"),
       password    = config.getString(s"$namespace.password"),
-      createGraph = config.getBoolean(s"$namespace.create-graph"),
+      createStore = config.getBoolean(s"$namespace.create-graph"),
     )
 
   override protected[this] val defaultValues: Config = ConfigFactory.parseMap(Map(
@@ -50,7 +50,7 @@ object GraphConfig
 
   override protected[this] val defaultMailbox: Config = load(parseString(
     s"""$mailbox {
-      mailbox-type = "${classOf[GraphMailbox].getCanonicalName}"
+      mailbox-type = "${classOf[SemanticMailbox].getCanonicalName}"
       mailbox-capacity = 100
       mailbox-push-timeout-time = 1ms
     }"""))

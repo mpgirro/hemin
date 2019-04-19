@@ -1,19 +1,19 @@
-package hemin.engine.graph
+package hemin.engine.semantic
 
 import akka.actor.{Actor, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
-import hemin.engine.graph.GraphStore._
-import hemin.engine.graph.repository.{GraphRepository, Neo4jRepository}
+import hemin.engine.semantic.SemanticStore._
+import hemin.engine.semantic.repository.graph.{GraphRepository, Neo4jRepository}
 import hemin.engine.model.{Episode, Podcast}
-import hemin.engine.node.Node.{ActorRefSupervisor, ReportGraphStoreInitializationComplete}
+import hemin.engine.node.Node.{ActorRefSupervisor, ReportSemanticStoreInitializationComplete}
 
 import scala.concurrent.ExecutionContext
 
-object GraphStore {
-  final val name = "graph"
+object SemanticStore {
+  final val name = "semantic"
 
-  def props(config: GraphConfig): Props =
-    Props(new GraphStore(config))
+  def props(config: SemanticConfig): Props =
+    Props(new SemanticStore(config))
       .withDispatcher(config.dispatcher)
       .withMailbox(config.mailbox)
 
@@ -23,7 +23,7 @@ object GraphStore {
   final case class GeneratePodcastEpisodeRelationship(podcastId: Option[String], episodeId: Option[String]) extends GraphStoreMessage
 }
 
-class GraphStore (config: GraphConfig)
+class SemanticStore(config: SemanticConfig)
   extends Actor {
 
   private val log: Logger = Logger(getClass)
@@ -33,18 +33,18 @@ class GraphStore (config: GraphConfig)
 
   private implicit val executionContext: ExecutionContext = context.dispatcher
 
-  private val repository: GraphRepository = new Neo4jRepository(config, executionContext)
+  private val graphRepository: GraphRepository = new Neo4jRepository(config, executionContext)
 
   private var supervisor: ActorRef = _
 
   // wipe all data if it pleases and sparkles
-  if (config.createGraph) {
-    log.info("Deleting Graph database on startup")
-    repository.dropAll()
+  if (config.createStore) {
+    log.info("Deleting Semantic database(s) on startup")
+    graphRepository.dropAll()
   }
 
   override def postStop: Unit = {
-    log.info("{} subsystem shutting down", GraphStore.name.toUpperCase)
+    log.info("{} subsystem shutting down", SemanticStore.name.toUpperCase)
   }
 
   override def receive: Receive = {
@@ -52,7 +52,7 @@ class GraphStore (config: GraphConfig)
     case ActorRefSupervisor(ref) =>
       log.debug("Received ActorRefSupervisor(_)")
       supervisor = ref
-      supervisor ! ReportGraphStoreInitializationComplete
+      supervisor ! ReportSemanticStoreInitializationComplete
 
     case GeneratePodcastNode(podcast) =>
       onGeneratePodcastNode(podcast)
@@ -72,46 +72,46 @@ class GraphStore (config: GraphConfig)
 
   private def onGeneratePodcastNode(podcast: Podcast): Unit = {
     log.debug("Received GeneratePodcastNode({})", podcast.id)
-    repository.createPodcast(podcast)
+    graphRepository.createPodcast(podcast)
     podcast.id.foreach { podcastId =>
       podcast.link.foreach { websiteUrl =>
-        repository.createWebsite(websiteUrl)
-        repository.linkPodcastWebsite(podcastId, websiteUrl)
+        graphRepository.createWebsite(websiteUrl)
+        graphRepository.linkPodcastWebsite(podcastId, websiteUrl)
       }
       podcast.persona.authors.foreach { person =>
-        repository.createPerson(person)
-        repository.linkPodcastPerson(podcastId, person, GraphRepository.AUTHOR_RELATIONSHIP)
+        graphRepository.createPerson(person)
+        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.AUTHOR_RELATIONSHIP)
       }
       podcast.persona.contributors.foreach { person =>
-        repository.createPerson(person)
-        repository.linkPodcastPerson(podcastId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
+        graphRepository.createPerson(person)
+        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
       }
       podcast.itunes.owner.foreach { person =>
-        repository.createPerson(person)
-        repository.linkPodcastPerson(podcastId, person, GraphRepository.ITUNES_OWNER_RELATIONSHIP)
+        graphRepository.createPerson(person)
+        graphRepository.linkPodcastPerson(podcastId, person, GraphRepository.ITUNES_OWNER_RELATIONSHIP)
       }
     }
   }
 
   private def onGenerateEpisodetNode(episode: Episode): Unit = {
     log.debug("Received GenerateEpisodetNode({})", episode.id)
-    repository.createEpisode(episode)
+    graphRepository.createEpisode(episode)
     episode.id.foreach { episodeId =>
       episode.link.foreach { websiteUrl =>
-        repository.createWebsite(websiteUrl)
-        repository.linkEpisodeWebsite(episodeId, websiteUrl)
+        graphRepository.createWebsite(websiteUrl)
+        graphRepository.linkEpisodeWebsite(episodeId, websiteUrl)
       }
       episode.persona.authors.foreach { person =>
-        repository.createPerson(person)
-        repository.linkEpisodePerson(episodeId, person, GraphRepository.AUTHOR_RELATIONSHIP)
+        graphRepository.createPerson(person)
+        graphRepository.linkEpisodePerson(episodeId, person, GraphRepository.AUTHOR_RELATIONSHIP)
       }
       episode.persona.contributors.foreach { person =>
-        repository.createPerson(person)
-        repository.linkEpisodePerson(episodeId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
+        graphRepository.createPerson(person)
+        graphRepository.linkEpisodePerson(episodeId, person, GraphRepository.CONTRIBUTOR_RELATIONSHIP)
       }
       episode.itunes.author.foreach { itunesAuthor =>
-        repository.createPerson(itunesAuthor)
-        repository.linkEpisodePerson(episodeId, itunesAuthor, GraphRepository.ITUNES_AUTHOR_RELATIONSHIP)
+        graphRepository.createPerson(itunesAuthor)
+        graphRepository.linkEpisodePerson(episodeId, itunesAuthor, GraphRepository.ITUNES_AUTHOR_RELATIONSHIP)
       }
     }
   }
@@ -119,7 +119,7 @@ class GraphStore (config: GraphConfig)
   private def onGeneratePodcastEpisodeRelationship(podcastId: Option[String], episodeId: Option[String]): Unit = {
     log.debug("Received GeneratePodcastEpisodeRelationship({},{})", podcastId, episodeId)
     (podcastId, episodeId) match {
-      case (Some(pId), Some(eId)) => repository.linkPodcastEpisode(pId, eId)
+      case (Some(pId), Some(eId)) => graphRepository.linkPodcastEpisode(pId, eId)
       case (_, _) => log.warn("Cannot create Podcast-Episode relationship for : ({},{})", podcastId, episodeId)
     }
   }

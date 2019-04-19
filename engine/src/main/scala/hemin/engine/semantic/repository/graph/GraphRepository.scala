@@ -1,7 +1,8 @@
-package hemin.engine.graph.repository
+package hemin.engine.semantic.repository.graph
 
 import com.typesafe.scalalogging.Logger
 import hemin.engine.model.{Episode, Person, Podcast}
+import hemin.engine.semantic.repository.SemanticRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -27,7 +28,7 @@ object GraphRepository {
   val LINKS_TO_RELATIONSHIP: String = "LINKS_TO"
 }
 
-trait GraphRepository {
+trait GraphRepository extends SemanticRepository {
 
   protected[this] implicit val executionContext: ExecutionContext
 

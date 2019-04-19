@@ -1,14 +1,14 @@
-package hemin.engine.graph.repository
+package hemin.engine.semantic.repository.graph
 
 import com.typesafe.scalalogging.Logger
-import hemin.engine.graph.GraphConfig
-import hemin.engine.graph.repository.GraphRepository._
+import hemin.engine.semantic.SemanticConfig
+import hemin.engine.semantic.repository.graph.GraphRepository._
 import hemin.engine.model.{Episode, Person, Podcast}
 import org.neo4j.driver.v1._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Neo4jRepository(config: GraphConfig,
+class Neo4jRepository(config: SemanticConfig,
                       ec: ExecutionContext)
   extends GraphRepository {
 

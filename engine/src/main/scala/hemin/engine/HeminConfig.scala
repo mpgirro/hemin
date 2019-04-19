@@ -5,7 +5,7 @@ import com.typesafe.config.{Config, ConfigFactory}
 import hemin.engine.catalog.CatalogConfig
 import hemin.engine.cli.CliConfig
 import hemin.engine.crawler.CrawlerConfig
-import hemin.engine.graph.GraphConfig
+import hemin.engine.semantic.SemanticConfig
 import hemin.engine.index.IndexConfig
 import hemin.engine.node.NodeConfig
 import hemin.engine.parser.ParserConfig
@@ -17,7 +17,7 @@ import hemin.engine.updater.UpdaterConfig
   * @param catalog  Configuration for [[hemin.engine.catalog.CatalogStore]] subsystem
   * @param cli      Configuration for [[hemin.engine.cli.CommandLineInterpreter]] subsystem
   * @param crawler  Configuration for [[hemin.engine.crawler.Crawler]] subsystem
-  * @param graph    Configuration for [[hemin.engine.graph.GraphConfig]] subsystem
+  * @param semantic Configuration for [[hemin.engine.semantic.SemanticConfig]] subsystem
   * @param index    Configuration for [[hemin.engine.index.IndexStore]] subsystem
   * @param node     Configuration for [[hemin.engine.node.Node]] subsystem
   * @param parser   Configuration for [[hemin.engine.parser.Parser]] subsystem
@@ -28,11 +28,11 @@ final case class HeminConfig(
   catalog:  CatalogConfig,
   cli:      CliConfig,
   crawler:  CrawlerConfig,
-  graph:    GraphConfig,
   index:    IndexConfig,
   node:     NodeConfig,
   parser:   ParserConfig,
   searcher: SearcherConfig,
+  semantic: SemanticConfig,
   updater:  UpdaterConfig,
 )
 
@@ -69,11 +69,11 @@ object HeminConfig {
     .withFallback(CatalogConfig.defaultConfig)
     .withFallback(CliConfig.defaultConfig)
     .withFallback(CrawlerConfig.defaultConfig)
-    .withFallback(GraphConfig.defaultConfig)
     .withFallback(IndexConfig.defaultConfig)
     .withFallback(NodeConfig.defaultConfig)
     .withFallback(ParserConfig.defaultConfig)
     .withFallback(SearcherConfig.defaultConfig)
+    .withFallback(SemanticConfig.defaultConfig)
     .withFallback(UpdaterConfig.defaultConfig)
 
   /** The default configuration of an [[HeminEngine]]
@@ -111,11 +111,11 @@ object HeminConfig {
       catalog  = CatalogConfig.fromConfig(config),
       cli      = CliConfig.fromConfig(config),
       crawler  = CrawlerConfig.fromConfig(config),
-      graph    = GraphConfig.fromConfig(config),
       index    = IndexConfig.fromConfig(config),
       node     = NodeConfig.fromConfig(config),
       parser   = ParserConfig.fromConfig(config),
       searcher = SearcherConfig.fromConfig(config),
+      semantic = SemanticConfig.fromConfig(config),
       updater  = UpdaterConfig.fromConfig(config),
     )
 

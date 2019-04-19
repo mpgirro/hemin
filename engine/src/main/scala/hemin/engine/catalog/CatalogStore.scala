@@ -5,7 +5,7 @@ import com.typesafe.scalalogging.Logger
 import hemin.engine.catalog.CatalogStore._
 import hemin.engine.catalog.repository._
 import hemin.engine.crawler.Crawler._
-import hemin.engine.graph.GraphStore._
+import hemin.engine.semantic.SemanticStore._
 import hemin.engine.index.IndexStore.AddDocIndexEvent
 import hemin.engine.model._
 import hemin.engine.node.Node._
