@@ -8,6 +8,7 @@
 
 <div align="center">
   
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/93fa2bfafa7f47988bb01dee6a50add5)](https://app.codacy.com/app/mpgirro/hemin?utm_source=github.com&utm_medium=referral&utm_content=mpgirro/hemin&utm_campaign=Badge_Grade_Dashboard)
 [![Website hemin.io](https://img.shields.io/website-up-down-green-red/https/hemin.io.svg)](https://hemin.io/) [![Build Status](https://travis-ci.org/mpgirro/hemin.png)](https://travis-ci.org/mpgirro/hemin) [![Scala version](https://img.shields.io/badge/scala-2.12-blue.svg)](https://www.scala-lang.org/download/2.12.0.html) [![Elm version](https://img.shields.io/badge/elm-0.19-blue.svg)](https://github.com/elm/compiler/blob/master/upgrade-docs/0.19.md) [![Akka version](https://img.shields.io/badge/akka-2.5-blue.svg)](https://akka.io/blog/news/2017/04/13/akka-2.5.0-released) [![Play Framework version](https://img.shields.io/badge/play-2.6-blue.svg)](https://www.playframework.com/documentation/2.6.x/Highlights26) [![Solr version](https://img.shields.io/badge/solr-7.5-blue.svg)](https://lucene.apache.org/solr/guide/7_5/index.html) [![Mongo version](https://img.shields.io/badge/mongo-4.0-blue.svg)](https://docs.mongodb.com/manual/release-notes/4.0/)
 
 </div>
