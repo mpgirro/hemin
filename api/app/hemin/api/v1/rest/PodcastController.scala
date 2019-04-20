@@ -41,12 +41,15 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
     response          = classOf[Podcast],
     responseContainer = "List")
   @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size smaller than 1")))
   def all(
     @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
     @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
     implicit request =>
       log.trace(s"GET all podcasts: p = $pageNumber & s = $pageSize")
+
+      // TODO check that pageNumber / pageSize are > 1
+
       podcastService
         .all(pageNumber, pageSize)
         .map(ps => Ok(Json.toJson(ArrayWrapper(ps))))
@@ -57,12 +60,15 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
     response          = classOf[Podcast],
     responseContainer = "List")
   @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size smaller than 1")))
   def allAsTeaser(
     @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
     @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
     implicit request =>
       log.trace(s"GET all podcasts as teasers: pageNumber = $pageNumber & pageSize = $pageSize")
+
+      // TODO check that pageNumber / pageSize are > 1
+
       podcastService
         .all(pageNumber, pageSize)
         .map(ps => ps.map(PodcastMapper.toTeaser))
@@ -109,12 +115,15 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
     response          = classOf[Podcast],
     responseContainer = "List")
   @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size smaller than 1")))
   def newest(
     @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
     @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
     implicit request =>
       log.trace(s"GET newest podcasts: pageNumber = $pageNumber & pageSize = $pageSize")
+
+      // TODO check that pageNumber / pageSize are > 1
+
       podcastService
         .newest(pageNumber, pageSize)
         .map(ps => Ok(Json.toJson(ArrayWrapper(ps))))

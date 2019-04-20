@@ -28,6 +28,9 @@ class SearchController @Inject() (cc: SearchControllerComponents)
       val p: String = pageNumber.map("& p = "+_).getOrElse("")
       val s: String = pageSize.map(" & s = "+_).getOrElse("")
       log.trace(s"SEARCH: q = $query $p $s")
+
+      // TODO check that pageNumber / pageSize are > 1
+
       searchService
         .search(query,pageNumber,pageSize)
         .map(rs => Ok(Json.toJson(rs)))

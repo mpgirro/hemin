@@ -55,7 +55,7 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
     response = classOf[Episode],
     responseContainer = "List")
   @ApiResponses(Array(
-    new ApiResponse(code = 400, message = "Invalid ID supplied")))
+    new ApiResponse(code = 400, message = "page number or page size smaller than 1")))
   def latest(
     @ApiParam(value = "Number of the page of Episodes to fetch") pageNumber: Option[Int],
     @ApiParam(value = "Size of the page of Episodes to fetch") pageSize: Option[Int]): Action[AnyContent] = EpisodeAction.async {
@@ -63,11 +63,11 @@ class EpisodeController @Inject() (cc: EpisodeControllerComponents)
       log.trace(s"GET latest episodes: pageNumber = $pageNumber & pageSize = $pageSize")
 
       /* TODO produce useful status codes for invalid arguments
-      if (pageNumber.isDefined && pageNumber.get < 0) {
+      if (pageNumber.isDefined && pageNumber.get < 1) {
         return BadRequest
       }
 
-      if (pageSize.isDefined && pageSize.get < 0) {
+      if (pageSize.isDefined && pageSize.get < 1) {
         return BadRequest
       }
       */
