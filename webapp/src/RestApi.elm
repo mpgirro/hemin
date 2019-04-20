@@ -67,11 +67,11 @@ getAllPodcasts resultWrapper pageNumber pageSize =
     let
         p : String
         p =
-            "p=" ++ String.fromInt pageNumber
+            "pageNumber=" ++ String.fromInt pageNumber
 
         s : String
         s =
-            "s=" ++ String.fromInt pageSize
+            "pageSize=" ++ String.fromInt pageSize
     in
     Http.get
         { url = apiBase ++ "/podcast/teaser?" ++ p ++ "&" ++ s

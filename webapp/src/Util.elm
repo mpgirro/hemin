@@ -76,7 +76,7 @@ maybeQueryParam : Maybe String -> Maybe String
 maybeQueryParam query =
     case query of
         Just q ->
-            Just ("q=" ++ q)
+            Just ("query=" ++ q)
 
         Nothing ->
             Nothing
@@ -86,7 +86,7 @@ maybePageNumberParam : Maybe Int -> Maybe String
 maybePageNumberParam pageNumber =
     case pageNumber of
         Just page ->
-            Just ("p=" ++ String.fromInt page)
+            Just ("pageNumber=" ++ String.fromInt page)
 
         Nothing ->
             Nothing
@@ -96,7 +96,7 @@ maybePageSizeParam : Maybe Int -> Maybe String
 maybePageSizeParam pageSize =
     case pageSize of
         Just size ->
-            Just ("s=" ++ String.fromInt size)
+            Just ("pageSize=" ++ String.fromInt size)
 
         Nothing ->
             Nothing
