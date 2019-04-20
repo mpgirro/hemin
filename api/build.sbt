@@ -52,7 +52,9 @@ libraryDependencies += "io.gatling.highcharts" % "gatling-charts-highcharts" % g
 libraryDependencies += "io.gatling" % "gatling-test-framework" % gatlingVersion(scalaBinaryVersion.value) % Test
 
 // JAX-RS is required by Swagger for some annotations
-libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar")) // this is a workaround for https://github.com/jax-rs/api/issues/571
+//libraryDependencies += "javax.ws.rs" % "javax.ws.rs-api" % "2.1.1" artifacts(Artifact("javax.ws.rs-api", "jar", "jar")) // this is a workaround for https://github.com/jax-rs/api/issues/571
+
+libraryDependencies += "io.swagger" % "swagger-annotations" % "1.5.22"
 libraryDependencies += "io.swagger" %% "swagger-play2" % "1.7.0"
 //libraryDependencies += "com.iheart" %% "play-swagger" % "0.7.5-PLAY2.7" // https://github.com/iheartradio/play-swagger
 

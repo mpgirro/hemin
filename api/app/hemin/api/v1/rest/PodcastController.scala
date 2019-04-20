@@ -3,24 +3,20 @@ package hemin.api.v1.rest
 import hemin.api.v1.rest.base.PodcastBaseController
 import hemin.api.v1.rest.component.PodcastControllerComponents
 import hemin.api.v1.util.ArrayWrapper
-import hemin.engine.model.{Episode, Podcast}
+import hemin.engine.model.{Episode, Feed, Podcast}
 import hemin.engine.util.mapper.{EpisodeMapper, PodcastMapper}
 import io.swagger.annotations._
 import javax.inject.Inject
-import javax.ws.rs.{GET, Path}
 import play.api.Logger
 import play.api.libs.json.Json
 import play.api.mvc._
 
 @Api("Podcast")
-@Path("/api/v1/podcast")
 class PodcastController @Inject() (cc: PodcastControllerComponents)
   extends PodcastBaseController(cc) {
 
   private val log = Logger(getClass).logger
 
-  @GET
-  @Path("/")
   @ApiOperation(
     value    = "Finds an Podcast by ID",
     notes    = "Multiple status values can be provided with comma seperated strings",
@@ -29,8 +25,8 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
     new ApiResponse(code = 400, message = "Invalid ID supplied"),
     new ApiResponse(code = 404, message = "Podcast not found")))
   def find(
-    @ApiParam(value = "ID of the Podcast to fetch") id: String): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
+    @ApiParam(value = "ID of the Podcast to fetch") id: String): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
       log.trace(s"GET podcast: id = $id")
       podcastService
         .find(id)
@@ -40,58 +36,84 @@ class PodcastController @Inject() (cc: PodcastControllerComponents)
         }
     }
 
-  @GET
-  @Path("/")
   @ApiOperation(
     value             = "Finds Podcasts by Page-Number and Page-Size",
     response          = classOf[Podcast],
     responseContainer = "List")
-  def all(p: Option[Int], s: Option[Int]): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
-      log.trace(s"GET all podcasts: p = $p & s = $s")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+  def all(
+    @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
+    @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
+      log.trace(s"GET all podcasts: p = $pageNumber & s = $pageSize")
       podcastService
-        .all(p, s)
-        .map { ps =>
-          Ok(Json.toJson(ArrayWrapper(ps)))
-        }
+        .all(pageNumber, pageSize)
+        .map(ps => Ok(Json.toJson(ArrayWrapper(ps))))
     }
 
-  def allAsTeaser(p: Option[Int], s: Option[Int]): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
-      log.trace(s"GET all podcasts as teasers: p = $p & s = $s")
+  @ApiOperation(
+    value             = "Finds Podcasts by Page-Number and Page-Size in a condensed information density",
+    response          = classOf[Podcast],
+    responseContainer = "List")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+  def allAsTeaser(
+    @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
+    @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
+      log.trace(s"GET all podcasts as teasers: pageNumber = $pageNumber & pageSize = $pageSize")
       podcastService
-        .all(p, s)
+        .all(pageNumber, pageSize)
         .map(ps => ps.map(PodcastMapper.toTeaser))
         .map(_.flatten)
-        .map { ps =>
-          Ok(Json.toJson(ArrayWrapper(ps)))
-        }
+        .map(ps => Ok(Json.toJson(ArrayWrapper(ps))))
     }
 
-  def episodes(id: String): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
+  @ApiOperation(
+    value    = "Finds Episodes of a Podcast by ID",
+    response = classOf[Episode],
+    responseContainer = "List")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Invalid ID supplied"),
+    new ApiResponse(code = 404, message = "Podcast not found")))
+  def episodes(
+    @ApiParam(value = "ID of the Podcast") id: String): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
       log.trace(s"GET episodes by podcast (reduced to teasers): id = $id")
       podcastService
         .episodes(id)
         .map(_.map(EpisodeMapper.toTeaser))
         .map(_.flatten)
-        .map { es =>
-          Ok(Json.toJson(ArrayWrapper(es)))
-        }
+        .map(es => Ok(Json.toJson(ArrayWrapper(es))))
     }
 
-  def feeds(id: String): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
+  @ApiOperation(
+    value    = "Finds Feeds of a Podcast by ID",
+    response = classOf[Feed],
+    responseContainer = "List")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Invalid ID supplied"),
+    new ApiResponse(code = 404, message = "Podcast not found")))
+  def feeds(
+    @ApiParam(value = "ID of the Podcast") id: String): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
       log.trace(s"GET feeds by podcast: id = $id")
       podcastService
         .feeds(id)
-        .map { fs =>
-          Ok(Json.toJson(ArrayWrapper(fs)))
-        }
+        .map(fs => Ok(Json.toJson(ArrayWrapper(fs))))
     }
 
-  def newest(pageNumber: Option[Int], pageSize: Option[Int]): Action[AnyContent] =
-    PodcastAction.async { implicit request =>
+  @ApiOperation(
+    value             = "Finds newest Podcasts registered by Hemin by Page-Number and Page-Size",
+    response          = classOf[Podcast],
+    responseContainer = "List")
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Page-Number or Page-Size was lesser than 0")))
+  def newest(
+    @ApiParam(value = "Number of the page of Podcasts to fetch") pageNumber: Option[Int],
+    @ApiParam(value = "Size of the page of Podcasts to fetch") pageSize: Option[Int]): Action[AnyContent] = PodcastAction.async {
+    implicit request =>
       log.trace(s"GET newest podcasts: pageNumber = $pageNumber & pageSize = $pageSize")
       podcastService
         .newest(pageNumber, pageSize)

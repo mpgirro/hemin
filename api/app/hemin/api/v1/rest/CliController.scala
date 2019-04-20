@@ -17,8 +17,8 @@ class CliController @Inject() (cc: CliControllerComponents,
 
   private val log = Logger(getClass).logger
 
-  def eval: Action[AnyContent] =
-    CliAction.async { implicit request =>
+  def eval: Action[AnyContent] = CliAction.async {
+    implicit request =>
       request.body.asText match {
         case Some(cmd) =>
           log.trace(s"EVAL: $cmd")

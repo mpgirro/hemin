@@ -16,8 +16,8 @@ class CategoryController @Inject() (cc: CategoryControllerComponents,
 
   private val log = Logger(getClass).logger
 
-  def distinct: Action[AnyContent] =
-    CategoryAction.async { implicit request =>
+  def distinct: Action[AnyContent] = CategoryAction.async {
+    implicit request =>
       log.trace(s"GET distinct categories")
       categoryService
         .distinct

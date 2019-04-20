@@ -4,7 +4,7 @@ import play.api.test._
 import play.api.test.Helpers._
 import play.api.test.CSRFTokenHelper._
 
-class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest {
+class ApplicationSpec extends PlaySpec with GuiceOneAppPerTest {
 
   "HomeController" should {
 

@@ -2,7 +2,8 @@ package hemin.api.v1.rest
 
 import hemin.api.v1.rest.base.FeedBaseController
 import hemin.api.v1.rest.component.FeedControllerComponents
-import io.swagger.annotations.Api
+import hemin.engine.model.Feed
+import io.swagger.annotations._
 import javax.inject.Inject
 import play.api.Logger
 import play.api.libs.json.Json
@@ -16,8 +17,15 @@ class FeedController @Inject() (cc: FeedControllerComponents)
 
   private val log = Logger(getClass).logger
 
-  def find(id: String): Action[AnyContent] =
-    FeedAction.async { implicit request =>
+  @ApiOperation(
+    value    = "Finds an Feed by ID",
+    response = classOf[Feed])
+  @ApiResponses(Array(
+    new ApiResponse(code = 400, message = "Invalid ID supplied"),
+    new ApiResponse(code = 404, message = "Feed not found")))
+  def find(
+    @ApiParam(value = "ID of the Feed") id: String): Action[AnyContent] = FeedAction.async {
+    implicit request =>
       log.trace(s"GET feed: id = $id")
       feedService
         .find(id)
@@ -27,8 +35,8 @@ class FeedController @Inject() (cc: FeedControllerComponents)
         }
     }
 
-  def propose: Action[AnyContent] =
-    FeedAction.async { implicit request =>
+  def propose: Action[AnyContent] = FeedAction.async {
+    implicit request =>
       Future {
         request.body.asText match {
           case Some(url) =>
@@ -42,8 +50,8 @@ class FeedController @Inject() (cc: FeedControllerComponents)
       }
     }
 
-  def opmlImport: Action[AnyContent] =
-    FeedAction.async { implicit request =>
+  def opmlImport: Action[AnyContent] = FeedAction.async {
+    implicit request =>
       Future {
         request.body.asText match {
           case Some(xmlData) =>
