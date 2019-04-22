@@ -11,8 +11,6 @@ matrix:
       jdk:
         - oraclejdk8
         - openjdk8
-#      elm: # clear
-#      node_js: # clear
       services:
         - docker
       before_install:
@@ -30,8 +28,6 @@ matrix:
       jdk:
         - oraclejdk8
         - openjdk8
-#      elm: # clear
-#      node_js: # clear
       cache:
         directories:
           - $HOME/.m2
@@ -54,8 +50,6 @@ matrix:
         - ISOLATED=true
       elm: elm0.19.0
       node_js: '10' # latest 10.x
-#      scala: # clear
-#      jdk: # clear
       cache:
         directories:
           - tests/elm-stuff/build-artifacts
