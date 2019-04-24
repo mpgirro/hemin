@@ -8,6 +8,10 @@ import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter,
 
 import scala.concurrent.{ExecutionContext, Future}
 
+object MongoRepository {
+  val sortAscendingByMongoId: BSONDocument = BSONDocument("id" -> 1)
+}
+
 trait MongoRepository[T] {
 
   protected[this] implicit val executionContext: ExecutionContext

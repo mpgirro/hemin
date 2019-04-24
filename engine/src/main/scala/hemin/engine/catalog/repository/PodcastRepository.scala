@@ -27,7 +27,7 @@ class PodcastRepository(db: Future[DefaultDB],
 
   override protected[this] implicit val bsonReader: BSONDocumentReader[Podcast] = BsonConversion.podcastReader
 
-  override protected[this] val defaultSort: BSONDocument = BSONDocument("_id" -> 1) // sort ascending by mongo ID
+  override protected[this] val defaultSort: BSONDocument = MongoRepository.sortAscendingByMongoId
 
   override protected[this] def querySafeguard: BSONDocument = BSONDocument("pubDate" -> BSONDocument("$lt" -> TimeUtil.now))
 
