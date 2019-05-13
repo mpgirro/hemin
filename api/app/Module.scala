@@ -1,5 +1,5 @@
 import com.google.inject.AbstractModule
-import hemin.api.v1.service.EngineService
+import io.hemin.api.v1.service.EngineService
 import net.codingwell.scalaguice.ScalaModule
 import play.api.{Configuration, Environment}
 

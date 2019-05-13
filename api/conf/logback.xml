@@ -60,8 +60,8 @@
     <logger name="controllers" level="TRACE" />
     <logger name="services" level="INFO" />
 
-    <logger name="hemin.api.v1" level="TRACE" />
-    <logger name="hemin.engine" level="INFO" />
+    <logger name="io.hemin.api.v1" level="TRACE" />
+    <logger name="io.hemin.engine" level="INFO" />
 
     <logger name="ch.qos.logback" level="WARN"/>
     <logger name="liquibase" level="WARN"/>
