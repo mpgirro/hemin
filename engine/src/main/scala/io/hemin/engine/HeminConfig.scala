@@ -38,7 +38,7 @@ final case class HeminConfig(
 
 object HeminConfig {
 
-  final val namespace: String = "hemin.engine"
+  final val namespace: String = "io.hemin.engine"
 
   /** Load from a given `com.typesafe.config.Config` object.  To ensure
     * a fully initialized [[io.hemin.engine.HeminConfig]], the given
