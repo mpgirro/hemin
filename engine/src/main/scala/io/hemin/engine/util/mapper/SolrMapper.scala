@@ -1,7 +1,5 @@
 package io.hemin.engine.util.mapper
 
-import java.util.Date
-
 import com.google.common.collect.Lists
 import io.hemin.engine.model.{Document, IndexField}
 import io.hemin.engine.util.mapper.MapperErrors._
@@ -14,7 +12,7 @@ object SolrMapper {
   def toSolr(src: Document): Try[SolrInputDocument] = Option(src)
     .map { s =>
       val d = new SolrInputDocument
-      s.docType.foreach        { x => d.addField(IndexField.DocType.entryName, x) }
+      s.documentType.foreach   { x => d.addField(IndexField.DocType.entryName, x) }
       s.id.foreach             { x => d.addField(IndexField.Id.entryName, x) }
       s.title.foreach          { x => d.addField(IndexField.Title.entryName, x) }
       s.link.foreach           { x =>

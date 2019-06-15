@@ -17,7 +17,10 @@ final case class Person(
   name: Option[String]  = None,
   email: Option[String] = None,
   uri: Option[String]   = None,
-) extends Patchable[Person] {
+) extends Patchable[Person]
+  with Documentable {
+
+  override def documentType: DocumentType = DocumentType.Person
 
   override def patchLeft(diff: Person): Person = Option(diff) match {
     case None       => this

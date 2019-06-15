@@ -1,7 +1,7 @@
 package io.hemin.engine.util.mapper
 
 import io.hemin.engine.HeminException
-import io.hemin.engine.model.{Document, Episode, Podcast}
+import io.hemin.engine.model.{Document, Episode, Person, Podcast}
 
 import scala.util.{Failure, Try}
 
@@ -36,6 +36,12 @@ object MapperErrors {
   private[mapper] def mapperFailureEpisodeToIndexDoc(cause: Throwable): Try[Document] = Failure(cause)
   private[mapper] def mapperErrorEpisodeToIndexDoc(value: Episode): HeminException =
     new HeminException(s"Error mapping Episode to IndexDoc : $value")
+
+  /** Returns the result of [[MapperErrors.mapperErrorPersonToIndexDoc]] as a Failure */
+  private[mapper] def mapperFailurePersonToIndexDoc(value: Person): Try[Document] = Failure(mapperErrorPersonToIndexDoc(value))
+  private[mapper] def mapperFailurePersonToIndexDoc(cause: Throwable): Try[Document] = Failure(cause)
+  private[mapper] def mapperErrorPersonToIndexDoc(value: Person): HeminException =
+    new HeminException(s"Error mapping Person to IndexDoc : $value")
 
   /** Returns the result of [[MapperErrors.mapperErrorUnsupportedIndexDocumentType]] as a Failure */
   private[mapper] def mapperFailureUnsupportedIndexDocumentType(value: String): Try[Document] =

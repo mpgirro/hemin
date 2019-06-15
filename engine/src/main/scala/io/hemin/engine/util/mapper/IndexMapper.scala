@@ -1,6 +1,6 @@
 package io.hemin.engine.util.mapper
 
-import io.hemin.engine.model.{Document, Episode, IndexField, Podcast}
+import io.hemin.engine.model._
 import io.hemin.engine.util.mapper.MapperErrors._
 import org.apache.solr.common.SolrDocument
 
@@ -8,13 +8,10 @@ import scala.util.{Failure, Success, Try}
 
 object IndexMapper {
 
-  final val podcastDocType: String = "podcast"
-  final val episodeDocType: String = "episode"
-
   def toDocument(src: Podcast): Try[Document] = Option(src)
     .map { s =>
       Document(
-        docType        = Some(podcastDocType),
+        documentType   = Some(s.documentType),
         id             = s.id,
         title          = s.title,
         link           = s.link,
@@ -36,7 +33,7 @@ object IndexMapper {
   def toDocument(src: Episode): Try[Document] = Option(src)
     .map { s =>
       Document(
-        docType        = Some(episodeDocType),
+        documentType   = Some(s.documentType),
         id             = s.id,
         title          = s.title,
         link           = s.link,
@@ -55,16 +52,38 @@ object IndexMapper {
     .map(Success(_))
     .getOrElse(mapperFailureEpisodeToIndexDoc(src))
 
+  def toDocument(src: Person): Try[Document] = Option(src)
+    .map { s =>
+      Document(
+        documentType   = Some(s.documentType),
+        id             = None,
+        title          = s.name,
+        link           = None,
+        description    = None,
+        pubDate        = None,
+        image          = None,
+        itunesAuthor   = None,
+        itunesSummary  = None,
+        podcastTitle   = None,
+        chapterMarks   = None,
+        contentEncoded = None,
+        transcript     = None,
+        websiteData    = None
+      )
+    }
+    .map(Success(_))
+    .getOrElse(mapperFailurePersonToIndexDoc(src))
+
   def toDocument(src: SolrDocument): Try[Document] = Option(src)
     .map { s =>
       val docType = SolrMapper.firstStringMatch(s, IndexField.DocType.entryName)
       docType match {
-        case Some(IndexMapper.podcastDocType) =>
+        case Some(DocumentType.Podcast.entryName) =>
           PodcastMapper.toPodcast(src) match {
             case Success(p)  => toDocument(p)
             case Failure(ex) => mapperFailurePodcastToIndexDoc(ex)
           }
-        case Some(IndexMapper.episodeDocType) =>
+        case Some(DocumentType.Episode.entryName) =>
           EpisodeMapper.toEpisode(src) match {
             case Success(e)  => toDocument(e): Try[Document]
             case Failure(ex) => mapperFailureEpisodeToIndexDoc(ex)

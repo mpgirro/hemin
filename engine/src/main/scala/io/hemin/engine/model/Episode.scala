@@ -18,7 +18,10 @@ final case class Episode(
   itunes: EpisodeItunes             = EpisodeItunes(),
   enclosure: EpisodeEnclosure       = EpisodeEnclosure(),
   registration: EpisodeRegistration = EpisodeRegistration(),
-) extends Patchable[Episode] {
+) extends Patchable[Episode]
+  with Documentable {
+
+  override def documentType: DocumentType = DocumentType.Episode
 
   override def patchLeft(diff: Episode): Episode = Option(diff) match {
     case None       => this

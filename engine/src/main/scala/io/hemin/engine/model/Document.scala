@@ -1,26 +1,26 @@
 package io.hemin.engine.model
 
 final case class Document(
-  docType: Option[String]        = None,
-  id: Option[String]             = None,
-  title: Option[String]          = None,
-  link: Option[String]           = None,
-  description: Option[String]    = None,
-  pubDate: Option[Long]          = None,
-  image: Option[String]          = None,
-  itunesAuthor: Option[String]   = None,
-  itunesSummary: Option[String]  = None,
-  podcastTitle: Option[String]   = None,
-  chapterMarks: Option[String]   = None,
-  contentEncoded: Option[String] = None,
-  transcript: Option[String]     = None,
-  websiteData: Option[String]    = None,
+  documentType: Option[DocumentType] = None,
+  id: Option[String]                 = None,
+  title: Option[String]              = None,
+  link: Option[String]               = None,
+  description: Option[String]        = None,
+  pubDate: Option[Long]              = None,
+  image: Option[String]              = None,
+  itunesAuthor: Option[String]       = None,
+  itunesSummary: Option[String]      = None,
+  podcastTitle: Option[String]       = None,
+  chapterMarks: Option[String]       = None,
+  contentEncoded: Option[String]     = None,
+  transcript: Option[String]         = None,
+  websiteData: Option[String]        = None,
 ) extends Patchable[Document] {
 
   override def patchLeft(diff: Document): Document = Option(diff) match {
     case None       => this
     case Some(that) => Document(
-      docType        = reduceLeft(this.docType, that.docType),
+      documentType   = reduceLeft(this.documentType, that.documentType),
       id             = reduceLeft(this.id, that.id),
       title          = reduceLeft(this.title, that.title),
       link           = reduceLeft(this.link, that.link),
@@ -40,7 +40,7 @@ final case class Document(
   override def patchRight(diff: Document): Document = Option(diff) match {
     case None       => this
     case Some(that) => Document(
-      docType        = reduceRight(this.docType, that.docType),
+      documentType   = reduceRight(this.documentType, that.documentType),
       id             = reduceRight(this.id, that.id),
       title          = reduceRight(this.title, that.title),
       link           = reduceRight(this.link, that.link),

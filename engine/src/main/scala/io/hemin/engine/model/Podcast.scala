@@ -20,7 +20,10 @@ final case class Podcast(
   itunes: PodcastItunes             = PodcastItunes(),
   feedpress: PodcastFeedpress       = PodcastFeedpress(),
   fyyd: PodcastFyyd                 = PodcastFyyd(),
-) extends Patchable[Podcast] {
+) extends Patchable[Podcast]
+  with Documentable {
+
+  override def documentType: DocumentType = DocumentType.Podcast
 
   override def patchLeft(diff: Podcast): Podcast = Option(diff) match {
     case None       => this
