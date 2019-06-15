@@ -23,7 +23,7 @@ object Searcher {
   // SearchQueries
   final case class SearchRequest(query: String, pageNumber: Option[Int], pageSize: Option[Int]) extends SearcherQuery
   // SearchQueryResults
-  final case class SearchReply(query: String, pageNumber: Option[Int], pageSize: Option[Int], results: SearchResult) extends SearcherQueryResult
+  final case class SearchReply(request: SearchRequest, result: SearchResult) extends SearcherQueryResult
 }
 
 class Searcher (config: SearcherConfig)
@@ -51,13 +51,13 @@ class Searcher (config: SearcherConfig)
       supervisor = ref
       supervisor ! ReportSearcherInitializationComplete
 
-    case SearchRequest(query, pageNumber, pageSize) =>
+    case request@SearchRequest(query, pageNumber, pageSize) =>
       log.debug("Received SearchRequest('{}',{},{}) message", query, pageNumber, pageSize)
 
       val theSender = sender()
       retriever.search(query, pageNumber, pageSize)
         .onComplete {
-          case Success(results) => theSender ! SearchReply(query, pageNumber, pageSize, results)
+          case Success(result) => theSender ! SearchReply(request, result)
           case Failure(ex) =>
             log.error("Error on searching Index : {}", ex)
             ex.printStackTrace()

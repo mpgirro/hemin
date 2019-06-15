@@ -53,7 +53,7 @@ class SearcherSpec
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest("", defaultPageNumber, defaultPageSize))
       .mapTo[SearchReply]
-      .map(_.results)
+      .map(_.result)
       .map(assertEmptySearchResult)
   }
 
@@ -61,7 +61,7 @@ class SearcherSpec
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(null, defaultPageNumber, defaultPageSize))
       .mapTo[SearchReply]
-      .map(_.results)
+      .map(_.result)
       .map(assertEmptySearchResult)
   }
 
@@ -69,7 +69,7 @@ class SearcherSpec
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(defaultQuery, Some(0), defaultPageSize))
       .mapTo[SearchReply]
-      .map(_.results)
+      .map(_.result)
       .map(assertEmptySearchResult)
   }
 
@@ -77,7 +77,7 @@ class SearcherSpec
     val searcher: ActorRef = defaultTestSearcher()
     (searcher ? SearchRequest(defaultQuery, defaultPageNumber, Some(0)))
       .mapTo[SearchReply]
-      .map(_.results)
+      .map(_.result)
       .map(assertEmptySearchResult)
   }
 
