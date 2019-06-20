@@ -1,7 +1,10 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import reactivemongo.bson.{BSONDocument, BSONValue}
 
+/**
+  * @author max
+  */
 object Query {
 
   /** Creates a `BSONDocument` instance from the elements map,

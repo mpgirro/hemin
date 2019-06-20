@@ -1,4 +1,4 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogConfig
@@ -7,8 +7,8 @@ import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver}
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Failure, Success}
 
-class RepositoryFactory(config: CatalogConfig,
-                        ec: ExecutionContext) {
+class MongoRepositoryFactory(config: CatalogConfig,
+                             ec: ExecutionContext) {
 
   private implicit val implicitExecutionContext: ExecutionContext = ec
 
@@ -53,12 +53,12 @@ class RepositoryFactory(config: CatalogConfig,
     getImageRepository.deleteAll()
   }
 
-  def getPodcastRepository: PodcastRepository = new PodcastRepository(resolveDB, ec)
+  def getPodcastRepository: PodcastMongoRepository = new PodcastMongoRepository(resolveDB, ec)
 
-  def getEpisodeRepository: EpisodeRepository = new EpisodeRepository(resolveDB, ec)
+  def getEpisodeRepository: EpisodeMongoRepository = new EpisodeMongoRepository(resolveDB, ec)
 
-  def getFeedRepository: FeedRepository = new FeedRepository(resolveDB, ec)
+  def getFeedRepository: FeedMongoRepository = new FeedMongoRepository(resolveDB, ec)
 
-  def getImageRepository: ImageRepository = new ImageRepository(resolveDB, ec)
+  def getImageRepository: ImageMongoRepository = new ImageMongoRepository(resolveDB, ec)
 
 }

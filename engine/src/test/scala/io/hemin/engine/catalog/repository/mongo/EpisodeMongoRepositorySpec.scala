@@ -1,6 +1,5 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
-import com.typesafe.scalalogging.Logger
 import io.hemin.engine.TestConstants
 import io.hemin.engine.catalog.CatalogConfig
 import io.hemin.engine.model.Episode
@@ -8,7 +7,7 @@ import io.hemin.engine.util.TimeUtil
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{AsyncFlatSpec, BeforeAndAfter, BeforeAndAfterAll, Matchers}
 
-class EpisodeRepositorySpec
+class EpisodeMongoRepositorySpec
   extends AsyncFlatSpec
     with Matchers
     with ScalaFutures
@@ -38,8 +37,8 @@ class EpisodeRepositorySpec
   */
 
   val catalogConfig: CatalogConfig = TestConstants.engineConfig.catalog
-  val repositoryFactory: RepositoryFactory = new RepositoryFactory(catalogConfig, executionContext)
-  val episodeRepository: EpisodeRepository = repositoryFactory.getEpisodeRepository
+  val repositoryFactory: MongoRepositoryFactory = new MongoRepositoryFactory(catalogConfig, executionContext)
+  val episodeRepository: EpisodeMongoRepository = repositoryFactory.getEpisodeRepository
 
   "The EpisodeRepository" should "not eventually retrieve an episode with a future pubDate" in {
 

@@ -1,4 +1,4 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminException

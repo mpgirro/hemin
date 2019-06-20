@@ -1,18 +1,17 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminException
-import io.hemin.engine.catalog.repository.BsonConversion._
+import io.hemin.engine.catalog.repository.mongo.BsonConversion._
 import io.hemin.engine.model.Image
 import reactivemongo.api.DefaultDB
-import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson.{BSONDocument, BSONDocumentReader, BSONDocumentWriter}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 
-class ImageRepository (db: Future[DefaultDB],
-                       ec: ExecutionContext)
+class ImageMongoRepository(db: Future[DefaultDB],
+                           ec: ExecutionContext)
   extends MongoRepository[Image] {
 
   override protected[this] val collectionName: String = "images"

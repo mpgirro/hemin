@@ -4,6 +4,7 @@ import akka.actor.{Actor, ActorLogging, ActorRef, Props}
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.catalog.CatalogStore._
 import io.hemin.engine.catalog.repository._
+import io.hemin.engine.catalog.repository.mongo._
 import io.hemin.engine.crawler.Crawler._
 import io.hemin.engine.graph.GraphStore._
 import io.hemin.engine.index.IndexStore.AddDocIndexEvent
@@ -101,12 +102,12 @@ class CatalogStore(config: CatalogConfig)
   private var updater: ActorRef = _
   private var supervisor: ActorRef = _
 
-  private val repositoryFactory: RepositoryFactory = new RepositoryFactory(config, executionContext)
+  private val repositoryFactory: MongoRepositoryFactory = new MongoRepositoryFactory(config, executionContext)
 
-  private val podcasts: PodcastRepository = repositoryFactory.getPodcastRepository
-  private val episodes: EpisodeRepository = repositoryFactory.getEpisodeRepository
-  private val feeds: FeedRepository = repositoryFactory.getFeedRepository
-  private val images: ImageRepository = repositoryFactory.getImageRepository
+  private val podcasts: PodcastMongoRepository = repositoryFactory.getPodcastRepository
+  private val episodes: EpisodeMongoRepository = repositoryFactory.getEpisodeRepository
+  private val feeds: FeedMongoRepository = repositoryFactory.getFeedRepository
+  private val images: ImageMongoRepository = repositoryFactory.getImageRepository
 
   // wipe all data if it pleases and sparkles
   if (config.createDatabase) {

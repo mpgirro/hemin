@@ -1,17 +1,16 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminException
-import io.hemin.engine.catalog.repository.BsonConversion._
+import io.hemin.engine.catalog.repository.mongo.BsonConversion._
 import io.hemin.engine.model.Feed
 import reactivemongo.api.DefaultDB
-import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeedRepository(db: Future[DefaultDB],
-                     ec: ExecutionContext)
+class FeedMongoRepository(db: Future[DefaultDB],
+                          ec: ExecutionContext)
   extends MongoRepository[Feed] {
 
   override protected[this] val collectionName: String = "feeds"

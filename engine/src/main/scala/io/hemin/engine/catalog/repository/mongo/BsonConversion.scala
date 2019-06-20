@@ -1,11 +1,14 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import java.time.{LocalDateTime, ZonedDateTime}
 
 import io.hemin.engine.model._
 import io.hemin.engine.util.mapper.DateMapper
-import reactivemongo.bson._
+import reactivemongo.bson.{BSONBoolean, BSONDateTime, BSONDocument, BSONDocumentReader, BSONDocumentWriter, BSONInteger, BSONLong, BSONNumberLike, BSONReader, BSONString, BSONWriter, Macros}
 
+/**
+  * @author max
+  */
 object BsonConversion {
 
   def toBsonI(value: Option[Int]): Option[BSONInteger] = value.flatMap(toBsonI)

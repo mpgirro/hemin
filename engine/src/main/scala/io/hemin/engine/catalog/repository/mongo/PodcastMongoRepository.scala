@@ -1,18 +1,17 @@
-package io.hemin.engine.catalog.repository
+package io.hemin.engine.catalog.repository.mongo
 
 import com.typesafe.scalalogging.Logger
 import io.hemin.engine.HeminException
-import io.hemin.engine.catalog.repository.BsonConversion._
+import io.hemin.engine.catalog.repository.mongo.BsonConversion._
 import io.hemin.engine.model.Podcast
 import io.hemin.engine.util.TimeUtil
 import reactivemongo.api.DefaultDB
-import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.bson._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class PodcastRepository(db: Future[DefaultDB],
-                        ec: ExecutionContext)
+class PodcastMongoRepository(db: Future[DefaultDB],
+                             ec: ExecutionContext)
   extends MongoRepository[Podcast] {
 
   override protected[this] val collectionName: String = "podcasts"
