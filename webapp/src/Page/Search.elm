@@ -26,7 +26,7 @@ import Router exposing (redirectByIndexDocType)
 import Skeleton exposing (Page)
 import String.Extra
 import Url exposing (Url)
-import Util exposing (emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateHtml)
+import Util exposing (buildSearchUrl, emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateHtml)
 
 
 
@@ -117,30 +117,9 @@ updateSearchUrl model =
 redirectLocalUrl : Model -> Cmd Msg
 redirectLocalUrl model =
     let
-        q =
-            maybeQueryParam model.query
-
-        p =
-            maybePageNumberParam model.pageNumber
-
-        s =
-            maybePageSizeParam model.pageSize
-
-        params : String
-        params =
-            String.join "&" (Maybe.Extra.values [ q, p, s ])
-
-        urlQuery : String
-        urlQuery =
-            if params == "" then
-                ""
-
-            else
-                "?" ++ params
-
         path : String
         path =
-            (++) "/search" urlQuery
+            buildSearchUrl model.query model.pageNumber model.pageSize
     in
     case model.navigationKey of
         Just key ->
@@ -352,22 +331,9 @@ viewPubDate doc =
 viewPagination : Maybe String -> Maybe Int -> Maybe Int -> SearchResult -> Html Msg
 viewPagination query pageNumber pageSize searchResult =
     let
-        qParam : String
-        qParam =
-            "q=" ++ maybeAsString query
-
-        sParam : String
-        sParam =
-            case pageSize of
-                Just s ->
-                    "&s=" ++ String.fromInt s
-
-                Nothing ->
-                    ""
-
         path : Int -> String
         path p =
-            "/search?" ++ qParam ++ "&p=" ++ String.fromInt p ++ sParam
+            buildSearchUrl query (Just p) pageSize
 
         viewFirst : Html Msg
         viewFirst =

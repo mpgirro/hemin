@@ -38,7 +38,7 @@ parser =
         [ Parser.map HomePage Parser.top
         , Parser.map PodcastPage (s "p" </> string)
         , Parser.map EpisodePage (s "e" </> string)
-        , Parser.map SearchPage (s "search" <?> Query.string "q" <?> Query.int "p" <?> Query.int "s")
+        , Parser.map SearchPage (s "search" <?> Query.string "query" <?> Query.int "pageNumber" <?> Query.int "pageSize")
         , Parser.map DiscoverPage (s "discover")
         , Parser.map ProposePage (s "propose")
         ]

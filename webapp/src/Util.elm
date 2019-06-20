@@ -1,5 +1,6 @@
 module Util exposing
-    ( decodePosix
+    ( buildSearchUrl
+    , decodePosix
     , emptyHtml
     , encodeMaybeBool
     , encodeMaybeInt
@@ -19,6 +20,7 @@ import Html exposing (Html, div, span, text)
 import Html.Attributes exposing (class, property)
 import Json.Decode exposing (Decoder, maybe)
 import Json.Encode
+import Maybe.Extra
 import Time exposing (Month, Posix, millisToPosix, toDay, toMonth, toYear)
 
 
@@ -100,6 +102,36 @@ maybePageSizeParam pageSize =
 
         Nothing ->
             Nothing
+
+
+buildSearchUrl : Maybe String -> Maybe Int -> Maybe Int -> String
+buildSearchUrl query pageNumber pageSize =
+    let
+        q =
+            maybeQueryParam query
+
+        p =
+            maybePageNumberParam pageNumber
+
+        s =
+            maybePageSizeParam pageSize
+
+        params : String
+        params =
+            String.join "&" (Maybe.Extra.values [ q, p, s ])
+
+        urlQuery : String
+        urlQuery =
+            if params == "" then
+                ""
+
+            else
+                "?" ++ params
+
+    in
+    (++) "/search" urlQuery
+
+
 
 
 emptyHtml : Html msg

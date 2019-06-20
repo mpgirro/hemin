@@ -25,7 +25,7 @@ import RemoteData exposing (WebData)
 import RestApi
 import Router exposing (redirectToEpisode, redirectToPodcast)
 import Skeleton exposing (Page)
-import Util exposing (emptyHtml, maybeAsString)
+import Util exposing (buildSearchUrl, emptyHtml, maybeAsString)
 
 
 
@@ -95,7 +95,7 @@ update msg model =
         RedirectToSearch ->
             case (model.searchQuery, model.navigationKey) of
                 (Just query, Just key) ->
-                    ( model, Browser.Navigation.pushUrl key ("/search?q=" ++ query) )
+                    ( model, Browser.Navigation.pushUrl key (buildSearchUrl (Just query) Nothing Nothing) )
 
                 (_, _) ->
                     ( model, Cmd.none )

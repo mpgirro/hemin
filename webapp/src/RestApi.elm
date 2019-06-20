@@ -21,7 +21,7 @@ import Data.Podcast exposing (Podcast, podcastDecoder, podcastListDecoder)
 import Data.SearchResult exposing (SearchResult, searchResultDecoder)
 import Http
 import Maybe.Extra
-import Util exposing (maybePageNumberParam, maybePageSizeParam, maybeQueryParam)
+import Util exposing (buildSearchUrl)
 
 
 apiBase : String
@@ -116,29 +116,12 @@ getLatestEpisodes resultWrapper pageNumber pageSize =
 getSearchResult : (Result Http.Error SearchResult -> msg) -> Maybe String -> Maybe Int -> Maybe Int -> Cmd msg
 getSearchResult resultWrapper query pageNumber pageSize =
     let
-        q =
-            maybeQueryParam query
-
-        p =
-            maybePageNumberParam pageNumber
-
-        s =
-            maybePageSizeParam pageSize
-
-        params : String
-        params =
-            String.join "&" (Maybe.Extra.values [ q, p, s ])
-
         urlQuery : String
         urlQuery =
-            if params == "" then
-                ""
-
-            else
-                "?" ++ params
+            buildSearchUrl query pageNumber pageSize
     in
     Http.get
-        { url = apiBase ++ "/search" ++ urlQuery
+        { url = apiBase ++ urlQuery
         , expect = Http.expectJson resultWrapper searchResultDecoder
         }
 
