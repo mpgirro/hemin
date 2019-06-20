@@ -75,14 +75,20 @@ buildPage title body =
 
 
 template : Html msg -> List (Html msg)
-template content =
-    [ div [ class "hemin", class "container-md" ]
-        [ div
-            [ class "px-2" ]
-            [ navbar
-            , content
-            , footer
+template mainContent =
+    let
+        leftContent = text ""
+
+        rightContent = text ""
+    in
+    [ div [ class "hemin", class "container-fluid" ]
+        [ navbar
+        , div [ class "row" ]
+            [ div [ class "col-2" ] [ leftContent ]
+            , div [ class "col-8" ] [ mainContent ]
+            , div [ class "col-2" ] [ rightContent ]
             ]
+        , footer
         ]
     ]
 
@@ -90,21 +96,20 @@ template content =
 navbar : Html msg
 navbar =
     nav
-        [ class "UnderlineNav"
-        , class "mb-4"
-        ]
-        [ div [ class "UnderlineNav-actions" ]
-            [ a [ href "/" ]
-                [ img [ src "/logo.svg", width 12, height 12, alt "" ] []
-                , div [ class "hemin-brand", class "d-inline-block mx-1" ]
-                    [ text Const.siteName ]
+        [ class "navbar", class "navbar-expand-lg", class "navbar-light", class "bg-light" ]
+        [ a [ href "/", class "navbar-brand" ]
+            [ img [ src "/logo.svg", class "mr-1", width 18, height 18, alt "" ] []
+            , text Const.siteName
+            ]
+        , div
+            [ class "collapse", class "navbar-collapse" ]
+            [ div [ class "navbar-nav" ]
+                [ a [ class "nav-item", class "nav-link", href "/search" ] [ text "search" ]
+                , a [ class "nav-item", class "nav-link", href "/discover" ] [ text "discover" ]
+                , a [ class "nav-item", class "nav-link", href "/propose" ] [ text "+feed" ]
                 ]
             ]
-        , div [ class "UnderlineNav-body" ]
-            [ a [ class "UnderlineNav-item", href "/search" ] [ text "search" ]
-            , a [ class "UnderlineNav-item", href "/discover" ] [ text "discover" ]
-            , a [ class "UnderlineNav-item", href "/propose" ] [ text "+feed" ]
-            ]
+
         ]
 
 

@@ -189,9 +189,6 @@ viewSearchInput : Model -> Html Msg
 viewSearchInput model =
     input
         [ class "form-control"
-
-        --, class "input-block"
-        , class "input"
         , attribute "style" "height: 44px !important"
         , type_ "text"
         , value (maybeAsString model.query)
@@ -205,10 +202,10 @@ viewSearchInput model =
 
 viewSearchButton : Model -> Html Msg
 viewSearchButton model =
-    span [ class "input-group-button" ]
+    div [ class "input-group-append" ]
         [ button
             [ class "btn"
-            , class "text-normal"
+            , class "btn-outline-primary"
             , type_ "button"
             , ariaLabel "Search"
             , onClick (updateSearchUrl model)
@@ -234,7 +231,7 @@ viewSearchResults model =
         RemoteData.Success searchResult ->
             div []
                 [ viewTotalHits searchResult
-                , ul [ class "list-style-none" ] <|
+                , ul [ class "list-unstyled" ] <|
                     List.map viewIndexDoc searchResult.results
                 , viewPagination model.query model.pageNumber model.pageSize searchResult
                 ]
@@ -252,34 +249,30 @@ viewTotalHits searchResult =
 
 viewIndexDoc : IndexDoc -> Html Msg
 viewIndexDoc doc =
-    li [ class "py-2" ]
-        [ div [ class "clearfix" ]
-            [ viewCoverImage doc
-            , div [ class "overflow-hidden" ]
-                [ viewIndexDocTitleAsLink doc
-                , viewIndexDocSubtitle doc
-                , p []
-                    [ viewDocType doc
-                    , viewPubDate doc
-                    ]
-                , viewStrippedDescription doc
-                ]
+    li [ class "media", class "my-4" ]
+        [ viewCoverImage doc
+        , div [ class "media-body" ]
+            [ viewIndexDocTitleAsLink doc
+            , viewIndexDocSubtitle doc
+            , p []
+                [ viewDocType doc
+                , viewPubDate doc
+                 ]
+            , viewStrippedDescription doc
             ]
         ]
 
 
 viewCoverImage : IndexDoc -> Html Msg
 viewCoverImage doc =
-    div [ class "float-left", class "mr-3", class "mt-1", class "bg-gray" ]
-        [ img
-            [ src (maybeAsString doc.image)
-            , alt ("cover image of " ++ maybeAsString doc.title)
-            , class "avatar"
-            , width 72
-            , height 72
-            ]
-            []
-        ]
+    img
+                [ src (maybeAsString doc.image)
+                , alt ("cover image of " ++ maybeAsString doc.title)
+                , class "mr-3"
+                , width 72
+                , height 72
+                ]
+                []
 
 
 viewStrippedDescription : IndexDoc -> Html Msg
@@ -299,7 +292,7 @@ viewStrippedDescription doc =
 viewIndexDocTitleAsLink : IndexDoc -> Html Msg
 viewIndexDocTitleAsLink doc =
     a
-        [ href (redirectByIndexDocType doc), class "f4" ]
+        [ href (redirectByIndexDocType doc), class "h4", class "mt-0", class "mb-1" ]
         [ maybeAsText doc.title ]
 
 
@@ -379,13 +372,16 @@ viewPagination query pageNumber pageSize searchResult =
         viewFirst : Html Msg
         viewFirst =
             if searchResult.currPage > 1 then
-                a
-                    [ class "first_page"
-                    , rel "first"
-                    , ariaLabel "First"
-                    , href (path 1)
+                li [ class "page-item" ]
+                    [ a
+                                          [ class "page-link"
+                                          , rel "first"
+                                          , ariaLabel "First"
+                                          , href (path 1)
+                                          ]
+                                          [ text "1" ]
                     ]
-                    [ text "1" ]
+
 
             else
                 emptyHtml
@@ -393,33 +389,45 @@ viewPagination query pageNumber pageSize searchResult =
         viewPrev : Html Msg
         viewPrev =
             if searchResult.currPage > 1 then
-                a
-                    [ class "previous_page"
-                    , rel "previous"
-                    , ariaLabel "Previous"
-                    , href (path (searchResult.currPage - 1))
+                li [ class "page-item" ]
+                    [ a
+                                          [ class "page-link"
+                                          , rel "previous"
+                                          , ariaLabel "Previous"
+                                          , href (path (searchResult.currPage - 1))
+                                          ]
+                                          [ text "Previous" ]
                     ]
-                    [ text "Previous" ]
+
 
             else
                 emptyHtml
 
         viewLowerGap : Html Msg
         viewLowerGap =
-            if searchResult.currPage > 1 then
-                span [ class "gap" ] [ text "…" ]
+            if searchResult.currPage > 2 then
+                li [ class "page-item" ]
+                    [ span [ class "page-link" ] [ text "…" ]
+                    ]
+
 
             else
                 emptyHtml
 
         viewCurrent : Html Msg
         viewCurrent =
-            em [ class "current", class "selected" ] [ text (String.fromInt searchResult.currPage) ]
+            li [ class "page-item", class "active" ]
+                [ em [ class "page-link" ] [ text (String.fromInt searchResult.currPage) ]
+                ]
+
 
         viewHigherGap : Html Msg
         viewHigherGap =
-            if searchResult.currPage < searchResult.maxPage then
-                span [ class "gap" ] [ text "…" ]
+            if searchResult.currPage < searchResult.maxPage - 1 then
+                li [ class "page-item" ]
+                    [ span [ class "page-link" ] [ text "…" ]
+                    ]
+
 
             else
                 emptyHtml
@@ -427,13 +435,16 @@ viewPagination query pageNumber pageSize searchResult =
         viewNext : Html Msg
         viewNext =
             if searchResult.currPage < searchResult.maxPage then
-                a
-                    [ class "next_page"
-                    , rel "next"
-                    , ariaLabel "Next"
-                    , href (path (searchResult.currPage + 1))
+                li [ class "page-item" ]
+                    [ a
+                                          [ class "page-link"
+                                          , rel "next"
+                                          , ariaLabel "Next"
+                                          , href (path (searchResult.currPage + 1))
+                                          ]
+                                          [ text "Next" ]
                     ]
-                    [ text "Next" ]
+
 
             else
                 emptyHtml
@@ -441,21 +452,24 @@ viewPagination query pageNumber pageSize searchResult =
         viewLast : Html Msg
         viewLast =
             if searchResult.currPage < searchResult.maxPage then
-                a
-                    [ class "last_page"
-                    , rel "last"
-                    , ariaLabel "Last"
-                    , href (path searchResult.maxPage)
+                li [ class "page-item" ]
+                    [ a
+                                          [ class "page-link"
+                                          , rel "last"
+                                          , ariaLabel "Last"
+                                          , href (path searchResult.maxPage)
+                                          ]
+                                          [ text (String.fromInt searchResult.maxPage) ]
+
                     ]
-                    [ text (String.fromInt searchResult.maxPage) ]
 
             else
                 emptyHtml
     in
     if searchResult.maxPage > 1 then
-        nav [ class "paginate-container", ariaLabel "Pagination" ]
+        nav [ ariaLabel "Pagination" ]
             [ div
-                [ class "pagination" ]
+                [ class "pagination", class "justify-content-center" ]
                 [ viewPrev
                 , viewFirst
                 , viewLowerGap

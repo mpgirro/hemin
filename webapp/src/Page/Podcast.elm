@@ -197,7 +197,7 @@ viewCoverImage podcast =
                 altText =
                     "cover image of podcast: " ++ maybeAsString podcast.title
             in
-            div [] [ img [ src image, alt altText, class "width-full" ] [] ]
+            div [] [ img [ src image, alt altText, class "img-fluid" ] [] ]
 
         Nothing ->
             emptyHtml
@@ -295,7 +295,7 @@ viewEpisodes webdata =
                     div [ class "mt-4" ]
                         [ div [ class "Subhead" ]
                             [ div [ class "Subhead-heading" ] [ text "Episodes" ] ]
-                        , ul [ class "list-style-none" ] <|
+                        , ul [ class "list-unstyled" ] <|
                             List.map viewEpisodeTeaser episodes
                         ]
 
@@ -311,16 +311,15 @@ viewEpisodeTeaser episode =
                         altText =
                             "cover image of " ++ maybeAsString episode.title
                     in
-                    div [ class "float-left", class "mr-3", class "mt-1", class "bg-gray" ]
-                        [ img
-                            [ src (maybeAsString episode.image)
-                            , alt ("cover image of episode: " ++ maybeAsString episode.title)
-                            , class "avatar"
-                            , width 56
-                            , height 56
-                            ]
-                            []
+                    img
+                        [ src (maybeAsString episode.image)
+                        , alt ("cover image of episode: " ++ maybeAsString episode.title)
+                        , class "mr-3"
+                        , class "mt-1"
+                        , width 56
+                        , height 56
                         ]
+                        []
 
                 Nothing ->
                     emptyHtml
@@ -328,7 +327,7 @@ viewEpisodeTeaser episode =
         viewEpisodeTeaserTitle : Html Msg
         viewEpisodeTeaserTitle =
             a
-                [ href (redirectToEpisode episode), class "f4" ]
+                [ href (redirectToEpisode episode), class "h4" ]
                 [ maybeAsText episode.title ]
 
         viewEpisodeTeaserDescription : Html Msg
@@ -366,14 +365,12 @@ viewEpisodeTeaser episode =
             in
             p [] [ text teaser ]
     in
-    li [ class "py-2" ]
-        [ div [ class "clearfix" ]
-            [ viewEpisodeTeaserCover
-            , div [ class "overflow-hidden" ]
-                [ viewEpisodeTeaserTitle
-                , br [] []
-                , viewEpisodeTeaserDescription
-                ]
+    li [ class "media", class "my-4" ]
+        [ viewEpisodeTeaserCover
+        , div [ class "overflow-hidden" ]
+            [ viewEpisodeTeaserTitle
+            , br [] []
+            , viewEpisodeTeaserDescription
             ]
         ]
 

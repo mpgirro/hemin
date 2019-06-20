@@ -154,9 +154,6 @@ viewSearchInput : Model -> Html Msg
 viewSearchInput model =
     input
         [ class "form-control"
-        , class "input"
-
-        --, height 44
         , attribute "style" "height: 44px !important"
         , type_ "text"
         , value (maybeAsString model.searchQuery)
@@ -170,10 +167,10 @@ viewSearchInput model =
 
 viewSearchButton : Model -> Html Msg
 viewSearchButton model =
-    span [ class "input-group-button" ]
+    div [ class "input-group-append" ]
         [ button
             [ class "btn"
-            , class "text-normal"
+            , class "btn-outline-primary"
             , type_ "button"
             , ariaLabel "Search"
             , onClick RedirectToSearch
@@ -221,7 +218,7 @@ viewNavButtonRow =
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline"
+                , class "btn-outline-primary"
                 , href ""
                 , role "button"
                 ]
@@ -234,7 +231,7 @@ viewNavButtonRow =
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline"
+                , class "btn-outline-primary"
                 , href ""
                 , role "button"
                 ]
@@ -247,7 +244,7 @@ viewNavButtonRow =
             [ a
                 [ class "btn"
                 , class "btn-large"
-                , class "btn-outline"
+                , class "btn-outline-primary"
                 , href "/discover"
                 , role "button"
                 ]
@@ -282,7 +279,7 @@ viewLatestEpisodes latestEpisodes =
                     , ariaLabel (tooltip episode)
                     ]
                     [ img
-                        [ class "width-full"
+                        [ class "img-thumbnail"
                         , class "avatar"
                         , src (maybeAsString episode.image)
                         , alt (maybeAsString episode.title)
@@ -341,7 +338,7 @@ viewNewestPodcast newestPodcasts =
                     , ariaLabel (tooltip podcast)
                     ]
                     [ img
-                        [ class "width-full"
+                        [ class "img-thumbnail"
                         , class "avatar"
                         , src (maybeAsString podcast.image)
                         , alt (maybeAsString podcast.title)

@@ -122,8 +122,7 @@ viewPodcastCover podcast =
             , ariaLabel tooltip
             ]
             [ img
-                [ class "width-full"
-                , class "avatar"
+                [ class "img-thumbnail"
                 , src (maybeAsString podcast.image)
                 , alt (maybeAsString podcast.title)
                 ]

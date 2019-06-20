@@ -31,7 +31,7 @@ type alias IndexDoc =
 indexDocDecoder : Decoder IndexDoc
 indexDocDecoder =
     Json.Decode.succeed IndexDoc
-        |> required "docType" string
+        |> required "documentType" string
         |> required "id" string
         |> optional "title" (maybe string) Nothing
         |> optional "link" (maybe string) Nothing

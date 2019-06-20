@@ -9,9 +9,9 @@ module Page.Propose exposing
 import Const
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, div, form, hr, input, p, span, text)
-import Html.Attributes exposing (autocomplete, class, disabled, multiple, placeholder, spellcheck, type_, value)
-import Html.Attributes.Aria exposing (ariaLabel)
+import Html exposing (Html, button, div, form, hr, input, p, span, text, label)
+import Html.Attributes exposing (autocomplete, class, disabled, multiple, placeholder, spellcheck, type_, value, for, id)
+import Html.Attributes.Aria exposing (ariaLabel, ariaDescribedby)
 import Html.Events exposing (on, onClick, onInput, onSubmit)
 import Http
 import Page.Error as ErrorPage
@@ -180,7 +180,9 @@ viewFeedUrlForm url =
             [ onSubmit FeedUrlPropose ]
             [ div [ class "input-group" ]
                 [ viewFeedUrlInput url
-                , viewFeedUrlSubmitButton
+                , div [ class "input-group-append" ]
+                    [ viewFeedUrlSubmitButton
+                    ]
                 ]
             ]
         ]
@@ -194,7 +196,6 @@ viewFeedUrlInput url =
     in
     input
         [ class "form-control"
-        , class "input-block"
         , type_ "text"
         , value url
         , placeholder placeholderValue
@@ -208,16 +209,14 @@ viewFeedUrlInput url =
 
 viewFeedUrlSubmitButton : Html Msg
 viewFeedUrlSubmitButton =
-    span [ class "input-group-button" ]
-        [ button
-            [ class "btn"
-            , class "text-normal"
-            , type_ "button"
-            , ariaLabel "Submit"
-            , onClick FeedUrlPropose
-            ]
-            [ text "Submit" ]
-        ]
+    button
+                [ class "btn"
+                , class "btn-outline-primary"
+                , type_ "button"
+                , ariaLabel "Submit"
+                , onClick FeedUrlPropose
+                ]
+                [ text "Submit" ]
 
 
 viewOpmlFileForm : String -> Html Msg
@@ -230,8 +229,10 @@ viewOpmlFileForm fileName =
             []
             [ div [ class "input-group" ]
                 [ viewOpmlFileInput fileName
-                , viewOpmlSelectButton
-                , viewOpmlUploadButton
+                , div [ class "input-group-append" ]
+                    [ viewOpmlSelectButton
+                    , viewOpmlUploadButton
+                    ]
                 ]
             ]
         ]
@@ -240,43 +241,39 @@ viewOpmlFileForm fileName =
 viewOpmlFileInput : String -> Html Msg
 viewOpmlFileInput fileName =
     input
-        [ class "form-control"
-        , class "input-block"
-        , type_ "text"
-        , value fileName
-        , autocomplete False
-        , spellcheck False
-        , disabled True
-        ]
-        []
+                             [ class "form-control"
+                             , type_ "text"
+                             , value fileName
+                             , autocomplete False
+                             , spellcheck False
+                             , disabled True
+                             ]
+                             []
+
 
 
 viewOpmlSelectButton : Html Msg
 viewOpmlSelectButton =
-    span [ class "input-group-button" ]
-        [ button
-            [ class "btn"
-            , class "text-normal"
-            , type_ "button"
-            , ariaLabel "Select"
-            , onClick OpmlSelectRequested
-            ]
-            [ text "Select" ]
-        ]
+    button
+                [ class "btn"
+                , class "btn-outline-primary"
+                , type_ "button"
+                , ariaLabel "Select"
+                , onClick OpmlSelectRequested
+                ]
+                [ text "Select" ]
 
 
 viewOpmlUploadButton : Html Msg
 viewOpmlUploadButton =
-    span [ class "input-group-button" ]
-        [ button
-            [ class "btn"
-            , class "text-normal"
-            , type_ "button"
-            , ariaLabel "Upload"
-            , onClick OpmlUploadRequested
-            ]
-            [ text "Upload" ]
-        ]
+    button
+                [ class "btn"
+                , class "btn-outline-primary"
+                , type_ "button"
+                , ariaLabel "Upload"
+                , onClick OpmlUploadRequested
+                ]
+                [ text "Upload" ]
 
 
 

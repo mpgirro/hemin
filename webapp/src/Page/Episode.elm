@@ -191,7 +191,7 @@ viewCoverImage episode =
                 altText =
                     "cover image of " ++ maybeAsString episode.title
             in
-            div [] [ img [ src image, alt altText, class "width-full" ] [] ]
+            div [] [ img [ src image, alt altText, class "img-fluid" ] [] ]
 
         Nothing ->
             emptyHtml
