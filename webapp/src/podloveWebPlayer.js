@@ -16,8 +16,10 @@ export default function configurePodloveWebPlayer(oConfig) {
     "controlChapters"
   ];
 
-  if (oConfig.chapters.length > 0) {
+  if (oConfig.chapters && oConfig.chapters.length > 0) {
     oConfig.visibleComponents.push("tabChapters");
+  } else if (oConfig.chapters && oConfig.chapters.length < 1) {
+    delete oConfig.chapters;
   }
 
   /*
