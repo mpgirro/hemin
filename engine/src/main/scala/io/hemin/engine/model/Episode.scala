@@ -1,6 +1,9 @@
 package io.hemin.engine.model
 
+import reactivemongo.bson.Macros.Annotations.Key
+
 final case class Episode(
+  @Key("_id")
   id: Option[String]                = None,
   podcastId: Option[String]         = None,
   podcastTitle: Option[String]      = None,

@@ -1,6 +1,9 @@
 package io.hemin.engine.model
 
+import reactivemongo.bson.Macros.Annotations.Key
+
 final case class Image (
+  @Key("_id")
   id: Option[String]          = None,
   url: Option[String]         = None,
   data: Option[String]        = None,

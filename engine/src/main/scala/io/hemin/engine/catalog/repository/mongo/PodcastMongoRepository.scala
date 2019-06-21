@@ -34,7 +34,7 @@ class PodcastMongoRepository(db: Future[DefaultDB],
     new HeminException(s"Saving Podcast to database was unsuccessful : $value")
 
   override def save(podcast: Podcast): Future[Podcast] = {
-    val query = BSONDocument("id" -> podcast.id)
+    val query = BSONDocument("_id" -> podcast.id)
     collection.flatMap { _
       .update(query, podcast, upsert = true)
       .flatMap { _ => findOne(podcast.id)
@@ -48,7 +48,7 @@ class PodcastMongoRepository(db: Future[DefaultDB],
 
   override def findOne(id: String): Future[Option[Podcast]] = {
     log.debug("Request to get Podcast (ID) : {}", id)
-    findOne(Query("id" -> toBsonS(id)))
+    findOne(Query("_id" -> toBsonS(id)))
   }
 
   def findAllRegistrationCompleteAsTeaser(pageNumber: Int, pageSize: Int): Future[List[Podcast]] = {

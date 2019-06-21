@@ -34,7 +34,7 @@ class ImageMongoRepository(db: Future[DefaultDB],
     new HeminException(s"Saving Image to database was unsuccessful : $value")
 
   override def save(image: Image): Future[Image] = {
-    val query = BSONDocument("id" -> image.id)
+    val query = BSONDocument("_id" -> image.id)
     collection.flatMap { _
       .update(query, image, upsert = true)
       .flatMap { _ =>
@@ -49,7 +49,7 @@ class ImageMongoRepository(db: Future[DefaultDB],
 
   override def findOne(id: String): Future[Option[Image]] = {
     log.debug("Request to get Image (ID) : {}", id)
-    findOne(Query("id" -> toBsonS(id)))
+    findOne(Query("_id" -> toBsonS(id)))
   }
 
   /*

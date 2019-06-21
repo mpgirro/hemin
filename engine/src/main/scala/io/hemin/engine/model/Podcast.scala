@@ -1,6 +1,9 @@
 package io.hemin.engine.model
 
+import reactivemongo.bson.Macros.Annotations.Key
+
 final case class Podcast(
+  @Key("_id")
   id: Option[String]                = None,
   title: Option[String]             = None,
   link: Option[String]              = None,

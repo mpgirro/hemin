@@ -33,7 +33,7 @@ class FeedMongoRepository(db: Future[DefaultDB],
     new HeminException(s"Saving Feed to database was unsuccessful : $value")
 
   override def save(feed: Feed): Future[Feed] = {
-    val query = BSONDocument("id" -> feed.id)
+    val query = BSONDocument("_id" -> feed.id)
     collection.flatMap { _
       .update(query, feed, upsert = true)
       .flatMap { _ =>
@@ -48,7 +48,7 @@ class FeedMongoRepository(db: Future[DefaultDB],
 
   override def findOne(id: String): Future[Option[Feed]] = {
     log.debug("Request to get Feed (ID) : {}", id)
-    findOne(Query("id" -> toBsonS(id)))
+    findOne(Query("_id" -> toBsonS(id)))
   }
 
   def findOneByUrlAndPodcastId(url: String, podcastId: String): Future[Option[Feed]] = {

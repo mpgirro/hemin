@@ -1,6 +1,9 @@
 package io.hemin.engine.model
 
+import reactivemongo.bson.Macros.Annotations.Key
+
 final case class Feed(
+  @Key("_id")
   id: Option[String]                  = None,
   primary: Boolean                    = false,
   podcastId: Option[String]           = None,

@@ -11,7 +11,7 @@ object IndexMapper {
   def toDocument(src: Podcast): Try[Document] = Option(src)
     .map { s =>
       Document(
-        documentType   = Some(s.documentType),
+        documentType   = Some(s.documentType.entryName),
         id             = s.id,
         title          = s.title,
         link           = s.link,
@@ -33,7 +33,7 @@ object IndexMapper {
   def toDocument(src: Episode): Try[Document] = Option(src)
     .map { s =>
       Document(
-        documentType   = Some(s.documentType),
+        documentType   = Some(s.documentType.entryName),
         id             = s.id,
         title          = s.title,
         link           = s.link,
@@ -55,7 +55,7 @@ object IndexMapper {
   def toDocument(src: Person): Try[Document] = Option(src)
     .map { s =>
       Document(
-        documentType   = Some(s.documentType),
+        documentType   = Some(s.documentType.entryName),
         id             = None,
         title          = s.name,
         link           = None,
