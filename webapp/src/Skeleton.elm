@@ -28,9 +28,9 @@ type alias Page msg =
 -- VIEW
 
 
-view : String -> Html msg -> Page msg
-view title body =
-    buildPage title (template body)
+view : String -> Html msg -> Html msg -> Html msg -> Page msg
+view title mainContent leftContent rightContent =
+    buildPage title (template mainContent leftContent rightContent)
 
 
 viewLink : Maybe String -> Html msg
@@ -74,21 +74,18 @@ buildPage title body =
     }
 
 
-template : Html msg -> List (Html msg)
-template mainContent =
-    let
-        leftContent = text ""
-
-        rightContent = text ""
-    in
-    [ div [ class "hemin", class "container-fluid" ]
-        [ navbar
-        , div [ class "row" ]
-            [ div [ class "col-2" ] [ leftContent ]
-            , div [ class "col-8" ] [ mainContent ]
-            , div [ class "col-2" ] [ rightContent ]
-            ]
-        , footer
+template : Html msg -> Html msg -> Html msg -> List (Html msg)
+template mainContent leftContent rightContent =
+    [ div [ class "hemin" ]
+        [ div [ class "container-fluid" ]
+                  [ navbar
+                  , div [ class "row" ]
+                      [ div [ class "col-2" ] [ leftContent ]
+                      , div [ class "col-8" ] [ mainContent ]
+                      , div [ class "col-2" ] [ rightContent ]
+                      ]
+                  , footer
+                  ]
         ]
     ]
 

@@ -9,7 +9,7 @@ module Page.Propose exposing
 import Const
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, div, form, hr, input, p, span, text, label)
+import Html exposing (Html, button, div, form, hr, input, p, span, text, label, h1, h2, h3, h4, h5, h6)
 import Html.Attributes exposing (autocomplete, class, disabled, multiple, placeholder, spellcheck, type_, value, for, id)
 import Html.Attributes.Aria exposing (ariaLabel, ariaDescribedby)
 import Html.Events exposing (on, onClick, onInput, onSubmit)
@@ -171,20 +171,24 @@ view model =
 viewFeedUrlForm : String -> Html Msg
 viewFeedUrlForm url =
     div []
-        [ p []
-            [ text "Please submit the URL to the feed of the podcast that you want to add to "
-            , text Const.siteName
-            , text ":"
-            ]
+        [ div [ class "subhead" ]
+                  [ h2 [ class "subhead-heading" ]
+                      [ text "Feed URL" ]
+                  , p [ class "subhead-description" ]
+                      [ text "Please submit the URL to the feed of the podcast that you want to add to "
+                      , text Const.siteName
+                      , text ":"
+                      ]
+                  ]
         , Html.form
-            [ onSubmit FeedUrlPropose ]
-            [ div [ class "input-group" ]
-                [ viewFeedUrlInput url
-                , div [ class "input-group-append" ]
-                    [ viewFeedUrlSubmitButton
-                    ]
-                ]
-            ]
+                      [ onSubmit FeedUrlPropose ]
+                      [ div [ class "input-group" ]
+                          [ viewFeedUrlInput url
+                          , div [ class "input-group-append" ]
+                              [ viewFeedUrlSubmitButton
+                              ]
+                          ]
+                      ]
         ]
 
 

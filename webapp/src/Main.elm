@@ -29,6 +29,7 @@ import Podlove.SubscribeButton as PodloveButton
 import Router exposing (Route(..), fromUrl, parser)
 import Skeleton exposing (Page)
 import Url exposing (Url)
+import Util exposing (emptyHtml)
 
 
 
@@ -283,7 +284,7 @@ view model =
         ( title, body ) =
             viewContent model
     in
-    Skeleton.view title body
+    Skeleton.view title body emptyHtml emptyHtml
 
 
 viewContent : Model -> ( String, Html Msg )

@@ -3,3 +3,21 @@
     padding-left: 0;
     padding-right: 0;
 }
+.hemin .subhead {
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    border-bottom: 1px #e1e4e8 solid;
+}
+
+.hemin .subhead-heading {
+
+}
+
+.hemin .subhead-description {
+    color: #586069;
+    margin-bottom: 0;
+}
+
+.hemin .img-thumbnail {
+    padding: 0;
+}
