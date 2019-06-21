@@ -64,6 +64,7 @@ viewLoadingText =
     text "Loading ..."
 
 
+
 -- INTERNAL
 
 
@@ -78,14 +79,14 @@ template : Html msg -> Html msg -> Html msg -> List (Html msg)
 template mainContent leftContent rightContent =
     [ div [ class "hemin" ]
         [ div [ class "container-fluid" ]
-                  [ navbar
-                  , div [ class "row" ]
-                      [ div [ class "col-2" ] [ leftContent ]
-                      , div [ class "col-8" ] [ mainContent ]
-                      , div [ class "col-2" ] [ rightContent ]
-                      ]
-                  , footer
-                  ]
+            [ navbar
+            , div [ class "row" ]
+                [ div [ class "col-2" ] [ leftContent ]
+                , div [ class "col-8" ] [ mainContent ]
+                , div [ class "col-2" ] [ rightContent ]
+                ]
+            , footer
+            ]
         ]
     ]
 
@@ -106,7 +107,6 @@ navbar =
                 , a [ class "nav-item", class "nav-link", href "/propose" ] [ text "+feed" ]
                 ]
             ]
-
         ]
 
 

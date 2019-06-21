@@ -26,7 +26,7 @@ import Router exposing (redirectByIndexDocType)
 import Skeleton exposing (Page)
 import String.Extra
 import Url exposing (Url)
-import Util exposing (buildSearchUrl, emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, viewInnerHtml, prettyDateHtml)
+import Util exposing (buildSearchUrl, emptyHtml, maybeAsString, maybeAsText, maybePageNumberParam, maybePageSizeParam, maybeQueryParam, prettyDateHtml, viewInnerHtml)
 
 
 
@@ -236,7 +236,7 @@ viewIndexDoc doc =
             , p []
                 [ viewDocType doc
                 , viewPubDate doc
-                 ]
+                ]
             , viewStrippedDescription doc
             ]
         ]
@@ -245,13 +245,13 @@ viewIndexDoc doc =
 viewCoverImage : IndexDoc -> Html Msg
 viewCoverImage doc =
     img
-                [ src (maybeAsString doc.image)
-                , alt ("cover image of " ++ maybeAsString doc.title)
-                , class "mr-3"
-                , width 72
-                , height 72
-                ]
-                []
+        [ src (maybeAsString doc.image)
+        , alt ("cover image of " ++ maybeAsString doc.title)
+        , class "mr-3"
+        , width 72
+        , height 72
+        ]
+        []
 
 
 viewStrippedDescription : IndexDoc -> Html Msg
@@ -277,15 +277,16 @@ viewIndexDocTitleAsLink doc =
 
 viewIndexDocSubtitle : IndexDoc -> Html Msg
 viewIndexDocSubtitle doc =
-    case (doc.docType, doc.podcastTitle) of
-        ("podcast", _) ->
+    case ( doc.docType, doc.podcastTitle ) of
+        ( "podcast", _ ) ->
             emptyHtml
 
-        ("episode", Just podcastTitle) ->
+        ( "episode", Just podcastTitle ) ->
             p [ class "note" ] [ text podcastTitle ]
 
-        (_, _) ->
+        ( _, _ ) ->
             emptyHtml
+
 
 viewDocType : IndexDoc -> Html Msg
 viewDocType doc =
@@ -340,14 +341,13 @@ viewPagination query pageNumber pageSize searchResult =
             if searchResult.currPage > 1 then
                 li [ class "page-item" ]
                     [ a
-                                          [ class "page-link"
-                                          , rel "first"
-                                          , ariaLabel "First"
-                                          , href (path 1)
-                                          ]
-                                          [ text "1" ]
+                        [ class "page-link"
+                        , rel "first"
+                        , ariaLabel "First"
+                        , href (path 1)
+                        ]
+                        [ text "1" ]
                     ]
-
 
             else
                 emptyHtml
@@ -357,14 +357,13 @@ viewPagination query pageNumber pageSize searchResult =
             if searchResult.currPage > 1 then
                 li [ class "page-item" ]
                     [ a
-                                          [ class "page-link"
-                                          , rel "previous"
-                                          , ariaLabel "Previous"
-                                          , href (path (searchResult.currPage - 1))
-                                          ]
-                                          [ text "Previous" ]
+                        [ class "page-link"
+                        , rel "previous"
+                        , ariaLabel "Previous"
+                        , href (path (searchResult.currPage - 1))
+                        ]
+                        [ text "Previous" ]
                     ]
-
 
             else
                 emptyHtml
@@ -376,7 +375,6 @@ viewPagination query pageNumber pageSize searchResult =
                     [ span [ class "page-link" ] [ text "…" ]
                     ]
 
-
             else
                 emptyHtml
 
@@ -386,14 +384,12 @@ viewPagination query pageNumber pageSize searchResult =
                 [ em [ class "page-link" ] [ text (String.fromInt searchResult.currPage) ]
                 ]
 
-
         viewHigherGap : Html Msg
         viewHigherGap =
             if searchResult.currPage < searchResult.maxPage - 1 then
                 li [ class "page-item" ]
                     [ span [ class "page-link" ] [ text "…" ]
                     ]
-
 
             else
                 emptyHtml
@@ -403,14 +399,13 @@ viewPagination query pageNumber pageSize searchResult =
             if searchResult.currPage < searchResult.maxPage then
                 li [ class "page-item" ]
                     [ a
-                                          [ class "page-link"
-                                          , rel "next"
-                                          , ariaLabel "Next"
-                                          , href (path (searchResult.currPage + 1))
-                                          ]
-                                          [ text "Next" ]
+                        [ class "page-link"
+                        , rel "next"
+                        , ariaLabel "Next"
+                        , href (path (searchResult.currPage + 1))
+                        ]
+                        [ text "Next" ]
                     ]
-
 
             else
                 emptyHtml
@@ -420,13 +415,12 @@ viewPagination query pageNumber pageSize searchResult =
             if searchResult.currPage < searchResult.maxPage then
                 li [ class "page-item" ]
                     [ a
-                                          [ class "page-link"
-                                          , rel "last"
-                                          , ariaLabel "Last"
-                                          , href (path searchResult.maxPage)
-                                          ]
-                                          [ text (String.fromInt searchResult.maxPage) ]
-
+                        [ class "page-link"
+                        , rel "last"
+                        , ariaLabel "Last"
+                        , href (path searchResult.maxPage)
+                        ]
+                        [ text (String.fromInt searchResult.maxPage) ]
                     ]
 
             else

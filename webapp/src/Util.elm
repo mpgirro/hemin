@@ -127,11 +127,8 @@ buildSearchUrl query pageNumber pageSize =
 
             else
                 "?" ++ params
-
     in
     (++) "/search" urlQuery
-
-
 
 
 emptyHtml : Html msg

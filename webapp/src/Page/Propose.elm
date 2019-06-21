@@ -9,9 +9,9 @@ module Page.Propose exposing
 import Const
 import File exposing (File)
 import File.Select as Select
-import Html exposing (Html, button, div, form, hr, input, p, span, text, label, h1, h2, h3, h4, h5, h6)
-import Html.Attributes exposing (autocomplete, class, disabled, multiple, placeholder, spellcheck, type_, value, for, id)
-import Html.Attributes.Aria exposing (ariaLabel, ariaDescribedby)
+import Html exposing (Html, button, div, form, h1, h2, h3, h4, h5, h6, hr, input, label, p, span, text)
+import Html.Attributes exposing (autocomplete, class, disabled, for, id, multiple, placeholder, spellcheck, type_, value)
+import Html.Attributes.Aria exposing (ariaDescribedby, ariaLabel)
 import Html.Events exposing (on, onClick, onInput, onSubmit)
 import Http
 import Page.Error as ErrorPage
@@ -172,23 +172,23 @@ viewFeedUrlForm : String -> Html Msg
 viewFeedUrlForm url =
     div []
         [ div [ class "subhead" ]
-                  [ h2 [ class "subhead-heading" ]
-                      [ text "Feed URL" ]
-                  , p [ class "subhead-description" ]
-                      [ text "Please submit the URL to the feed of the podcast that you want to add to "
-                      , text Const.siteName
-                      , text ":"
-                      ]
-                  ]
+            [ h2 [ class "subhead-heading" ]
+                [ text "Feed URL" ]
+            , p [ class "subhead-description" ]
+                [ text "Please submit the URL to the feed of the podcast that you want to add to "
+                , text Const.siteName
+                , text ":"
+                ]
+            ]
         , Html.form
-                      [ onSubmit FeedUrlPropose ]
-                      [ div [ class "input-group" ]
-                          [ viewFeedUrlInput url
-                          , div [ class "input-group-append" ]
-                              [ viewFeedUrlSubmitButton
-                              ]
-                          ]
-                      ]
+            [ onSubmit FeedUrlPropose ]
+            [ div [ class "input-group" ]
+                [ viewFeedUrlInput url
+                , div [ class "input-group-append" ]
+                    [ viewFeedUrlSubmitButton
+                    ]
+                ]
+            ]
         ]
 
 
@@ -214,13 +214,13 @@ viewFeedUrlInput url =
 viewFeedUrlSubmitButton : Html Msg
 viewFeedUrlSubmitButton =
     button
-                [ class "btn"
-                , class "btn-outline-primary"
-                , type_ "button"
-                , ariaLabel "Submit"
-                , onClick FeedUrlPropose
-                ]
-                [ text "Submit" ]
+        [ class "btn"
+        , class "btn-outline-primary"
+        , type_ "button"
+        , ariaLabel "Submit"
+        , onClick FeedUrlPropose
+        ]
+        [ text "Submit" ]
 
 
 viewOpmlFileForm : String -> Html Msg
@@ -245,39 +245,38 @@ viewOpmlFileForm fileName =
 viewOpmlFileInput : String -> Html Msg
 viewOpmlFileInput fileName =
     input
-                             [ class "form-control"
-                             , type_ "text"
-                             , value fileName
-                             , autocomplete False
-                             , spellcheck False
-                             , disabled True
-                             ]
-                             []
-
+        [ class "form-control"
+        , type_ "text"
+        , value fileName
+        , autocomplete False
+        , spellcheck False
+        , disabled True
+        ]
+        []
 
 
 viewOpmlSelectButton : Html Msg
 viewOpmlSelectButton =
     button
-                [ class "btn"
-                , class "btn-outline-primary"
-                , type_ "button"
-                , ariaLabel "Select"
-                , onClick OpmlSelectRequested
-                ]
-                [ text "Select" ]
+        [ class "btn"
+        , class "btn-outline-primary"
+        , type_ "button"
+        , ariaLabel "Select"
+        , onClick OpmlSelectRequested
+        ]
+        [ text "Select" ]
 
 
 viewOpmlUploadButton : Html Msg
 viewOpmlUploadButton =
     button
-                [ class "btn"
-                , class "btn-outline-primary"
-                , type_ "button"
-                , ariaLabel "Upload"
-                , onClick OpmlUploadRequested
-                ]
-                [ text "Upload" ]
+        [ class "btn"
+        , class "btn-outline-primary"
+        , type_ "button"
+        , ariaLabel "Upload"
+        , onClick OpmlUploadRequested
+        ]
+        [ text "Upload" ]
 
 
 

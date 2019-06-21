@@ -14,7 +14,7 @@ import Data.DatabaseStats exposing (DatabaseStats)
 import Data.Episode exposing (Episode)
 import Data.Podcast exposing (Podcast)
 import FeatherIcons
-import Html exposing (Html, a, button, div, img, input, li, p, span, text, ul, h1, h2)
+import Html exposing (Html, a, button, div, h1, h2, img, input, li, p, span, text, ul)
 import Html.Attributes exposing (alt, attribute, autocomplete, class, height, href, placeholder, spellcheck, src, type_, value, width)
 import Html.Attributes.Aria exposing (ariaLabel, role)
 import Html.Events exposing (onClick, onInput, onSubmit)
@@ -81,7 +81,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         UpdateModel m ->
-            ( m, Cmd.none)
+            ( m, Cmd.none )
 
         GotNewestPodcastListData newestPodcasts ->
             ( { model | newestPodcasts = newestPodcasts }, Cmd.none )
@@ -93,11 +93,11 @@ update msg model =
             ( { model | databaseStats = stats }, Cmd.none )
 
         RedirectToSearch ->
-            case (model.searchQuery, model.navigationKey) of
-                (Just query, Just key) ->
+            case ( model.searchQuery, model.navigationKey ) of
+                ( Just query, Just key ) ->
                     ( model, Browser.Navigation.pushUrl key (buildSearchUrl (Just query) Nothing Nothing) )
 
-                (_, _) ->
+                ( _, _ ) ->
                     ( model, Cmd.none )
 
 
@@ -125,12 +125,14 @@ view model =
     in
     ( title, body )
 
+
 viewPageTitle : Html Msg
 viewPageTitle =
     div [ class "text-center" ]
         [ h1 [ class "f1" ] [ text Const.siteName ]
         , h2 [ class "f3" ] [ text "Podcast Catalog & Search Engine" ]
         ]
+
 
 viewSearchForm : Model -> Html Msg
 viewSearchForm model =
@@ -186,21 +188,22 @@ viewSearchNote dbStats =
     let
         info : DatabaseStats -> String
         info stats =
-            (String.fromInt stats.episodeCount) ++ " episodes in " ++ (String.fromInt stats.podcastCount) ++ " podcasts"
+            String.fromInt stats.episodeCount ++ " episodes in " ++ String.fromInt stats.podcastCount ++ " podcasts"
     in
     case dbStats of
         RemoteData.NotAsked ->
             Skeleton.viewInitializingText
 
         RemoteData.Loading ->
-           Skeleton.viewLoadingText
+            Skeleton.viewLoadingText
 
         RemoteData.Failure error ->
             --ErrorPage.viewHttpFailure error
             emptyHtml
 
         RemoteData.Success stats ->
-            div [ class "note"
+            div
+                [ class "note"
                 , class "text-center"
                 , class "mt-2"
                 ]

@@ -70,13 +70,15 @@ update msg model =
                 cmd : Cmd Msg
                 cmd =
                     sendPodlovePlayerModelToJs mod
-
             in
             ( mod, cmd )
 
         PodlovePlayerMsg playerMsg ->
             updatePodlovePlayer model playerMsg
-            --( model, Cmd.none )
+
+
+
+--( model, Cmd.none )
 
 
 updatePodlovePlayer : Model -> PodlovePlayer.Msg -> ( Model, Cmd Msg )
@@ -96,7 +98,10 @@ updatePodlovePlayer model playerMsg =
             PodlovePlayer.update playerMsg playerModel
     in
     ( model, wrapPodlovePlayerMsg m )
-    --( model, Cmd.none )
+
+
+
+--( model, Cmd.none )
 
 
 sendPodlovePlayerModelToJs : Model -> Cmd Msg
@@ -169,18 +174,17 @@ viewPodcastTitle episode =
                     "Go to Podcast"
     in
     div
-                    [ class "text-center"
-                    , class "f4"
-                    , class "lh-condensed-ultra"
-                    , class "mb-2"
-                    ]
-                    [ a
-                        [ href (redirectToParent episode)
-                        , class "link-gray"
-                        ]
-                        [ text txt ]
-                    ]
-
+        [ class "text-center"
+        , class "f4"
+        , class "lh-condensed-ultra"
+        , class "mb-2"
+        ]
+        [ a
+            [ href (redirectToParent episode)
+            , class "link-gray"
+            ]
+            [ text txt ]
+        ]
 
 
 viewCoverImage : Episode -> Html Msg
@@ -276,12 +280,12 @@ viewItunesDuration episode =
     let
         value : Html Msg
         value =
-           case episode.itunes.duration of
-            Just duration ->
-                text duration
+            case episode.itunes.duration of
+                Just duration ->
+                    text duration
 
-            Nothing ->
-                text "n/a"
+                Nothing ->
+                    text "n/a"
     in
     span [ class "mr-2" ] [ text "duration:", value ]
 
@@ -294,6 +298,7 @@ viewPodlovePlayer episode =
             episodeToPodlovePlayerModel episode
     in
     wrapPodloveButtonHtml (PodlovePlayer.view playerModel)
+
 
 
 --- HTTP ---
@@ -346,21 +351,22 @@ modelToPodlovePlayerModel model =
         _ ->
             PodlovePlayer.emptyModel
 
+
 episodeToPodlovePlayerModel : Episode -> PodlovePlayer.Model
 episodeToPodlovePlayerModel episode =
     let
         toPlayerModel : Episode -> PodlovePlayer.Model
         toPlayerModel e =
             -- TODO
-             { duration = episode.itunes.duration
-             , audio =
+            { duration = episode.itunes.duration
+            , audio =
                 { url = episode.enclosure.url
                 , size = episode.enclosure.length
                 , mimeType = episode.enclosure.typ
                 }
-              -- TODO set the chapters; add them to episode
-              , chapters = []
-              }
 
+            -- TODO set the chapters; add them to episode
+            , chapters = []
+            }
     in
     toPlayerModel episode
