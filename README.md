@@ -17,29 +17,7 @@
 <!--[![GitHub release](https://img.shields.io/github/release/mpgirro/hemin.svg)](https://github.com/mpgirro/hemin/releases/)-->
 
 
-HEMIN is a podcast catalog & search engine infrastructure. It's engine is written in [Scala](https://www.scala-lang.org), uses [MongoDB](https://www.mongodb.com) to store the podcast/episode/feed catalog, and indexes the data with [Solr](http://lucene.apache.org/solr/). The REST API relies on the [Play](https://www.playframework.com) framework for routing and JSON. The server is fully asynchronous, and makes heavy use of [Akka](https://akka.io) actors and [Scala Futures](https://docs.scala-lang.org/overviews/core/futures.html). The current web client is written in ~~[Typescript](https://www.typescriptlang.org) and builds on the [Angular](https://angular.io) framework~~ [Elm](https://elm-lang.org).
-
-
-### ⚠️ Early development status warning
-
-
-The Hemin infrastructure is still in the early development phase and not yet ready for full productive use.
-
-The system currently supports the following standards:
-
-  * Syndication feeds in [RSS 2.0](https://cyber.harvard.edu/rss/rss.html) or Atom ([RFC 4287](https://tools.ietf.org/html/rfc4287)) format
-  * Metadata from Apple's [Podcasts Connect](https://help.apple.com/itc/podcasts_connect/#/itcb54353390) XML namespace ("iTunes tags")
-  * Chapter marks in [Podlove Simple Chapter](https://podlove.org/simple-chapters/) format
-
-Support for the following standards is planned:
-
-  * Paged Feeds ([RFC 5005](https://tools.ietf.org/html/rfc5005))
-  * Add feeds by importing [OPML](http://dev.opml.org) files
-  * Provide an [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification) for [API v1](docs/api/v1.md)
-  * Adhere to [JSON:API](https://jsonapi.org) standards in [API v2](docs/api/v2.md)
-  * Provide an [OpenAPI specification](https://github.com/OAI/OpenAPI-Specification) for [API v2](docs/api/v2.md)
-
-Further roadmap information for the subprojects is documented in their respective [GitHub projects](https://github.com/mpgirro/hemin/projects) board.
+Hemin is a podcast catalog & search engine infrastructure. It's engine is written in [Scala](https://www.scala-lang.org), uses [MongoDB](https://www.mongodb.com) to store the podcast/episode/feed catalog, and indexes the data with [Solr](http://lucene.apache.org/solr/). The REST API relies on the [Play](https://www.playframework.com) framework for routing and JSON. The server is fully asynchronous, and makes heavy use of [Akka](https://akka.io) actors and [Scala Futures](https://docs.scala-lang.org/overviews/core/futures.html). The current web client is written in ~~[Typescript](https://www.typescriptlang.org) and builds on the [Angular](https://angular.io) framework~~ [Elm](https://elm-lang.org).
 
 
 ## WebApp ([hemin.io](https://hemin.io))
