@@ -20,7 +20,7 @@
 Hemin is a podcast catalog & search engine infrastructure. It's engine is written in [Scala](https://www.scala-lang.org), uses [MongoDB](https://www.mongodb.com) to store the podcast/episode/feed catalog, and indexes the data with [Solr](http://lucene.apache.org/solr/). The REST API relies on the [Play](https://www.playframework.com) framework for routing and JSON. The server is fully asynchronous, and makes heavy use of [Akka](https://akka.io) actors and [Scala Futures](https://docs.scala-lang.org/overviews/core/futures.html). The current web client is written in ~~[Typescript](https://www.typescriptlang.org) and builds on the [Angular](https://angular.io) framework~~ [Elm](https://elm-lang.org).
 
 
-## WebApp ([hemin.io](https://hemin.io))
+## WebApp
 
 
 A WebApp is available at [hemin.io](https://hemin.io)
@@ -35,7 +35,7 @@ There are several different frontend variant implementations for the Hemin syste
   -->
 
 
-## RESTful API ([api.hemin.io](https://api.hemin.io))
+## RESTful API
 
 
 The base for all REST endpoints is: [https://api.hemin.io/api/v1](https://api.hemin.io/api/v1)
